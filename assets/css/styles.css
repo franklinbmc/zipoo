@@ -2100,6 +2100,13 @@ textarea {
   overflow: auto;
 }
 
+.inner-topbar h1 {
+  margin: 0;
+  color: var(--color-navy);
+  font-size: 1.15rem;
+  font-weight: 900;
+}
+
 .topbar-spacer {
   width: 44px;
   height: 44px;
@@ -2108,52 +2115,68 @@ textarea {
 .settings-page {
   display: grid;
   align-content: start;
-  gap: 18px;
+  gap: 12px;
   width: min(640px, 100%);
   margin: 0 auto;
   padding: 16px 0 32px;
 }
 
-.settings-title-block {
+.settings-accordion {
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.settings-accordion summary {
   display: grid;
-  gap: 4px;
-}
-
-.settings-title-block h1 {
-  margin: 0;
-  color: var(--color-navy);
-  font-size: 1.75rem;
-}
-
-.settings-list-group {
-  display: grid;
-  gap: 9px;
-}
-
-.settings-list-group h2 {
-  display: flex;
+  grid-template-columns: minmax(0, 1fr) 20px;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
-  margin: 0;
-  color: var(--color-muted);
-  font-size: 0.85rem;
+  min-height: 54px;
+  padding: 0 12px;
+  color: var(--color-text);
+  cursor: pointer;
+  list-style: none;
   font-weight: 900;
-  text-transform: uppercase;
 }
 
-.settings-list-group h2 small {
+.settings-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-accordion summary small {
+  display: block;
+  margin-top: 2px;
   color: var(--color-muted);
   font-size: 0.78rem;
-  text-transform: none;
+  font-weight: 800;
+}
+
+.settings-accordion summary svg,
+.settings-list-row svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--color-muted);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 54px;
+}
+
+.settings-accordion[open] summary > svg {
+  transform: rotate(90deg);
 }
 
 .settings-list {
   display: grid;
   overflow: hidden;
-  border: 1px solid var(--color-line);
-  border-radius: 12px;
   background: #fff;
+}
+
+.flush-list {
+  border-top: 1px solid var(--color-line);
+  border-radius: 0;
 }
 
 .settings-list-row {
@@ -2187,16 +2210,6 @@ textarea {
   font-size: 0.9rem;
   font-weight: 800;
   text-align: right;
-}
-
-.settings-list-row svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: var(--color-muted);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 54px;
 }
 
 .settings-list-row.current strong {

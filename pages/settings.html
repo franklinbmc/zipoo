@@ -9,32 +9,27 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=38">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=39">
 </head>
 <body>
   <div class="app-shell settings-page-shell">
-    <header class="topbar app-topbar">
+    <header class="topbar app-topbar inner-topbar">
       <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
         <svg viewBox="0 0 512 512" aria-hidden="true">
           <path d="M328 112L184 256l144 144" />
         </svg>
       </a>
-      <a class="brand" href="/" aria-label="Zipoo home">
-        <span class="brand-mark">Z</span>
-        <span class="brand-name">Zipoo</span>
-      </a>
+      <h1>Settings</h1>
       <span class="topbar-spacer" aria-hidden="true"></span>
     </header>
 
     <main class="settings-page" data-settings-page>
-      <section class="settings-title-block">
-        <span class="eyebrow">Account</span>
-        <h1>Settings</h1>
-      </section>
-
-      <section class="settings-list-group">
-        <h2>Account details</h2>
-        <div class="settings-list">
+      <details class="settings-accordion" open>
+        <summary>
+          <span>Account details</span>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+        </summary>
+        <div class="settings-list flush-list">
           <div class="settings-list-row">
             <span>Name</span>
             <strong data-settings-name>-</strong>
@@ -56,16 +51,22 @@
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </div>
         </div>
-      </section>
+      </details>
 
-      <section class="settings-list-group">
-        <h2>My Businesses <small data-business-count>0 registered</small></h2>
-        <div class="settings-list" data-settings-business-list></div>
-      </section>
+      <details class="settings-accordion">
+        <summary>
+          <span>My Businesses <small data-business-count>0 registered</small></span>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+        </summary>
+        <div class="settings-list flush-list" data-settings-business-list></div>
+      </details>
 
-      <section class="settings-list-group">
-        <h2>Create new business</h2>
-        <form class="settings-list business-create-form" data-business-create-form>
+      <details class="settings-accordion">
+        <summary>
+          <span>Create new business</span>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+        </summary>
+        <form class="settings-list flush-list business-create-form" data-business-create-form>
           <label class="settings-list-row field-row">
             <span>Business name</span>
             <input type="text" name="business_name" placeholder="New company" required>
@@ -83,7 +84,7 @@
           <p class="inline-error" hidden data-business-create-error></p>
           <button class="btn btn-primary full" type="submit">Create business</button>
         </form>
-      </section>
+      </details>
     </main>
   </div>
 
