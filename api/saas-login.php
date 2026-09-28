@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/db.php';
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -24,10 +26,7 @@ if ($email === '' || $password === '') {
 }
 
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=zipoo;charset=utf8mb4', 'root', '', [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    $pdo = db();
     $stmt = $pdo->prepare('SELECT id, full_name, email, password_hash FROM tbl_saas_admins WHERE email = :email AND is_active = 1 LIMIT 1');
     $stmt->execute([':email' => $email]);
     $admin = $stmt->fetch();

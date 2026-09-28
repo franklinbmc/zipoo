@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/db.php';
+
 session_start();
 
 header('Content-Type: application/json; charset=utf-8');
@@ -29,10 +31,7 @@ if (strlen($otp) !== 6) {
 }
 
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=zipoo;charset=utf8mb4', 'root', '', [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    $pdo = db();
 
     $stmt = $pdo->prepare(
         'SELECT id, otp_hash

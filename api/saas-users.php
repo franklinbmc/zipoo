@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/db.php';
+
 session_start();
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -12,10 +14,7 @@ if (empty($_SESSION['saas_admin_id'])) {
 }
 
 try {
-    $pdo = new PDO('mysql:host=localhost;dbname=zipoo;charset=utf8mb4', 'root', '', [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    $pdo = db();
     $query = trim((string) ($_GET['q'] ?? ''));
     $sql = 'SELECT u.id, u.full_name, u.phone, u.email, u.created_at, b.business_name, b.account_status
             FROM tbl_users u

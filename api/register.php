@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/db.php';
+
 session_start();
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -173,15 +175,7 @@ if (!preg_match('/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/', $password)) {
 }
 
 try {
-    $pdo = new PDO(
-        'mysql:host=localhost;dbname=zipoo;charset=utf8mb4',
-        'root',
-        '',
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]
-    );
+    $pdo = db();
     ensure_otp_table($pdo);
 
     $location = $pdo->prepare(

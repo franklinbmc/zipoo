@@ -1,19 +1,13 @@
 <?php
 declare(strict_types=1);
 
+require_once __DIR__ . '/db.php';
+
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
 
 try {
-    $pdo = new PDO(
-        'mysql:host=localhost;dbname=zipoo;charset=utf8mb4',
-        'root',
-        '',
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]
-    );
+    $pdo = db();
 
     $rows = $pdo
         ->query('SELECT region_code, region_name, district_code, district_name FROM tbl_tanzania_locations ORDER BY region_name, district_name')
