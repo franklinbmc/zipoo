@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=40">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=43">
 </head>
 <body>
   <div class="app-shell login-entry">
@@ -51,7 +51,10 @@
       <section class="company-switcher" data-company-switcher>
         <div class="company-current">
           <span class="sheet-label">Current serving business:</span>
-          <strong data-current-business>Business</strong>
+          <span class="company-current-action">
+            <strong data-current-business>Business</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
         </div>
         <label class="company-select" hidden data-company-select-wrap>
           <span class="sheet-label">Change business</span>
@@ -114,6 +117,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=35" defer></script>
+  <script src="/assets/js/app.js?v=38" defer></script>
 </body>
 </html>

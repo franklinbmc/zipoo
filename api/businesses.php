@@ -32,8 +32,22 @@ function business_payload(array $business): array
         'business_name' => $business['business_name'],
         'business_type' => $business['business_type'],
         'region_code' => $business['region_code'] ?? null,
+        'region_name' => $business['region_name'] ?? null,
         'district_code' => $business['district_code'] ?? null,
+        'district_name' => $business['district_name'] ?? null,
+        'plan_name' => $business['plan_name'] ?? null,
+        'account_status' => $business['account_status'] ?? null,
+        'created_at' => $business['created_at'] ?? null,
     ];
+}
+
+function business_select_sql(string $where): string
+{
+    return "SELECT b.id, b.business_name, b.business_type, b.region_code, l.region_name, b.district_code, l.district_name,
+                   b.plan_name, b.account_status, b.created_at
+            FROM tbl_businesses b
+            LEFT JOIN tbl_tanzania_locations l ON l.region_code = b.region_code AND l.district_code = b.district_code
+            WHERE {$where}";
 }
 
 function notify_user(PDO $pdo, int $userId, string $subject, string $message): void
@@ -48,13 +62,11 @@ function notify_user(PDO $pdo, int $userId, string $subject, string $message): v
     } catch (Throwable) {
     }
 }
+
 function load_businesses(PDO $pdo, int $userId, ?int $businessId): array
 {
     $stmt = $pdo->prepare(
-        'SELECT id, business_name, business_type, region_code, district_code
-         FROM tbl_businesses
-         WHERE owner_user_id = :user_id OR id = :business_id
-         ORDER BY id ASC'
+        business_select_sql('b.owner_user_id = :user_id OR b.id = :business_id') . ' ORDER BY b.id ASC'
     );
     $stmt->execute([
         ':user_id' => $userId,
@@ -111,10 +123,7 @@ try {
         }
 
         $check = $pdo->prepare(
-            'SELECT id, business_name, business_type, region_code, district_code
-         FROM tbl_businesses
-             WHERE id = :business_id AND (owner_user_id = :user_id OR id = :current_business_id)
-             LIMIT 1'
+            business_select_sql('b.id = :business_id AND (b.owner_user_id = :user_id OR b.id = :current_business_id)') . ' LIMIT 1'
         );
         $check->execute([
             ':business_id' => $businessId,

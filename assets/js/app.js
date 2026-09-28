@@ -285,18 +285,28 @@ const refreshStoredBusinesses = async () => {
     const payload = await response.json();
 
     if (!response.ok || !payload.ok || !Array.isArray(payload.businesses)) {
-      return;
+      return null;
     }
 
     localStorage.setItem("zipoo.businesses", JSON.stringify(payload.businesses));
     if (payload.current_business_id) {
       localStorage.setItem("zipoo.currentBusinessId", String(payload.current_business_id));
+      const selectedBusiness = payload.businesses.find((business) => String(business.id) === String(payload.current_business_id));
+      if (selectedBusiness) {
+        const savedUser = readStoredJson("zipoo.user", {});
+        localStorage.setItem("zipoo.user", JSON.stringify({
+          ...savedUser,
+          business_id: selectedBusiness.id,
+          business_name: selectedBusiness.business_name,
+        }));
+      }
     }
+    return payload;
   } catch {
     // Keep the locally saved business list when offline or logged out.
   }
+  return null;
 };
-
 const switchStoredBusiness = async (businessId) => {
   const body = new FormData();
   body.set("action", "switch");
@@ -351,6 +361,7 @@ const setupQuickPanel = () => {
   };
 
   syncQuickBusinessUi();
+  refreshStoredBusinesses().then(syncQuickBusinessUi);
 
   if (!panel || !openButton || !closeButton) {
     return;
@@ -386,6 +397,7 @@ const setupQuickPanel = () => {
     companySelect.disabled = true;
     try {
       await switchStoredBusiness(companySelect.value);
+      await refreshStoredBusinesses();
       syncQuickBusinessUi();
       closePanel();
     } catch (error) {
@@ -460,6 +472,11 @@ const setupSettingsPage = () => {
     }
   };
 
+  const businessDetailText = (business, isCurrent = false) => {
+    const location = [business.region_name, business.district_name].filter(Boolean).join(" / ");
+    const details = [business.business_type, location, business.plan_name, business.account_status].filter(Boolean);
+    return isCurrent ? (details.length ? `Current - ${details.join(" - ")}` : "Current") : (details.join(" - ") || "Registered");
+  };
   const renderBusinessRows = () => {
     const { knownBusinesses, selectedBusiness } = getStoredBusinessState();
     if (businessCount) businessCount.textContent = `${knownBusinesses.length} registered`;
@@ -471,7 +488,7 @@ const setupSettingsPage = () => {
       const name = document.createElement("span");
       const value = document.createElement("strong");
       name.textContent = business.business_name || `Business ${business.id}`;
-      value.textContent = isCurrent ? "Current" : (business.business_type || "Registered");
+      value.textContent = businessDetailText(business, isCurrent);
       row.append(name, value);
       return row;
     }));
@@ -488,7 +505,7 @@ const setupSettingsPage = () => {
       const meta = document.createElement("strong");
       const actions = document.createElement("div");
       name.textContent = business.business_name || `Business ${business.id}`;
-      meta.textContent = isCurrent ? "Current" : (business.business_type || "Registered");
+      meta.textContent = businessDetailText(business, isCurrent);
       actions.className = "business-manager-actions";
 
       if (!isCurrent) {
@@ -588,8 +605,8 @@ const setupSettingsPage = () => {
       regions = Array.isArray(payload.regions) ? payload.regions : [];
       businessRegion.replaceChildren(...regions.map((region) => {
         const option = document.createElement("option");
-        option.value = region.code;
-        option.textContent = region.name;
+        option.value = region.value;
+        option.textContent = region.label;
         return option;
       }));
       businessRegion.dispatchEvent(new Event("change"));
@@ -599,18 +616,21 @@ const setupSettingsPage = () => {
   };
 
   businessRegion?.addEventListener("change", () => {
-    const region = regions.find((item) => item.code === businessRegion.value);
+    const region = regions.find((item) => item.value === businessRegion.value);
     const districts = Array.isArray(region?.districts) ? region.districts : [];
     businessDistrict?.replaceChildren(...districts.map((district) => {
       const option = document.createElement("option");
-      option.value = district.code;
-      option.textContent = district.name;
+      option.value = district.value;
+      option.textContent = district.label;
       return option;
     }));
   });
 
   accountEditButtons.forEach((button) => {
-    button.addEventListener("click", () => openAccountModal(button.dataset.accountEdit));
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      openAccountModal(button.dataset.accountEdit);
+    });
   });
 
   accountClose?.addEventListener("click", closeAccountModal);
@@ -622,6 +642,9 @@ const setupSettingsPage = () => {
     const body = new FormData(accountForm);
     body.set("action", editStep === "verify" ? "verify_change" : "request_change");
     body.set("field", editField);
+    if (editStep === "verify") {
+      body.delete("value");
+    }
     if (accountSubmit) accountSubmit.disabled = true;
 
     try {

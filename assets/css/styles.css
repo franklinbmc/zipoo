@@ -1220,8 +1220,28 @@ body.offline .status-dot {
 .company-current {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
+}
+
+
+.company-current-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.company-current-action svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: var(--color-muted);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 54px;
 }
 
 .company-current strong {
