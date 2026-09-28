@@ -569,11 +569,12 @@ const setupSettingsPage = () => {
   const render = () => {
     const { user, selectedBusiness } = getStoredBusinessState();
     const ownerName = user.full_name || "Owner profile";
-    const businessName = selectedBusiness?.business_name || user.business_name || "Business";
+    const profileBusinessName = user.business_name || "Business";
+    const businessName = selectedBusiness?.business_name || profileBusinessName;
     if (ownerAvatar) ownerAvatar.textContent = ownerName.trim().charAt(0).toUpperCase() || "U";
     if (ownerProfileName) ownerProfileName.textContent = ownerName;
     if (ownerProfileMeta) ownerProfileMeta.textContent = [user.phone, user.email].filter(Boolean).join(" - ") || "Profile details";
-    if (settingsBusinessName) settingsBusinessName.textContent = businessName;
+    if (settingsBusinessName) settingsBusinessName.textContent = profileBusinessName;
     if (settingsName) settingsName.textContent = user.full_name || "-";
     if (settingsPhone) settingsPhone.textContent = user.phone || "-";
     if (settingsEmail) settingsEmail.textContent = user.email || "-";

@@ -58,10 +58,9 @@ try {
     $pdo = db();
 
     $stmt = $pdo->prepare(
-        'SELECT u.id, u.business_id, u.full_name, u.phone, u.email, b.business_name
-         FROM tbl_users u
-         LEFT JOIN tbl_businesses b ON b.id = u.business_id
-         WHERE u.id = :id
+        'SELECT id, business_id, full_name, phone, email, business_name, business_type, region_code, district_code
+         FROM tbl_users
+         WHERE id = :id
          LIMIT 1'
     );
     $stmt->execute([':id' => $userId]);
