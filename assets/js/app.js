@@ -420,6 +420,10 @@ const setupSettingsPage = () => {
     return;
   }
 
+  const ownerAvatar = document.querySelector("[data-owner-avatar]");
+  const ownerProfileName = document.querySelector("[data-owner-profile-name]");
+  const ownerProfileMeta = document.querySelector("[data-owner-profile-meta]");
+  const settingsBusinessName = document.querySelector("[data-settings-business-name]");
   const settingsName = document.querySelector("[data-settings-name]");
   const settingsPhone = document.querySelector("[data-settings-phone]");
   const settingsEmail = document.querySelector("[data-settings-email]");
@@ -564,10 +568,16 @@ const setupSettingsPage = () => {
 
   const render = () => {
     const { user, selectedBusiness } = getStoredBusinessState();
+    const ownerName = user.full_name || "Owner profile";
+    const businessName = selectedBusiness?.business_name || user.business_name || "Business";
+    if (ownerAvatar) ownerAvatar.textContent = ownerName.trim().charAt(0).toUpperCase() || "U";
+    if (ownerProfileName) ownerProfileName.textContent = ownerName;
+    if (ownerProfileMeta) ownerProfileMeta.textContent = [user.phone, user.email].filter(Boolean).join(" - ") || "Profile details";
+    if (settingsBusinessName) settingsBusinessName.textContent = businessName;
     if (settingsName) settingsName.textContent = user.full_name || "-";
     if (settingsPhone) settingsPhone.textContent = user.phone || "-";
     if (settingsEmail) settingsEmail.textContent = user.email || "-";
-    if (settingsCurrentBusiness) settingsCurrentBusiness.textContent = selectedBusiness?.business_name || "Business";
+    if (settingsCurrentBusiness) settingsCurrentBusiness.textContent = businessName;
     renderBusinessRows();
   };
 

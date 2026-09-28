@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=42">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=44">
 </head>
 <body>
   <div class="app-shell settings-page-shell">
@@ -30,6 +30,17 @@
           <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
         </summary>
         <div class="settings-list flush-list">
+          <div class="owner-profile-card">
+            <div class="owner-avatar" data-owner-avatar>U</div>
+            <div>
+              <strong data-owner-profile-name>Owner profile</strong>
+              <span data-owner-profile-meta>-</span>
+            </div>
+          </div>
+          <div class="settings-list-row">
+            <span>Business name</span>
+            <strong data-settings-business-name>-</strong>
+          </div>
           <button class="settings-list-row" type="button" data-account-edit="full_name">
             <span>Name</span>
             <strong data-settings-name>-</strong>
@@ -141,6 +152,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=37" defer></script>
+  <script src="/assets/js/app.js?v=39" defer></script>
 </body>
 </html>
