@@ -237,9 +237,46 @@ const setupQuickPanel = () => {
   const openButton = document.querySelector("[data-quick-open]");
   const closeButton = document.querySelector("[data-quick-close]");
   const logoutButton = document.querySelector("[data-logout]");
+  const currentBusiness = document.querySelector("[data-current-business]");
+  const companySelectWrap = document.querySelector("[data-company-select-wrap]");
+  const companySelect = document.querySelector("[data-company-select]");
+  const createBusiness = document.querySelector("[data-create-business]");
 
   if (!panel || !openButton || !closeButton) {
     return;
+  }
+
+  const readStoredJson = (key, fallback) => {
+    try {
+      return JSON.parse(localStorage.getItem(key) || "");
+    } catch {
+      return fallback;
+    }
+  };
+
+  const user = readStoredJson("zipoo.user", {});
+  const businesses = readStoredJson("zipoo.businesses", []);
+  const knownBusinesses = Array.isArray(businesses) && businesses.length
+    ? businesses
+    : user.business_id
+      ? [{ id: user.business_id, business_name: user.business_name || "Primary business" }]
+      : [];
+  const savedBusinessId = localStorage.getItem("zipoo.currentBusinessId") || String(user.business_id || knownBusinesses[0]?.id || "");
+  const selectedBusiness = knownBusinesses.find((business) => String(business.id) === savedBusinessId) || knownBusinesses[0];
+
+  if (currentBusiness) {
+    currentBusiness.textContent = selectedBusiness?.business_name || "Primary business";
+  }
+
+  if (companySelect && companySelectWrap && knownBusinesses.length > 1) {
+    companySelect.replaceChildren(...knownBusinesses.map((business) => {
+      const option = document.createElement("option");
+      option.value = String(business.id);
+      option.textContent = business.business_name || `Business ${business.id}`;
+      option.selected = String(business.id) === String(selectedBusiness?.id || "");
+      return option;
+    }));
+    companySelectWrap.hidden = false;
   }
 
   const openPanel = () => {
@@ -264,6 +301,80 @@ const setupQuickPanel = () => {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !panel.hidden) {
       closePanel();
+    }
+  });
+
+  companySelect?.addEventListener("change", async () => {
+    const previousValue = savedBusinessId;
+    const nextBusiness = knownBusinesses.find((business) => String(business.id) === companySelect.value);
+    const body = new FormData();
+    body.set("action", "switch");
+    body.set("business_id", companySelect.value);
+
+    companySelect.disabled = true;
+    try {
+      const response = await fetch(`${getBasePath()}api/businesses.php`, {
+        method: "POST",
+        body,
+      });
+      const payload = await response.json();
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message || "Unable to switch business.");
+      }
+
+      localStorage.setItem("zipoo.currentBusinessId", companySelect.value);
+      if (currentBusiness) {
+        currentBusiness.textContent = payload.business?.business_name || nextBusiness?.business_name || "Selected business";
+      }
+      closePanel();
+    } catch (switchError) {
+      companySelect.value = previousValue;
+      alert(switchError.message || "Unable to switch business.");
+    } finally {
+      companySelect.disabled = false;
+    }
+  });
+
+  createBusiness?.addEventListener("click", async (event) => {
+    event.preventDefault();
+    const businessName = window.prompt("Business name");
+
+    if (!businessName?.trim()) {
+      return;
+    }
+
+    const businessType = window.prompt("Business type", "service") || "service";
+    const body = new FormData();
+    body.set("action", "create");
+    body.set("business_name", businessName.trim());
+    body.set("business_type", businessType.trim() || "service");
+
+    createBusiness.setAttribute("aria-disabled", "true");
+    try {
+      const response = await fetch(`${getBasePath()}api/businesses.php`, {
+        method: "POST",
+        body,
+      });
+      const payload = await response.json();
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message || "Unable to create business.");
+      }
+
+      const nextBusinesses = Array.isArray(payload.businesses) ? payload.businesses : [...knownBusinesses, payload.business].filter(Boolean);
+      localStorage.setItem("zipoo.businesses", JSON.stringify(nextBusinesses));
+      if (payload.business?.id) {
+        localStorage.setItem("zipoo.currentBusinessId", String(payload.business.id));
+      }
+      if (currentBusiness) {
+        currentBusiness.textContent = payload.business?.business_name || businessName.trim();
+      }
+      window.location.reload();
+    } catch (createError) {
+      alert(createError.message || "Unable to create business.");
+    } finally {
+      createBusiness.removeAttribute("aria-disabled");
     }
   });
 
@@ -492,6 +603,12 @@ const setupLoginFlow = () => {
       localStorage.setItem("zipoo.isLoggedIn", "true");
       if (payload.user) {
         localStorage.setItem("zipoo.user", JSON.stringify(payload.user));
+      }
+      if (Array.isArray(payload.businesses)) {
+        localStorage.setItem("zipoo.businesses", JSON.stringify(payload.businesses));
+      }
+      if (payload.user?.business_id) {
+        localStorage.setItem("zipoo.currentBusinessId", String(payload.user.business_id));
       }
       window.location.href = `${getBasePath()}dashboard`;
     } catch (submitError) {
