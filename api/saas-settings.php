@@ -74,7 +74,7 @@ function upload_asset(string $field): ?string
         respond(500, ['ok' => false, 'message' => 'Unable to save uploaded file.']);
     }
 
-    return '/zipoo/uploads/platform/' . $filename;
+    return '/uploads/platform/' . $filename;
 }
 
 function update_manifest(array $settings): void

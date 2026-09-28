@@ -6,15 +6,15 @@
   <meta name="theme-color" content="#0D2B5B">
   <meta name="description" content="Zipoo business management app login.">
   <title>Login - Zipoo</title>
-  <link rel="manifest" href="/zipoo/manifest.json">
-  <link rel="icon" href="/zipoo/assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/zipoo/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/zipoo/assets/css/styles.css?v=32">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=32">
 </head>
 <body>
   <div class="app-shell login-entry">
     <header class="topbar app-topbar">
-      <a class="brand" href="/zipoo/" aria-label="Zipoo home">
+      <a class="brand" href="/" aria-label="Zipoo home">
         <span class="brand-mark">Z</span>
         <span class="brand-name">Zipoo</span>
       </a>
@@ -26,7 +26,7 @@
     </header>
 
     <main class="entry-main">
-      <form class="entry-login" action="/zipoo/api/login.php" method="post" novalidate data-login-flow>
+      <form class="entry-login" action="/api/login.php" method="post" novalidate data-login-flow>
         <h1 data-i18n="login.title">Login to Zipoo</h1>
         <label>
           <span data-i18n="auth.phoneEmail">Phone Number / Email</span>
@@ -81,7 +81,7 @@
           <button type="button" data-lang="sw">Kiswahili</button>
         </div>
       </div>
-      <a class="sheet-action" href="/zipoo/register">
+      <a class="sheet-action" href="/register">
         <span data-i18n="common.register">Create Account</span>
       </a>
       <a class="sheet-action" href="#">
@@ -89,6 +89,6 @@
       </a>
     </div>
   </div>
-  <script src="/zipoo/assets/js/app.js?v=29" defer></script>
+  <script src="/assets/js/app.js?v=31" defer></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const getBasePath = () => "/zipoo/";
+const getBasePath = () => "/";
 
 const applyTheme = (theme) => {
   const nextTheme = theme === "dark" ? "dark" : "light";

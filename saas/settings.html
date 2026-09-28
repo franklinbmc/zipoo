@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#0D2B5B">
   <title>System Settings - Zipoo Admin</title>
-  <link rel="icon" href="/zipoo/assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/zipoo/assets/css/styles.css?v=32">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=32">
 </head>
 <body>
   <div class="saas-admin-layout">
     <aside class="saas-sidebar">
       <div class="saas-sidebar-head">
-        <a class="brand" href="/zipoo/saas/dashboard">
+        <a class="brand" href="/saas/dashboard">
           <span class="brand-mark">Z</span>
           <span class="brand-name">Zipoo Admin</span>
         </a>
@@ -23,12 +23,12 @@
         </button>
       </div>
       <nav class="saas-nav">
-        <a href="/zipoo/saas/dashboard"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M80 220l176-140 176 140v212H304V304h-96v128H80z" /></svg><span>Dashboard</span></a>
-        <a href="/zipoo/saas/businesses"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 144l160-64 160 64-160 64zM96 144v224l160 64 160-64V144M256 208v224" /></svg><span>Businesses</span></a>
-        <a href="/zipoo/saas/users"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M176 240a72 72 0 1 0 0-144 72 72 0 0 0 0 144ZM64 432c16-80 72-128 112-128s96 48 112 128M352 224a56 56 0 1 0 0-112M320 304c48 8 84 48 96 112" /></svg><span>Users</span></a>
+        <a href="/saas/dashboard"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M80 220l176-140 176 140v212H304V304h-96v128H80z" /></svg><span>Dashboard</span></a>
+        <a href="/saas/businesses"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 144l160-64 160 64-160 64zM96 144v224l160 64 160-64V144M256 208v224" /></svg><span>Businesses</span></a>
+        <a href="/saas/users"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M176 240a72 72 0 1 0 0-144 72 72 0 0 0 0 144ZM64 432c16-80 72-128 112-128s96 48 112 128M352 224a56 56 0 1 0 0-112M320 304c48 8 84 48 96 112" /></svg><span>Users</span></a>
         <a href="#"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 160h320M128 96h256M128 224h256M160 288h192M192 352h128" /></svg><span>Plans</span></a>
         <a href="#"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M80 160h352v224H80zM80 224h352M144 320h72" /></svg><span>Subscriptions</span></a>
-        <a class="active" href="/zipoo/saas/settings"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 176a80 80 0 1 0 0 160 80 80 0 0 0 0-160ZM96 256h48M368 256h48M256 96v48M256 368v48M143 143l34 34M335 335l34 34M369 143l-34 34M177 335l-34 34" /></svg><span>System Settings</span></a>
+        <a class="active" href="/saas/settings"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 176a80 80 0 1 0 0 160 80 80 0 0 0 0-160ZM96 256h48M368 256h48M256 96v48M256 368v48M143 143l34 34M335 335l34 34M369 143l-34 34M177 335l-34 34" /></svg><span>System Settings</span></a>
         <a href="#"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M128 96h256v320H128zM176 160h160M176 224h160M176 288h112" /></svg><span>Audit Logs</span></a>
       </nav>
     </aside>
@@ -67,7 +67,7 @@
             <div class="admin-menu-panel" hidden data-admin-menu-panel>
               <a href="#">My Profile</a>
               <a href="#">Change Password</a>
-              <a href="/zipoo/saas/settings">Settings</a>
+              <a href="/saas/settings">Settings</a>
               <button type="button" data-saas-logout>Logout</button>
             </div>
           </div>
@@ -103,7 +103,7 @@
                 <h2>MEGASMS - MARKETING & GUEST MESSAGING</h2>
                 <p>Used by checkout thank-you messages and Marketing campaigns. API details: megasms.co.tz/docs.</p>
               </div>
-              <form class="settings-form sms-basic-form" action="/zipoo/api/saas-settings.php" method="post" data-settings-form>
+              <form class="settings-form sms-basic-form" action="/api/saas-settings.php" method="post" data-settings-form>
                 <input type="hidden" name="group" value="sms">
                 <label class="full-span"><span>MEGASMS API BASE URL</span><input type="url" name="api_url" value="https://megasms.co.tz/api/v1" data-setting="sms.api_url"></label>
                 <label><span>MEGASMS API TOKEN / KEY</span><input type="password" name="api_key" placeholder="MegaSMS Bearer API Token" data-setting="sms.api_key"></label>
@@ -115,7 +115,7 @@
             <div class="sms-test-card">
               <h2>Test SMS</h2>
               <p>Uses the saved MegaSMS API key and Sender ID.</p>
-              <form class="settings-test-form stacked" action="/zipoo/api/saas-settings.php" method="post" data-settings-test-form>
+              <form class="settings-test-form stacked" action="/api/saas-settings.php" method="post" data-settings-test-form>
                 <input type="hidden" name="action" value="test_sms">
                 <input type="tel" name="test_phone" placeholder="e.g. 0712345678">
                 <textarea name="test_message" placeholder="Optional test message"></textarea>
@@ -126,7 +126,7 @@
           </div>
 
           <div class="settings-subpanel" hidden data-subtab-panel="smtp-setup">
-            <form class="settings-form" action="/zipoo/api/saas-settings.php" method="post" data-settings-form>
+            <form class="settings-form" action="/api/saas-settings.php" method="post" data-settings-form>
               <input type="hidden" name="group" value="smtp">
               <label><span>SMTP Host</span><input type="text" name="smtp_host" placeholder="smtp.example.com" data-setting="smtp.smtp_host"></label>
               <label><span>SMTP Port</span><input type="number" name="smtp_port" placeholder="587" data-setting="smtp.smtp_port"></label>
@@ -137,7 +137,7 @@
               <p class="inline-status" hidden data-settings-status></p>
               <button class="btn btn-primary" type="submit">Save SMTP Setup</button>
             </form>
-            <form class="settings-test-form" action="/zipoo/api/saas-settings.php" method="post" data-settings-test-form>
+            <form class="settings-test-form" action="/api/saas-settings.php" method="post" data-settings-test-form>
               <input type="hidden" name="action" value="test_smtp">
               <label><span>Test Email</span><input type="email" name="test_email" placeholder="you@example.com"></label>
               <button class="btn btn-secondary" type="submit">Test Email</button>
@@ -146,7 +146,7 @@
           </div>
 
           <div class="settings-subpanel" hidden data-subtab-panel="platform-setup">
-            <form class="settings-form two-col" action="/zipoo/api/saas-settings.php" method="post" enctype="multipart/form-data" data-settings-form>
+            <form class="settings-form two-col" action="/api/saas-settings.php" method="post" enctype="multipart/form-data" data-settings-form>
               <input type="hidden" name="group" value="platform">
               <label><span>Platform Name</span><input type="text" name="platform_name" value="Zipoo" data-setting="platform.platform_name"></label>
               <label><span>Version</span><input type="text" name="version" value="1.0.0" data-setting="platform.version"></label>
@@ -171,7 +171,7 @@
               <h2>Regions</h2>
               <button class="btn btn-primary" type="button" data-new-region>Add Region</button>
             </div>
-            <form class="definition-form" action="/zipoo/api/saas-locations.php" method="post" data-region-form>
+            <form class="definition-form" action="/api/saas-locations.php" method="post" data-region-form>
               <input type="hidden" name="type" value="region">
               <input type="hidden" name="mode" value="add" data-region-mode>
               <input type="hidden" name="original_region_code" data-original-region-code>
@@ -188,7 +188,7 @@
               <h2>Districts</h2>
               <button class="btn btn-primary" type="button" data-new-district>Add District</button>
             </div>
-            <form class="definition-form" action="/zipoo/api/saas-locations.php" method="post" data-district-form>
+            <form class="definition-form" action="/api/saas-locations.php" method="post" data-district-form>
               <input type="hidden" name="type" value="district">
               <input type="hidden" name="mode" value="add" data-district-mode>
               <input type="hidden" name="original_district_code" data-original-district-code>
@@ -204,6 +204,6 @@
       </section>
     </main>
   </div>
-  <script src="/zipoo/assets/js/saas.js?v=17" defer></script>
+  <script src="/assets/js/saas.js?v=18" defer></script>
 </body>
 </html>

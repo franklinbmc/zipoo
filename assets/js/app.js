@@ -7,7 +7,7 @@ const REGISTER_DRAFT_COOKIE = "zipoo_register_draft";
 const getBasePath = () => {
   const script = document.currentScript || document.querySelector('script[src*="assets/js/app.js"]');
   if (!script) {
-    return "/zipoo/";
+    return "/";
   }
 
   return new URL("../../", script.src).pathname;
@@ -101,11 +101,11 @@ const readCookie = (name) => {
 
 const writeCookie = (name, value, maxAgeDays = 7) => {
   const maxAge = maxAgeDays * 24 * 60 * 60;
-  document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/zipoo; SameSite=Lax`;
+  document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
 };
 
 const clearCookie = (name) => {
-  document.cookie = `${name}=; Max-Age=0; Path=/zipoo; SameSite=Lax`;
+  document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
 };
 
 const readRegisterDraft = () => {
