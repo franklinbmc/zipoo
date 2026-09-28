@@ -1,36 +1,41 @@
-RewriteEngine On
-RewriteBase /zipoo/
+Options -Indexes
+DirectoryIndex index.html
 
-RewriteRule ^login/?$ pages/login.html [L]
-RewriteRule ^register/?$ pages/register.html [L]
-RewriteRule ^dashboard/?$ pages/dashboard.html [L]
-RewriteRule ^saas/?$ saas/index.html [L]
-RewriteRule ^saas/login/?$ saas/login.html [L]
-RewriteRule ^saas/dashboard/?$ saas/dashboard.html [L]
-RewriteRule ^saas/businesses/?$ saas/businesses.html [L]
-RewriteRule ^saas/users/?$ saas/users.html [L]
-RewriteRule ^saas/settings/?$ saas/settings.html [L]
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
 
-RewriteCond %{THE_REQUEST} \s/+zipoo/pages/login\.html[\s?] [NC]
-RewriteRule ^pages/login\.html$ login [R=302,L]
+  # Serve existing files and folders directly, including API PHP files.
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
 
-RewriteCond %{THE_REQUEST} \s/+zipoo/pages/register\.html[\s?] [NC]
-RewriteRule ^pages/register\.html$ register [R=302,L]
+  # Public app routes.
+  RewriteRule ^login/?$ pages/login.html [L]
+  RewriteRule ^register/?$ pages/register.html [L]
+  RewriteRule ^dashboard/?$ pages/dashboard.html [L]
 
-RewriteCond %{THE_REQUEST} \s/+zipoo/pages/dashboard\.html[\s?] [NC]
-RewriteRule ^pages/dashboard\.html$ dashboard [R=302,L]
+  # SaaS admin routes.
+  RewriteRule ^saas/?$ saas/index.html [L]
+  RewriteRule ^saas/login/?$ saas/login.html [L]
+  RewriteRule ^saas/dashboard/?$ saas/dashboard.html [L]
+  RewriteRule ^saas/businesses/?$ saas/businesses.html [L]
+  RewriteRule ^saas/users/?$ saas/users.html [L]
+  RewriteRule ^saas/settings/?$ saas/settings.html [L]
 
-RewriteCond %{THE_REQUEST} \s/+zipoo/saas/login\.html[\s?] [NC]
-RewriteRule ^saas/login\.html$ saas/login [R=302,L]
+  # PWA fallback for client-side navigation.
+  RewriteRule ^ index.html [L]
+</IfModule>
 
-RewriteCond %{THE_REQUEST} \s/+zipoo/saas/dashboard\.html[\s?] [NC]
-RewriteRule ^saas/dashboard\.html$ saas/dashboard [R=302,L]
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
 
-RewriteCond %{THE_REQUEST} \s/+zipoo/saas/businesses\.html[\s?] [NC]
-RewriteRule ^saas/businesses\.html$ saas/businesses [R=302,L]
+  <FilesMatch "\.(?:css|js|png|jpg|jpeg|gif|svg|webp|ico|woff2?|otf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
 
-RewriteCond %{THE_REQUEST} \s/+zipoo/saas/users\.html[\s?] [NC]
-RewriteRule ^saas/users\.html$ saas/users [R=302,L]
-
-RewriteCond %{THE_REQUEST} \s/+zipoo/saas/settings\.html[\s?] [NC]
-RewriteRule ^saas/settings\.html$ saas/settings [R=302,L]
+  <FilesMatch "^(?:index\.html|manifest\.json|service-worker\.js)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
