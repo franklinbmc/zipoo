@@ -1984,6 +1984,16 @@ textarea {
 }
 
 @media (max-width: 640px) {
+  .quick-backdrop {
+    padding: 0 0 10px;
+  }
+
+  .quick-panel {
+    width: 100%;
+    border-right: 0;
+    border-left: 0;
+  }
+
   .app-shell,
   .auth-layout {
     padding: 12px;
