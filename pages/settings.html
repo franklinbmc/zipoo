@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=39">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=41">
 </head>
 <body>
   <div class="app-shell settings-page-shell">
@@ -59,14 +59,8 @@
           <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
         </summary>
         <div class="settings-list flush-list" data-settings-business-list></div>
-      </details>
-
-      <details class="settings-accordion">
-        <summary>
-          <span>Create new business</span>
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-        </summary>
-        <form class="settings-list flush-list business-create-form" data-business-create-form>
+        <form class="settings-list nested-list business-create-form" data-business-create-form>
+          <div class="settings-list-subhead">Create new business</div>
           <label class="settings-list-row field-row">
             <span>Business name</span>
             <input type="text" name="business_name" placeholder="New company" required>
@@ -96,6 +90,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=34" defer></script>
+  <script src="/assets/js/app.js?v=35" defer></script>
 </body>
 </html>

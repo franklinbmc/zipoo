@@ -271,12 +271,30 @@ const getStoredBusinessState = () => {
   const knownBusinesses = Array.isArray(businesses) && businesses.length
     ? businesses
     : user.business_id
-      ? [{ id: user.business_id, business_name: user.business_name || "Primary business" }]
+      ? [{ id: user.business_id, business_name: user.business_name || `Business ${user.business_id}` }]
       : [];
   const savedBusinessId = localStorage.getItem("zipoo.currentBusinessId") || String(user.business_id || knownBusinesses[0]?.id || "");
   const selectedBusiness = knownBusinesses.find((business) => String(business.id) === savedBusinessId) || knownBusinesses[0] || null;
 
   return { user, knownBusinesses, selectedBusiness };
+};
+
+const refreshStoredBusinesses = async () => {
+  try {
+    const response = await fetch(`${getBasePath()}api/businesses.php`);
+    const payload = await response.json();
+
+    if (!response.ok || !payload.ok || !Array.isArray(payload.businesses)) {
+      return;
+    }
+
+    localStorage.setItem("zipoo.businesses", JSON.stringify(payload.businesses));
+    if (payload.current_business_id) {
+      localStorage.setItem("zipoo.currentBusinessId", String(payload.current_business_id));
+    }
+  } catch {
+    // Keep the locally saved business list when offline or logged out.
+  }
 };
 
 const switchStoredBusiness = async (businessId) => {
@@ -318,7 +336,7 @@ const setupQuickPanel = () => {
   const syncQuickBusinessUi = () => {
     const { knownBusinesses, selectedBusiness } = getStoredBusinessState();
     if (currentBusiness) {
-      currentBusiness.textContent = selectedBusiness?.business_name || "Primary business";
+      currentBusiness.textContent = selectedBusiness?.business_name || "Business";
     }
     if (companySelect && companySelectWrap) {
       companySelect.replaceChildren(...knownBusinesses.map((business) => {
@@ -404,7 +422,7 @@ const setupSettingsPage = () => {
     if (settingsName) settingsName.textContent = user.full_name || "-";
     if (settingsPhone) settingsPhone.textContent = user.phone || "-";
     if (settingsEmail) settingsEmail.textContent = user.email || "-";
-    if (settingsCurrentBusiness) settingsCurrentBusiness.textContent = selectedBusiness?.business_name || "Primary business";
+    if (settingsCurrentBusiness) settingsCurrentBusiness.textContent = selectedBusiness?.business_name || "Business";
     if (businessCount) businessCount.textContent = `${knownBusinesses.length} registered`;
 
     settingsBusinessList?.replaceChildren(...knownBusinesses.map((business) => {

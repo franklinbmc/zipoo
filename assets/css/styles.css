@@ -1218,15 +1218,17 @@ body.offline .status-dot {
 }
 
 .company-current {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .company-current strong {
+  min-width: 0;
   color: var(--color-navy);
   font-size: 1rem;
+  text-align: right;
 }
 
 .company-select {
@@ -2177,6 +2179,19 @@ textarea {
 .flush-list {
   border-top: 1px solid var(--color-line);
   border-radius: 0;
+}
+
+.nested-list {
+  border-top: 1px solid var(--color-line);
+  background: #fbfdff;
+}
+
+.settings-list-subhead {
+  padding: 12px 12px 4px;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .settings-list-row {
