@@ -1165,7 +1165,7 @@ body.offline .status-dot {
   z-index: 24;
   display: grid;
   align-items: start;
-  padding: 0;
+  padding: 0 10px 10px;
   background: rgba(18, 35, 63, 0.3);
 }
 
@@ -1174,12 +1174,10 @@ body.offline .status-dot {
 }
 
 .quick-panel {
-  width: 100%;
-  margin: 0;
+  width: min(520px, 100%);
+  margin: 0 auto;
   border: 1px solid rgba(219, 227, 239, 0.9);
   border-top: 0;
-  border-right: 0;
-  border-left: 0;
   border-radius: 0 0 18px 18px;
   padding: 10px 14px 16px;
   background: rgba(255, 255, 255, 0.96);
