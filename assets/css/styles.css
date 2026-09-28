@@ -2382,6 +2382,209 @@ button.settings-list-row:focus-visible {
   gap: 12px;
 }
 
+.business-accordion-item {
+  border-bottom: 1px solid var(--color-line);
+  background: #fff;
+  transition: background-color 0.15s ease;
+}
+
+.business-accordion-item:last-child {
+  border-bottom: 0;
+}
+
+.business-accordion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 0;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: background-color 0.15s ease;
+}
+
+.business-accordion-header:hover,
+.business-accordion-header:focus-visible {
+  background: #f8fafc;
+}
+
+.business-accordion-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
+.business-accordion-name {
+  color: var(--color-navy);
+  font-size: 0.95rem;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.business-serving-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: rgba(14, 116, 219, 0.1);
+  color: var(--color-blue);
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.business-accordion-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--color-muted);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 54px;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.15s ease;
+}
+
+.business-accordion-item.is-open {
+  background: #fbfdff;
+}
+
+.business-accordion-item.is-open > .business-accordion-header {
+  border-bottom: 1px solid var(--color-line);
+}
+
+.business-accordion-item.is-open .business-accordion-chevron {
+  transform: rotate(90deg);
+  stroke: var(--color-blue);
+}
+
+.business-accordion-panel {
+  padding: 12px 14px 16px;
+  display: grid;
+  gap: 10px;
+  background: #fbfdff;
+  animation: businessAccordionDown 0.2s ease-out;
+}
+
+.business-accordion-panel[hidden] {
+  display: none;
+}
+
+@keyframes businessAccordionDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.business-accordion-panel .settings-list-row.field-row {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: #fff;
+  margin-bottom: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.business-accordion-panel .settings-list-row.field-row:focus-within {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px rgba(14, 116, 219, 0.08);
+}
+
+.business-accordion-panel .settings-list-row.read-only-row {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  background: #f8fafc;
+  margin-bottom: 8px;
+}
+
+.business-accordion-panel .settings-list-row.read-only-row strong {
+  color: var(--color-navy);
+  font-weight: 800;
+}
+
+.business-accordion-panel .status-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.business-accordion-panel .status-tag.inactive {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.business-accordion-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.business-accordion-secondary-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-outline {
+  color: var(--color-blue);
+  background: #fff;
+  border-color: var(--color-line);
+}
+
+.btn-outline:hover {
+  background: #f8fafc;
+  border-color: var(--color-blue);
+}
+
+.btn-danger-outline {
+  color: #b42318;
+  background: #fff;
+  border-color: #fecdd3;
+}
+
+.btn-danger-outline:hover {
+  background: #fff1f2;
+  border-color: #fda4af;
+}
+
+.btn-sm {
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 0.85rem;
+}
+
+.business-serving-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: rgba(14, 116, 219, 0.08);
+  color: var(--color-blue);
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-align: center;
+}
+
 .business-manager-row {
   grid-template-columns: minmax(0, 1fr) auto auto;
 }

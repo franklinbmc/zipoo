@@ -211,6 +211,82 @@ try {
         ]);
     }
 
+    if ($action === 'update') {
+        $businessId = (int) ($_POST['business_id'] ?? 0);
+        $businessName = trim((string) ($_POST['business_name'] ?? ''));
+        $businessType = trim((string) ($_POST['business_type'] ?? 'service'));
+        $regionCode = trim((string) ($_POST['region'] ?? $_POST['region_code'] ?? ''));
+        $districtCode = trim((string) ($_POST['district'] ?? $_POST['district_code'] ?? ''));
+
+        if ($businessId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Choose a business to edit.']);
+        }
+        if ($businessName === '') {
+            respond(422, ['ok' => false, 'message' => 'Business name is required.']);
+        }
+        if ($regionCode === '' || $districtCode === '') {
+            respond(422, ['ok' => false, 'message' => 'Region and district are required.']);
+        }
+
+        $check = $pdo->prepare('SELECT id FROM tbl_businesses WHERE id = :business_id AND owner_user_id = :user_id LIMIT 1');
+        $check->execute([':business_id' => $businessId, ':user_id' => $userId]);
+        if (!$check->fetch()) {
+            respond(403, ['ok' => false, 'message' => 'You cannot edit that business.']);
+        }
+
+        $update = $pdo->prepare(
+            'UPDATE tbl_businesses
+             SET business_name = :business_name,
+                 business_type = :business_type,
+                 region_code = :region_code,
+                 district_code = :district_code
+             WHERE id = :business_id AND owner_user_id = :user_id'
+        );
+        $update->execute([
+            ':business_name' => $businessName,
+            ':business_type' => $businessType !== '' ? $businessType : 'service',
+            ':region_code' => $regionCode,
+            ':district_code' => $districtCode,
+            ':business_id' => $businessId,
+            ':user_id' => $userId,
+        ]);
+
+        if ($currentBusinessId !== null && $businessId === $currentBusinessId) {
+            $pdo->prepare(
+                'UPDATE tbl_users
+                 SET business_name = :business_name,
+                     business_type = :business_type,
+                     region_code = :region_code,
+                     district_code = :district_code
+                 WHERE id = :user_id'
+            )->execute([
+                ':business_name' => $businessName,
+                ':business_type' => $businessType !== '' ? $businessType : 'service',
+                ':region_code' => $regionCode,
+                ':district_code' => $districtCode,
+                ':user_id' => $userId,
+            ]);
+        }
+
+        notify_user($pdo, $userId, 'Zipoo business updated', 'Business details were updated for ' . $businessName . '.');
+
+        $businesses = load_businesses($pdo, $userId, $currentBusinessId);
+        $updatedBusiness = null;
+        foreach ($businesses as $b) {
+            if ($b['id'] === $businessId) {
+                $updatedBusiness = $b;
+                break;
+            }
+        }
+
+        respond(200, [
+            'ok' => true,
+            'message' => 'Business updated successfully.',
+            'business' => $updatedBusiness,
+            'businesses' => $businesses,
+        ]);
+    }
+
     respond(422, ['ok' => false, 'message' => 'Unknown business action.']);
 } catch (Throwable $error) {
     respond(500, ['ok' => false, 'message' => 'Unable to update businesses right now.']);

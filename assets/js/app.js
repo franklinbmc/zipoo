@@ -475,6 +475,49 @@ const setupSettingsPage = () => {
   let editStep = "request";
   let regions = [];
 
+  const ensureBusinessLocations = async () => {
+    if (regions.length) {
+      return regions;
+    }
+    try {
+      const response = await fetch(`${getBasePath()}api/locations.php`);
+      const payload = await response.json();
+      regions = Array.isArray(payload.regions) ? payload.regions : [];
+    } catch {
+      regions = [];
+    }
+    return regions;
+  };
+
+  const populateLocationSelects = (regionEl, districtEl, selectedRegionCode, selectedDistrictCode) => {
+    if (!regionEl || !districtEl) return;
+    regionEl.replaceChildren(...regions.map((r) => {
+      const opt = document.createElement("option");
+      opt.value = r.value;
+      opt.textContent = r.label;
+      if (r.value === selectedRegionCode) opt.selected = true;
+      return opt;
+    }));
+
+    const updateDistricts = () => {
+      const currentReg = regions.find((r) => r.value === regionEl.value);
+      const districts = Array.isArray(currentReg?.districts) ? currentReg.districts : [];
+      districtEl.replaceChildren(...districts.map((d) => {
+        const opt = document.createElement("option");
+        opt.value = d.value;
+        opt.textContent = d.label;
+        return opt;
+      }));
+    };
+
+    updateDistricts();
+    if (selectedDistrictCode) {
+      districtEl.value = selectedDistrictCode;
+    }
+
+    regionEl.onchange = updateDistricts;
+  };
+
   const labels = {
     full_name: "Name",
     phone: "Phone",
@@ -505,41 +548,198 @@ const setupSettingsPage = () => {
 
     settingsBusinessList?.replaceChildren(...knownBusinesses.map((business) => {
       const isCurrent = String(business.id) === String(selectedBusiness?.id || "");
-      const row = document.createElement("div");
+      const row = document.createElement("button");
+      row.type = "button";
       row.className = `settings-list-row business-settings-row${isCurrent ? " current" : ""}`;
       const name = document.createElement("span");
       const value = document.createElement("strong");
       name.textContent = business.business_name || `Business ${business.id}`;
       value.textContent = businessDetailText(business, isCurrent);
-      row.append(name, value);
+      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      chevron.setAttribute("viewBox", "0 0 512 512");
+      chevron.setAttribute("aria-hidden", "true");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M184 112l144 144-144 144");
+      chevron.append(path);
+      row.append(name, value, chevron);
+
+      row.addEventListener("click", async () => {
+        if (businessModal) businessModal.hidden = false;
+        await ensureBusinessLocations();
+        renderBusinessManager(business.id);
+        await loadBusinessLocations();
+      });
+
       return row;
     }));
   };
 
-  const renderBusinessManager = () => {
+  const renderBusinessManager = (openBusinessId = null) => {
     const { knownBusinesses, selectedBusiness } = getStoredBusinessState();
     businessManagerList?.replaceChildren(...knownBusinesses.map((business) => {
       const isCurrent = String(business.id) === String(selectedBusiness?.id || "");
-      const row = document.createElement("div");
-      row.className = `settings-list-row business-manager-row${isCurrent ? " current" : ""}`;
+      const isOpen = openBusinessId !== null && String(business.id) === String(openBusinessId);
+
+      const item = document.createElement("div");
+      item.className = `business-accordion-item${isOpen ? " is-open" : ""}${isCurrent ? " current" : ""}`;
+      item.dataset.businessItemId = String(business.id);
+
+      // Accordion header: shows only business name on the left and chevron on the right
+      const header = document.createElement("button");
+      header.type = "button";
+      header.className = "business-accordion-header";
+      header.setAttribute("aria-expanded", isOpen ? "true" : "false");
+
+      const headerLeft = document.createElement("div");
+      headerLeft.className = "business-accordion-header-left";
 
       const name = document.createElement("span");
-      const meta = document.createElement("strong");
-      const actions = document.createElement("div");
+      name.className = "business-accordion-name";
       name.textContent = business.business_name || `Business ${business.id}`;
-      meta.textContent = businessDetailText(business, isCurrent);
-      actions.className = "business-manager-actions";
+      headerLeft.append(name);
+
+      if (isCurrent) {
+        const servingPill = document.createElement("span");
+        servingPill.className = "business-serving-pill";
+        servingPill.textContent = "Serving";
+        headerLeft.append(servingPill);
+      }
+
+      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      chevron.setAttribute("class", "business-accordion-chevron");
+      chevron.setAttribute("viewBox", "0 0 512 512");
+      chevron.setAttribute("aria-hidden", "true");
+      const chevronPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      chevronPath.setAttribute("d", "M184 112l144 144-144 144");
+      chevron.append(chevronPath);
+
+      header.append(headerLeft, chevron);
+
+      // Accordion panel: contains editable business details
+      const panel = document.createElement("div");
+      panel.className = "business-accordion-panel";
+      panel.hidden = !isOpen;
+
+      const form = document.createElement("form");
+      form.className = "business-accordion-form";
+
+      // Hidden business id
+      const idInput = document.createElement("input");
+      idInput.type = "hidden";
+      idInput.name = "business_id";
+      idInput.value = String(business.id);
+
+      // Business name field
+      const nameRow = document.createElement("label");
+      nameRow.className = "settings-list-row field-row";
+      const nameLabel = document.createElement("span");
+      nameLabel.textContent = "Business name";
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.name = "business_name";
+      nameInput.value = business.business_name || "";
+      nameInput.required = true;
+      nameRow.append(nameLabel, nameInput);
+
+      // Business type field
+      const typeRow = document.createElement("label");
+      typeRow.className = "settings-list-row field-row";
+      const typeLabel = document.createElement("span");
+      typeLabel.textContent = "Business type";
+      const typeSelect = document.createElement("select");
+      typeSelect.name = "business_type";
+      [
+        { value: "retail", label: "Retail" },
+        { value: "service", label: "Service" },
+        { value: "wholesale", label: "Wholesale" },
+      ].forEach((opt) => {
+        const option = document.createElement("option");
+        option.value = opt.value;
+        option.textContent = opt.label;
+        if (opt.value === (business.business_type || "service")) {
+          option.selected = true;
+        }
+        typeSelect.append(option);
+      });
+      typeRow.append(typeLabel, typeSelect);
+
+      // Region field
+      const regionRow = document.createElement("label");
+      regionRow.className = "settings-list-row field-row";
+      const regionLabel = document.createElement("span");
+      regionLabel.textContent = "Region";
+      const regionSelect = document.createElement("select");
+      regionSelect.name = "region";
+      regionSelect.required = true;
+      regionRow.append(regionLabel, regionSelect);
+
+      // District field
+      const districtRow = document.createElement("label");
+      districtRow.className = "settings-list-row field-row";
+      const districtLabel = document.createElement("span");
+      districtLabel.textContent = "District";
+      const districtSelect = document.createElement("select");
+      districtSelect.name = "district";
+      districtSelect.required = true;
+      districtRow.append(districtLabel, districtSelect);
+
+      // Populate locations
+      if (regions.length) {
+        populateLocationSelects(regionSelect, districtSelect, business.region_code, business.district_code);
+      } else {
+        ensureBusinessLocations().then(() => {
+          populateLocationSelects(regionSelect, districtSelect, business.region_code, business.district_code);
+        });
+      }
+
+      // Meta info rows: Plan & Status
+      const planRow = document.createElement("div");
+      planRow.className = "settings-list-row field-row read-only-row";
+      const planLabel = document.createElement("span");
+      planLabel.textContent = "Subscription plan";
+      const planValue = document.createElement("strong");
+      planValue.textContent = business.plan_name || "Starter";
+      planRow.append(planLabel, planValue);
+
+      const statusRow = document.createElement("div");
+      statusRow.className = "settings-list-row field-row read-only-row";
+      const statusLabel = document.createElement("span");
+      statusLabel.textContent = "Account status";
+      const statusValue = document.createElement("strong");
+      const status = (business.account_status || "active").toLowerCase();
+      statusValue.className = `status-tag ${status}`;
+      statusValue.textContent = status.toUpperCase();
+      statusRow.append(statusLabel, statusValue);
+
+      // Inline error message
+      const errorMsg = document.createElement("p");
+      errorMsg.className = "inline-error";
+      errorMsg.hidden = true;
+
+      // Actions section
+      const actions = document.createElement("div");
+      actions.className = "business-accordion-actions";
+
+      const saveBtn = document.createElement("button");
+      saveBtn.className = "btn btn-primary full";
+      saveBtn.type = "submit";
+      saveBtn.textContent = "Save changes";
+      actions.append(saveBtn);
 
       if (!isCurrent) {
+        const secondaryActions = document.createElement("div");
+        secondaryActions.className = "business-accordion-secondary-actions";
+
         const setDefault = document.createElement("button");
         setDefault.type = "button";
-        setDefault.textContent = "Set default";
+        setDefault.className = "btn btn-outline btn-sm";
+        setDefault.textContent = "Set serving";
         setDefault.addEventListener("click", async () => {
           setDefault.disabled = true;
           try {
             await switchStoredBusiness(String(business.id));
             render();
-            renderBusinessManager();
+            renderBusinessManager(business.id);
             await showAppModal("Business changed", `${business.business_name || "Business"} is now serving.`);
           } catch (error) {
             await showAppModal("Unable to switch business", error.message || "Please try again.");
@@ -550,9 +750,12 @@ const setupSettingsPage = () => {
 
         const deleteButton = document.createElement("button");
         deleteButton.type = "button";
-        deleteButton.className = "danger";
-        deleteButton.textContent = "Delete";
+        deleteButton.className = "btn btn-danger-outline btn-sm";
+        deleteButton.textContent = "Delete business";
         deleteButton.addEventListener("click", async () => {
+          const confirmed = window.confirm(`Are you sure you want to delete ${business.business_name || "this business"}?`);
+          if (!confirmed) return;
+
           const body = new FormData();
           body.set("action", "delete");
           body.set("business_id", business.id);
@@ -576,11 +779,95 @@ const setupSettingsPage = () => {
           }
         });
 
-        actions.append(setDefault, deleteButton);
+        secondaryActions.append(setDefault, deleteButton);
+        actions.append(secondaryActions);
+      } else {
+        const servingNotice = document.createElement("div");
+        servingNotice.className = "business-serving-notice";
+        servingNotice.textContent = "Currently serving business";
+        actions.append(servingNotice);
       }
 
-      row.append(name, meta, actions);
-      return row;
+      form.append(idInput, nameRow, typeRow, regionRow, districtRow, planRow, statusRow, errorMsg, actions);
+      panel.append(form);
+
+      // Accordion toggle behavior
+      header.addEventListener("click", () => {
+        const currentlyOpen = !panel.hidden;
+
+        // Close other accordion items
+        businessManagerList?.querySelectorAll(".business-accordion-item").forEach((otherItem) => {
+          if (otherItem !== item) {
+            otherItem.classList.remove("is-open");
+            const otherHeader = otherItem.querySelector(".business-accordion-header");
+            const otherPanel = otherItem.querySelector(".business-accordion-panel");
+            if (otherHeader) otherHeader.setAttribute("aria-expanded", "false");
+            if (otherPanel) otherPanel.hidden = true;
+          }
+        });
+
+        if (currentlyOpen) {
+          item.classList.remove("is-open");
+          header.setAttribute("aria-expanded", "false");
+          panel.hidden = true;
+        } else {
+          item.classList.add("is-open");
+          header.setAttribute("aria-expanded", "true");
+          panel.hidden = false;
+        }
+      });
+
+      // Save form submit
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        errorMsg.hidden = true;
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving...";
+
+        const body = new FormData(form);
+        body.set("action", "update");
+
+        try {
+          const response = await fetch(`${getBasePath()}api/businesses.php`, {
+            method: "POST",
+            body,
+          });
+          const payload = await response.json();
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload.message || "Unable to update business.");
+          }
+
+          if (Array.isArray(payload.businesses)) {
+            localStorage.setItem("zipoo.businesses", JSON.stringify(payload.businesses));
+          }
+
+          const { selectedBusiness: currentSelected } = getStoredBusinessState();
+          const isThisCurrent = String(business.id) === String(currentSelected?.id || "");
+          if (isThisCurrent && payload.business) {
+            const savedUser = readStoredJson("zipoo.user", {});
+            localStorage.setItem("zipoo.user", JSON.stringify({
+              ...savedUser,
+              business_name: payload.business.business_name,
+              business_type: payload.business.business_type,
+              region_code: payload.business.region_code,
+              district_code: payload.business.district_code,
+            }));
+          }
+
+          render();
+          renderBusinessManager(business.id);
+          await showAppModal("Business updated", `${payload.business?.business_name || "Business"} details were updated.`);
+        } catch (err) {
+          errorMsg.textContent = err.message || "Unable to update business.";
+          errorMsg.hidden = false;
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Save changes";
+        }
+      });
+
+      item.append(header, panel);
+      return item;
     }));
   };
 
@@ -625,35 +912,11 @@ const setupSettingsPage = () => {
   };
 
   const loadBusinessLocations = async () => {
-    if (!businessRegion || !businessDistrict || regions.length) {
-      return;
-    }
-    try {
-      const response = await fetch(`${getBasePath()}api/locations.php`);
-      const payload = await response.json();
-      regions = Array.isArray(payload.regions) ? payload.regions : [];
-      businessRegion.replaceChildren(...regions.map((region) => {
-        const option = document.createElement("option");
-        option.value = region.value;
-        option.textContent = region.label;
-        return option;
-      }));
-      businessRegion.dispatchEvent(new Event("change"));
-    } catch {
-      regions = [];
+    await ensureBusinessLocations();
+    if (businessRegion && businessDistrict) {
+      populateLocationSelects(businessRegion, businessDistrict, businessRegion.value, businessDistrict.value);
     }
   };
-
-  businessRegion?.addEventListener("change", () => {
-    const region = regions.find((item) => item.value === businessRegion.value);
-    const districts = Array.isArray(region?.districts) ? region.districts : [];
-    businessDistrict?.replaceChildren(...districts.map((district) => {
-      const option = document.createElement("option");
-      option.value = district.value;
-      option.textContent = district.label;
-      return option;
-    }));
-  });
 
   accountEditButtons.forEach((button) => {
     button.addEventListener("click", (event) => {
@@ -708,6 +971,7 @@ const setupSettingsPage = () => {
 
   businessOpen?.addEventListener("click", async () => {
     if (businessModal) businessModal.hidden = false;
+    await ensureBusinessLocations();
     renderBusinessManager();
     await loadBusinessLocations();
   });
