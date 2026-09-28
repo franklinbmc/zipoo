@@ -55,7 +55,51 @@ try {
     $_SESSION['zipoo_user_id'] = $userId;
     unset($_SESSION['zipoo_pending_user_id']);
 
-    respond(200, ['ok' => true, 'message' => 'OTP verified.']);
+    $userStmt = $pdo->prepare(
+        'SELECT id, business_id, full_name, phone, email, business_name
+         FROM tbl_users
+         WHERE id = :id
+         LIMIT 1'
+    );
+    $userStmt->execute([':id' => $userId]);
+    $user = $userStmt->fetch();
+
+    $businessId = $user && $user['business_id'] ? (int) $user['business_id'] : null;
+    if ($businessId !== null) {
+        $_SESSION['zipoo_business_id'] = $businessId;
+    }
+
+    $businesses = [];
+    if ($businessId !== null) {
+        $businessesStmt = $pdo->prepare(
+            'SELECT id, business_name, business_type
+             FROM tbl_businesses
+             WHERE owner_user_id = :user_id OR id = :business_id
+             ORDER BY id ASC'
+        );
+        $businessesStmt->execute([':user_id' => $userId, ':business_id' => $businessId]);
+        $businesses = array_map(static function (array $b): array {
+            return [
+                'id' => (int) $b['id'],
+                'business_name' => $b['business_name'],
+                'business_type' => $b['business_type'],
+            ];
+        }, $businessesStmt->fetchAll());
+    }
+
+    respond(200, [
+        'ok' => true,
+        'message' => 'OTP verified.',
+        'user' => $user ? [
+            'id' => (int) $user['id'],
+            'business_id' => $businessId,
+            'business_name' => $user['business_name'] ?? null,
+            'full_name' => $user['full_name'],
+            'phone' => $user['phone'],
+            'email' => $user['email'],
+        ] : null,
+        'businesses' => $businesses,
+    ]);
 } catch (Throwable) {
     respond(500, ['ok' => false, 'message' => 'Unable to verify OTP right now.']);
 }

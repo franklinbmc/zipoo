@@ -38,6 +38,9 @@ function user_payload(array $user): array
         'phone' => $user['phone'],
         'email' => $user['email'],
         'business_name' => $user['business_name'] ?? null,
+        'business_type' => $user['business_type'] ?? null,
+        'region_code' => $user['region_code'] ?? null,
+        'district_code' => $user['district_code'] ?? null,
     ];
 }
 
@@ -58,9 +61,14 @@ try {
     $pdo = db();
 
     $stmt = $pdo->prepare(
-        'SELECT id, business_id, full_name, phone, email, business_name, business_type, region_code, district_code
-         FROM tbl_users
-         WHERE id = :id
+        'SELECT u.id, u.business_id, u.full_name, u.phone, u.email,
+                COALESCE(b.business_name, u.business_name) AS business_name,
+                COALESCE(b.business_type, u.business_type) AS business_type,
+                COALESCE(b.region_code, u.region_code) AS region_code,
+                COALESCE(b.district_code, u.district_code) AS district_code
+         FROM tbl_users u
+         LEFT JOIN tbl_businesses b ON b.id = u.business_id
+         WHERE u.id = :id
          LIMIT 1'
     );
     $stmt->execute([':id' => $userId]);

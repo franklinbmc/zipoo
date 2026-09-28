@@ -307,6 +307,28 @@ const refreshStoredBusinesses = async () => {
   }
   return null;
 };
+
+const refreshStoredAccount = async () => {
+  try {
+    const response = await fetch(`${getBasePath()}api/account.php`);
+    if (response.status === 401) {
+      if (navigator.onLine && (document.querySelector("[data-settings-page]") || document.querySelector("[data-quick-panel]"))) {
+        localStorage.removeItem("zipoo.isLoggedIn");
+        window.location.replace(`${getBasePath()}login`);
+      }
+      return null;
+    }
+    const payload = await response.json();
+    if (response.ok && payload.ok && payload.user) {
+      const savedUser = readStoredJson("zipoo.user", {});
+      localStorage.setItem("zipoo.user", JSON.stringify({ ...savedUser, ...payload.user }));
+      return payload.user;
+    }
+  } catch {
+    // Keep existing local account details for offline rendering.
+  }
+  return null;
+};
 const switchStoredBusiness = async (businessId) => {
   const body = new FormData();
   body.set("action", "switch");
@@ -361,6 +383,7 @@ const setupQuickPanel = () => {
   };
 
   syncQuickBusinessUi();
+  refreshStoredAccount().then(syncQuickBusinessUi);
   refreshStoredBusinesses().then(syncQuickBusinessUi);
 
   if (!panel || !openButton || !closeButton) {
@@ -465,14 +488,9 @@ const setupSettingsPage = () => {
   };
 
   const refreshAccount = async () => {
-    try {
-      const response = await fetch(`${getBasePath()}api/account.php`);
-      const payload = await response.json();
-      if (response.ok && payload.ok && payload.user) {
-        storeAccount(payload.user);
-      }
-    } catch {
-      // Existing local account details are enough for offline rendering.
+    const user = await refreshStoredAccount();
+    if (user) {
+      render();
     }
   };
 
@@ -569,11 +587,11 @@ const setupSettingsPage = () => {
   const render = () => {
     const { user, selectedBusiness } = getStoredBusinessState();
     const ownerName = user.full_name || "Owner profile";
-    const profileBusinessName = user.business_name || "Business";
+    const profileBusinessName = user.business_name || selectedBusiness?.business_name || "-";
     const businessName = selectedBusiness?.business_name || profileBusinessName;
-    if (ownerAvatar) ownerAvatar.textContent = ownerName.trim().charAt(0).toUpperCase() || "U";
+    if (ownerAvatar) ownerAvatar.textContent = (user.full_name ? user.full_name.trim().charAt(0).toUpperCase() : "U");
     if (ownerProfileName) ownerProfileName.textContent = ownerName;
-    if (ownerProfileMeta) ownerProfileMeta.textContent = [user.phone, user.email].filter(Boolean).join(" - ") || "Profile details";
+    if (ownerProfileMeta) ownerProfileMeta.textContent = [user.phone, user.email].filter(Boolean).join(" - ") || "-";
     if (settingsBusinessName) settingsBusinessName.textContent = profileBusinessName;
     if (settingsName) settingsName.textContent = user.full_name || "-";
     if (settingsPhone) settingsPhone.textContent = user.phone || "-";
@@ -1304,6 +1322,15 @@ const setupRegisterFlow = () => {
       }
 
       localStorage.setItem("zipoo.isLoggedIn", "true");
+      if (payload.user) {
+        localStorage.setItem("zipoo.user", JSON.stringify(payload.user));
+      }
+      if (Array.isArray(payload.businesses)) {
+        localStorage.setItem("zipoo.businesses", JSON.stringify(payload.businesses));
+      }
+      if (payload.user?.business_id) {
+        localStorage.setItem("zipoo.currentBusinessId", String(payload.user.business_id));
+      }
       showRegistrationSuccess();
     } catch (verifyError) {
       otpVerify.disabled = false;
@@ -1351,6 +1378,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupPasswordTools();
   setupLoginFlow();
   setupLocationSelects().finally(setupRegisterFlow);
+  setupSettingsPage();
   updateConnectionStatus();
   registerServiceWorker();
 });
