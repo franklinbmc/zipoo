@@ -1237,7 +1237,7 @@ body.offline .status-dot {
 .company-select select {
   min-height: 40px;
 }
-`r`n
+
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2328,7 +2328,7 @@ button.business-settings-row:disabled {
   }
 
   .quick-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .saas-admin-layout {
