@@ -1,8 +1,9 @@
-const CACHE_NAME = "zipoo-phase-1-v65";
+const CACHE_NAME = "zipoo-phase-1-v66";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./pages/dashboard.html",
+  "./pages/settings.html",
   "./pages/login.html",
   "./pages/register.html",
   "./saas/index.html",
@@ -38,6 +39,7 @@ const APP_SHELL = [
   "./assets/css/styles.css?v=35",
   "./assets/css/styles.css?v=36",
   "./assets/css/styles.css?v=37",
+  "./assets/css/styles.css?v=38",
   "./assets/js/app.js",
   "./assets/js/app.js?v=3",
   "./assets/js/app.js?v=4",
@@ -67,6 +69,7 @@ const APP_SHELL = [
   "./assets/js/app.js?v=31",
   "./assets/js/app.js?v=32",
   "./assets/js/app.js?v=33",
+  "./assets/js/app.js?v=34",
   "./assets/js/app.js?v=29",
   "./assets/js/app.js?v=30",
   "./assets/js/saas.js",
@@ -155,7 +158,9 @@ self.addEventListener("fetch", (event) => {
         const url = new URL(event.request.url);
         const fallback = url.pathname.includes("dashboard")
           ? "./pages/dashboard.html"
-          : url.pathname.includes("register")
+          : url.pathname.includes("settings")
+            ? "./pages/settings.html"
+            : url.pathname.includes("register")
             ? "./pages/register.html"
             : url.pathname.includes("login")
               ? "./pages/login.html"

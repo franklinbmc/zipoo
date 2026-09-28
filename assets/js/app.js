@@ -257,6 +257,55 @@ const showAppModal = (title, message) => new Promise((resolve) => {
   closeButton.focus();
 });
 
+const readStoredJson = (key, fallback) => {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "");
+  } catch {
+    return fallback;
+  }
+};
+
+const getStoredBusinessState = () => {
+  const user = readStoredJson("zipoo.user", {});
+  const businesses = readStoredJson("zipoo.businesses", []);
+  const knownBusinesses = Array.isArray(businesses) && businesses.length
+    ? businesses
+    : user.business_id
+      ? [{ id: user.business_id, business_name: user.business_name || "Primary business" }]
+      : [];
+  const savedBusinessId = localStorage.getItem("zipoo.currentBusinessId") || String(user.business_id || knownBusinesses[0]?.id || "");
+  const selectedBusiness = knownBusinesses.find((business) => String(business.id) === savedBusinessId) || knownBusinesses[0] || null;
+
+  return { user, knownBusinesses, selectedBusiness };
+};
+
+const switchStoredBusiness = async (businessId) => {
+  const body = new FormData();
+  body.set("action", "switch");
+  body.set("business_id", businessId);
+
+  const response = await fetch(`${getBasePath()}api/businesses.php`, {
+    method: "POST",
+    body,
+  });
+  const payload = await response.json();
+
+  if (!response.ok || !payload.ok) {
+    throw new Error(payload.message || "Unable to switch business.");
+  }
+
+  localStorage.setItem("zipoo.currentBusinessId", String(businessId));
+  if (payload.business) {
+    const { knownBusinesses } = getStoredBusinessState();
+    const nextBusinesses = knownBusinesses.map((business) => (
+      String(business.id) === String(payload.business.id) ? payload.business : business
+    ));
+    localStorage.setItem("zipoo.businesses", JSON.stringify(nextBusinesses));
+  }
+
+  return payload.business;
+};
+
 const setupQuickPanel = () => {
   const panel = document.querySelector("[data-quick-panel]");
   const openButton = document.querySelector("[data-quick-open]");
@@ -265,56 +314,12 @@ const setupQuickPanel = () => {
   const currentBusiness = document.querySelector("[data-current-business]");
   const companySelectWrap = document.querySelector("[data-company-select-wrap]");
   const companySelect = document.querySelector("[data-company-select]");
-  const settingsOpen = document.querySelector("[data-settings-open]");
-  const settingsModal = document.querySelector("[data-settings-modal]");
-  const settingsClose = document.querySelector("[data-settings-close]");
-  const settingsName = document.querySelector("[data-settings-name]");
-  const settingsPhone = document.querySelector("[data-settings-phone]");
-  const settingsEmail = document.querySelector("[data-settings-email]");
-  const settingsCurrentBusiness = document.querySelector("[data-settings-current-business]");
-  const settingsBusinessList = document.querySelector("[data-settings-business-list]");
-  const businessCount = document.querySelector("[data-business-count]");
-  const createForm = document.querySelector("[data-business-create-form]");
-  const createError = document.querySelector("[data-business-create-error]");
 
-  if (!panel || !openButton || !closeButton) {
-    return;
-  }
-
-  const readStoredJson = (key, fallback) => {
-    try {
-      return JSON.parse(localStorage.getItem(key) || "");
-    } catch {
-      return fallback;
-    }
-  };
-
-  const user = readStoredJson("zipoo.user", {});
-  let knownBusinesses = [];
-  let selectedBusiness = null;
-
-  const refreshBusinesses = () => {
-    const businesses = readStoredJson("zipoo.businesses", []);
-    knownBusinesses = Array.isArray(businesses) && businesses.length
-      ? businesses
-      : user.business_id
-        ? [{ id: user.business_id, business_name: user.business_name || "Primary business" }]
-        : [];
-    const savedBusinessId = localStorage.getItem("zipoo.currentBusinessId") || String(user.business_id || knownBusinesses[0]?.id || "");
-    selectedBusiness = knownBusinesses.find((business) => String(business.id) === savedBusinessId) || knownBusinesses[0] || null;
-  };
-
-  const syncBusinessUi = () => {
-    refreshBusinesses();
-    const currentName = selectedBusiness?.business_name || "Primary business";
-
+  const syncQuickBusinessUi = () => {
+    const { knownBusinesses, selectedBusiness } = getStoredBusinessState();
     if (currentBusiness) {
-      currentBusiness.textContent = currentName;
+      currentBusiness.textContent = selectedBusiness?.business_name || "Primary business";
     }
-    if (settingsCurrentBusiness) {
-      settingsCurrentBusiness.textContent = currentName;
-    }
-
     if (companySelect && companySelectWrap) {
       companySelect.replaceChildren(...knownBusinesses.map((business) => {
         const option = document.createElement("option");
@@ -325,80 +330,13 @@ const setupQuickPanel = () => {
       }));
       companySelectWrap.hidden = knownBusinesses.length <= 1;
     }
-
-    if (businessCount) {
-      businessCount.textContent = `${knownBusinesses.length} registered`;
-    }
   };
 
-  const switchBusiness = async (businessId) => {
-    const body = new FormData();
-    body.set("action", "switch");
-    body.set("business_id", businessId);
+  syncQuickBusinessUi();
 
-    const response = await fetch(`${getBasePath()}api/businesses.php`, {
-      method: "POST",
-      body,
-    });
-    const payload = await response.json();
-
-    if (!response.ok || !payload.ok) {
-      throw new Error(payload.message || "Unable to switch business.");
-    }
-
-    localStorage.setItem("zipoo.currentBusinessId", String(businessId));
-    if (payload.business) {
-      const nextBusinesses = knownBusinesses.map((business) => (
-        String(business.id) === String(payload.business.id) ? payload.business : business
-      ));
-      localStorage.setItem("zipoo.businesses", JSON.stringify(nextBusinesses));
-    }
-    syncBusinessUi();
-    renderSettingsBusinesses();
-  };
-
-  const renderSettingsBusinesses = () => {
-    if (!settingsBusinessList) {
-      return;
-    }
-
-    syncBusinessUi();
-    settingsBusinessList.replaceChildren(...knownBusinesses.map((business) => {
-      const row = document.createElement("div");
-      const isCurrent = String(business.id) === String(selectedBusiness?.id || "");
-      row.className = `business-row${isCurrent ? " current" : ""}`;
-
-      const details = document.createElement("div");
-      const name = document.createElement("strong");
-      const type = document.createElement("span");
-      name.textContent = business.business_name || `Business ${business.id}`;
-      type.textContent = isCurrent ? "Current" : (business.business_type || "Business");
-      details.append(name, type);
-
-      if (isCurrent) {
-        row.append(details);
-        return row;
-      }
-
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = "Switch";
-      button.addEventListener("click", async () => {
-        button.disabled = true;
-        try {
-          await switchBusiness(String(business.id));
-          await showAppModal("Business changed", `${business.business_name || "Business"} is now serving.`);
-        } catch (error) {
-          await showAppModal("Unable to switch business", error.message || "Please try again.");
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-      row.append(details, button);
-      return row;
-    }));
-  };
+  if (!panel || !openButton || !closeButton) {
+    return;
+  }
 
   const openPanel = () => {
     panel.hidden = false;
@@ -412,29 +350,6 @@ const setupQuickPanel = () => {
     openButton.focus();
   };
 
-  const openSettings = () => {
-    if (!settingsModal) {
-      return;
-    }
-
-    if (settingsName) settingsName.textContent = user.full_name || "-";
-    if (settingsPhone) settingsPhone.textContent = user.phone || "-";
-    if (settingsEmail) settingsEmail.textContent = user.email || "-";
-    renderSettingsBusinesses();
-    closePanel();
-    settingsModal.hidden = false;
-    settingsClose?.focus();
-  };
-
-  const closeSettings = () => {
-    if (settingsModal) {
-      settingsModal.hidden = true;
-    }
-    settingsOpen?.focus();
-  };
-
-  syncBusinessUi();
-
   openButton.addEventListener("click", openPanel);
   closeButton.addEventListener("click", closePanel);
   panel.addEventListener("click", (event) => {
@@ -442,29 +357,18 @@ const setupQuickPanel = () => {
       closePanel();
     }
   });
-  settingsOpen?.addEventListener("click", openSettings);
-  settingsClose?.addEventListener("click", closeSettings);
-  settingsModal?.addEventListener("click", (event) => {
-    if (event.target === settingsModal) {
-      closeSettings();
-    }
-  });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      if (!panel.hidden) {
-        closePanel();
-      }
-      if (settingsModal && !settingsModal.hidden) {
-        closeSettings();
-      }
+    if (event.key === "Escape" && !panel.hidden) {
+      closePanel();
     }
   });
 
   companySelect?.addEventListener("change", async () => {
-    const previousValue = String(selectedBusiness?.id || "");
+    const previousValue = String(getStoredBusinessState().selectedBusiness?.id || "");
     companySelect.disabled = true;
     try {
-      await switchBusiness(companySelect.value);
+      await switchStoredBusiness(companySelect.value);
+      syncQuickBusinessUi();
       closePanel();
     } catch (error) {
       companySelect.value = previousValue;
@@ -473,6 +377,76 @@ const setupQuickPanel = () => {
       companySelect.disabled = false;
     }
   });
+
+  logoutButton?.addEventListener("click", () => {
+    localStorage.removeItem("zipoo.isLoggedIn");
+    window.location.href = `${getBasePath()}login`;
+  });
+};
+
+const setupSettingsPage = () => {
+  const page = document.querySelector("[data-settings-page]");
+  if (!page) {
+    return;
+  }
+
+  const settingsName = document.querySelector("[data-settings-name]");
+  const settingsPhone = document.querySelector("[data-settings-phone]");
+  const settingsEmail = document.querySelector("[data-settings-email]");
+  const settingsCurrentBusiness = document.querySelector("[data-settings-current-business]");
+  const settingsBusinessList = document.querySelector("[data-settings-business-list]");
+  const businessCount = document.querySelector("[data-business-count]");
+  const createForm = document.querySelector("[data-business-create-form]");
+  const createError = document.querySelector("[data-business-create-error]");
+
+  const render = () => {
+    const { user, knownBusinesses, selectedBusiness } = getStoredBusinessState();
+    if (settingsName) settingsName.textContent = user.full_name || "-";
+    if (settingsPhone) settingsPhone.textContent = user.phone || "-";
+    if (settingsEmail) settingsEmail.textContent = user.email || "-";
+    if (settingsCurrentBusiness) settingsCurrentBusiness.textContent = selectedBusiness?.business_name || "Primary business";
+    if (businessCount) businessCount.textContent = `${knownBusinesses.length} registered`;
+
+    settingsBusinessList?.replaceChildren(...knownBusinesses.map((business) => {
+      const isCurrent = String(business.id) === String(selectedBusiness?.id || "");
+      const row = document.createElement(isCurrent ? "div" : "button");
+      row.className = `settings-list-row business-settings-row${isCurrent ? " current" : ""}`;
+      if (!isCurrent) {
+        row.type = "button";
+      }
+
+      const label = document.createElement("span");
+      const value = document.createElement("strong");
+      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      label.textContent = business.business_name || `Business ${business.id}`;
+      value.textContent = isCurrent ? "Current" : (business.business_type || "Switch");
+      chevron.setAttribute("viewBox", "0 0 512 512");
+      chevron.setAttribute("aria-hidden", "true");
+      path.setAttribute("d", "M184 112l144 144-144 144");
+      chevron.append(path);
+      row.append(label, value, chevron);
+
+      if (!isCurrent) {
+        row.addEventListener("click", async () => {
+          row.disabled = true;
+          try {
+            await switchStoredBusiness(String(business.id));
+            render();
+            await showAppModal("Business changed", `${business.business_name || "Business"} is now serving.`);
+          } catch (error) {
+            await showAppModal("Unable to switch business", error.message || "Please try again.");
+          } finally {
+            row.disabled = false;
+          }
+        });
+      }
+
+      return row;
+    }));
+  };
+
+  render();
 
   createForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -496,14 +470,14 @@ const setupQuickPanel = () => {
         throw new Error(payload.message || "Unable to create business.");
       }
 
+      const { knownBusinesses } = getStoredBusinessState();
       const nextBusinesses = Array.isArray(payload.businesses) ? payload.businesses : [...knownBusinesses, payload.business].filter(Boolean);
       localStorage.setItem("zipoo.businesses", JSON.stringify(nextBusinesses));
       if (payload.business?.id) {
         localStorage.setItem("zipoo.currentBusinessId", String(payload.business.id));
       }
       createForm.reset();
-      syncBusinessUi();
-      renderSettingsBusinesses();
+      render();
       await showAppModal("Business created", `${payload.business?.business_name || "New business"} is now serving.`);
     } catch (error) {
       if (createError) {
@@ -515,11 +489,6 @@ const setupQuickPanel = () => {
     } finally {
       submitButton.disabled = false;
     }
-  });
-
-  logoutButton?.addEventListener("click", () => {
-    localStorage.removeItem("zipoo.isLoggedIn");
-    window.location.href = `${getBasePath()}login`;
   });
 };
 const setupSearchSelects = () => {

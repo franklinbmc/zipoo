@@ -89,13 +89,13 @@
           </svg>
           <span>Reports</span>
         </a>
-        <button class="quick-tile" type="button" data-settings-open>
+        <a class="quick-tile" href="/settings">
           <svg viewBox="0 0 512 512" aria-hidden="true">
             <circle cx="256" cy="256" r="72" />
             <path d="M256 48v56M256 408v56M96 96l40 40M376 376l40 40M48 256h56M408 256h56M96 416l40-40M376 136l40-40" />
           </svg>
           <span>Settings</span>
-        </button>
+        </a>
         <button class="quick-tile" type="button" data-logout>
           <svg viewBox="0 0 512 512" aria-hidden="true">
             <path d="M224 96H112v320h112M304 160l96 96-96 96M400 256H192" />
@@ -106,62 +106,6 @@
     </aside>
   </div>
 
-  <div class="modal-backdrop" id="settings-modal" hidden data-settings-modal>
-    <section class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-      <div class="settings-modal-header">
-        <div>
-          <span class="sheet-label">Account</span>
-          <h2 id="settings-title">Settings</h2>
-        </div>
-        <button class="icon-button sheet-close" type="button" aria-label="Close settings" data-settings-close>
-          <svg viewBox="0 0 512 512" aria-hidden="true">
-            <path d="M128 128l256 256M384 128L128 384" />
-          </svg>
-        </button>
-      </div>
-
-      <div class="settings-modal-body">
-        <section class="settings-card">
-          <h3>Account details</h3>
-          <dl class="account-details">
-            <div><dt>Name</dt><dd data-settings-name>-</dd></div>
-            <div><dt>Phone</dt><dd data-settings-phone>-</dd></div>
-            <div><dt>Email</dt><dd data-settings-email>-</dd></div>
-            <div><dt>Serving business</dt><dd data-settings-current-business>-</dd></div>
-          </dl>
-        </section>
-
-        <section class="settings-card">
-          <div class="settings-card-head">
-            <h3>My Businesses</h3>
-            <span data-business-count>0</span>
-          </div>
-          <div class="business-list" data-settings-business-list></div>
-        </section>
-
-        <section class="settings-card">
-          <h3>Create new business</h3>
-          <form class="business-create-form" data-business-create-form>
-            <label>
-              <span>Business name</span>
-              <input type="text" name="business_name" placeholder="New company" required>
-            </label>
-            <label>
-              <span>Business type</span>
-              <select name="business_type">
-                <option value="retail">Retail</option>
-                <option value="service" selected>Service</option>
-                <option value="wholesale">Wholesale</option>
-              </select>
-            </label>
-            <p class="inline-error" hidden data-business-create-error></p>
-            <button class="btn btn-primary full" type="submit">Create business</button>
-          </form>
-        </section>
-      </div>
-    </section>
-  </div>
-
   <div class="modal-backdrop" hidden data-app-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
       <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
@@ -170,6 +114,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=33" defer></script>
+  <script src="/assets/js/app.js?v=34" defer></script>
 </body>
 </html>

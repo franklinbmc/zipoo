@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#F6F8FC">
+  <meta name="description" content="Zipoo account settings.">
+  <title>Settings - Zipoo</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=38">
+</head>
+<body>
+  <div class="app-shell settings-page-shell">
+    <header class="topbar app-topbar">
+      <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
+      </a>
+      <a class="brand" href="/" aria-label="Zipoo home">
+        <span class="brand-mark">Z</span>
+        <span class="brand-name">Zipoo</span>
+      </a>
+      <span class="topbar-spacer" aria-hidden="true"></span>
+    </header>
+
+    <main class="settings-page" data-settings-page>
+      <section class="settings-title-block">
+        <span class="eyebrow">Account</span>
+        <h1>Settings</h1>
+      </section>
+
+      <section class="settings-list-group">
+        <h2>Account details</h2>
+        <div class="settings-list">
+          <div class="settings-list-row">
+            <span>Name</span>
+            <strong data-settings-name>-</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+          <div class="settings-list-row">
+            <span>Phone</span>
+            <strong data-settings-phone>-</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+          <div class="settings-list-row">
+            <span>Email</span>
+            <strong data-settings-email>-</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+          <div class="settings-list-row">
+            <span>Current serving business</span>
+            <strong data-settings-current-business>-</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="settings-list-group">
+        <h2>My Businesses <small data-business-count>0 registered</small></h2>
+        <div class="settings-list" data-settings-business-list></div>
+      </section>
+
+      <section class="settings-list-group">
+        <h2>Create new business</h2>
+        <form class="settings-list business-create-form" data-business-create-form>
+          <label class="settings-list-row field-row">
+            <span>Business name</span>
+            <input type="text" name="business_name" placeholder="New company" required>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </label>
+          <label class="settings-list-row field-row">
+            <span>Business type</span>
+            <select name="business_type">
+              <option value="retail">Retail</option>
+              <option value="service" selected>Service</option>
+              <option value="wholesale">Wholesale</option>
+            </select>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </label>
+          <p class="inline-error" hidden data-business-create-error></p>
+          <button class="btn btn-primary full" type="submit">Create business</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-close>OK</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=34" defer></script>
+</body>
+</html>

@@ -14,6 +14,7 @@ DirectoryIndex index.html
   RewriteRule ^login/?$ pages/login.html [L]
   RewriteRule ^register/?$ pages/register.html [L]
   RewriteRule ^dashboard/?$ pages/dashboard.html [L]
+  RewriteRule ^settings/?$ pages/settings.html [L]
 
   # SaaS admin routes.
   RewriteRule ^saas/?$ saas/index.html [L]
