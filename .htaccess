@@ -1,0 +1,36 @@
+RewriteEngine On
+RewriteBase /zipoo/
+
+RewriteRule ^login/?$ pages/login.html [L]
+RewriteRule ^register/?$ pages/register.html [L]
+RewriteRule ^dashboard/?$ pages/dashboard.html [L]
+RewriteRule ^saas/?$ saas/index.html [L]
+RewriteRule ^saas/login/?$ saas/login.html [L]
+RewriteRule ^saas/dashboard/?$ saas/dashboard.html [L]
+RewriteRule ^saas/businesses/?$ saas/businesses.html [L]
+RewriteRule ^saas/users/?$ saas/users.html [L]
+RewriteRule ^saas/settings/?$ saas/settings.html [L]
+
+RewriteCond %{THE_REQUEST} \s/+zipoo/pages/login\.html[\s?] [NC]
+RewriteRule ^pages/login\.html$ login [R=302,L]
+
+RewriteCond %{THE_REQUEST} \s/+zipoo/pages/register\.html[\s?] [NC]
+RewriteRule ^pages/register\.html$ register [R=302,L]
+
+RewriteCond %{THE_REQUEST} \s/+zipoo/pages/dashboard\.html[\s?] [NC]
+RewriteRule ^pages/dashboard\.html$ dashboard [R=302,L]
+
+RewriteCond %{THE_REQUEST} \s/+zipoo/saas/login\.html[\s?] [NC]
+RewriteRule ^saas/login\.html$ saas/login [R=302,L]
+
+RewriteCond %{THE_REQUEST} \s/+zipoo/saas/dashboard\.html[\s?] [NC]
+RewriteRule ^saas/dashboard\.html$ saas/dashboard [R=302,L]
+
+RewriteCond %{THE_REQUEST} \s/+zipoo/saas/businesses\.html[\s?] [NC]
+RewriteRule ^saas/businesses\.html$ saas/businesses [R=302,L]
+
+RewriteCond %{THE_REQUEST} \s/+zipoo/saas/users\.html[\s?] [NC]
+RewriteRule ^saas/users\.html$ saas/users [R=302,L]
+
+RewriteCond %{THE_REQUEST} \s/+zipoo/saas/settings\.html[\s?] [NC]
+RewriteRule ^saas/settings\.html$ saas/settings [R=302,L]

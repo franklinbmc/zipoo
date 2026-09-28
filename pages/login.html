@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0D2B5B">
+  <meta name="description" content="Zipoo business management app login.">
+  <title>Login - Zipoo</title>
+  <link rel="manifest" href="/zipoo/manifest.json">
+  <link rel="icon" href="/zipoo/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/zipoo/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/zipoo/assets/css/styles.css?v=32">
+</head>
+<body>
+  <div class="app-shell login-entry">
+    <header class="topbar app-topbar">
+      <a class="brand" href="/zipoo/" aria-label="Zipoo home">
+        <span class="brand-mark">Z</span>
+        <span class="brand-name">Zipoo</span>
+      </a>
+      <button class="icon-button menu-button" type="button" aria-label="Open menu" aria-controls="app-menu" aria-expanded="false" data-menu-open>
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M80 160h352M80 256h352M80 352h352" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="entry-main">
+      <form class="entry-login" action="/zipoo/api/login.php" method="post" novalidate data-login-flow>
+        <h1 data-i18n="login.title">Login to Zipoo</h1>
+        <label>
+          <span data-i18n="auth.phoneEmail">Phone Number / Email</span>
+          <input type="text" name="login" autocomplete="username" placeholder="0712345678">
+        </label>
+        <label>
+          <span data-i18n="auth.password">Password</span>
+          <div class="password-field" data-password-field>
+            <input type="password" name="password" autocomplete="current-password" placeholder="••••••••">
+            <button class="password-toggle" type="button" aria-label="Show password" data-password-toggle>
+              <svg class="icon-eye" viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M48 256s76-128 208-128 208 128 208 128-76 128-208 128S48 256 48 256Z" />
+                <circle cx="256" cy="256" r="64" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 512 512" aria-hidden="true" hidden>
+                <path d="M64 64l384 384M48 256s76-128 208-128a212 212 0 0 1 92 21M464 256s-76 128-208 128a212 212 0 0 1-92-21" />
+                <path d="M216 216a64 64 0 0 0 80 80" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <label class="checkbox-label compact-row">
+          <input type="checkbox" name="remember">
+          <span data-i18n="login.remember">Remember Me</span>
+        </label>
+        <p class="inline-error" hidden data-login-error></p>
+        <p class="inline-status" hidden data-login-status></p>
+        <button class="btn btn-primary full" type="submit" data-i18n="common.login">Login</button>
+      </form>
+    </main>
+
+    <footer class="entry-footer">
+      <p data-i18n="app.tagline">Zipoo - Business anywhere</p>
+    </footer>
+  </div>
+
+  <div class="sheet-backdrop" id="app-menu" hidden data-menu>
+    <div class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <h2 id="menu-title" data-i18n="menu.title">Menu</h2>
+        <button class="icon-button sheet-close" type="button" aria-label="Close menu" data-menu-close>
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M128 128l256 256M384 128L128 384" />
+          </svg>
+        </button>
+      </div>
+      <div class="sheet-section">
+        <span class="sheet-label" data-i18n="menu.language">Language</span>
+        <div class="language-switcher sheet-language" aria-label="Language">
+          <button type="button" data-lang="en">English</button>
+          <button type="button" data-lang="sw">Kiswahili</button>
+        </div>
+      </div>
+      <a class="sheet-action" href="/zipoo/register">
+        <span data-i18n="common.register">Create Account</span>
+      </a>
+      <a class="sheet-action" href="#">
+        <span data-i18n="login.forgot">Forgot Password?</span>
+      </a>
+    </div>
+  </div>
+  <script src="/zipoo/assets/js/app.js?v=29" defer></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0D2B5B">
+  <meta name="description" content="Zipoo dashboard route.">
+  <title>Dashboard - Zipoo</title>
+  <link rel="manifest" href="/zipoo/manifest.json">
+  <link rel="icon" href="/zipoo/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/zipoo/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/zipoo/assets/css/styles.css?v=32">
+</head>
+<body>
+  <div class="app-shell login-entry">
+    <header class="topbar app-topbar">
+      <a class="brand" href="/zipoo/" aria-label="Zipoo home">
+        <span class="brand-mark">Z</span>
+        <span class="brand-name">Zipoo</span>
+      </a>
+      <button class="icon-button menu-button" type="button" aria-label="Open shortcuts" aria-controls="quick-panel" aria-expanded="false" data-quick-open>
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M80 160h352M80 256h352M80 352h352" />
+        </svg>
+      </button>
+    </header>
+    <main class="entry-main">
+      <section class="entry-login">
+        <h1>Dashboard</h1>
+      </section>
+    </main>
+    <footer class="entry-footer">
+      <p data-i18n="app.tagline">Zipoo - Business anywhere</p>
+    </footer>
+  </div>
+
+  <div class="quick-backdrop" id="quick-panel" hidden data-quick-panel>
+    <aside class="quick-panel" role="dialog" aria-modal="true" aria-labelledby="quick-title">
+      <div class="quick-handle" aria-hidden="true"></div>
+      <div class="quick-header">
+        <div>
+          <span class="sheet-label">Shortcuts</span>
+          <h2 id="quick-title">Zipoo Areas</h2>
+        </div>
+        <button class="icon-button sheet-close" type="button" aria-label="Close shortcuts" data-quick-close>
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M128 128l256 256M384 128L128 384" />
+          </svg>
+        </button>
+      </div>
+      <div class="quick-grid">
+        <a class="quick-tile active" href="/zipoo/dashboard">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M80 220l176-140 176 140v212H304V304h-96v128H80z" />
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <a class="quick-tile" href="#">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M96 160h320M128 96h256M128 224h256M160 288h192M192 352h128" />
+          </svg>
+          <span>Sales</span>
+        </a>
+        <a class="quick-tile" href="#">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M96 144l160-64 160 64-160 64zM96 144v224l160 64 160-64V144M256 208v224" />
+          </svg>
+          <span>Stock</span>
+        </a>
+        <a class="quick-tile" href="#">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M176 240a72 72 0 1 0 0-144 72 72 0 0 0 0 144ZM64 432c16-80 72-128 112-128s96 48 112 128M352 224a56 56 0 1 0 0-112M320 304c48 8 84 48 96 112" />
+          </svg>
+          <span>Customers</span>
+        </a>
+        <a class="quick-tile" href="#">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M96 416V96h320v320zM160 352h192M160 288h192M160 224h120M160 160h80" />
+          </svg>
+          <span>Reports</span>
+        </a>
+        <button class="quick-tile" type="button" data-logout>
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M224 96H112v320h112M304 160l96 96-96 96M400 256H192" />
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <script src="/zipoo/assets/js/app.js?v=28" defer></script>
+</body>
+</html>

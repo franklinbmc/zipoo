@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0D2B5B">
+  <meta name="description" content="Zipoo business management app registration.">
+  <title>Create Account - Zipoo</title>
+  <link rel="manifest" href="/zipoo/manifest.json">
+  <link rel="icon" href="/zipoo/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/zipoo/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/zipoo/assets/css/styles.css?v=32">
+</head>
+<body>
+  <div class="app-shell login-entry">
+    <header class="topbar app-topbar">
+      <a class="brand" href="/zipoo/" aria-label="Zipoo home">
+        <span class="brand-mark">Z</span>
+        <span class="brand-name">Zipoo</span>
+      </a>
+      <button class="icon-button menu-button" type="button" aria-label="Open menu" aria-controls="app-menu" aria-expanded="false" data-menu-open>
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M80 160h352M80 256h352M80 352h352" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="entry-main">
+      <form class="entry-login register-flow" action="/zipoo/api/register.php" method="post" novalidate data-register-flow>
+        <div class="flow-progress" aria-label="Registration progress">
+          <span class="flow-dot active"></span>
+          <span class="flow-dot"></span>
+          <span class="flow-dot"></span>
+        </div>
+        <span class="flow-count" data-flow-count>1 / 3</span>
+        <span class="eyebrow centered" data-i18n="register.stepPersonal">Personal Information</span>
+        <h1 data-i18n="register.title">Create your account</h1>
+        <p class="flow-helper" data-i18n="register.personalHint">Let us start with who you are.</p>
+
+        <label class="flow-field active" data-flow-field>
+          <span data-i18n="register.fullName">Full Name</span>
+          <input type="text" name="full_name" placeholder="Amina Juma" autocomplete="name" required>
+        </label>
+        <label class="flow-field" data-flow-field hidden>
+          <span data-i18n="register.phone">Phone Number</span>
+          <input type="tel" name="phone" placeholder="0712345678" autocomplete="tel" inputmode="numeric" maxlength="10" required data-validate="phone">
+        </label>
+        <label class="flow-field" data-flow-field hidden>
+          <span data-i18n="register.email">Email</span>
+          <input type="email" name="email" placeholder="name@example.com" autocomplete="email" data-validate="email">
+        </label>
+        <label class="flow-field" data-flow-field data-flow-section="business" hidden>
+          <span data-i18n="register.businessName">Business Name</span>
+          <input type="text" name="business_name" placeholder="Zipoo Shop" required>
+        </label>
+        <label class="flow-field" data-flow-field data-flow-section="business" hidden>
+          <span data-i18n="register.businessType">Business Type</span>
+          <div class="search-select" data-search-select>
+            <input type="hidden" name="business_type" required data-search-select-value>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label data-i18n="register.businessType">Business Type</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M112 184l144 144 144-144" />
+              </svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search data-i18n-placeholder="common.search" placeholder="Search">
+              <div class="search-select-options" data-search-select-options>
+                <button type="button" data-search-select-option data-value="retail" data-label-key="register.retail" data-i18n="register.retail">Retail</button>
+                <button type="button" data-search-select-option data-value="service" data-label-key="register.service" data-i18n="register.service">Service</button>
+                <button type="button" data-search-select-option data-value="wholesale" data-label-key="register.wholesale" data-i18n="register.wholesale">Wholesale</button>
+              </div>
+            </div>
+          </div>
+        </label>
+        <label class="flow-field" data-flow-field data-flow-section="business" hidden>
+          <span data-i18n="register.region">Region</span>
+          <div class="search-select" data-search-select data-location-select="region">
+            <input type="hidden" name="region" required data-search-select-value>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label data-i18n="register.region">Region</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M112 184l144 144 144-144" />
+              </svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search data-i18n-placeholder="common.search" placeholder="Search">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
+        </label>
+        <label class="flow-field" data-flow-field data-flow-section="business" hidden>
+          <span data-i18n="register.district">District</span>
+          <div class="search-select" data-search-select data-location-select="district">
+            <input type="hidden" name="district" required data-search-select-value>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false" disabled>
+              <span data-search-select-label data-i18n="register.district">District</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M112 184l144 144 144-144" />
+              </svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search data-i18n-placeholder="common.search" placeholder="Search">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
+        </label>
+        <label class="flow-field" data-flow-field data-flow-section="security" hidden>
+          <span data-i18n="auth.password">Password</span>
+          <div class="password-field" data-password-field>
+            <input type="password" name="password" placeholder="••••••••" autocomplete="new-password" required minlength="8" data-validate="password">
+            <span class="password-valid" hidden data-password-valid aria-hidden="true">
+              <svg viewBox="0 0 64 64">
+                <path d="M20 33.5l8 8L45 23"></path>
+              </svg>
+            </span>
+            <button class="password-toggle" type="button" aria-label="Show password" data-password-toggle>
+              <svg class="icon-eye" viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M48 256s76-128 208-128 208 128 208 128-76 128-208 128S48 256 48 256Z" />
+                <circle cx="256" cy="256" r="64" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 512 512" aria-hidden="true" hidden>
+                <path d="M64 64l384 384M48 256s76-128 208-128a212 212 0 0 1 92 21M464 256s-76 128-208 128a212 212 0 0 1-92-21" />
+                <path d="M216 216a64 64 0 0 0 80 80" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <label class="flow-field" data-flow-field data-flow-section="security" hidden>
+          <span data-i18n="register.confirmPassword">Confirm Password</span>
+          <div class="password-field" data-password-field>
+            <input type="password" name="confirm_password" placeholder="••••••••" autocomplete="new-password" required data-validate="confirm-password">
+            <button class="password-toggle" type="button" aria-label="Show password" data-password-toggle>
+              <svg class="icon-eye" viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M48 256s76-128 208-128 208 128 208 128-76 128-208 128S48 256 48 256Z" />
+                <circle cx="256" cy="256" r="64" />
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 512 512" aria-hidden="true" hidden>
+                <path d="M64 64l384 384M48 256s76-128 208-128a212 212 0 0 1 92 21M464 256s-76 128-208 128a212 212 0 0 1-92-21" />
+                <path d="M216 216a64 64 0 0 0 80 80" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <p class="inline-error" hidden data-flow-error data-i18n="validation.required">This field is required.</p>
+        <p class="inline-status" hidden data-flow-status></p>
+
+        <div class="otp-panel" hidden data-otp-panel>
+          <label>
+            <span data-i18n="register.otpLabel">Enter OTP</span>
+            <input type="text" name="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" data-otp-input>
+          </label>
+          <button class="btn btn-primary full" type="button" data-otp-verify data-i18n="register.verifyOtp">Verify OTP</button>
+        </div>
+
+        <div class="register-success" hidden data-register-success>
+          <div class="success-check" aria-hidden="true">
+            <svg viewBox="0 0 64 64">
+              <circle cx="32" cy="32" r="28"></circle>
+              <path d="M20 33.5l8 8L45 23"></path>
+            </svg>
+          </div>
+          <h2 data-i18n="register.congratsTitle">Congratulations</h2>
+          <p data-i18n="register.congratsMessage">You have made it to the great application.</p>
+          <span class="success-countdown" data-success-countdown>5</span>
+        </div>
+
+        <div class="flow-actions">
+          <button class="btn btn-secondary icon-only" type="button" data-flow-back aria-label="Go back" hidden>
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M328 112L184 256l144 144" />
+            </svg>
+          </button>
+          <button class="btn btn-primary btn-with-icon" type="button" data-flow-next>
+            <span data-i18n="common.next">Next</span>
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M184 112l144 144-144 144" />
+            </svg>
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <footer class="entry-footer">
+      <p data-i18n="app.tagline">Zipoo - Business anywhere</p>
+    </footer>
+  </div>
+
+  <div class="sheet-backdrop" id="app-menu" hidden data-menu>
+    <div class="bottom-sheet" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="sheet-header">
+        <h2 id="menu-title" data-i18n="menu.title">Menu</h2>
+        <button class="icon-button sheet-close" type="button" aria-label="Close menu" data-menu-close>
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M128 128l256 256M384 128L128 384" />
+          </svg>
+        </button>
+      </div>
+      <div class="sheet-section">
+        <span class="sheet-label" data-i18n="menu.language">Language</span>
+        <div class="language-switcher sheet-language" aria-label="Language">
+          <button type="button" data-lang="en">English</button>
+          <button type="button" data-lang="sw">Kiswahili</button>
+        </div>
+      </div>
+      <a class="sheet-action" href="/zipoo/login">
+        <span data-i18n="common.login">Login</span>
+      </a>
+    </div>
+  </div>
+  <script src="/zipoo/assets/js/app.js?v=30" defer></script>
+</body>
+</html>

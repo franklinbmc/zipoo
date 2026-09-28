@@ -1,0 +1,9049 @@
+{
+  "_attribution": "Data from Open Admin Data (https://openadmindata.org/tz/) — CC-BY-4.0. Please cite: https://github.com/open-admin-data/tanzania-administrative-divisions",
+  "data": [
+    {
+      "id": "TZ01",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Dodoma",
+        "en": "Dodoma",
+        "slug": "dodoma"
+      },
+      "code": {
+        "id": "TZ01",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 189
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.845",
+        "lon": "36.008"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/dodoma/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0101",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kondoa",
+        "en": "Kondoa",
+        "slug": "kondoa"
+      },
+      "code": {
+        "id": "TZ0101",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ01",
+        "level": 1,
+        "name": {
+          "local": "Dodoma",
+          "en": "Dodoma",
+          "slug": "dodoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ01",
+          "level": 1,
+          "name": {
+            "local": "Dodoma",
+            "en": "Dodoma",
+            "slug": "dodoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 28
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.78",
+        "lon": "35.887"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0102",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mpwapwa",
+        "en": "Mpwapwa",
+        "slug": "mpwapwa"
+      },
+      "code": {
+        "id": "TZ0102",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ01",
+        "level": 1,
+        "name": {
+          "local": "Dodoma",
+          "en": "Dodoma",
+          "slug": "dodoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ01",
+          "level": 1,
+          "name": {
+            "local": "Dodoma",
+            "en": "Dodoma",
+            "slug": "dodoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 30
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.763",
+        "lon": "36.262"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0103",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kongwa",
+        "en": "Kongwa",
+        "slug": "kongwa"
+      },
+      "code": {
+        "id": "TZ0103",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ01",
+        "level": 1,
+        "name": {
+          "local": "Dodoma",
+          "en": "Dodoma",
+          "slug": "dodoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ01",
+          "level": 1,
+          "name": {
+            "local": "Dodoma",
+            "en": "Dodoma",
+            "slug": "dodoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 22
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.974",
+        "lon": "36.607"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0104",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Chamwino",
+        "en": "Chamwino",
+        "slug": "chamwino"
+      },
+      "code": {
+        "id": "TZ0104",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ01",
+        "level": 1,
+        "name": {
+          "local": "Dodoma",
+          "en": "Dodoma",
+          "slug": "dodoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ01",
+          "level": 1,
+          "name": {
+            "local": "Dodoma",
+            "en": "Dodoma",
+            "slug": "dodoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 32
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.232",
+        "lon": "35.678"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0105",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Dodoma Urban",
+        "en": "Dodoma Urban",
+        "slug": "dodoma-urban"
+      },
+      "code": {
+        "id": "TZ0105",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ01",
+        "level": 1,
+        "name": {
+          "local": "Dodoma",
+          "en": "Dodoma",
+          "slug": "dodoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ01",
+          "level": 1,
+          "name": {
+            "local": "Dodoma",
+            "en": "Dodoma",
+            "slug": "dodoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 37
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.146",
+        "lon": "35.807"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0106",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Bahi",
+        "en": "Bahi",
+        "slug": "bahi"
+      },
+      "code": {
+        "id": "TZ0106",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ01",
+        "level": 1,
+        "name": {
+          "local": "Dodoma",
+          "en": "Dodoma",
+          "slug": "dodoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ01",
+          "level": 1,
+          "name": {
+            "local": "Dodoma",
+            "en": "Dodoma",
+            "slug": "dodoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.167",
+        "lon": "35.567"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0107",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Chemba",
+        "en": "Chemba",
+        "slug": "chemba"
+      },
+      "code": {
+        "id": "TZ0107",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ01",
+        "level": 1,
+        "name": {
+          "local": "Dodoma",
+          "en": "Dodoma",
+          "slug": "dodoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ01",
+          "level": 1,
+          "name": {
+            "local": "Dodoma",
+            "en": "Dodoma",
+            "slug": "dodoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.27",
+        "lon": "35.695"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ02",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Arusha",
+        "en": "Arusha",
+        "slug": "arusha"
+      },
+      "code": {
+        "id": "TZ02",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 123
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.918",
+        "lon": "36.089"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/arusha/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0201",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Monduli",
+        "en": "Monduli",
+        "slug": "monduli"
+      },
+      "code": {
+        "id": "TZ0201",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ02",
+        "level": 1,
+        "name": {
+          "local": "Arusha",
+          "en": "Arusha",
+          "slug": "arusha"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ02",
+          "level": 1,
+          "name": {
+            "local": "Arusha",
+            "en": "Arusha",
+            "slug": "arusha"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 15
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.452",
+        "lon": "36.235"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0202",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Meru",
+        "en": "Meru",
+        "slug": "meru"
+      },
+      "code": {
+        "id": "TZ0202",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ02",
+        "level": 1,
+        "name": {
+          "local": "Arusha",
+          "en": "Arusha",
+          "slug": "arusha"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ02",
+          "level": 1,
+          "name": {
+            "local": "Arusha",
+            "en": "Arusha",
+            "slug": "arusha"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.323",
+        "lon": "36.906"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0203",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Arusha Urban",
+        "en": "Arusha Urban",
+        "slug": "arusha-urban"
+      },
+      "code": {
+        "id": "TZ0203",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ02",
+        "level": 1,
+        "name": {
+          "local": "Arusha",
+          "en": "Arusha",
+          "slug": "arusha"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ02",
+          "level": 1,
+          "name": {
+            "local": "Arusha",
+            "en": "Arusha",
+            "slug": "arusha"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 19
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.448",
+        "lon": "36.675"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0204",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Karatu",
+        "en": "Karatu",
+        "slug": "karatu"
+      },
+      "code": {
+        "id": "TZ0204",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ02",
+        "level": 1,
+        "name": {
+          "local": "Arusha",
+          "en": "Arusha",
+          "slug": "arusha"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ02",
+          "level": 1,
+          "name": {
+            "local": "Arusha",
+            "en": "Arusha",
+            "slug": "arusha"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 14
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.487",
+        "lon": "35.362"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0205",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ngorongoro",
+        "en": "Ngorongoro",
+        "slug": "ngorongoro"
+      },
+      "code": {
+        "id": "TZ0205",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ02",
+        "level": 1,
+        "name": {
+          "local": "Arusha",
+          "en": "Arusha",
+          "slug": "arusha"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ02",
+          "level": 1,
+          "name": {
+            "local": "Arusha",
+            "en": "Arusha",
+            "slug": "arusha"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.654",
+        "lon": "35.505"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0206",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Arusha",
+        "en": "Arusha",
+        "slug": "arusha"
+      },
+      "code": {
+        "id": "TZ0206",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ02",
+        "level": 1,
+        "name": {
+          "local": "Arusha",
+          "en": "Arusha",
+          "slug": "arusha"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ02",
+          "level": 1,
+          "name": {
+            "local": "Arusha",
+            "en": "Arusha",
+            "slug": "arusha"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.359",
+        "lon": "36.679"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0207",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Longido",
+        "en": "Longido",
+        "slug": "longido"
+      },
+      "code": {
+        "id": "TZ0207",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ02",
+        "level": 1,
+        "name": {
+          "local": "Arusha",
+          "en": "Arusha",
+          "slug": "arusha"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ02",
+          "level": 1,
+          "name": {
+            "local": "Arusha",
+            "en": "Arusha",
+            "slug": "arusha"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 16
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.642",
+        "lon": "36.658"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ03",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Kilimanjaro",
+        "en": "Kilimanjaro",
+        "slug": "kilimanjaro"
+      },
+      "code": {
+        "id": "TZ03",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 153
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.732",
+        "lon": "37.647"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/kilimanjaro/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0301",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Rombo",
+        "en": "Rombo",
+        "slug": "rombo"
+      },
+      "code": {
+        "id": "TZ0301",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ03",
+        "level": 1,
+        "name": {
+          "local": "Kilimanjaro",
+          "en": "Kilimanjaro",
+          "slug": "kilimanjaro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ03",
+          "level": 1,
+          "name": {
+            "local": "Kilimanjaro",
+            "en": "Kilimanjaro",
+            "slug": "kilimanjaro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 24
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.126",
+        "lon": "37.48"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0302",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mwanga",
+        "en": "Mwanga",
+        "slug": "mwanga"
+      },
+      "code": {
+        "id": "TZ0302",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ03",
+        "level": 1,
+        "name": {
+          "local": "Kilimanjaro",
+          "en": "Kilimanjaro",
+          "slug": "kilimanjaro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ03",
+          "level": 1,
+          "name": {
+            "local": "Kilimanjaro",
+            "en": "Kilimanjaro",
+            "slug": "kilimanjaro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.684",
+        "lon": "37.681"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0303",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Same",
+        "en": "Same",
+        "slug": "same"
+      },
+      "code": {
+        "id": "TZ0303",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ03",
+        "level": 1,
+        "name": {
+          "local": "Kilimanjaro",
+          "en": "Kilimanjaro",
+          "slug": "kilimanjaro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ03",
+          "level": 1,
+          "name": {
+            "local": "Kilimanjaro",
+            "en": "Kilimanjaro",
+            "slug": "kilimanjaro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 31
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.203",
+        "lon": "37.932"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0304",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Moshi",
+        "en": "Moshi",
+        "slug": "moshi"
+      },
+      "code": {
+        "id": "TZ0304",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ03",
+        "level": 1,
+        "name": {
+          "local": "Kilimanjaro",
+          "en": "Kilimanjaro",
+          "slug": "kilimanjaro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ03",
+          "level": 1,
+          "name": {
+            "local": "Kilimanjaro",
+            "en": "Kilimanjaro",
+            "slug": "kilimanjaro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 31
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.37",
+        "lon": "37.432"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0305",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Hai",
+        "en": "Hai",
+        "slug": "hai"
+      },
+      "code": {
+        "id": "TZ0305",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ03",
+        "level": 1,
+        "name": {
+          "local": "Kilimanjaro",
+          "en": "Kilimanjaro",
+          "slug": "kilimanjaro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ03",
+          "level": 1,
+          "name": {
+            "local": "Kilimanjaro",
+            "en": "Kilimanjaro",
+            "slug": "kilimanjaro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 14
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.24",
+        "lon": "37.187"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0306",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Moshi Urban",
+        "en": "Moshi Urban",
+        "slug": "moshi-urban"
+      },
+      "code": {
+        "id": "TZ0306",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ03",
+        "level": 1,
+        "name": {
+          "local": "Kilimanjaro",
+          "en": "Kilimanjaro",
+          "slug": "kilimanjaro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ03",
+          "level": 1,
+          "name": {
+            "local": "Kilimanjaro",
+            "en": "Kilimanjaro",
+            "slug": "kilimanjaro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.346",
+        "lon": "37.343"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0307",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Siha",
+        "en": "Siha",
+        "slug": "siha"
+      },
+      "code": {
+        "id": "TZ0307",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ03",
+        "level": 1,
+        "name": {
+          "local": "Kilimanjaro",
+          "en": "Kilimanjaro",
+          "slug": "kilimanjaro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ03",
+          "level": 1,
+          "name": {
+            "local": "Kilimanjaro",
+            "en": "Kilimanjaro",
+            "slug": "kilimanjaro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 12
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.108",
+        "lon": "37.077"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ04",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Tanga",
+        "en": "Tanga",
+        "slug": "tanga"
+      },
+      "code": {
+        "id": "TZ04",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 10,
+        "ward": 215
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.064",
+        "lon": "38.12"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/tanga/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0401",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Lushoto",
+        "en": "Lushoto",
+        "slug": "lushoto"
+      },
+      "code": {
+        "id": "TZ0401",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 44
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.546",
+        "lon": "38.438"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0402",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Korogwe",
+        "en": "Korogwe",
+        "slug": "korogwe"
+      },
+      "code": {
+        "id": "TZ0402",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.931",
+        "lon": "38.335"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0403",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Muheza",
+        "en": "Muheza",
+        "slug": "muheza"
+      },
+      "code": {
+        "id": "TZ0403",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 33
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.179",
+        "lon": "38.824"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0404",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Tanga Urban",
+        "en": "Tanga Urban",
+        "slug": "tanga-urban"
+      },
+      "code": {
+        "id": "TZ0404",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 24
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.126",
+        "lon": "39.017"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0405",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Pangani",
+        "en": "Pangani",
+        "slug": "pangani"
+      },
+      "code": {
+        "id": "TZ0405",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 13
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.615",
+        "lon": "38.843"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0406",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Handeni",
+        "en": "Handeni",
+        "slug": "handeni"
+      },
+      "code": {
+        "id": "TZ0406",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.494",
+        "lon": "38.213"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0407",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kilindi",
+        "en": "Kilindi",
+        "slug": "kilindi"
+      },
+      "code": {
+        "id": "TZ0407",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.503",
+        "lon": "37.498"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0408",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mkinga",
+        "en": "Mkinga",
+        "slug": "mkinga"
+      },
+      "code": {
+        "id": "TZ0408",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.697",
+        "lon": "38.941"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0409",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Korogwe Township Authority",
+        "en": "Korogwe Township Authority",
+        "slug": "korogwe-township-authority"
+      },
+      "code": {
+        "id": "TZ0409",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 8
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.145",
+        "lon": "38.476"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0410",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Handeni Mji",
+        "en": "Handeni Mji",
+        "slug": "handeni-mji"
+      },
+      "code": {
+        "id": "TZ0410",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ04",
+        "level": 1,
+        "name": {
+          "local": "Tanga",
+          "en": "Tanga",
+          "slug": "tanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ04",
+          "level": 1,
+          "name": {
+            "local": "Tanga",
+            "en": "Tanga",
+            "slug": "tanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 12
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.441",
+        "lon": "37.924"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ05",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Morogoro",
+        "en": "Morogoro",
+        "slug": "morogoro"
+      },
+      "code": {
+        "id": "TZ05",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 154
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.861",
+        "lon": "36.92"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/morogoro/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0501",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kilosa",
+        "en": "Kilosa",
+        "slug": "kilosa"
+      },
+      "code": {
+        "id": "TZ0501",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ05",
+        "level": 1,
+        "name": {
+          "local": "Morogoro",
+          "en": "Morogoro",
+          "slug": "morogoro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ05",
+          "level": 1,
+          "name": {
+            "local": "Morogoro",
+            "en": "Morogoro",
+            "slug": "morogoro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 35
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.957",
+        "lon": "36.988"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0502",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Morogoro",
+        "en": "Morogoro",
+        "slug": "morogoro"
+      },
+      "code": {
+        "id": "TZ0502",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ05",
+        "level": 1,
+        "name": {
+          "local": "Morogoro",
+          "en": "Morogoro",
+          "slug": "morogoro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ05",
+          "level": 1,
+          "name": {
+            "local": "Morogoro",
+            "en": "Morogoro",
+            "slug": "morogoro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 29
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.052",
+        "lon": "37.826"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0503",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kilombero",
+        "en": "Kilombero",
+        "slug": "kilombero"
+      },
+      "code": {
+        "id": "TZ0503",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ05",
+        "level": 1,
+        "name": {
+          "local": "Morogoro",
+          "en": "Morogoro",
+          "slug": "morogoro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ05",
+          "level": 1,
+          "name": {
+            "local": "Morogoro",
+            "en": "Morogoro",
+            "slug": "morogoro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 19
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.562",
+        "lon": "36.562"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0504",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ulanga",
+        "en": "Ulanga",
+        "slug": "ulanga"
+      },
+      "code": {
+        "id": "TZ0504",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ05",
+        "level": 1,
+        "name": {
+          "local": "Morogoro",
+          "en": "Morogoro",
+          "slug": "morogoro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ05",
+          "level": 1,
+          "name": {
+            "local": "Morogoro",
+            "en": "Morogoro",
+            "slug": "morogoro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 24
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.043",
+        "lon": "36.555"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0505",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Morogoro Urban",
+        "en": "Morogoro Urban",
+        "slug": "morogoro-urban"
+      },
+      "code": {
+        "id": "TZ0505",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ05",
+        "level": 1,
+        "name": {
+          "local": "Morogoro",
+          "en": "Morogoro",
+          "slug": "morogoro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ05",
+          "level": 1,
+          "name": {
+            "local": "Morogoro",
+            "en": "Morogoro",
+            "slug": "morogoro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 19
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.786",
+        "lon": "37.667"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0506",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mvomero",
+        "en": "Mvomero",
+        "slug": "mvomero"
+      },
+      "code": {
+        "id": "TZ0506",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ05",
+        "level": 1,
+        "name": {
+          "local": "Morogoro",
+          "en": "Morogoro",
+          "slug": "morogoro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ05",
+          "level": 1,
+          "name": {
+            "local": "Morogoro",
+            "en": "Morogoro",
+            "slug": "morogoro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.599",
+        "lon": "37.634"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0507",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Gairo",
+        "en": "Gairo",
+        "slug": "gairo"
+      },
+      "code": {
+        "id": "TZ0507",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ05",
+        "level": 1,
+        "name": {
+          "local": "Morogoro",
+          "en": "Morogoro",
+          "slug": "morogoro"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ05",
+          "level": 1,
+          "name": {
+            "local": "Morogoro",
+            "en": "Morogoro",
+            "slug": "morogoro"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 11
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.228",
+        "lon": "37.055"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ06",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Pwani",
+        "en": "Pwani",
+        "slug": "pwani"
+      },
+      "code": {
+        "id": "TZ06",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 111
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.177",
+        "lon": "38.851"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/pwani/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0601",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Bagamoyo",
+        "en": "Bagamoyo",
+        "slug": "bagamoyo"
+      },
+      "code": {
+        "id": "TZ0601",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ06",
+        "level": 1,
+        "name": {
+          "local": "Pwani",
+          "en": "Pwani",
+          "slug": "pwani"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ06",
+          "level": 1,
+          "name": {
+            "local": "Pwani",
+            "en": "Pwani",
+            "slug": "pwani"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 22
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.309",
+        "lon": "38.46"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0602",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kibaha",
+        "en": "Kibaha",
+        "slug": "kibaha"
+      },
+      "code": {
+        "id": "TZ0602",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ06",
+        "level": 1,
+        "name": {
+          "local": "Pwani",
+          "en": "Pwani",
+          "slug": "pwani"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ06",
+          "level": 1,
+          "name": {
+            "local": "Pwani",
+            "en": "Pwani",
+            "slug": "pwani"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 11
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.806",
+        "lon": "38.61"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0603",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kisarawe",
+        "en": "Kisarawe",
+        "slug": "kisarawe"
+      },
+      "code": {
+        "id": "TZ0603",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ06",
+        "level": 1,
+        "name": {
+          "local": "Pwani",
+          "en": "Pwani",
+          "slug": "pwani"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ06",
+          "level": 1,
+          "name": {
+            "local": "Pwani",
+            "en": "Pwani",
+            "slug": "pwani"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 15
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.182",
+        "lon": "38.692"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0604",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mkuranga",
+        "en": "Mkuranga",
+        "slug": "mkuranga"
+      },
+      "code": {
+        "id": "TZ0604",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ06",
+        "level": 1,
+        "name": {
+          "local": "Pwani",
+          "en": "Pwani",
+          "slug": "pwani"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ06",
+          "level": 1,
+          "name": {
+            "local": "Pwani",
+            "en": "Pwani",
+            "slug": "pwani"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 18
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.246",
+        "lon": "39.136"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0605",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Rufiji",
+        "en": "Rufiji",
+        "slug": "rufiji"
+      },
+      "code": {
+        "id": "TZ0605",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ06",
+        "level": 1,
+        "name": {
+          "local": "Pwani",
+          "en": "Pwani",
+          "slug": "pwani"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ06",
+          "level": 1,
+          "name": {
+            "local": "Pwani",
+            "en": "Pwani",
+            "slug": "pwani"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 26
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.991",
+        "lon": "38.62"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0606",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mafia",
+        "en": "Mafia",
+        "slug": "mafia"
+      },
+      "code": {
+        "id": "TZ0606",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ06",
+        "level": 1,
+        "name": {
+          "local": "Pwani",
+          "en": "Pwani",
+          "slug": "pwani"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ06",
+          "level": 1,
+          "name": {
+            "local": "Pwani",
+            "en": "Pwani",
+            "slug": "pwani"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 8
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.86",
+        "lon": "39.706"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0607",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kibaha Urban",
+        "en": "Kibaha Urban",
+        "slug": "kibaha-urban"
+      },
+      "code": {
+        "id": "TZ0607",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ06",
+        "level": 1,
+        "name": {
+          "local": "Pwani",
+          "en": "Pwani",
+          "slug": "pwani"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ06",
+          "level": 1,
+          "name": {
+            "local": "Pwani",
+            "en": "Pwani",
+            "slug": "pwani"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 11
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.691",
+        "lon": "38.913"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ07",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Dar-es-salaam",
+        "en": "Dar-es-salaam",
+        "slug": "dar-es-salaam"
+      },
+      "code": {
+        "id": "TZ07",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 3,
+        "ward": 90
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.872",
+        "lon": "39.28"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/dar-es-salaam/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0701",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kinondoni",
+        "en": "Kinondoni",
+        "slug": "kinondoni"
+      },
+      "code": {
+        "id": "TZ0701",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ07",
+        "level": 1,
+        "name": {
+          "local": "Dar-es-salaam",
+          "en": "Dar-es-salaam",
+          "slug": "dar-es-salaam"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ07",
+          "level": 1,
+          "name": {
+            "local": "Dar-es-salaam",
+            "en": "Dar-es-salaam",
+            "slug": "dar-es-salaam"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 34
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.719",
+        "lon": "39.148"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0702",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ilala",
+        "en": "Ilala",
+        "slug": "ilala"
+      },
+      "code": {
+        "id": "TZ0702",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ07",
+        "level": 1,
+        "name": {
+          "local": "Dar-es-salaam",
+          "en": "Dar-es-salaam",
+          "slug": "dar-es-salaam"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ07",
+          "level": 1,
+          "name": {
+            "local": "Dar-es-salaam",
+            "en": "Dar-es-salaam",
+            "slug": "dar-es-salaam"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 26
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.941",
+        "lon": "39.161"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0703",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Temeke",
+        "en": "Temeke",
+        "slug": "temeke"
+      },
+      "code": {
+        "id": "TZ0703",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ07",
+        "level": 1,
+        "name": {
+          "local": "Dar-es-salaam",
+          "en": "Dar-es-salaam",
+          "slug": "dar-es-salaam"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ07",
+          "level": 1,
+          "name": {
+            "local": "Dar-es-salaam",
+            "en": "Dar-es-salaam",
+            "slug": "dar-es-salaam"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 30
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.996",
+        "lon": "39.372"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ08",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Lindi",
+        "en": "Lindi",
+        "slug": "lindi"
+      },
+      "code": {
+        "id": "TZ08",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 6,
+        "ward": 136
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.334",
+        "lon": "38.424"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/lindi/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0801",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kilwa",
+        "en": "Kilwa",
+        "slug": "kilwa"
+      },
+      "code": {
+        "id": "TZ0801",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ08",
+        "level": 1,
+        "name": {
+          "local": "Lindi",
+          "en": "Lindi",
+          "slug": "lindi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ08",
+          "level": 1,
+          "name": {
+            "local": "Lindi",
+            "en": "Lindi",
+            "slug": "lindi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.089",
+        "lon": "39.05"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0802",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Lindi",
+        "en": "Lindi",
+        "slug": "lindi"
+      },
+      "code": {
+        "id": "TZ0802",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ08",
+        "level": 1,
+        "name": {
+          "local": "Lindi",
+          "en": "Lindi",
+          "slug": "lindi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ08",
+          "level": 1,
+          "name": {
+            "local": "Lindi",
+            "en": "Lindi",
+            "slug": "lindi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 30
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.037",
+        "lon": "39.499"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0803",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Nachingwea",
+        "en": "Nachingwea",
+        "slug": "nachingwea"
+      },
+      "code": {
+        "id": "TZ0803",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ08",
+        "level": 1,
+        "name": {
+          "local": "Lindi",
+          "en": "Lindi",
+          "slug": "lindi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ08",
+          "level": 1,
+          "name": {
+            "local": "Lindi",
+            "en": "Lindi",
+            "slug": "lindi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 26
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.327",
+        "lon": "38.219"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0804",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Liwale",
+        "en": "Liwale",
+        "slug": "liwale"
+      },
+      "code": {
+        "id": "TZ0804",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ08",
+        "level": 1,
+        "name": {
+          "local": "Lindi",
+          "en": "Lindi",
+          "slug": "lindi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ08",
+          "level": 1,
+          "name": {
+            "local": "Lindi",
+            "en": "Lindi",
+            "slug": "lindi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.186",
+        "lon": "37.793"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0805",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ruangwa",
+        "en": "Ruangwa",
+        "slug": "ruangwa"
+      },
+      "code": {
+        "id": "TZ0805",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ08",
+        "level": 1,
+        "name": {
+          "local": "Lindi",
+          "en": "Lindi",
+          "slug": "lindi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ08",
+          "level": 1,
+          "name": {
+            "local": "Lindi",
+            "en": "Lindi",
+            "slug": "lindi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.09",
+        "lon": "38.954"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0806",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Lindi Urban",
+        "en": "Lindi Urban",
+        "slug": "lindi-urban"
+      },
+      "code": {
+        "id": "TZ0806",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ08",
+        "level": 1,
+        "name": {
+          "local": "Lindi",
+          "en": "Lindi",
+          "slug": "lindi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ08",
+          "level": 1,
+          "name": {
+            "local": "Lindi",
+            "en": "Lindi",
+            "slug": "lindi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 18
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.961",
+        "lon": "39.598"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ09",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Mtwara",
+        "en": "Mtwara",
+        "slug": "mtwara"
+      },
+      "code": {
+        "id": "TZ09",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 149
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.771",
+        "lon": "39.222"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/mtwara/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ0901",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mtwara",
+        "en": "Mtwara",
+        "slug": "mtwara"
+      },
+      "code": {
+        "id": "TZ0901",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ09",
+        "level": 1,
+        "name": {
+          "local": "Mtwara",
+          "en": "Mtwara",
+          "slug": "mtwara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ09",
+          "level": 1,
+          "name": {
+            "local": "Mtwara",
+            "en": "Mtwara",
+            "slug": "mtwara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 28
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.477",
+        "lon": "40.045"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0902",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Newala",
+        "en": "Newala",
+        "slug": "newala"
+      },
+      "code": {
+        "id": "TZ0902",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ09",
+        "level": 1,
+        "name": {
+          "local": "Mtwara",
+          "en": "Mtwara",
+          "slug": "mtwara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ09",
+          "level": 1,
+          "name": {
+            "local": "Mtwara",
+            "en": "Mtwara",
+            "slug": "mtwara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 28
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.7",
+        "lon": "39.261"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0903",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Masasi",
+        "en": "Masasi",
+        "slug": "masasi"
+      },
+      "code": {
+        "id": "TZ0903",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ09",
+        "level": 1,
+        "name": {
+          "local": "Mtwara",
+          "en": "Mtwara",
+          "slug": "mtwara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ09",
+          "level": 1,
+          "name": {
+            "local": "Mtwara",
+            "en": "Mtwara",
+            "slug": "mtwara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 22
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.762",
+        "lon": "38.821"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0904",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Tandahimba",
+        "en": "Tandahimba",
+        "slug": "tandahimba"
+      },
+      "code": {
+        "id": "TZ0904",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ09",
+        "level": 1,
+        "name": {
+          "local": "Mtwara",
+          "en": "Mtwara",
+          "slug": "mtwara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ09",
+          "level": 1,
+          "name": {
+            "local": "Mtwara",
+            "en": "Mtwara",
+            "slug": "mtwara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 30
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.663",
+        "lon": "39.619"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0905",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mtwara Urban",
+        "en": "Mtwara Urban",
+        "slug": "mtwara-urban"
+      },
+      "code": {
+        "id": "TZ0905",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ09",
+        "level": 1,
+        "name": {
+          "local": "Mtwara",
+          "en": "Mtwara",
+          "slug": "mtwara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ09",
+          "level": 1,
+          "name": {
+            "local": "Mtwara",
+            "en": "Mtwara",
+            "slug": "mtwara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 15
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.316",
+        "lon": "40.148"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0906",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Nanyumbu",
+        "en": "Nanyumbu",
+        "slug": "nanyumbu"
+      },
+      "code": {
+        "id": "TZ0906",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ09",
+        "level": 1,
+        "name": {
+          "local": "Mtwara",
+          "en": "Mtwara",
+          "slug": "mtwara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ09",
+          "level": 1,
+          "name": {
+            "local": "Mtwara",
+            "en": "Mtwara",
+            "slug": "mtwara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 14
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-11.051",
+        "lon": "38.443"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ0907",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Masasi  Township Authority",
+        "en": "Masasi  Township Authority",
+        "slug": "masasi-township-authority"
+      },
+      "code": {
+        "id": "TZ0907",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ09",
+        "level": 1,
+        "name": {
+          "local": "Mtwara",
+          "en": "Mtwara",
+          "slug": "mtwara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ09",
+          "level": 1,
+          "name": {
+            "local": "Mtwara",
+            "en": "Mtwara",
+            "slug": "mtwara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 12
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.751",
+        "lon": "38.879"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ10",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Ruvuma",
+        "en": "Ruvuma",
+        "slug": "ruvuma"
+      },
+      "code": {
+        "id": "TZ10",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 6,
+        "ward": 140
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.505",
+        "lon": "36.341"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/ruvuma/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1001",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Tunduru",
+        "en": "Tunduru",
+        "slug": "tunduru"
+      },
+      "code": {
+        "id": "TZ1001",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ10",
+        "level": 1,
+        "name": {
+          "local": "Ruvuma",
+          "en": "Ruvuma",
+          "slug": "ruvuma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ10",
+          "level": 1,
+          "name": {
+            "local": "Ruvuma",
+            "en": "Ruvuma",
+            "slug": "ruvuma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 35
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.895",
+        "lon": "37.322"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1002",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Songea",
+        "en": "Songea",
+        "slug": "songea"
+      },
+      "code": {
+        "id": "TZ1002",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ10",
+        "level": 1,
+        "name": {
+          "local": "Ruvuma",
+          "en": "Ruvuma",
+          "slug": "ruvuma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ10",
+          "level": 1,
+          "name": {
+            "local": "Ruvuma",
+            "en": "Ruvuma",
+            "slug": "ruvuma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.415",
+        "lon": "35.526"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1003",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mbinga",
+        "en": "Mbinga",
+        "slug": "mbinga"
+      },
+      "code": {
+        "id": "TZ1003",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ10",
+        "level": 1,
+        "name": {
+          "local": "Ruvuma",
+          "en": "Ruvuma",
+          "slug": "ruvuma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ10",
+          "level": 1,
+          "name": {
+            "local": "Ruvuma",
+            "en": "Ruvuma",
+            "slug": "ruvuma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 34
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.703",
+        "lon": "35.018"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1004",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Songea Urban",
+        "en": "Songea Urban",
+        "slug": "songea-urban"
+      },
+      "code": {
+        "id": "TZ1004",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ10",
+        "level": 1,
+        "name": {
+          "local": "Ruvuma",
+          "en": "Ruvuma",
+          "slug": "ruvuma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ10",
+          "level": 1,
+          "name": {
+            "local": "Ruvuma",
+            "en": "Ruvuma",
+            "slug": "ruvuma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.637",
+        "lon": "35.583"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1005",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Namtumbo",
+        "en": "Namtumbo",
+        "slug": "namtumbo"
+      },
+      "code": {
+        "id": "TZ1005",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ10",
+        "level": 1,
+        "name": {
+          "local": "Ruvuma",
+          "en": "Ruvuma",
+          "slug": "ruvuma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ10",
+          "level": 1,
+          "name": {
+            "local": "Ruvuma",
+            "en": "Ruvuma",
+            "slug": "ruvuma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 18
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.673",
+        "lon": "36.393"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1006",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Nyasa",
+        "en": "Nyasa",
+        "slug": "nyasa"
+      },
+      "code": {
+        "id": "TZ1006",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ10",
+        "level": 1,
+        "name": {
+          "local": "Ruvuma",
+          "en": "Ruvuma",
+          "slug": "ruvuma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ10",
+          "level": 1,
+          "name": {
+            "local": "Ruvuma",
+            "en": "Ruvuma",
+            "slug": "ruvuma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 15
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-11.007",
+        "lon": "35"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ11",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Iringa",
+        "en": "Iringa",
+        "slug": "iringa"
+      },
+      "code": {
+        "id": "TZ11",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 5,
+        "ward": 93
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.964",
+        "lon": "35.519"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/iringa/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1101",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Iringa",
+        "en": "Iringa",
+        "slug": "iringa"
+      },
+      "code": {
+        "id": "TZ1101",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ11",
+        "level": 1,
+        "name": {
+          "local": "Iringa",
+          "en": "Iringa",
+          "slug": "iringa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ11",
+          "level": 1,
+          "name": {
+            "local": "Iringa",
+            "en": "Iringa",
+            "slug": "iringa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 25
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.564",
+        "lon": "35.197"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1102",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mufindi",
+        "en": "Mufindi",
+        "slug": "mufindi"
+      },
+      "code": {
+        "id": "TZ1102",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ11",
+        "level": 1,
+        "name": {
+          "local": "Iringa",
+          "en": "Iringa",
+          "slug": "iringa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ11",
+          "level": 1,
+          "name": {
+            "local": "Iringa",
+            "en": "Iringa",
+            "slug": "iringa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 27
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.57",
+        "lon": "35.333"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1103",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Iringa Urban",
+        "en": "Iringa Urban",
+        "slug": "iringa-urban"
+      },
+      "code": {
+        "id": "TZ1103",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ11",
+        "level": 1,
+        "name": {
+          "local": "Iringa",
+          "en": "Iringa",
+          "slug": "iringa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ11",
+          "level": 1,
+          "name": {
+            "local": "Iringa",
+            "en": "Iringa",
+            "slug": "iringa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 16
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.748",
+        "lon": "35.702"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1104",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kilolo",
+        "en": "Kilolo",
+        "slug": "kilolo"
+      },
+      "code": {
+        "id": "TZ1104",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ11",
+        "level": 1,
+        "name": {
+          "local": "Iringa",
+          "en": "Iringa",
+          "slug": "iringa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ11",
+          "level": 1,
+          "name": {
+            "local": "Iringa",
+            "en": "Iringa",
+            "slug": "iringa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 22
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.785",
+        "lon": "36.216"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1105",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mafinga Township Authority",
+        "en": "Mafinga Township Authority",
+        "slug": "mafinga-township-authority"
+      },
+      "code": {
+        "id": "TZ1105",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ11",
+        "level": 1,
+        "name": {
+          "local": "Iringa",
+          "en": "Iringa",
+          "slug": "iringa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ11",
+          "level": 1,
+          "name": {
+            "local": "Iringa",
+            "en": "Iringa",
+            "slug": "iringa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 3
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.362",
+        "lon": "35.273"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ12",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Mbeya",
+        "en": "Mbeya",
+        "slug": "mbeya"
+      },
+      "code": {
+        "id": "TZ12",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 6,
+        "ward": 154
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.292",
+        "lon": "33.931"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/mbeya/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1201",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Chunya",
+        "en": "Chunya",
+        "slug": "chunya"
+      },
+      "code": {
+        "id": "TZ1201",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ12",
+        "level": 1,
+        "name": {
+          "local": "Mbeya",
+          "en": "Mbeya",
+          "slug": "mbeya"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ12",
+          "level": 1,
+          "name": {
+            "local": "Mbeya",
+            "en": "Mbeya",
+            "slug": "mbeya"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 16
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.806",
+        "lon": "33.582"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1202",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mbeya",
+        "en": "Mbeya",
+        "slug": "mbeya"
+      },
+      "code": {
+        "id": "TZ1202",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ12",
+        "level": 1,
+        "name": {
+          "local": "Mbeya",
+          "en": "Mbeya",
+          "slug": "mbeya"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ12",
+          "level": 1,
+          "name": {
+            "local": "Mbeya",
+            "en": "Mbeya",
+            "slug": "mbeya"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 25
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.971",
+        "lon": "33.419"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1203",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kyela",
+        "en": "Kyela",
+        "slug": "kyela"
+      },
+      "code": {
+        "id": "TZ1203",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ12",
+        "level": 1,
+        "name": {
+          "local": "Mbeya",
+          "en": "Mbeya",
+          "slug": "mbeya"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ12",
+          "level": 1,
+          "name": {
+            "local": "Mbeya",
+            "en": "Mbeya",
+            "slug": "mbeya"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.544",
+        "lon": "33.879"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1204",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Rungwe",
+        "en": "Rungwe",
+        "slug": "rungwe"
+      },
+      "code": {
+        "id": "TZ1204",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ12",
+        "level": 1,
+        "name": {
+          "local": "Mbeya",
+          "en": "Mbeya",
+          "slug": "mbeya"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ12",
+          "level": 1,
+          "name": {
+            "local": "Mbeya",
+            "en": "Mbeya",
+            "slug": "mbeya"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 37
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.236",
+        "lon": "33.706"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1207",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mbarali",
+        "en": "Mbarali",
+        "slug": "mbarali"
+      },
+      "code": {
+        "id": "TZ1207",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ12",
+        "level": 1,
+        "name": {
+          "local": "Mbeya",
+          "en": "Mbeya",
+          "slug": "mbeya"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ12",
+          "level": 1,
+          "name": {
+            "local": "Mbeya",
+            "en": "Mbeya",
+            "slug": "mbeya"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.278",
+        "lon": "34.259"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1208",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mbeya Urban",
+        "en": "Mbeya Urban",
+        "slug": "mbeya-urban"
+      },
+      "code": {
+        "id": "TZ1208",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ12",
+        "level": 1,
+        "name": {
+          "local": "Mbeya",
+          "en": "Mbeya",
+          "slug": "mbeya"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ12",
+          "level": 1,
+          "name": {
+            "local": "Mbeya",
+            "en": "Mbeya",
+            "slug": "mbeya"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 36
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.905",
+        "lon": "33.475"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ13",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Singida",
+        "en": "Singida",
+        "slug": "singida"
+      },
+      "code": {
+        "id": "TZ13",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 6,
+        "ward": 124
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.668",
+        "lon": "34.421"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/singida/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1301",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Iramba",
+        "en": "Iramba",
+        "slug": "iramba"
+      },
+      "code": {
+        "id": "TZ1301",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ13",
+        "level": 1,
+        "name": {
+          "local": "Singida",
+          "en": "Singida",
+          "slug": "singida"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ13",
+          "level": 1,
+          "name": {
+            "local": "Singida",
+            "en": "Singida",
+            "slug": "singida"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.386",
+        "lon": "34.243"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1302",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Singida",
+        "en": "Singida",
+        "slug": "singida"
+      },
+      "code": {
+        "id": "TZ1302",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ13",
+        "level": 1,
+        "name": {
+          "local": "Singida",
+          "en": "Singida",
+          "slug": "singida"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ13",
+          "level": 1,
+          "name": {
+            "local": "Singida",
+            "en": "Singida",
+            "slug": "singida"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.722",
+        "lon": "34.97"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1303",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Manyoni",
+        "en": "Manyoni",
+        "slug": "manyoni"
+      },
+      "code": {
+        "id": "TZ1303",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ13",
+        "level": 1,
+        "name": {
+          "local": "Singida",
+          "en": "Singida",
+          "slug": "singida"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ13",
+          "level": 1,
+          "name": {
+            "local": "Singida",
+            "en": "Singida",
+            "slug": "singida"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 30
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.406",
+        "lon": "34.421"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1304",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Singida Urban",
+        "en": "Singida Urban",
+        "slug": "singida-urban"
+      },
+      "code": {
+        "id": "TZ1304",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ13",
+        "level": 1,
+        "name": {
+          "local": "Singida",
+          "en": "Singida",
+          "slug": "singida"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ13",
+          "level": 1,
+          "name": {
+            "local": "Singida",
+            "en": "Singida",
+            "slug": "singida"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 16
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.814",
+        "lon": "34.718"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1305",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ikungi",
+        "en": "Ikungi",
+        "slug": "ikungi"
+      },
+      "code": {
+        "id": "TZ1305",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ13",
+        "level": 1,
+        "name": {
+          "local": "Singida",
+          "en": "Singida",
+          "slug": "singida"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ13",
+          "level": 1,
+          "name": {
+            "local": "Singida",
+            "en": "Singida",
+            "slug": "singida"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 26
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.124",
+        "lon": "34.55"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1306",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mkalama",
+        "en": "Mkalama",
+        "slug": "mkalama"
+      },
+      "code": {
+        "id": "TZ1306",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ13",
+        "level": 1,
+        "name": {
+          "local": "Singida",
+          "en": "Singida",
+          "slug": "singida"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ13",
+          "level": 1,
+          "name": {
+            "local": "Singida",
+            "en": "Singida",
+            "slug": "singida"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 14
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.212",
+        "lon": "34.747"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ14",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Tabora",
+        "en": "Tabora",
+        "slug": "tabora"
+      },
+      "code": {
+        "id": "TZ14",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 166
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.427",
+        "lon": "32.64"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/tabora/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1401",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Nzega",
+        "en": "Nzega",
+        "slug": "nzega"
+      },
+      "code": {
+        "id": "TZ1401",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ14",
+        "level": 1,
+        "name": {
+          "local": "Tabora",
+          "en": "Tabora",
+          "slug": "tabora"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ14",
+          "level": 1,
+          "name": {
+            "local": "Tabora",
+            "en": "Tabora",
+            "slug": "tabora"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 37
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.4",
+        "lon": "32.977"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1402",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Igunga",
+        "en": "Igunga",
+        "slug": "igunga"
+      },
+      "code": {
+        "id": "TZ1402",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ14",
+        "level": 1,
+        "name": {
+          "local": "Tabora",
+          "en": "Tabora",
+          "slug": "tabora"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ14",
+          "level": 1,
+          "name": {
+            "local": "Tabora",
+            "en": "Tabora",
+            "slug": "tabora"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 26
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.378",
+        "lon": "33.758"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1403",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Uyui",
+        "en": "Uyui",
+        "slug": "uyui"
+      },
+      "code": {
+        "id": "TZ1403",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ14",
+        "level": 1,
+        "name": {
+          "local": "Tabora",
+          "en": "Tabora",
+          "slug": "tabora"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ14",
+          "level": 1,
+          "name": {
+            "local": "Tabora",
+            "en": "Tabora",
+            "slug": "tabora"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 24
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.94",
+        "lon": "33.219"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1404",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Urambo",
+        "en": "Urambo",
+        "slug": "urambo"
+      },
+      "code": {
+        "id": "TZ1404",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ14",
+        "level": 1,
+        "name": {
+          "local": "Tabora",
+          "en": "Tabora",
+          "slug": "tabora"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ14",
+          "level": 1,
+          "name": {
+            "local": "Tabora",
+            "en": "Tabora",
+            "slug": "tabora"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 16
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.233",
+        "lon": "32.167"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1405",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Sikonge",
+        "en": "Sikonge",
+        "slug": "sikonge"
+      },
+      "code": {
+        "id": "TZ1405",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ14",
+        "level": 1,
+        "name": {
+          "local": "Tabora",
+          "en": "Tabora",
+          "slug": "tabora"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ14",
+          "level": 1,
+          "name": {
+            "local": "Tabora",
+            "en": "Tabora",
+            "slug": "tabora"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.086",
+        "lon": "33.069"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1406",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Tabora Urban",
+        "en": "Tabora Urban",
+        "slug": "tabora-urban"
+      },
+      "code": {
+        "id": "TZ1406",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ14",
+        "level": 1,
+        "name": {
+          "local": "Tabora",
+          "en": "Tabora",
+          "slug": "tabora"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ14",
+          "level": 1,
+          "name": {
+            "local": "Tabora",
+            "en": "Tabora",
+            "slug": "tabora"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 25
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.941",
+        "lon": "32.813"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1407",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kaliua",
+        "en": "Kaliua",
+        "slug": "kaliua"
+      },
+      "code": {
+        "id": "TZ1407",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ14",
+        "level": 1,
+        "name": {
+          "local": "Tabora",
+          "en": "Tabora",
+          "slug": "tabora"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ14",
+          "level": 1,
+          "name": {
+            "local": "Tabora",
+            "en": "Tabora",
+            "slug": "tabora"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.945",
+        "lon": "31.766"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ15",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Rukwa",
+        "en": "Rukwa",
+        "slug": "rukwa"
+      },
+      "code": {
+        "id": "TZ15",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 4,
+        "ward": 64
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.979",
+        "lon": "31.477"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/rukwa/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1501",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kalambo",
+        "en": "Kalambo",
+        "slug": "kalambo"
+      },
+      "code": {
+        "id": "TZ1501",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ15",
+        "level": 1,
+        "name": {
+          "local": "Rukwa",
+          "en": "Rukwa",
+          "slug": "rukwa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ15",
+          "level": 1,
+          "name": {
+            "local": "Rukwa",
+            "en": "Rukwa",
+            "slug": "rukwa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.538",
+        "lon": "31.581"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1502",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Sumbawanga",
+        "en": "Sumbawanga",
+        "slug": "sumbawanga"
+      },
+      "code": {
+        "id": "TZ1502",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ15",
+        "level": 1,
+        "name": {
+          "local": "Rukwa",
+          "en": "Rukwa",
+          "slug": "rukwa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ15",
+          "level": 1,
+          "name": {
+            "local": "Rukwa",
+            "en": "Rukwa",
+            "slug": "rukwa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 15
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.085",
+        "lon": "31.915"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1503",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Nkasi",
+        "en": "Nkasi",
+        "slug": "nkasi"
+      },
+      "code": {
+        "id": "TZ1503",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ15",
+        "level": 1,
+        "name": {
+          "local": "Rukwa",
+          "en": "Rukwa",
+          "slug": "rukwa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ15",
+          "level": 1,
+          "name": {
+            "local": "Rukwa",
+            "en": "Rukwa",
+            "slug": "rukwa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.587",
+        "lon": "31.011"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1504",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Sumbawanga Urban",
+        "en": "Sumbawanga Urban",
+        "slug": "sumbawanga-urban"
+      },
+      "code": {
+        "id": "TZ1504",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ15",
+        "level": 1,
+        "name": {
+          "local": "Rukwa",
+          "en": "Rukwa",
+          "slug": "rukwa"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ15",
+          "level": 1,
+          "name": {
+            "local": "Rukwa",
+            "en": "Rukwa",
+            "slug": "rukwa"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 15
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.975",
+        "lon": "31.629"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ16",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Kigoma",
+        "en": "Kigoma",
+        "slug": "kigoma"
+      },
+      "code": {
+        "id": "TZ16",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 8,
+        "ward": 111
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.699",
+        "lon": "30.541"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/kigoma/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1601",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kibondo",
+        "en": "Kibondo",
+        "slug": "kibondo"
+      },
+      "code": {
+        "id": "TZ1601",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ16",
+        "level": 1,
+        "name": {
+          "local": "Kigoma",
+          "en": "Kigoma",
+          "slug": "kigoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ16",
+          "level": 1,
+          "name": {
+            "local": "Kigoma",
+            "en": "Kigoma",
+            "slug": "kigoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 13
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.184",
+        "lon": "30.94"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1602",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kasulu",
+        "en": "Kasulu",
+        "slug": "kasulu"
+      },
+      "code": {
+        "id": "TZ1602",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ16",
+        "level": 1,
+        "name": {
+          "local": "Kigoma",
+          "en": "Kigoma",
+          "slug": "kigoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ16",
+          "level": 1,
+          "name": {
+            "local": "Kigoma",
+            "en": "Kigoma",
+            "slug": "kigoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 19
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.434",
+        "lon": "30.41"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1603",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kigoma",
+        "en": "Kigoma",
+        "slug": "kigoma"
+      },
+      "code": {
+        "id": "TZ1603",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ16",
+        "level": 1,
+        "name": {
+          "local": "Kigoma",
+          "en": "Kigoma",
+          "slug": "kigoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ16",
+          "level": 1,
+          "name": {
+            "local": "Kigoma",
+            "en": "Kigoma",
+            "slug": "kigoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 11
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.701",
+        "lon": "29.794"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1604",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kigoma  Urban",
+        "en": "Kigoma  Urban",
+        "slug": "kigoma-urban"
+      },
+      "code": {
+        "id": "TZ1604",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ16",
+        "level": 1,
+        "name": {
+          "local": "Kigoma",
+          "en": "Kigoma",
+          "slug": "kigoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ16",
+          "level": 1,
+          "name": {
+            "local": "Kigoma",
+            "en": "Kigoma",
+            "slug": "kigoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 19
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.894",
+        "lon": "29.66"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1605",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Uvinza",
+        "en": "Uvinza",
+        "slug": "uvinza"
+      },
+      "code": {
+        "id": "TZ1605",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ16",
+        "level": 1,
+        "name": {
+          "local": "Kigoma",
+          "en": "Kigoma",
+          "slug": "kigoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ16",
+          "level": 1,
+          "name": {
+            "local": "Kigoma",
+            "en": "Kigoma",
+            "slug": "kigoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 14
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.704",
+        "lon": "30.48"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1606",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Buhigwe",
+        "en": "Buhigwe",
+        "slug": "buhigwe"
+      },
+      "code": {
+        "id": "TZ1606",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ16",
+        "level": 1,
+        "name": {
+          "local": "Kigoma",
+          "en": "Kigoma",
+          "slug": "kigoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ16",
+          "level": 1,
+          "name": {
+            "local": "Kigoma",
+            "en": "Kigoma",
+            "slug": "kigoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 15
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.477",
+        "lon": "29.986"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1607",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kakonko",
+        "en": "Kakonko",
+        "slug": "kakonko"
+      },
+      "code": {
+        "id": "TZ1607",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ16",
+        "level": 1,
+        "name": {
+          "local": "Kigoma",
+          "en": "Kigoma",
+          "slug": "kigoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ16",
+          "level": 1,
+          "name": {
+            "local": "Kigoma",
+            "en": "Kigoma",
+            "slug": "kigoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 11
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.21",
+        "lon": "30.849"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1608",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kasulu Township Authority",
+        "en": "Kasulu Township Authority",
+        "slug": "kasulu-township-authority"
+      },
+      "code": {
+        "id": "TZ1608",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ16",
+        "level": 1,
+        "name": {
+          "local": "Kigoma",
+          "en": "Kigoma",
+          "slug": "kigoma"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ16",
+          "level": 1,
+          "name": {
+            "local": "Kigoma",
+            "en": "Kigoma",
+            "slug": "kigoma"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 9
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.582",
+        "lon": "30.09"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ17",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Shinyanga",
+        "en": "Shinyanga",
+        "slug": "shinyanga"
+      },
+      "code": {
+        "id": "TZ17",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 5,
+        "ward": 118
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.76",
+        "lon": "32.958"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/shinyanga/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1701",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Shinyanga Urban",
+        "en": "Shinyanga Urban",
+        "slug": "shinyanga-urban"
+      },
+      "code": {
+        "id": "TZ1701",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ17",
+        "level": 1,
+        "name": {
+          "local": "Shinyanga",
+          "en": "Shinyanga",
+          "slug": "shinyanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ17",
+          "level": 1,
+          "name": {
+            "local": "Shinyanga",
+            "en": "Shinyanga",
+            "slug": "shinyanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.624",
+        "lon": "33.449"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1702",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kishapu",
+        "en": "Kishapu",
+        "slug": "kishapu"
+      },
+      "code": {
+        "id": "TZ1702",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ17",
+        "level": 1,
+        "name": {
+          "local": "Shinyanga",
+          "en": "Shinyanga",
+          "slug": "shinyanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ17",
+          "level": 1,
+          "name": {
+            "local": "Shinyanga",
+            "en": "Shinyanga",
+            "slug": "shinyanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.68",
+        "lon": "33.693"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1703",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Shinyanga",
+        "en": "Shinyanga",
+        "slug": "shinyanga"
+      },
+      "code": {
+        "id": "TZ1703",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ17",
+        "level": 1,
+        "name": {
+          "local": "Shinyanga",
+          "en": "Shinyanga",
+          "slug": "shinyanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ17",
+          "level": 1,
+          "name": {
+            "local": "Shinyanga",
+            "en": "Shinyanga",
+            "slug": "shinyanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 26
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.598",
+        "lon": "33.107"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1704",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kahama",
+        "en": "Kahama",
+        "slug": "kahama"
+      },
+      "code": {
+        "id": "TZ1704",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ17",
+        "level": 1,
+        "name": {
+          "local": "Shinyanga",
+          "en": "Shinyanga",
+          "slug": "shinyanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ17",
+          "level": 1,
+          "name": {
+            "local": "Shinyanga",
+            "en": "Shinyanga",
+            "slug": "shinyanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 35
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.76",
+        "lon": "32.341"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1705",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kahama Township Authority",
+        "en": "Kahama Township Authority",
+        "slug": "kahama-township-authority"
+      },
+      "code": {
+        "id": "TZ1705",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ17",
+        "level": 1,
+        "name": {
+          "local": "Shinyanga",
+          "en": "Shinyanga",
+          "slug": "shinyanga"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ17",
+          "level": 1,
+          "name": {
+            "local": "Shinyanga",
+            "en": "Shinyanga",
+            "slug": "shinyanga"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.838",
+        "lon": "32.609"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ18",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Kagera",
+        "en": "Kagera",
+        "slug": "kagera"
+      },
+      "code": {
+        "id": "TZ18",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 8,
+        "ward": 181
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.172",
+        "lon": "31.514"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/kagera/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1801",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Karagwe",
+        "en": "Karagwe",
+        "slug": "karagwe"
+      },
+      "code": {
+        "id": "TZ1801",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ18",
+        "level": 1,
+        "name": {
+          "local": "Kagera",
+          "en": "Kagera",
+          "slug": "kagera"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ18",
+          "level": 1,
+          "name": {
+            "local": "Kagera",
+            "en": "Kagera",
+            "slug": "kagera"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 22
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.721",
+        "lon": "31.084"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1802",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Bukoba",
+        "en": "Bukoba",
+        "slug": "bukoba"
+      },
+      "code": {
+        "id": "TZ1802",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ18",
+        "level": 1,
+        "name": {
+          "local": "Kagera",
+          "en": "Kagera",
+          "slug": "kagera"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ18",
+          "level": 1,
+          "name": {
+            "local": "Kagera",
+            "en": "Kagera",
+            "slug": "kagera"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 29
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.353",
+        "lon": "31.604"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1803",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Muleba",
+        "en": "Muleba",
+        "slug": "muleba"
+      },
+      "code": {
+        "id": "TZ1803",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ18",
+        "level": 1,
+        "name": {
+          "local": "Kagera",
+          "en": "Kagera",
+          "slug": "kagera"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ18",
+          "level": 1,
+          "name": {
+            "local": "Kagera",
+            "en": "Kagera",
+            "slug": "kagera"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 43
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.923",
+        "lon": "31.903"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1804",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Biharamulo",
+        "en": "Biharamulo",
+        "slug": "biharamulo"
+      },
+      "code": {
+        "id": "TZ1804",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ18",
+        "level": 1,
+        "name": {
+          "local": "Kagera",
+          "en": "Kagera",
+          "slug": "kagera"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ18",
+          "level": 1,
+          "name": {
+            "local": "Kagera",
+            "en": "Kagera",
+            "slug": "kagera"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 15
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.772",
+        "lon": "31.26"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1805",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ngara",
+        "en": "Ngara",
+        "slug": "ngara"
+      },
+      "code": {
+        "id": "TZ1805",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ18",
+        "level": 1,
+        "name": {
+          "local": "Kagera",
+          "en": "Kagera",
+          "slug": "kagera"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ18",
+          "level": 1,
+          "name": {
+            "local": "Kagera",
+            "en": "Kagera",
+            "slug": "kagera"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.626",
+        "lon": "30.738"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1806",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Bukoba Urban",
+        "en": "Bukoba Urban",
+        "slug": "bukoba-urban"
+      },
+      "code": {
+        "id": "TZ1806",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ18",
+        "level": 1,
+        "name": {
+          "local": "Kagera",
+          "en": "Kagera",
+          "slug": "kagera"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ18",
+          "level": 1,
+          "name": {
+            "local": "Kagera",
+            "en": "Kagera",
+            "slug": "kagera"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 14
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.321",
+        "lon": "31.817"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1807",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Missenyi",
+        "en": "Missenyi",
+        "slug": "missenyi"
+      },
+      "code": {
+        "id": "TZ1807",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ18",
+        "level": 1,
+        "name": {
+          "local": "Kagera",
+          "en": "Kagera",
+          "slug": "kagera"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ18",
+          "level": 1,
+          "name": {
+            "local": "Kagera",
+            "en": "Kagera",
+            "slug": "kagera"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.204",
+        "lon": "31.305"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1808",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kyerwa",
+        "en": "Kyerwa",
+        "slug": "kyerwa"
+      },
+      "code": {
+        "id": "TZ1808",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ18",
+        "level": 1,
+        "name": {
+          "local": "Kagera",
+          "en": "Kagera",
+          "slug": "kagera"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ18",
+          "level": 1,
+          "name": {
+            "local": "Kagera",
+            "en": "Kagera",
+            "slug": "kagera"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 18
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.299",
+        "lon": "30.78"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ19",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Mwanza",
+        "en": "Mwanza",
+        "slug": "mwanza"
+      },
+      "code": {
+        "id": "TZ19",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 154
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.551",
+        "lon": "32.861"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/mwanza/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ1901",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ukerewe",
+        "en": "Ukerewe",
+        "slug": "ukerewe"
+      },
+      "code": {
+        "id": "TZ1901",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ19",
+        "level": 1,
+        "name": {
+          "local": "Mwanza",
+          "en": "Mwanza",
+          "slug": "mwanza"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ19",
+          "level": 1,
+          "name": {
+            "local": "Mwanza",
+            "en": "Mwanza",
+            "slug": "mwanza"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 24
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.921",
+        "lon": "33.104"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1902",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Magu",
+        "en": "Magu",
+        "slug": "magu"
+      },
+      "code": {
+        "id": "TZ1902",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ19",
+        "level": 1,
+        "name": {
+          "local": "Mwanza",
+          "en": "Mwanza",
+          "slug": "mwanza"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ19",
+          "level": 1,
+          "name": {
+            "local": "Mwanza",
+            "en": "Mwanza",
+            "slug": "mwanza"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 18
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.609",
+        "lon": "33.401"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1903",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Nyamagana",
+        "en": "Nyamagana",
+        "slug": "nyamagana"
+      },
+      "code": {
+        "id": "TZ1903",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ19",
+        "level": 1,
+        "name": {
+          "local": "Mwanza",
+          "en": "Mwanza",
+          "slug": "mwanza"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ19",
+          "level": 1,
+          "name": {
+            "local": "Mwanza",
+            "en": "Mwanza",
+            "slug": "mwanza"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 12
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.576",
+        "lon": "32.944"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1904",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kwimba",
+        "en": "Kwimba",
+        "slug": "kwimba"
+      },
+      "code": {
+        "id": "TZ1904",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ19",
+        "level": 1,
+        "name": {
+          "local": "Mwanza",
+          "en": "Mwanza",
+          "slug": "mwanza"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ19",
+          "level": 1,
+          "name": {
+            "local": "Mwanza",
+            "en": "Mwanza",
+            "slug": "mwanza"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 30
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.038",
+        "lon": "33.267"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1905",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Sengerema",
+        "en": "Sengerema",
+        "slug": "sengerema"
+      },
+      "code": {
+        "id": "TZ1905",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ19",
+        "level": 1,
+        "name": {
+          "local": "Mwanza",
+          "en": "Mwanza",
+          "slug": "mwanza"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ19",
+          "level": 1,
+          "name": {
+            "local": "Mwanza",
+            "en": "Mwanza",
+            "slug": "mwanza"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 34
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.582",
+        "lon": "32.405"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1906",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ilemela",
+        "en": "Ilemela",
+        "slug": "ilemela"
+      },
+      "code": {
+        "id": "TZ1906",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ19",
+        "level": 1,
+        "name": {
+          "local": "Mwanza",
+          "en": "Mwanza",
+          "slug": "mwanza"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ19",
+          "level": 1,
+          "name": {
+            "local": "Mwanza",
+            "en": "Mwanza",
+            "slug": "mwanza"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 9
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.41",
+        "lon": "33.015"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ1907",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Misungwi",
+        "en": "Misungwi",
+        "slug": "misungwi"
+      },
+      "code": {
+        "id": "TZ1907",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ19",
+        "level": 1,
+        "name": {
+          "local": "Mwanza",
+          "en": "Mwanza",
+          "slug": "mwanza"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ19",
+          "level": 1,
+          "name": {
+            "local": "Mwanza",
+            "en": "Mwanza",
+            "slug": "mwanza"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 27
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.954",
+        "lon": "33.029"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ20",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Mara",
+        "en": "Mara",
+        "slug": "mara"
+      },
+      "code": {
+        "id": "TZ20",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 7,
+        "ward": 154
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.762",
+        "lon": "34.234"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/mara/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ2001",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Tarime",
+        "en": "Tarime",
+        "slug": "tarime"
+      },
+      "code": {
+        "id": "TZ2001",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ20",
+        "level": 1,
+        "name": {
+          "local": "Mara",
+          "en": "Mara",
+          "slug": "mara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ20",
+          "level": 1,
+          "name": {
+            "local": "Mara",
+            "en": "Mara",
+            "slug": "mara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 30
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.396",
+        "lon": "34.474"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2002",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Serengeti",
+        "en": "Serengeti",
+        "slug": "serengeti"
+      },
+      "code": {
+        "id": "TZ2002",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ20",
+        "level": 1,
+        "name": {
+          "local": "Mara",
+          "en": "Mara",
+          "slug": "mara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ20",
+          "level": 1,
+          "name": {
+            "local": "Mara",
+            "en": "Mara",
+            "slug": "mara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 28
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.957",
+        "lon": "34.741"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2003",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Musoma",
+        "en": "Musoma",
+        "slug": "musoma"
+      },
+      "code": {
+        "id": "TZ2003",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ20",
+        "level": 1,
+        "name": {
+          "local": "Mara",
+          "en": "Mara",
+          "slug": "mara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ20",
+          "level": 1,
+          "name": {
+            "local": "Mara",
+            "en": "Mara",
+            "slug": "mara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 14
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.825",
+        "lon": "33.532"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2004",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Bunda",
+        "en": "Bunda",
+        "slug": "bunda"
+      },
+      "code": {
+        "id": "TZ2004",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ20",
+        "level": 1,
+        "name": {
+          "local": "Mara",
+          "en": "Mara",
+          "slug": "mara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ20",
+          "level": 1,
+          "name": {
+            "local": "Mara",
+            "en": "Mara",
+            "slug": "mara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 28
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.036",
+        "lon": "33.763"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2005",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Musoma Urban",
+        "en": "Musoma Urban",
+        "slug": "musoma-urban"
+      },
+      "code": {
+        "id": "TZ2005",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ20",
+        "level": 1,
+        "name": {
+          "local": "Mara",
+          "en": "Mara",
+          "slug": "mara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ20",
+          "level": 1,
+          "name": {
+            "local": "Mara",
+            "en": "Mara",
+            "slug": "mara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 13
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.521",
+        "lon": "33.796"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2006",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Rorya",
+        "en": "Rorya",
+        "slug": "rorya"
+      },
+      "code": {
+        "id": "TZ2006",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ20",
+        "level": 1,
+        "name": {
+          "local": "Mara",
+          "en": "Mara",
+          "slug": "mara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ20",
+          "level": 1,
+          "name": {
+            "local": "Mara",
+            "en": "Mara",
+            "slug": "mara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.299",
+        "lon": "34.07"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2007",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Butiam",
+        "en": "Butiam",
+        "slug": "butiam"
+      },
+      "code": {
+        "id": "TZ2007",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ20",
+        "level": 1,
+        "name": {
+          "local": "Mara",
+          "en": "Mara",
+          "slug": "mara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ20",
+          "level": 1,
+          "name": {
+            "local": "Mara",
+            "en": "Mara",
+            "slug": "mara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 20
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-1.67",
+        "lon": "33.96"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ21",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Manyara",
+        "en": "Manyara",
+        "slug": "manyara"
+      },
+      "code": {
+        "id": "TZ21",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 6,
+        "ward": 122
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.7",
+        "lon": "36.432"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/manyara/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ2101",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Babati",
+        "en": "Babati",
+        "slug": "babati"
+      },
+      "code": {
+        "id": "TZ2101",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ21",
+        "level": 1,
+        "name": {
+          "local": "Manyara",
+          "en": "Manyara",
+          "slug": "manyara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ21",
+          "level": 1,
+          "name": {
+            "local": "Manyara",
+            "en": "Manyara",
+            "slug": "manyara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.024",
+        "lon": "35.75"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2102",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Hanang",
+        "en": "Hanang",
+        "slug": "hanang"
+      },
+      "code": {
+        "id": "TZ2102",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ21",
+        "level": 1,
+        "name": {
+          "local": "Manyara",
+          "en": "Manyara",
+          "slug": "manyara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ21",
+          "level": 1,
+          "name": {
+            "local": "Manyara",
+            "en": "Manyara",
+            "slug": "manyara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 25
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.56",
+        "lon": "35.265"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2103",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mbulu",
+        "en": "Mbulu",
+        "slug": "mbulu"
+      },
+      "code": {
+        "id": "TZ2103",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ21",
+        "level": 1,
+        "name": {
+          "local": "Manyara",
+          "en": "Manyara",
+          "slug": "manyara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ21",
+          "level": 1,
+          "name": {
+            "local": "Manyara",
+            "en": "Manyara",
+            "slug": "manyara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 32
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.94",
+        "lon": "35.295"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2104",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Simanjiro",
+        "en": "Simanjiro",
+        "slug": "simanjiro"
+      },
+      "code": {
+        "id": "TZ2104",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ21",
+        "level": 1,
+        "name": {
+          "local": "Manyara",
+          "en": "Manyara",
+          "slug": "manyara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ21",
+          "level": 1,
+          "name": {
+            "local": "Manyara",
+            "en": "Manyara",
+            "slug": "manyara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.321",
+        "lon": "37.145"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2105",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kiteto",
+        "en": "Kiteto",
+        "slug": "kiteto"
+      },
+      "code": {
+        "id": "TZ2105",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ21",
+        "level": 1,
+        "name": {
+          "local": "Manyara",
+          "en": "Manyara",
+          "slug": "manyara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ21",
+          "level": 1,
+          "name": {
+            "local": "Manyara",
+            "en": "Manyara",
+            "slug": "manyara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 19
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.194",
+        "lon": "36.817"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2106",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Babati Urban",
+        "en": "Babati Urban",
+        "slug": "babati-urban"
+      },
+      "code": {
+        "id": "TZ2106",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ21",
+        "level": 1,
+        "name": {
+          "local": "Manyara",
+          "en": "Manyara",
+          "slug": "manyara"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ21",
+          "level": 1,
+          "name": {
+            "local": "Manyara",
+            "en": "Manyara",
+            "slug": "manyara"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 8
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.214",
+        "lon": "35.727"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ22",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Njombe",
+        "en": "Njombe",
+        "slug": "njombe"
+      },
+      "code": {
+        "id": "TZ22",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 6,
+        "ward": 96
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.601",
+        "lon": "34.667"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/njombe/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ2201",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Njombe Urban",
+        "en": "Njombe Urban",
+        "slug": "njombe-urban"
+      },
+      "code": {
+        "id": "TZ2201",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ22",
+        "level": 1,
+        "name": {
+          "local": "Njombe",
+          "en": "Njombe",
+          "slug": "njombe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ22",
+          "level": 1,
+          "name": {
+            "local": "Njombe",
+            "en": "Njombe",
+            "slug": "njombe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 13
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.468",
+        "lon": "34.849"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2202",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Wanging'ombe",
+        "en": "Wanging'ombe",
+        "slug": "wangingombe"
+      },
+      "code": {
+        "id": "TZ2202",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ22",
+        "level": 1,
+        "name": {
+          "local": "Njombe",
+          "en": "Njombe",
+          "slug": "njombe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ22",
+          "level": 1,
+          "name": {
+            "local": "Njombe",
+            "en": "Njombe",
+            "slug": "njombe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 17
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.053",
+        "lon": "34.584"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2203",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Makete",
+        "en": "Makete",
+        "slug": "makete"
+      },
+      "code": {
+        "id": "TZ2203",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ22",
+        "level": 1,
+        "name": {
+          "local": "Njombe",
+          "en": "Njombe",
+          "slug": "njombe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ22",
+          "level": 1,
+          "name": {
+            "local": "Njombe",
+            "en": "Njombe",
+            "slug": "njombe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 22
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.274",
+        "lon": "34.147"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2204",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Njombe",
+        "en": "Njombe",
+        "slug": "njombe"
+      },
+      "code": {
+        "id": "TZ2204",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ22",
+        "level": 1,
+        "name": {
+          "local": "Njombe",
+          "en": "Njombe",
+          "slug": "njombe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ22",
+          "level": 1,
+          "name": {
+            "local": "Njombe",
+            "en": "Njombe",
+            "slug": "njombe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 11
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.284",
+        "lon": "35.138"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2205",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ludewa",
+        "en": "Ludewa",
+        "slug": "ludewa"
+      },
+      "code": {
+        "id": "TZ2205",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ22",
+        "level": 1,
+        "name": {
+          "local": "Njombe",
+          "en": "Njombe",
+          "slug": "njombe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ22",
+          "level": 1,
+          "name": {
+            "local": "Njombe",
+            "en": "Njombe",
+            "slug": "njombe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 25
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-10.023",
+        "lon": "34.646"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2206",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Makambako Township Authority",
+        "en": "Makambako Township Authority",
+        "slug": "makambako-township-authority"
+      },
+      "code": {
+        "id": "TZ2206",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ22",
+        "level": 1,
+        "name": {
+          "local": "Njombe",
+          "en": "Njombe",
+          "slug": "njombe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ22",
+          "level": 1,
+          "name": {
+            "local": "Njombe",
+            "en": "Njombe",
+            "slug": "njombe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 8
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.902",
+        "lon": "34.916"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ23",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Katavi",
+        "en": "Katavi",
+        "slug": "katavi"
+      },
+      "code": {
+        "id": "TZ23",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 3,
+        "ward": 42
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.373",
+        "lon": "31.331"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/katavi/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ2301",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mpanda Urban",
+        "en": "Mpanda Urban",
+        "slug": "mpanda-urban"
+      },
+      "code": {
+        "id": "TZ2301",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ23",
+        "level": 1,
+        "name": {
+          "local": "Katavi",
+          "en": "Katavi",
+          "slug": "katavi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ23",
+          "level": 1,
+          "name": {
+            "local": "Katavi",
+            "en": "Katavi",
+            "slug": "katavi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 9
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.409",
+        "lon": "30.989"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2302",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mpanda",
+        "en": "Mpanda",
+        "slug": "mpanda"
+      },
+      "code": {
+        "id": "TZ2302",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ23",
+        "level": 1,
+        "name": {
+          "local": "Katavi",
+          "en": "Katavi",
+          "slug": "katavi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ23",
+          "level": 1,
+          "name": {
+            "local": "Katavi",
+            "en": "Katavi",
+            "slug": "katavi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 9
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.035",
+        "lon": "30.545"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2303",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mlele",
+        "en": "Mlele",
+        "slug": "mlele"
+      },
+      "code": {
+        "id": "TZ2303",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ23",
+        "level": 1,
+        "name": {
+          "local": "Katavi",
+          "en": "Katavi",
+          "slug": "katavi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ23",
+          "level": 1,
+          "name": {
+            "local": "Katavi",
+            "en": "Katavi",
+            "slug": "katavi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 24
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.61",
+        "lon": "31.843"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ24",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Simiyu",
+        "en": "Simiyu",
+        "slug": "simiyu"
+      },
+      "code": {
+        "id": "TZ24",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 5,
+        "ward": 111
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.132",
+        "lon": "34.323"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/simiyu/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ2401",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Bariadi",
+        "en": "Bariadi",
+        "slug": "bariadi"
+      },
+      "code": {
+        "id": "TZ2401",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ24",
+        "level": 1,
+        "name": {
+          "local": "Simiyu",
+          "en": "Simiyu",
+          "slug": "simiyu"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ24",
+          "level": 1,
+          "name": {
+            "local": "Simiyu",
+            "en": "Simiyu",
+            "slug": "simiyu"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 25
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.601",
+        "lon": "34.423"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2402",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Itilima",
+        "en": "Itilima",
+        "slug": "itilima"
+      },
+      "code": {
+        "id": "TZ2402",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ24",
+        "level": 1,
+        "name": {
+          "local": "Simiyu",
+          "en": "Simiyu",
+          "slug": "simiyu"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ24",
+          "level": 1,
+          "name": {
+            "local": "Simiyu",
+            "en": "Simiyu",
+            "slug": "simiyu"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 22
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.888",
+        "lon": "34.423"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2403",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Meatu",
+        "en": "Meatu",
+        "slug": "meatu"
+      },
+      "code": {
+        "id": "TZ2403",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ24",
+        "level": 1,
+        "name": {
+          "local": "Simiyu",
+          "en": "Simiyu",
+          "slug": "simiyu"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ24",
+          "level": 1,
+          "name": {
+            "local": "Simiyu",
+            "en": "Simiyu",
+            "slug": "simiyu"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 25
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.507",
+        "lon": "34.468"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2404",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Maswa",
+        "en": "Maswa",
+        "slug": "maswa"
+      },
+      "code": {
+        "id": "TZ2404",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ24",
+        "level": 1,
+        "name": {
+          "local": "Simiyu",
+          "en": "Simiyu",
+          "slug": "simiyu"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ24",
+          "level": 1,
+          "name": {
+            "local": "Simiyu",
+            "en": "Simiyu",
+            "slug": "simiyu"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 26
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.202",
+        "lon": "33.786"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2405",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Busega",
+        "en": "Busega",
+        "slug": "busega"
+      },
+      "code": {
+        "id": "TZ2405",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ24",
+        "level": 1,
+        "name": {
+          "local": "Simiyu",
+          "en": "Simiyu",
+          "slug": "simiyu"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ24",
+          "level": 1,
+          "name": {
+            "local": "Simiyu",
+            "en": "Simiyu",
+            "slug": "simiyu"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 13
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.377",
+        "lon": "33.761"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ25",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Geita",
+        "en": "Geita",
+        "slug": "geita"
+      },
+      "code": {
+        "id": "TZ25",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 5,
+        "ward": 98
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.353",
+        "lon": "31.971"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/geita/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ2501",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Geita",
+        "en": "Geita",
+        "slug": "geita"
+      },
+      "code": {
+        "id": "TZ2501",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ25",
+        "level": 1,
+        "name": {
+          "local": "Geita",
+          "en": "Geita",
+          "slug": "geita"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ25",
+          "level": 1,
+          "name": {
+            "local": "Geita",
+            "en": "Geita",
+            "slug": "geita"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 35
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.782",
+        "lon": "32.179"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2502",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Nyang'hwale",
+        "en": "Nyang'hwale",
+        "slug": "nyanghwale"
+      },
+      "code": {
+        "id": "TZ2502",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ25",
+        "level": 1,
+        "name": {
+          "local": "Geita",
+          "en": "Geita",
+          "slug": "geita"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ25",
+          "level": 1,
+          "name": {
+            "local": "Geita",
+            "en": "Geita",
+            "slug": "geita"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 12
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.178",
+        "lon": "32.588"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2503",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mbogwe",
+        "en": "Mbogwe",
+        "slug": "mbogwe"
+      },
+      "code": {
+        "id": "TZ2503",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ25",
+        "level": 1,
+        "name": {
+          "local": "Geita",
+          "en": "Geita",
+          "slug": "geita"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ25",
+          "level": 1,
+          "name": {
+            "local": "Geita",
+            "en": "Geita",
+            "slug": "geita"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 16
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.47",
+        "lon": "32.127"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2504",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Bukombe",
+        "en": "Bukombe",
+        "slug": "bukombe"
+      },
+      "code": {
+        "id": "TZ2504",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ25",
+        "level": 1,
+        "name": {
+          "local": "Geita",
+          "en": "Geita",
+          "slug": "geita"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ25",
+          "level": 1,
+          "name": {
+            "local": "Geita",
+            "en": "Geita",
+            "slug": "geita"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 13
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-3.788",
+        "lon": "31.654"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2505",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Chato",
+        "en": "Chato",
+        "slug": "chato"
+      },
+      "code": {
+        "id": "TZ2505",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ25",
+        "level": 1,
+        "name": {
+          "local": "Geita",
+          "en": "Geita",
+          "slug": "geita"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ25",
+          "level": 1,
+          "name": {
+            "local": "Geita",
+            "en": "Geita",
+            "slug": "geita"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 22
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-2.845",
+        "lon": "31.667"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ26",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Songwe",
+        "en": "Songwe",
+        "slug": "songwe"
+      },
+      "code": {
+        "id": "TZ26",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 5,
+        "ward": 64
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.275",
+        "lon": "32.855"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/songwe/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ2601",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Songwe",
+        "en": "Songwe",
+        "slug": "songwe"
+      },
+      "code": {
+        "id": "TZ2601",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ26",
+        "level": 1,
+        "name": {
+          "local": "Songwe",
+          "en": "Songwe",
+          "slug": "songwe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ26",
+          "level": 1,
+          "name": {
+            "local": "Songwe",
+            "en": "Songwe",
+            "slug": "songwe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 14
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-7.825",
+        "lon": "32.637"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2605",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Ileje",
+        "en": "Ileje",
+        "slug": "ileje"
+      },
+      "code": {
+        "id": "TZ2605",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ26",
+        "level": 1,
+        "name": {
+          "local": "Songwe",
+          "en": "Songwe",
+          "slug": "songwe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ26",
+          "level": 1,
+          "name": {
+            "local": "Songwe",
+            "en": "Songwe",
+            "slug": "songwe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 18
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.39",
+        "lon": "33.282"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2606",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mbozi",
+        "en": "Mbozi",
+        "slug": "mbozi"
+      },
+      "code": {
+        "id": "TZ2606",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ26",
+        "level": 1,
+        "name": {
+          "local": "Songwe",
+          "en": "Songwe",
+          "slug": "songwe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ26",
+          "level": 1,
+          "name": {
+            "local": "Songwe",
+            "en": "Songwe",
+            "slug": "songwe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 18
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.972",
+        "lon": "32.884"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2609",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Momba",
+        "en": "Momba",
+        "slug": "momba"
+      },
+      "code": {
+        "id": "TZ2609",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ26",
+        "level": 1,
+        "name": {
+          "local": "Songwe",
+          "en": "Songwe",
+          "slug": "songwe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ26",
+          "level": 1,
+          "name": {
+            "local": "Songwe",
+            "en": "Songwe",
+            "slug": "songwe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 13
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-8.789",
+        "lon": "32.466"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ2610",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Tunduma",
+        "en": "Tunduma",
+        "slug": "tunduma"
+      },
+      "code": {
+        "id": "TZ2610",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ26",
+        "level": 1,
+        "name": {
+          "local": "Songwe",
+          "en": "Songwe",
+          "slug": "songwe"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ26",
+          "level": 1,
+          "name": {
+            "local": "Songwe",
+            "en": "Songwe",
+            "slug": "songwe"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 1
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-9.303",
+        "lon": "32.802"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ51",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Kaskazini Unguja",
+        "en": "Kaskazini Unguja",
+        "slug": "kaskazini-unguja"
+      },
+      "code": {
+        "id": "TZ51",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 2,
+        "ward": 65
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.881",
+        "lon": "39.291"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/kaskazini-unguja/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ5101",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kaskazini A",
+        "en": "Kaskazini A",
+        "slug": "kaskazini-a"
+      },
+      "code": {
+        "id": "TZ5101",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ51",
+        "level": 1,
+        "name": {
+          "local": "Kaskazini Unguja",
+          "en": "Kaskazini Unguja",
+          "slug": "kaskazini-unguja"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ51",
+          "level": 1,
+          "name": {
+            "local": "Kaskazini Unguja",
+            "en": "Kaskazini Unguja",
+            "slug": "kaskazini-unguja"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 36
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.856",
+        "lon": "39.299"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ5102",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kaskazini B",
+        "en": "Kaskazini B",
+        "slug": "kaskazini-b"
+      },
+      "code": {
+        "id": "TZ5102",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ51",
+        "level": 1,
+        "name": {
+          "local": "Kaskazini Unguja",
+          "en": "Kaskazini Unguja",
+          "slug": "kaskazini-unguja"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ51",
+          "level": 1,
+          "name": {
+            "local": "Kaskazini Unguja",
+            "en": "Kaskazini Unguja",
+            "slug": "kaskazini-unguja"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 29
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.966",
+        "lon": "39.291"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ52",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Kusini Unguja",
+        "en": "Kusini Unguja",
+        "slug": "kusini-unguja"
+      },
+      "code": {
+        "id": "TZ52",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 2,
+        "ward": 61
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.25",
+        "lon": "39.425"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/kusini-unguja/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ5201",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kati",
+        "en": "Kati",
+        "slug": "kati"
+      },
+      "code": {
+        "id": "TZ5201",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ52",
+        "level": 1,
+        "name": {
+          "local": "Kusini Unguja",
+          "en": "Kusini Unguja",
+          "slug": "kusini-unguja"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ52",
+          "level": 1,
+          "name": {
+            "local": "Kusini Unguja",
+            "en": "Kusini Unguja",
+            "slug": "kusini-unguja"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 40
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.207",
+        "lon": "39.399"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ5202",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Kusini",
+        "en": "Kusini",
+        "slug": "kusini"
+      },
+      "code": {
+        "id": "TZ5202",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ52",
+        "level": 1,
+        "name": {
+          "local": "Kusini Unguja",
+          "en": "Kusini Unguja",
+          "slug": "kusini-unguja"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ52",
+          "level": 1,
+          "name": {
+            "local": "Kusini Unguja",
+            "en": "Kusini Unguja",
+            "slug": "kusini-unguja"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 21
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.327",
+        "lon": "39.484"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ53",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Mjini Magharibi",
+        "en": "Mjini Magharibi",
+        "slug": "mjini-magharibi"
+      },
+      "code": {
+        "id": "TZ53",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 2,
+        "ward": 84
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.174",
+        "lon": "39.248"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/mjini-magharibi/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ5301",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Magharibi",
+        "en": "Magharibi",
+        "slug": "magharibi"
+      },
+      "code": {
+        "id": "TZ5301",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ53",
+        "level": 1,
+        "name": {
+          "local": "Mjini Magharibi",
+          "en": "Mjini Magharibi",
+          "slug": "mjini-magharibi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ53",
+          "level": 1,
+          "name": {
+            "local": "Mjini Magharibi",
+            "en": "Mjini Magharibi",
+            "slug": "mjini-magharibi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 39
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.174",
+        "lon": "39.255"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ5302",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mjini",
+        "en": "Mjini",
+        "slug": "mjini"
+      },
+      "code": {
+        "id": "TZ5302",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ53",
+        "level": 1,
+        "name": {
+          "local": "Mjini Magharibi",
+          "en": "Mjini Magharibi",
+          "slug": "mjini-magharibi"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ53",
+          "level": 1,
+          "name": {
+            "local": "Mjini Magharibi",
+            "en": "Mjini Magharibi",
+            "slug": "mjini-magharibi"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 45
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-6.167",
+        "lon": "39.206"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ54",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Kaskazini Pemba",
+        "en": "Kaskazini Pemba",
+        "slug": "kaskazini-pemba"
+      },
+      "code": {
+        "id": "TZ54",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 2,
+        "ward": 59
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.036",
+        "lon": "39.753"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/kaskazini-pemba/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ5401",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Wete",
+        "en": "Wete",
+        "slug": "wete"
+      },
+      "code": {
+        "id": "TZ5401",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ54",
+        "level": 1,
+        "name": {
+          "local": "Kaskazini Pemba",
+          "en": "Kaskazini Pemba",
+          "slug": "kaskazini-pemba"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ54",
+          "level": 1,
+          "name": {
+            "local": "Kaskazini Pemba",
+            "en": "Kaskazini Pemba",
+            "slug": "kaskazini-pemba"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 32
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.092",
+        "lon": "39.752"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ5402",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Micheweni",
+        "en": "Micheweni",
+        "slug": "micheweni"
+      },
+      "code": {
+        "id": "TZ5402",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ54",
+        "level": 1,
+        "name": {
+          "local": "Kaskazini Pemba",
+          "en": "Kaskazini Pemba",
+          "slug": "kaskazini-pemba"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ54",
+          "level": 1,
+          "name": {
+            "local": "Kaskazini Pemba",
+            "en": "Kaskazini Pemba",
+            "slug": "kaskazini-pemba"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 27
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-4.957",
+        "lon": "39.775"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ55",
+      "level": 1,
+      "level_name": {
+        "local": "Mkoa",
+        "en": "Region"
+      },
+      "name": {
+        "local": "Kusini Pemba",
+        "en": "Kusini Pemba",
+        "slug": "kusini-pemba"
+      },
+      "code": {
+        "id": "TZ55",
+        "iso": null
+      },
+      "parent": null,
+      "ancestors": [],
+      "children_count": {
+        "district": 2,
+        "ward": 62
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.323",
+        "lon": "39.709"
+      },
+      "metadata": {},
+      "source": {
+        "name": "Open Admin Data",
+        "url": "https://openadmindata.org/tz/regions/kusini-pemba/",
+        "api": "https://openadmindata.org/api/tz/"
+      }
+    },
+    {
+      "id": "TZ5501",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Chake Chake",
+        "en": "Chake Chake",
+        "slug": "chake-chake"
+      },
+      "code": {
+        "id": "TZ5501",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ55",
+        "level": 1,
+        "name": {
+          "local": "Kusini Pemba",
+          "en": "Kusini Pemba",
+          "slug": "kusini-pemba"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ55",
+          "level": 1,
+          "name": {
+            "local": "Kusini Pemba",
+            "en": "Kusini Pemba",
+            "slug": "kusini-pemba"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 29
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.247",
+        "lon": "39.752"
+      },
+      "metadata": {},
+      "source": {}
+    },
+    {
+      "id": "TZ5502",
+      "level": 2,
+      "level_name": {
+        "local": "Wilaya",
+        "en": "District"
+      },
+      "name": {
+        "local": "Mkoani",
+        "en": "Mkoani",
+        "slug": "mkoani"
+      },
+      "code": {
+        "id": "TZ5502",
+        "iso": null
+      },
+      "parent": {
+        "id": "TZ55",
+        "level": 1,
+        "name": {
+          "local": "Kusini Pemba",
+          "en": "Kusini Pemba",
+          "slug": "kusini-pemba"
+        }
+      },
+      "ancestors": [
+        {
+          "id": "TZ55",
+          "level": 1,
+          "name": {
+            "local": "Kusini Pemba",
+            "en": "Kusini Pemba",
+            "slug": "kusini-pemba"
+          }
+        }
+      ],
+      "children_count": {
+        "ward": 33
+      },
+      "zip_codes": [],
+      "geo": {
+        "lat": "-5.384",
+        "lon": "39.686"
+      },
+      "metadata": {},
+      "source": {}
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+const CACHE_NAME = "zipoo-phase-1-v58";
+const APP_SHELL = [
+  "./",
+  "./index.html",
+  "./pages/dashboard.html",
+  "./pages/login.html",
+  "./pages/register.html",
+  "./saas/index.html",
+  "./saas/login.html",
+  "./saas/dashboard.html",
+  "./saas/businesses.html",
+  "./saas/users.html",
+  "./saas/settings.html",
+  "./assets/css/styles.css",
+  "./assets/css/styles.css?v=3",
+  "./assets/css/styles.css?v=4",
+  "./assets/css/styles.css?v=5",
+  "./assets/css/styles.css?v=6",
+  "./assets/css/styles.css?v=7",
+  "./assets/css/styles.css?v=8",
+  "./assets/css/styles.css?v=9",
+  "./assets/css/styles.css?v=10",
+  "./assets/css/styles.css?v=11",
+  "./assets/css/styles.css?v=12",
+  "./assets/css/styles.css?v=13",
+  "./assets/css/styles.css?v=15",
+  "./assets/css/styles.css?v=16",
+  "./assets/css/styles.css?v=17",
+  "./assets/css/styles.css?v=18",
+  "./assets/css/styles.css?v=19",
+  "./assets/css/styles.css?v=20",
+  "./assets/css/styles.css?v=21",
+  "./assets/css/styles.css?v=29",
+  "./assets/css/styles.css?v=30",
+  "./assets/css/styles.css?v=31",
+  "./assets/css/styles.css?v=32",
+  "./assets/js/app.js",
+  "./assets/js/app.js?v=3",
+  "./assets/js/app.js?v=4",
+  "./assets/js/app.js?v=5",
+  "./assets/js/app.js?v=6",
+  "./assets/js/app.js?v=7",
+  "./assets/js/app.js?v=8",
+  "./assets/js/app.js?v=9",
+  "./assets/js/app.js?v=10",
+  "./assets/js/app.js?v=11",
+  "./assets/js/app.js?v=12",
+  "./assets/js/app.js?v=13",
+  "./assets/js/app.js?v=15",
+  "./assets/js/app.js?v=16",
+  "./assets/js/app.js?v=17",
+  "./assets/js/app.js?v=18",
+  "./assets/js/app.js?v=19",
+  "./assets/js/app.js?v=20",
+  "./assets/js/app.js?v=21",
+  "./assets/js/app.js?v=22",
+  "./assets/js/app.js?v=23",
+  "./assets/js/app.js?v=24",
+  "./assets/js/app.js?v=25",
+  "./assets/js/app.js?v=26",
+  "./assets/js/app.js?v=27",
+  "./assets/js/app.js?v=28",
+  "./assets/js/app.js?v=29",
+  "./assets/js/app.js?v=30",
+  "./assets/js/saas.js",
+  "./assets/js/saas.js?v=1",
+  "./assets/js/saas.js?v=2",
+  "./assets/js/saas.js?v=3",
+  "./assets/js/saas.js?v=4",
+  "./assets/js/saas.js?v=5",
+  "./assets/js/saas.js?v=6",
+  "./assets/js/saas.js?v=7",
+  "./assets/js/saas.js?v=8",
+  "./assets/js/saas.js?v=9",
+  "./assets/js/saas.js?v=10",
+  "./assets/js/saas.js?v=11",
+  "./assets/js/saas.js?v=12",
+  "./assets/js/saas.js?v=13",
+  "./assets/js/saas.js?v=14",
+  "./assets/js/saas.js?v=15",
+  "./assets/js/saas.js?v=16",
+  "./assets/js/saas.js?v=17",
+  "./sf-pro-display/SFPRODISPLAYREGULAR.OTF",
+  "./sf-pro-display/SFPRODISPLAYMEDIUM.OTF",
+  "./sf-pro-display/SFPRODISPLAYBOLD.OTF",
+  "./assets/icons/icon.svg",
+  "./assets/icons/icon-192.svg",
+  "./assets/icons/icon-512.svg",
+  "./locales/en.json",
+  "./locales/en.json?v=6",
+  "./locales/en.json?v=7",
+  "./locales/en.json?v=8",
+  "./locales/en.json?v=9",
+  "./locales/en.json?v=10",
+  "./locales/en.json?v=11",
+  "./locales/en.json?v=12",
+  "./locales/en.json?v=13",
+  "./locales/en.json?v=14",
+  "./locales/en.json?v=15",
+  "./locales/en.json?v=16",
+  "./locales/en.json?v=17",
+  "./locales/sw.json",
+  "./locales/sw.json?v=6",
+  "./locales/sw.json?v=7",
+  "./locales/sw.json?v=8",
+  "./locales/sw.json?v=9",
+  "./locales/sw.json?v=10",
+  "./locales/sw.json?v=11",
+  "./locales/sw.json?v=12",
+  "./locales/sw.json?v=13",
+  "./locales/sw.json?v=14",
+  "./locales/sw.json?v=15",
+  "./locales/sw.json?v=16",
+  "./locales/sw.json?v=17",
+  "./manifest.json"
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(
+      keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+    ))
+  );
+  self.clients.claim();
+});
+
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") {
+    return;
+  }
+
+  if (new URL(event.request.url).pathname.includes("/api/")) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      return fetch(event.request).catch(() => {
+        if (event.request.mode === "navigate") {
+          return caches.match("./index.html");
+        }
+        return new Response("", { status: 503, statusText: "Offline" });
+      });
+    })
+  );
+});
