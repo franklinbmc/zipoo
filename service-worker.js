@@ -1,4 +1,4 @@
-const CACHE_NAME = "zipoo-phase-1-v61";
+const CACHE_NAME = "zipoo-phase-1-v62";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -145,18 +145,27 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(async () => {
+        const url = new URL(event.request.url);
+        const fallback = url.pathname.includes("dashboard")
+          ? "./pages/dashboard.html"
+          : url.pathname.includes("register")
+            ? "./pages/register.html"
+            : url.pathname.includes("login")
+              ? "./pages/login.html"
+              : "./index.html";
 
-      return fetch(event.request).catch(() => {
-        if (event.request.mode === "navigate") {
-          return caches.match("./index.html");
-        }
-        return new Response("", { status: 503, statusText: "Offline" });
-      });
-    })
+        return (await caches.match(event.request)) || caches.match(fallback) || caches.match("./index.html");
+      })
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => cachedResponse || fetch(event.request).catch(() => (
+      new Response("", { status: 503, statusText: "Offline" })
+    )))
   );
 });
