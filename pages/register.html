@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=32">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=33">
 </head>
 <body>
   <div class="app-shell login-entry">
@@ -43,11 +43,17 @@
         </label>
         <label class="flow-field" data-flow-field hidden>
           <span data-i18n="register.phone">Phone Number</span>
-          <input type="tel" name="phone" placeholder="0712345678" autocomplete="tel" inputmode="numeric" maxlength="10" required data-validate="phone">
+          <div class="input-check">
+            <input type="tel" name="phone" placeholder="0712345678" autocomplete="tel" inputmode="numeric" maxlength="10" required data-validate="phone" data-availability-check>
+            <span class="input-spinner" hidden data-input-spinner aria-hidden="true"></span>
+          </div>
         </label>
         <label class="flow-field" data-flow-field hidden>
           <span data-i18n="register.email">Email</span>
-          <input type="email" name="email" placeholder="name@example.com" autocomplete="email" data-validate="email">
+          <div class="input-check">
+            <input type="email" name="email" placeholder="name@example.com" autocomplete="email" data-validate="email" data-availability-check>
+            <span class="input-spinner" hidden data-input-spinner aria-hidden="true"></span>
+          </div>
         </label>
         <label class="flow-field" data-flow-field data-flow-section="business" hidden>
           <span data-i18n="register.businessName">Business Name</span>

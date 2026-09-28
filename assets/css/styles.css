@@ -692,6 +692,32 @@ input[type="file"] {
   padding: 10px 12px;
 }
 
+.input-check {
+  position: relative;
+}
+
+.input-check input {
+  padding-right: 44px;
+}
+
+.input-spinner {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  border: 2px solid rgba(13, 43, 91, 0.18);
+  border-top-color: var(--color-teal);
+  border-radius: 999px;
+  animation: spin 720ms linear infinite;
+  pointer-events: none;
+}
+
+.input-spinner[hidden] {
+  display: none;
+}
+
 .password-field {
   position: relative;
 }
@@ -2048,5 +2074,12 @@ textarea {
 
   .entry-footer {
     font-size: 0.82rem;
+  }
+}
+
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

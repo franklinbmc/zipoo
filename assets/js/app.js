@@ -133,30 +133,68 @@ const writeRegisterDraft = (form) => {
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const isValidPassword = (value) => /^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(value);
+const availabilityChecks = new WeakMap();
+
+const setAvailabilitySpinner = (input, isChecking) => {
+  input?.closest(".input-check")?.querySelector("[data-input-spinner]")?.toggleAttribute("hidden", !isChecking);
+};
 
 const checkRegistrationAvailability = async (input) => {
   if (!["phone", "email"].includes(input?.name) || !input.value.trim()) {
+    setAvailabilitySpinner(input, false);
     return "";
   }
 
+  const value = input.value.trim();
+  const checkToken = (availabilityChecks.get(input)?.token || 0) + 1;
+  availabilityChecks.set(input, { token: checkToken, value, error: "" });
+  setAvailabilitySpinner(input, true);
+
   const params = new URLSearchParams();
-  params.set(input.name, input.value.trim());
-  const response = await fetch(`${getBasePath()}api/check-registration.php?${params.toString()}`);
-  const payload = await response.json();
+  params.set(input.name, value);
 
-  if (!response.ok || !payload.ok) {
-    return payload.message || "Unable to check account details.";
+  try {
+    const response = await fetch(`${getBasePath()}api/check-registration.php?${params.toString()}`);
+    const payload = await response.json();
+    const current = availabilityChecks.get(input);
+
+    if (!current || current.token !== checkToken || input.value.trim() !== value) {
+      return "";
+    }
+
+    if (!response.ok || !payload.ok) {
+      current.error = payload.message || "Unable to check account details.";
+      return current.error;
+    }
+
+    if (input.name === "phone" && payload.phoneExists) {
+      current.error = "This phone number is already registered.";
+      return current.error;
+    }
+
+    if (input.name === "email" && payload.emailExists) {
+      current.error = "This email is already registered.";
+      return current.error;
+    }
+
+    current.error = "";
+    return "";
+  } catch {
+    const current = availabilityChecks.get(input);
+
+    if (current && current.token === checkToken && input.value.trim() === value) {
+      current.error = "Unable to check account details.";
+      return current.error;
+    }
+
+    return "";
+  } finally {
+    const current = availabilityChecks.get(input);
+
+    if (current?.token === checkToken) {
+      setAvailabilitySpinner(input, false);
+    }
   }
-
-  if (input.name === "phone" && payload.phoneExists) {
-    return "This phone number is already registered.";
-  }
-
-  if (input.name === "email" && payload.emailExists) {
-    return "This email is already registered.";
-  }
-
-  return "";
 };
 
 const setupBottomSheet = () => {
@@ -604,6 +642,50 @@ const setupRegisterFlow = () => {
       status.classList.remove("error");
     }
   };
+
+  form.querySelectorAll("[data-availability-check]").forEach((input) => {
+    let debounceTimer;
+
+    input.addEventListener("input", () => {
+      window.clearTimeout(debounceTimer);
+      const value = input.value.trim();
+      const field = input.closest("[data-flow-field]");
+      const isActiveField = fields[index] === field;
+
+      availabilityChecks.delete(input);
+      setAvailabilitySpinner(input, false);
+
+      if (isActiveField) {
+        clearFlowMessage();
+      }
+
+      if (!value) {
+        return;
+      }
+
+      if (input.dataset.validate === "phone" && (!/^0\d*$/.test(value) || value.length > 10)) {
+        return;
+      }
+
+      if (input.dataset.validate === "email" && !isValidEmail(value)) {
+        return;
+      }
+
+      debounceTimer = window.setTimeout(async () => {
+        const availabilityError = await checkRegistrationAvailability(input);
+
+        if (fields[index] !== field) {
+          return;
+        }
+
+        if (availabilityError) {
+          await showFlowError(availabilityError);
+        } else {
+          clearFlowMessage();
+        }
+      }, 450);
+    });
+  });
 
   const showRegistrationSuccess = () => {
     fields.forEach((field) => {
