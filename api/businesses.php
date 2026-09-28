@@ -31,13 +31,27 @@ function business_payload(array $business): array
         'id' => (int) $business['id'],
         'business_name' => $business['business_name'],
         'business_type' => $business['business_type'],
+        'region_code' => $business['region_code'] ?? null,
+        'district_code' => $business['district_code'] ?? null,
     ];
 }
 
+function notify_user(PDO $pdo, int $userId, string $subject, string $message): void
+{
+    try {
+        $stmt = $pdo->prepare('SELECT email FROM tbl_users WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $userId]);
+        $email = (string) ($stmt->fetchColumn() ?: '');
+        if ($email !== '') {
+            @mail($email, $subject, $message, 'From: no-reply@localhost');
+        }
+    } catch (Throwable) {
+    }
+}
 function load_businesses(PDO $pdo, int $userId, ?int $businessId): array
 {
     $stmt = $pdo->prepare(
-        'SELECT id, business_name, business_type
+        'SELECT id, business_name, business_type, region_code, district_code
          FROM tbl_businesses
          WHERE owner_user_id = :user_id OR id = :business_id
          ORDER BY id ASC'
@@ -69,6 +83,27 @@ try {
 
     $action = trim((string) ($_POST['action'] ?? ''));
 
+    if ($action === 'set_default') {
+        $action = 'switch';
+    }
+
+    if ($action === 'delete') {
+        $businessId = (int) ($_POST['business_id'] ?? 0);
+        if ($businessId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Choose a business.']);
+        }
+        if ($currentBusinessId !== null && $businessId === $currentBusinessId) {
+            respond(422, ['ok' => false, 'message' => 'Switch to another business before deleting this one.']);
+        }
+        $delete = $pdo->prepare('DELETE FROM tbl_businesses WHERE id = :business_id AND owner_user_id = :user_id');
+        $delete->execute([':business_id' => $businessId, ':user_id' => $userId]);
+        if ($delete->rowCount() === 0) {
+            respond(403, ['ok' => false, 'message' => 'You cannot delete that business.']);
+        }
+        notify_user($pdo, $userId, 'Zipoo business deleted', 'A business was deleted from your Zipoo account.');
+        respond(200, ['ok' => true, 'businesses' => load_businesses($pdo, $userId, $currentBusinessId)]);
+    }
+
     if ($action === 'switch') {
         $businessId = (int) ($_POST['business_id'] ?? 0);
         if ($businessId <= 0) {
@@ -76,8 +111,8 @@ try {
         }
 
         $check = $pdo->prepare(
-            'SELECT id, business_name, business_type
-             FROM tbl_businesses
+            'SELECT id, business_name, business_type, region_code, district_code
+         FROM tbl_businesses
              WHERE id = :business_id AND (owner_user_id = :user_id OR id = :current_business_id)
              LIMIT 1'
         );
@@ -96,19 +131,26 @@ try {
         $pdo->prepare('UPDATE tbl_users SET business_id = :business_id WHERE id = :user_id')
             ->execute([':business_id' => (int) $business['id'], ':user_id' => $userId]);
 
+        notify_user($pdo, $userId, 'Zipoo serving business changed', 'Your current serving business was changed.');
         respond(200, ['ok' => true, 'business' => business_payload($business)]);
     }
 
     if ($action === 'create') {
         $businessName = trim((string) ($_POST['business_name'] ?? ''));
         $businessType = trim((string) ($_POST['business_type'] ?? 'service'));
+        $regionCode = trim((string) ($_POST['region'] ?? $_POST['region_code'] ?? ''));
+        $districtCode = trim((string) ($_POST['district'] ?? $_POST['district_code'] ?? ''));
 
         if ($businessName === '') {
             respond(422, ['ok' => false, 'message' => 'Business name is required.']);
         }
 
         $defaults = null;
-        if ($currentBusinessId !== null) {
+        if ($regionCode !== '' && $districtCode !== '') {
+            $defaults = ['region_code' => $regionCode, 'district_code' => $districtCode];
+        }
+
+        if (!$defaults && $currentBusinessId !== null) {
             $defaultsStmt = $pdo->prepare('SELECT region_code, district_code FROM tbl_businesses WHERE id = :business_id LIMIT 1');
             $defaultsStmt->execute([':business_id' => $currentBusinessId]);
             $defaults = $defaultsStmt->fetch();
@@ -147,7 +189,11 @@ try {
             'id' => $businessId,
             'business_name' => $businessName,
             'business_type' => $businessType !== '' ? $businessType : 'service',
+            'region_code' => $defaults['region_code'],
+            'district_code' => $defaults['district_code'],
         ];
+
+        notify_user($pdo, $userId, 'Zipoo business created', 'A new business was created on your Zipoo account.');
 
         respond(201, [
             'ok' => true,

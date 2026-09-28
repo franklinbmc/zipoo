@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=41">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=42">
 </head>
 <body>
   <div class="app-shell settings-page-shell">
@@ -30,26 +30,26 @@
           <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
         </summary>
         <div class="settings-list flush-list">
-          <div class="settings-list-row">
+          <button class="settings-list-row" type="button" data-account-edit="full_name">
             <span>Name</span>
             <strong data-settings-name>-</strong>
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </div>
-          <div class="settings-list-row">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M410.3 231.1L280.9 101.7 85.3 297.3c-4.6 4.6-7.8 10.4-9.1 16.8L56 416l101.9-20.2c6.4-1.3 12.2-4.5 16.8-9.1l195.6-195.6zM326.6 56l129.4 129.4" /></svg>
+          </button>
+          <button class="settings-list-row" type="button" data-account-edit="phone">
             <span>Phone</span>
             <strong data-settings-phone>-</strong>
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </div>
-          <div class="settings-list-row">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M410.3 231.1L280.9 101.7 85.3 297.3c-4.6 4.6-7.8 10.4-9.1 16.8L56 416l101.9-20.2c6.4-1.3 12.2-4.5 16.8-9.1l195.6-195.6zM326.6 56l129.4 129.4" /></svg>
+          </button>
+          <button class="settings-list-row" type="button" data-account-edit="email">
             <span>Email</span>
             <strong data-settings-email>-</strong>
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </div>
-          <div class="settings-list-row">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M410.3 231.1L280.9 101.7 85.3 297.3c-4.6 4.6-7.8 10.4-9.1 16.8L56 416l101.9-20.2c6.4-1.3 12.2-4.5 16.8-9.1l195.6-195.6zM326.6 56l129.4 129.4" /></svg>
+          </button>
+          <button class="settings-list-row" type="button" data-business-manager-open>
             <span>Current serving business</span>
             <strong data-settings-current-business>-</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </div>
+          </button>
         </div>
       </details>
 
@@ -59,12 +59,56 @@
           <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
         </summary>
         <div class="settings-list flush-list" data-settings-business-list></div>
-        <form class="settings-list nested-list business-create-form" data-business-create-form>
+      </details>
+    </main>
+  </div>
+
+  <div class="fullscreen-modal" hidden data-account-edit-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="account-edit-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-account-edit-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="account-edit-title" data-account-edit-title>Edit account</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-account-edit-form>
+        <label class="form-field">
+          <span data-account-edit-label>Value</span>
+          <input type="text" name="value" data-account-edit-value required>
+        </label>
+        <div class="otp-grid" hidden data-account-otp-fields>
+          <label class="form-field">
+            <span>Old verification code</span>
+            <input type="text" name="old_otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+          </label>
+          <label class="form-field">
+            <span>New verification code</span>
+            <input type="text" name="new_otp" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+          </label>
+        </div>
+        <p class="inline-error" hidden data-account-edit-error></p>
+        <button class="btn btn-primary full" type="submit" data-account-edit-submit>Save</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="fullscreen-modal" hidden data-business-manager-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="business-manager-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-business-manager-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="business-manager-title">My Businesses</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body">
+        <div class="settings-list flush-list" data-business-manager-list></div>
+        <form class="settings-list nested-list business-create-form" data-business-manager-create-form>
           <div class="settings-list-subhead">Create new business</div>
           <label class="settings-list-row field-row">
             <span>Business name</span>
             <input type="text" name="business_name" placeholder="New company" required>
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </label>
           <label class="settings-list-row field-row">
             <span>Business type</span>
@@ -73,13 +117,20 @@
               <option value="service" selected>Service</option>
               <option value="wholesale">Wholesale</option>
             </select>
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </label>
-          <p class="inline-error" hidden data-business-create-error></p>
+          <label class="settings-list-row field-row">
+            <span>Region</span>
+            <select name="region" required data-business-region></select>
+          </label>
+          <label class="settings-list-row field-row">
+            <span>District</span>
+            <select name="district" required data-business-district></select>
+          </label>
+          <p class="inline-error" hidden data-business-manager-error></p>
           <button class="btn btn-primary full" type="submit">Create business</button>
         </form>
-      </details>
-    </main>
+      </div>
+    </section>
   </div>
 
   <div class="modal-backdrop" hidden data-app-modal>
@@ -90,6 +141,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=35" defer></script>
+  <script src="/assets/js/app.js?v=36" defer></script>
 </body>
 </html>

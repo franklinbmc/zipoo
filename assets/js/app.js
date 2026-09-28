@@ -414,99 +414,296 @@ const setupSettingsPage = () => {
   const settingsCurrentBusiness = document.querySelector("[data-settings-current-business]");
   const settingsBusinessList = document.querySelector("[data-settings-business-list]");
   const businessCount = document.querySelector("[data-business-count]");
-  const createForm = document.querySelector("[data-business-create-form]");
-  const createError = document.querySelector("[data-business-create-error]");
+  const accountEditButtons = document.querySelectorAll("[data-account-edit]");
+  const accountModal = document.querySelector("[data-account-edit-modal]");
+  const accountForm = document.querySelector("[data-account-edit-form]");
+  const accountClose = document.querySelector("[data-account-edit-close]");
+  const accountTitle = document.querySelector("[data-account-edit-title]");
+  const accountLabel = document.querySelector("[data-account-edit-label]");
+  const accountValue = document.querySelector("[data-account-edit-value]");
+  const accountOtpFields = document.querySelector("[data-account-otp-fields]");
+  const accountError = document.querySelector("[data-account-edit-error]");
+  const accountSubmit = document.querySelector("[data-account-edit-submit]");
+  const businessOpen = document.querySelector("[data-business-manager-open]");
+  const businessModal = document.querySelector("[data-business-manager-modal]");
+  const businessClose = document.querySelector("[data-business-manager-close]");
+  const businessManagerList = document.querySelector("[data-business-manager-list]");
+  const businessCreateForm = document.querySelector("[data-business-manager-create-form]");
+  const businessRegion = document.querySelector("[data-business-region]");
+  const businessDistrict = document.querySelector("[data-business-district]");
+  const businessError = document.querySelector("[data-business-manager-error]");
+  let editField = "";
+  let editStep = "request";
+  let regions = [];
 
-  const render = () => {
-    const { user, knownBusinesses, selectedBusiness } = getStoredBusinessState();
-    if (settingsName) settingsName.textContent = user.full_name || "-";
-    if (settingsPhone) settingsPhone.textContent = user.phone || "-";
-    if (settingsEmail) settingsEmail.textContent = user.email || "-";
-    if (settingsCurrentBusiness) settingsCurrentBusiness.textContent = selectedBusiness?.business_name || "Business";
+  const labels = {
+    full_name: "Name",
+    phone: "Phone",
+    email: "Email",
+  };
+
+  const storeAccount = (user) => {
+    if (!user) return;
+    const savedUser = readStoredJson("zipoo.user", {});
+    localStorage.setItem("zipoo.user", JSON.stringify({ ...savedUser, ...user }));
+  };
+
+  const refreshAccount = async () => {
+    try {
+      const response = await fetch(`${getBasePath()}api/account.php`);
+      const payload = await response.json();
+      if (response.ok && payload.ok && payload.user) {
+        storeAccount(payload.user);
+      }
+    } catch {
+      // Existing local account details are enough for offline rendering.
+    }
+  };
+
+  const renderBusinessRows = () => {
+    const { knownBusinesses, selectedBusiness } = getStoredBusinessState();
     if (businessCount) businessCount.textContent = `${knownBusinesses.length} registered`;
 
     settingsBusinessList?.replaceChildren(...knownBusinesses.map((business) => {
       const isCurrent = String(business.id) === String(selectedBusiness?.id || "");
-      const row = document.createElement(isCurrent ? "div" : "button");
+      const row = document.createElement("div");
       row.className = `settings-list-row business-settings-row${isCurrent ? " current" : ""}`;
-      if (!isCurrent) {
-        row.type = "button";
-      }
-
-      const label = document.createElement("span");
+      const name = document.createElement("span");
       const value = document.createElement("strong");
-      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-      label.textContent = business.business_name || `Business ${business.id}`;
-      value.textContent = isCurrent ? "Current" : (business.business_type || "Switch");
-      chevron.setAttribute("viewBox", "0 0 512 512");
-      chevron.setAttribute("aria-hidden", "true");
-      path.setAttribute("d", "M184 112l144 144-144 144");
-      chevron.append(path);
-      row.append(label, value, chevron);
-
-      if (!isCurrent) {
-        row.addEventListener("click", async () => {
-          row.disabled = true;
-          try {
-            await switchStoredBusiness(String(business.id));
-            render();
-            await showAppModal("Business changed", `${business.business_name || "Business"} is now serving.`);
-          } catch (error) {
-            await showAppModal("Unable to switch business", error.message || "Please try again.");
-          } finally {
-            row.disabled = false;
-          }
-        });
-      }
-
+      name.textContent = business.business_name || `Business ${business.id}`;
+      value.textContent = isCurrent ? "Current" : (business.business_type || "Registered");
+      row.append(name, value);
       return row;
     }));
   };
 
-  render();
+  const renderBusinessManager = () => {
+    const { knownBusinesses, selectedBusiness } = getStoredBusinessState();
+    businessManagerList?.replaceChildren(...knownBusinesses.map((business) => {
+      const isCurrent = String(business.id) === String(selectedBusiness?.id || "");
+      const row = document.createElement("div");
+      row.className = `settings-list-row business-manager-row${isCurrent ? " current" : ""}`;
 
-  createForm?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (createError) {
-      createError.hidden = true;
+      const name = document.createElement("span");
+      const meta = document.createElement("strong");
+      const actions = document.createElement("div");
+      name.textContent = business.business_name || `Business ${business.id}`;
+      meta.textContent = isCurrent ? "Current" : (business.business_type || "Registered");
+      actions.className = "business-manager-actions";
+
+      if (!isCurrent) {
+        const setDefault = document.createElement("button");
+        setDefault.type = "button";
+        setDefault.textContent = "Set default";
+        setDefault.addEventListener("click", async () => {
+          setDefault.disabled = true;
+          try {
+            await switchStoredBusiness(String(business.id));
+            render();
+            renderBusinessManager();
+            await showAppModal("Business changed", `${business.business_name || "Business"} is now serving.`);
+          } catch (error) {
+            await showAppModal("Unable to switch business", error.message || "Please try again.");
+          } finally {
+            setDefault.disabled = false;
+          }
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", async () => {
+          const body = new FormData();
+          body.set("action", "delete");
+          body.set("business_id", business.id);
+          deleteButton.disabled = true;
+          try {
+            const response = await fetch(`${getBasePath()}api/businesses.php`, { method: "POST", body });
+            const payload = await response.json();
+            if (!response.ok || !payload.ok) {
+              throw new Error(payload.message || "Unable to delete business.");
+            }
+            if (Array.isArray(payload.businesses)) {
+              localStorage.setItem("zipoo.businesses", JSON.stringify(payload.businesses));
+            }
+            render();
+            renderBusinessManager();
+            await showAppModal("Business deleted", `${business.business_name || "Business"} was deleted.`);
+          } catch (error) {
+            await showAppModal("Unable to delete business", error.message || "Please try again.");
+          } finally {
+            deleteButton.disabled = false;
+          }
+        });
+
+        actions.append(setDefault, deleteButton);
+      }
+
+      row.append(name, meta, actions);
+      return row;
+    }));
+  };
+
+  const render = () => {
+    const { user, selectedBusiness } = getStoredBusinessState();
+    if (settingsName) settingsName.textContent = user.full_name || "-";
+    if (settingsPhone) settingsPhone.textContent = user.phone || "-";
+    if (settingsEmail) settingsEmail.textContent = user.email || "-";
+    if (settingsCurrentBusiness) settingsCurrentBusiness.textContent = selectedBusiness?.business_name || "Business";
+    renderBusinessRows();
+  };
+
+  const closeAccountModal = () => {
+    if (accountModal) accountModal.hidden = true;
+  };
+
+  const openAccountModal = (field) => {
+    const { user } = getStoredBusinessState();
+    editField = field;
+    editStep = "request";
+    if (accountTitle) accountTitle.textContent = `Edit ${labels[field] || "account"}`;
+    if (accountLabel) accountLabel.textContent = labels[field] || "Value";
+    if (accountValue) {
+      accountValue.type = field === "email" ? "email" : field === "phone" ? "tel" : "text";
+      accountValue.value = user[field] || "";
+      accountValue.readOnly = false;
     }
+    if (accountOtpFields) accountOtpFields.hidden = true;
+    accountForm?.reset();
+    if (accountValue) accountValue.value = user[field] || "";
+    if (accountError) accountError.hidden = true;
+    if (accountSubmit) accountSubmit.textContent = field === "full_name" ? "Save" : "Send verification";
+    if (accountModal) accountModal.hidden = false;
+    accountValue?.focus();
+  };
 
-    const submitButton = createForm.querySelector('button[type="submit"]');
-    const body = new FormData(createForm);
-    body.set("action", "create");
-    submitButton.disabled = true;
+  const loadBusinessLocations = async () => {
+    if (!businessRegion || !businessDistrict || regions.length) {
+      return;
+    }
+    try {
+      const response = await fetch(`${getBasePath()}api/locations.php`);
+      const payload = await response.json();
+      regions = Array.isArray(payload.regions) ? payload.regions : [];
+      businessRegion.replaceChildren(...regions.map((region) => {
+        const option = document.createElement("option");
+        option.value = region.code;
+        option.textContent = region.name;
+        return option;
+      }));
+      businessRegion.dispatchEvent(new Event("change"));
+    } catch {
+      regions = [];
+    }
+  };
+
+  businessRegion?.addEventListener("change", () => {
+    const region = regions.find((item) => item.code === businessRegion.value);
+    const districts = Array.isArray(region?.districts) ? region.districts : [];
+    businessDistrict?.replaceChildren(...districts.map((district) => {
+      const option = document.createElement("option");
+      option.value = district.code;
+      option.textContent = district.name;
+      return option;
+    }));
+  });
+
+  accountEditButtons.forEach((button) => {
+    button.addEventListener("click", () => openAccountModal(button.dataset.accountEdit));
+  });
+
+  accountClose?.addEventListener("click", closeAccountModal);
+
+  accountForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!editField) return;
+    if (accountError) accountError.hidden = true;
+    const body = new FormData(accountForm);
+    body.set("action", editStep === "verify" ? "verify_change" : "request_change");
+    body.set("field", editField);
+    if (accountSubmit) accountSubmit.disabled = true;
 
     try {
-      const response = await fetch(`${getBasePath()}api/businesses.php`, {
-        method: "POST",
-        body,
-      });
+      const response = await fetch(`${getBasePath()}api/account.php`, { method: "POST", body });
       const payload = await response.json();
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message || "Unable to update account.");
+      }
 
+      if (payload.user) {
+        storeAccount(payload.user);
+        render();
+        closeAccountModal();
+        await showAppModal("Account updated", payload.message || "Your account was updated.");
+        return;
+      }
+
+      editStep = "verify";
+      if (accountOtpFields) accountOtpFields.hidden = false;
+      if (accountValue) accountValue.readOnly = true;
+      if (accountSubmit) accountSubmit.textContent = "Verify and save";
+      await showAppModal("Verification sent", payload.message || "Enter both verification codes to continue.");
+    } catch (error) {
+      if (accountError) {
+        accountError.textContent = error.message || "Unable to update account.";
+        accountError.hidden = false;
+      }
+    } finally {
+      if (accountSubmit) accountSubmit.disabled = false;
+    }
+  });
+
+  businessOpen?.addEventListener("click", async () => {
+    if (businessModal) businessModal.hidden = false;
+    renderBusinessManager();
+    await loadBusinessLocations();
+  });
+
+  businessClose?.addEventListener("click", () => {
+    if (businessModal) businessModal.hidden = true;
+  });
+
+  businessCreateForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (businessError) businessError.hidden = true;
+    const submitButton = businessCreateForm.querySelector('button[type="submit"]');
+    const body = new FormData(businessCreateForm);
+    body.set("action", "create");
+    if (submitButton) submitButton.disabled = true;
+
+    try {
+      const response = await fetch(`${getBasePath()}api/businesses.php`, { method: "POST", body });
+      const payload = await response.json();
       if (!response.ok || !payload.ok) {
         throw new Error(payload.message || "Unable to create business.");
       }
-
       const { knownBusinesses } = getStoredBusinessState();
       const nextBusinesses = Array.isArray(payload.businesses) ? payload.businesses : [...knownBusinesses, payload.business].filter(Boolean);
       localStorage.setItem("zipoo.businesses", JSON.stringify(nextBusinesses));
       if (payload.business?.id) {
         localStorage.setItem("zipoo.currentBusinessId", String(payload.business.id));
       }
-      createForm.reset();
+      businessCreateForm.reset();
+      businessRegion?.dispatchEvent(new Event("change"));
       render();
+      renderBusinessManager();
       await showAppModal("Business created", `${payload.business?.business_name || "New business"} is now serving.`);
     } catch (error) {
-      if (createError) {
-        createError.textContent = error.message || "Unable to create business.";
-        createError.hidden = false;
-      } else {
-        await showAppModal("Unable to create business", error.message || "Please try again.");
+      if (businessError) {
+        businessError.textContent = error.message || "Unable to create business.";
+        businessError.hidden = false;
       }
     } finally {
-      submitButton.disabled = false;
+      if (submitButton) submitButton.disabled = false;
     }
+  });
+
+  render();
+  refreshAccount().then(render);
+  refreshStoredBusinesses().then(() => {
+    render();
+    renderBusinessManager();
   });
 };
 const setupSearchSelects = () => {
