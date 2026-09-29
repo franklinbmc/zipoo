@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#F6F8FC">
+  <meta name="description" content="Manage Zipoo products, services, inventory stock, purchasing and movements.">
+  <title>Stock & Purchasing - Zipoo</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=56">
+</head>
+<body>
+  <div class="app-shell stock-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
+      </a>
+      <h1>Stock & Purchasing</h1>
+      <button class="icon-button" type="button" data-stock-quick-add aria-label="Quick action">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M256 112v288M112 256h288" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="customers-page" data-stock-page style="padding-bottom: 40px;">
+      <!-- KPI Overview Cards -->
+      <section class="stock-kpi-grid">
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Total Items</span>
+          <strong class="kpi-val" data-kpi-total-items>0</strong>
+        </div>
+        <div class="stock-kpi-card" data-kpi-low-stock-card>
+          <span class="kpi-label">Low Stock</span>
+          <strong class="kpi-val" data-kpi-low-stock>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Purchase Orders</span>
+          <strong class="kpi-val" data-kpi-total-po>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Movements Today</span>
+          <strong class="kpi-val" data-kpi-today-movements>0</strong>
+        </div>
+      </section>
+
+      <!-- 1. Products & Services Accordion -->
+      <details class="settings-accordion" data-accordion="items" open style="margin-bottom: 12px;">
+        <summary>
+          <span>Products & Services</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <strong data-items-count-badge style="font-size: 0.84rem; color: var(--color-muted); font-weight: 800;">0 items</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+        </summary>
+        <div class="settings-list flush-list" style="padding: 14px;">
+          <div class="stock-action-header">
+            <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Catalog & Inventory</span>
+            <button class="btn btn-primary btn-sm btn-with-icon" type="button" data-open-create-item>
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M256 112v288M112 256h288" /></svg>
+              <span>Add Product / Service</span>
+            </button>
+          </div>
+
+          <!-- Filter Pills -->
+          <div class="filter-bar" data-item-type-filters>
+            <button type="button" class="filter-pill active" data-filter-type="all">All Items</button>
+            <button type="button" class="filter-pill" data-filter-type="product">Products</button>
+            <button type="button" class="filter-pill" data-filter-type="service">Services</button>
+            <button type="button" class="filter-pill" data-filter-type="low_stock">⚠️ Low Stock</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="customers-search-wrap" style="margin-bottom: 12px;">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+            </svg>
+            <input type="search" class="customers-search-input" data-items-search placeholder="Search items by name, SKU, category...">
+          </div>
+
+          <!-- Items List Container -->
+          <div class="settings-list flush-list" data-stock-items-list style="display: grid; gap: 8px;"></div>
+
+          <!-- Empty State -->
+          <div class="company-users-empty" hidden data-stock-items-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+            <div style="font-size: 2rem; margin-bottom: 6px;">📦</div>
+            <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No items found</strong>
+            <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Add physical products to track stock, or services to bill clients.</p>
+            <button class="btn btn-primary btn-sm" type="button" data-open-create-item>Add Item</button>
+          </div>
+        </div>
+      </details>
+
+      <!-- 2. Purchasing Accordion (PO & Goods Receiving) -->
+      <details class="settings-accordion" data-accordion="purchasing" style="margin-bottom: 12px;">
+        <summary>
+          <span>Purchasing (PO & Receiving)</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <strong data-po-count-badge style="font-size: 0.84rem; color: var(--color-muted); font-weight: 800;">0 orders</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+        </summary>
+        <div class="settings-list flush-list" style="padding: 14px;">
+          <div class="stock-action-header">
+            <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Purchase Orders & GRN</span>
+            <button class="btn btn-primary btn-sm btn-with-icon" type="button" data-open-create-po>
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M256 112v288M112 256h288" /></svg>
+              <span>New Purchase Order</span>
+            </button>
+          </div>
+
+          <!-- PO Filter Pills -->
+          <div class="filter-bar" data-po-status-filters>
+            <button type="button" class="filter-pill active" data-filter-po="all">All Orders</button>
+            <button type="button" class="filter-pill" data-filter-po="draft">Draft</button>
+            <button type="button" class="filter-pill" data-filter-po="sent">Sent</button>
+            <button type="button" class="filter-pill" data-filter-po="partially_received">Partial</button>
+            <button type="button" class="filter-pill" data-filter-po="received">Received</button>
+          </div>
+
+          <!-- PO Search Input -->
+          <div class="customers-search-wrap" style="margin-bottom: 12px;">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+            </svg>
+            <input type="search" class="customers-search-input" data-po-search placeholder="Search by PO number or supplier name...">
+          </div>
+
+          <!-- PO List Container -->
+          <div class="settings-list flush-list" data-po-list style="display: grid; gap: 8px;"></div>
+
+          <!-- Empty State -->
+          <div class="company-users-empty" hidden data-po-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+            <div style="font-size: 2rem; margin-bottom: 6px;">📋</div>
+            <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No purchase orders yet</strong>
+            <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create purchase orders to procure items, generate PDFs, and receive goods.</p>
+            <button class="btn btn-primary btn-sm" type="button" data-open-create-po>New Purchase Order</button>
+          </div>
+        </div>
+      </details>
+
+      <!-- 3. Stock Movement Accordion -->
+      <details class="settings-accordion" data-accordion="movements">
+        <summary>
+          <span>Stock Movement</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <strong data-movements-count-badge style="font-size: 0.84rem; color: var(--color-muted); font-weight: 800;">Ledger</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+        </summary>
+        <div class="settings-list flush-list" style="padding: 14px;">
+          <div class="stock-action-header">
+            <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Inventory Ledger & Audit</span>
+            <button class="btn btn-outline btn-sm btn-with-icon" type="button" data-open-stock-adjust>
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M384 256H128M256 128v256" /></svg>
+              <span>Adjust Stock</span>
+            </button>
+          </div>
+
+          <!-- Movement Filter Pills -->
+          <div class="filter-bar" data-movement-filters>
+            <button type="button" class="filter-pill active" data-filter-movement="all">All Movements</button>
+            <button type="button" class="filter-pill" data-filter-movement="purchase_receive">Goods Received</button>
+            <button type="button" class="filter-pill" data-filter-movement="adjustment_add">+ Stock Added</button>
+            <button type="button" class="filter-pill" data-filter-movement="adjustment_subtract">- Stock Deducted</button>
+            <button type="button" class="filter-pill" data-filter-movement="sale">Sales</button>
+          </div>
+
+          <!-- Movement Search Input -->
+          <div class="customers-search-wrap" style="margin-bottom: 12px;">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+            </svg>
+            <input type="search" class="customers-search-input" data-movements-search placeholder="Search by item name, reference, notes...">
+          </div>
+
+          <!-- Movements List Container -->
+          <div class="settings-list flush-list" data-stock-movements-list style="display: grid; gap: 8px;"></div>
+
+          <!-- Empty State -->
+          <div class="company-users-empty" hidden data-stock-movements-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+            <div style="font-size: 2rem; margin-bottom: 6px;">📊</div>
+            <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No movements recorded</strong>
+            <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Inventory movements will automatically appear here when receiving goods or making adjustments.</p>
+          </div>
+        </div>
+      </details>
+    </main>
+  </div>
+
+  <!-- Modal 1: Item Details Modal -->
+  <div class="fullscreen-modal" hidden data-item-detail-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="item-detail-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-item-detail-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="item-detail-title">Item Details</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body customer-detail-body">
+        <div class="customer-detail-hero">
+          <div class="customer-avatar" data-item-detail-avatar>📦</div>
+          <h3 data-item-detail-name>-</h3>
+          <span class="customer-meta" data-item-detail-meta>-</span>
+        </div>
+
+        <div class="settings-list flush-list" style="border: 1px solid var(--color-line); border-radius: 12px; margin-top: 14px;">
+          <div class="settings-list-row field-display-row">
+            <span>Type</span>
+            <strong data-item-detail-type style="text-transform: capitalize;">-</strong>
+          </div>
+          <div class="settings-list-row field-display-row" data-item-stock-row>
+            <span>Current Stock</span>
+            <strong data-item-detail-stock>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Selling Price</span>
+            <strong data-item-detail-selling style="color: var(--color-blue);">-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Cost Price</span>
+            <strong data-item-detail-cost>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Profit Margin</span>
+            <strong data-item-detail-margin>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>SKU / Code</span>
+            <strong data-item-detail-sku>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Category</span>
+            <strong data-item-detail-category>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Unit of Measure</span>
+            <strong data-item-detail-unit>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row" data-item-min-stock-row>
+            <span>Min Stock Alert</span>
+            <strong data-item-detail-min-stock>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Description</span>
+            <strong data-item-detail-description style="font-size: 0.85rem; font-weight: 500;">-</strong>
+          </div>
+        </div>
+
+        <div class="customer-detail-actions" style="margin-top: 24px; display: grid; gap: 10px;">
+          <button class="btn btn-primary full" type="button" data-item-detail-edit-btn>Edit Item</button>
+          <button class="btn btn-outline full" type="button" data-item-detail-adjust-btn>Adjust Stock</button>
+          <button class="btn btn-danger-outline full" type="button" data-item-detail-delete-btn>Delete Item</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal 2: Item Create & Edit Modal -->
+  <div class="fullscreen-modal" hidden data-item-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="item-form-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-item-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="item-form-title" data-item-form-title>Add Item</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-item-form novalidate>
+        <input type="hidden" name="item_id" data-item-form-id>
+
+        <!-- Item Type Toggle -->
+        <label class="form-field">
+          <span>Item Type <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
+            <button type="button" class="btn btn-outline btn-sm active" data-type-choice="product" style="padding: 10px; font-weight: 800;">📦 Physical Product</button>
+            <button type="button" class="btn btn-outline btn-sm" data-type-choice="service" style="padding: 10px; font-weight: 800;">⚡ Service</button>
+          </div>
+          <input type="hidden" name="type" value="product" data-item-form-type>
+        </label>
+
+        <label class="form-field">
+          <span>Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="name" placeholder="e.g. Wireless Mouse or Consulting" required>
+        </label>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="form-field">
+            <span>Category</span>
+            <input type="text" name="category" placeholder="e.g. Electronics, Services" list="categories-list" value="General">
+            <datalist id="categories-list" data-categories-datalist></datalist>
+          </label>
+          <label class="form-field">
+            <span>Unit of Measure</span>
+            <select name="unit">
+              <option value="pcs" selected>pcs (Pieces)</option>
+              <option value="box">box (Boxes)</option>
+              <option value="kg">kg (Kilograms)</option>
+              <option value="litre">litre (Litres)</option>
+              <option value="meter">meter (Meters)</option>
+              <option value="hours">hours (Hours)</option>
+              <option value="service">service (Fixed service)</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="form-field">
+            <span>Selling Price <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+            <input type="number" name="selling_price" step="0.01" min="0" placeholder="0.00" required>
+          </label>
+          <label class="form-field">
+            <span>Cost Price</span>
+            <input type="number" name="cost_price" step="0.01" min="0" placeholder="0.00">
+          </label>
+        </div>
+
+        <div data-product-only-fields>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <label class="form-field" data-initial-stock-wrap>
+              <span>Opening Stock</span>
+              <input type="number" name="initial_stock" step="0.01" min="0" placeholder="0">
+            </label>
+            <label class="form-field">
+              <span>Min Stock Alert</span>
+              <input type="number" name="min_stock_alert" step="0.01" min="0" value="5">
+            </label>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <label class="form-field">
+              <span>SKU / Product Code</span>
+              <input type="text" name="sku" placeholder="e.g. SKU-001">
+            </label>
+            <label class="form-field">
+              <span>Barcode</span>
+              <input type="text" name="barcode" placeholder="e.g. 789123456">
+            </label>
+          </div>
+        </div>
+
+        <label class="form-field">
+          <span>Description / Notes</span>
+          <textarea name="description" rows="2" placeholder="Optional details..."></textarea>
+        </label>
+
+        <label class="form-field">
+          <span>Status</span>
+          <select name="status">
+            <option value="active" selected>Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+
+        <p class="inline-error" hidden data-item-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-item-form-submit>Save Item</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal 3: Manual Stock Adjustment Modal -->
+  <div class="fullscreen-modal" hidden data-stock-adjust-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="stock-adjust-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-stock-adjust-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="stock-adjust-title">Stock Adjustment</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-stock-adjust-form novalidate>
+        <label class="form-field">
+          <span>Select Product <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="item_id" data-adjust-item-select required>
+            <option value="">Choose a product...</option>
+          </select>
+        </label>
+
+        <div style="background: #f8fafc; border: 1px solid var(--color-line); border-radius: 8px; padding: 12px; margin-bottom: 12px;" data-adjust-preview hidden>
+          <div style="font-size: 0.8rem; color: var(--color-muted);">Current On-Hand Stock:</div>
+          <strong data-adjust-current-stock style="font-size: 1.1rem; color: var(--color-navy);">-</strong>
+        </div>
+
+        <label class="form-field">
+          <span>Adjustment Type <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="adjustment_type" required>
+            <option value="add" selected>+ Add Stock (Stock In / Found / Correction)</option>
+            <option value="subtract">- Deduct Stock (Damage / Lost / Expired / Correction)</option>
+          </select>
+        </label>
+
+        <label class="form-field">
+          <span>Quantity <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="number" name="quantity" step="0.01" min="0.01" placeholder="Enter quantity" required>
+        </label>
+
+        <label class="form-field">
+          <span>Reason / Reference Note <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="reason" placeholder="e.g. Stock take correction, Damaged during transit" required>
+        </label>
+
+        <p class="inline-error" hidden data-stock-adjust-error></p>
+        <button class="btn btn-primary full" type="submit" data-stock-adjust-submit>Apply Adjustment</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal 4: Purchase Order Create Modal -->
+  <div class="fullscreen-modal" hidden data-po-create-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="po-create-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-po-create-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="po-create-title">New Purchase Order</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-po-create-form novalidate>
+        <label class="form-field">
+          <span>Select Vendor / Supplier <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="supplier_id" data-po-supplier-select required>
+            <option value="">Choose supplier...</option>
+          </select>
+        </label>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="form-field">
+            <span>Order Date <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+            <input type="date" name="order_date" required>
+          </label>
+          <label class="form-field">
+            <span>Expected Date</span>
+            <input type="date" name="expected_date">
+          </label>
+        </div>
+
+        <!-- Line Items Section -->
+        <div style="margin: 16px 0 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 0.9rem; color: var(--color-navy);">Order Items</strong>
+            <button class="btn btn-outline btn-sm btn-with-icon" type="button" data-add-po-line>
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M256 112v288M112 256h288" /></svg>
+              <span>Add Item</span>
+            </button>
+          </div>
+          <div data-po-lines-container style="display: grid; gap: 8px;"></div>
+        </div>
+
+        <!-- Order Summary & Taxes -->
+        <div style="background: #f8fafc; border: 1px solid var(--color-line); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 6px;">
+            <span style="color: var(--color-muted);">Subtotal:</span>
+            <strong data-po-calc-subtotal>0.00 TZS</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; margin-bottom: 6px;">
+            <span style="color: var(--color-muted);">Tax Rate (%):</span>
+            <input type="number" name="tax_rate" step="0.1" min="0" value="0" data-po-tax-input style="width: 70px; text-align: right; height: 32px; padding: 2px 6px;">
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 8px;">
+            <span style="color: var(--color-muted);">Tax Amount:</span>
+            <span data-po-calc-tax>0.00 TZS</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; border-top: 1px dashed var(--color-line); padding-top: 8px; color: var(--color-blue);">
+            <span>Total Order Amount:</span>
+            <strong data-po-calc-total>0.00 TZS</strong>
+          </div>
+        </div>
+
+        <label class="form-field">
+          <span>Notes / Instructions for Vendor</span>
+          <textarea name="notes" rows="2" placeholder="e.g. Please deliver to warehouse back entrance."></textarea>
+        </label>
+
+        <p class="inline-error" hidden data-po-create-error></p>
+        <button class="btn btn-primary full" type="submit" data-po-create-submit>Create Purchase Order</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal 5: Purchase Order Detail Modal -->
+  <div class="fullscreen-modal" hidden data-po-detail-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="po-detail-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-po-detail-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="po-detail-title" data-po-detail-num>Purchase Order</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body" style="padding: 16px;">
+        <!-- Header Info Card -->
+        <div style="background: #fff; border: 1px solid var(--color-line); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 1.05rem; color: var(--color-navy);" data-po-detail-supplier>-</strong>
+            <span class="badge-status" data-po-detail-status-badge>DRAFT</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem; color: var(--color-muted);">
+            <div>Order Date: <strong data-po-detail-date style="color: var(--color-text);">-</strong></div>
+            <div>Expected: <strong data-po-detail-expected style="color: var(--color-text);">-</strong></div>
+            <div>Supplier Phone: <span data-po-detail-phone>-</span></div>
+            <div>Supplier Email: <span data-po-detail-email>-</span></div>
+          </div>
+        </div>
+
+        <!-- Line Items Table -->
+        <div style="border: 1px solid var(--color-line); border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 14px;">
+          <div style="background: #f8fafc; padding: 10px 14px; font-size: 0.84rem; font-weight: 800; color: var(--color-navy); border-bottom: 1px solid var(--color-line);">Order Items</div>
+          <div data-po-detail-items-list style="display: grid;"></div>
+          <div style="padding: 12px 14px; background: #f8fafc; border-top: 1px solid var(--color-line); display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.88rem; color: var(--color-muted); font-weight: 700;">Grand Total:</span>
+            <strong data-po-detail-grand-total style="font-size: 1.1rem; color: var(--color-blue);">-</strong>
+          </div>
+        </div>
+
+        <!-- Notes if any -->
+        <div style="background: #fff; border: 1px solid var(--color-line); border-radius: 12px; padding: 12px; margin-bottom: 16px;" data-po-detail-notes-wrap hidden>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--color-muted); font-weight: 800; margin-bottom: 4px;">Order Notes</div>
+          <p data-po-detail-notes style="margin: 0; font-size: 0.85rem; color: var(--color-text);"></p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: grid; gap: 10px; margin-bottom: 16px;">
+          <button class="btn btn-primary full btn-with-icon" type="button" data-po-receive-btn>
+            <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 16px; height: 16px; stroke-width: 44;"><path d="M112 268l144 144 144-144M256 392V100" /></svg>
+            <span>Receive Goods (GRN)</span>
+          </button>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button class="btn btn-outline full btn-with-icon" type="button" data-po-download-pdf-btn>
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 15px; height: 15px; stroke-width: 44;"><path d="M384 128v-48a32 32 0 00-32-32H160a32 32 0 00-32 32v48M128 384h256M256 224v160M192 320l64 64 64-64" /></svg>
+              <span>Download PDF</span>
+            </button>
+            <button class="btn btn-outline full btn-with-icon" type="button" data-po-email-btn>
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 15px; height: 15px; stroke-width: 44;"><path d="M48 112l208 144 208-144M48 112h416v288H48z" /></svg>
+              <span>Email to Vendor</span>
+            </button>
+          </div>
+          <button class="btn btn-danger-outline full" type="button" data-po-cancel-btn>Cancel Order</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal 6: Goods Receiving (GRN) Modal -->
+  <div class="fullscreen-modal" hidden data-grn-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="grn-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-grn-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="grn-title">Goods Receiving Note (GRN)</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-grn-form novalidate>
+        <input type="hidden" name="po_id" data-grn-po-id>
+        <div style="background: #f8fafc; border: 1px solid var(--color-line); border-radius: 12px; padding: 12px; margin-bottom: 12px;">
+          <div style="font-size: 0.8rem; color: var(--color-muted);">Receiving items for:</div>
+          <strong data-grn-po-num style="color: var(--color-navy); font-size: 1rem;">-</strong>
+        </div>
+
+        <label class="form-field">
+          <span>Date Received <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="date" name="received_date" required>
+        </label>
+
+        <div style="margin: 14px 0 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 0.88rem; color: var(--color-navy);">Items to Receive</strong>
+            <button class="btn btn-outline btn-sm" type="button" data-grn-receive-all style="padding: 4px 10px; font-size: 0.78rem;">Receive All Remaining</button>
+          </div>
+          <div data-grn-items-container style="display: grid; gap: 8px;"></div>
+        </div>
+
+        <label class="form-field">
+          <span>Delivery / Inspection Notes</span>
+          <input type="text" name="notes" placeholder="e.g. Delivered in good condition by driver Ally">
+        </label>
+
+        <p class="inline-error" hidden data-grn-error></p>
+        <button class="btn btn-primary full" type="submit" data-grn-submit>Confirm Goods Receipt & Update Stock</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- App Notice / Confirm Modal -->
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-close>OK</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=60" defer></script>
+</body>
+</html>

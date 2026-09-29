@@ -3257,4 +3257,114 @@ button.settings-list-row:focus-visible {
   fill: none;
 }
 
+/* Stock & Purchasing Styles */
+.stock-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+@media (min-width: 600px) {
+  .stock-kpi-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.stock-kpi-card {
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.stock-kpi-card .kpi-label {
+  font-size: 0.76rem;
+  color: var(--color-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.stock-kpi-card .kpi-val {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--color-navy);
+}
+.stock-kpi-card.alert .kpi-val {
+  color: var(--color-danger);
+}
+
+.filter-bar {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.filter-pill {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  background: #fff;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.filter-pill.active {
+  background: var(--color-navy);
+  border-color: var(--color-navy);
+  color: #fff;
+}
+
+.badge-stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+.badge-stock.in-stock {
+  background: rgba(16, 185, 129, 0.12);
+  color: #047857;
+}
+.badge-stock.low-stock {
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+}
+.badge-stock.out-of-stock {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+.badge-stock.service {
+  background: rgba(14, 116, 219, 0.12);
+  color: var(--color-blue);
+}
+
+.stock-action-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.po-line-item-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) 70px 100px 32px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+
 

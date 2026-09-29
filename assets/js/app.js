@@ -3511,11 +3511,1316 @@ const setupSuppliersPage = () => {
   // Initial load
   loadSuppliers();
 };
+const setupStockPage = () => {
+  const page = document.querySelector("[data-stock-page]");
+  if (!page) return;
+
+  // KPI Overview Elements
+  const kpiTotalItems = document.querySelector("[data-kpi-total-items]");
+  const kpiLowStock = document.querySelector("[data-kpi-low-stock]");
+  const kpiLowStockCard = document.querySelector("[data-kpi-low-stock-card]");
+  const kpiTotalPo = document.querySelector("[data-kpi-total-po]");
+  const kpiTodayMovements = document.querySelector("[data-kpi-today-movements]");
+
+  // 1. Items Elements
+  const itemsList = document.querySelector("[data-stock-items-list]");
+  const itemsEmpty = document.querySelector("[data-stock-items-empty]");
+  const itemsCountBadge = document.querySelector("[data-items-count-badge]");
+  const itemsSearch = document.querySelector("[data-items-search]");
+  const itemTypeFilters = document.querySelectorAll("[data-filter-type]");
+  const openCreateItemBtns = document.querySelectorAll("[data-open-create-item]");
+  const stockQuickAddBtn = document.querySelector("[data-stock-quick-add]");
+
+  // Item Details Modal
+  const itemDetailModal = document.querySelector("[data-item-detail-modal]");
+  const itemDetailCloseBtn = document.querySelector("[data-item-detail-close]");
+  const itemDetailAvatar = document.querySelector("[data-item-detail-avatar]");
+  const itemDetailName = document.querySelector("[data-item-detail-name]");
+  const itemDetailMeta = document.querySelector("[data-item-detail-meta]");
+  const itemDetailType = document.querySelector("[data-item-detail-type]");
+  const itemDetailStock = document.querySelector("[data-item-detail-stock]");
+  const itemDetailSelling = document.querySelector("[data-item-detail-selling]");
+  const itemDetailCost = document.querySelector("[data-item-detail-cost]");
+  const itemDetailMargin = document.querySelector("[data-item-detail-margin]");
+  const itemDetailSku = document.querySelector("[data-item-detail-sku]");
+  const itemDetailCategory = document.querySelector("[data-item-detail-category]");
+  const itemDetailUnit = document.querySelector("[data-item-detail-unit]");
+  const itemDetailMinStock = document.querySelector("[data-item-detail-min-stock]");
+  const itemDetailDescription = document.querySelector("[data-item-detail-description]");
+  const itemDetailEditBtn = document.querySelector("[data-item-detail-edit-btn]");
+  const itemDetailAdjustBtn = document.querySelector("[data-item-detail-adjust-btn]");
+  const itemDetailDeleteBtn = document.querySelector("[data-item-detail-delete-btn]");
+  const itemStockRow = document.querySelector("[data-item-stock-row]");
+  const itemMinStockRow = document.querySelector("[data-item-min-stock-row]");
+
+  // Item Form Modal (Add / Edit)
+  const itemFormModal = document.querySelector("[data-item-form-modal]");
+  const itemFormCloseBtn = document.querySelector("[data-item-form-close]");
+  const itemFormTitle = document.querySelector("[data-item-form-title]");
+  const itemForm = document.querySelector("[data-item-form]");
+  const itemFormError = document.querySelector("[data-item-form-error]");
+  const itemFormSubmit = document.querySelector("[data-item-form-submit]");
+  const itemFormId = document.querySelector("[data-item-form-id]");
+  const itemFormType = document.querySelector("[data-item-form-type]");
+  const typeChoiceBtns = document.querySelectorAll("[data-type-choice]");
+  const productOnlyFields = document.querySelector("[data-product-only-fields]");
+  const initialStockWrap = document.querySelector("[data-initial-stock-wrap]");
+  const categoriesDatalist = document.querySelector("[data-categories-datalist]");
+
+  // Stock Adjust Modal
+  const adjustModal = document.querySelector("[data-stock-adjust-modal]");
+  const adjustCloseBtn = document.querySelector("[data-stock-adjust-close]");
+  const adjustForm = document.querySelector("[data-stock-adjust-form]");
+  const adjustError = document.querySelector("[data-stock-adjust-error]");
+  const adjustSubmit = document.querySelector("[data-stock-adjust-submit]");
+  const adjustItemSelect = document.querySelector("[data-adjust-item-select]");
+  const adjustPreview = document.querySelector("[data-adjust-preview]");
+  const adjustCurrentStock = document.querySelector("[data-adjust-current-stock]");
+  const openAdjustBtns = document.querySelectorAll("[data-open-stock-adjust]");
+
+  // 2. Purchasing Elements
+  const poList = document.querySelector("[data-po-list]");
+  const poEmpty = document.querySelector("[data-po-empty]");
+  const poCountBadge = document.querySelector("[data-po-count-badge]");
+  const poSearch = document.querySelector("[data-po-search]");
+  const poStatusFilters = document.querySelectorAll("[data-filter-po]");
+  const openCreatePoBtns = document.querySelectorAll("[data-open-create-po]");
+
+  // PO Create Modal
+  const poCreateModal = document.querySelector("[data-po-create-modal]");
+  const poCreateCloseBtn = document.querySelector("[data-po-create-close]");
+  const poCreateForm = document.querySelector("[data-po-create-form]");
+  const poCreateError = document.querySelector("[data-po-create-error]");
+  const poCreateSubmit = document.querySelector("[data-po-create-submit]");
+  const poSupplierSelect = document.querySelector("[data-po-supplier-select]");
+  const poLinesContainer = document.querySelector("[data-po-lines-container]");
+  const addPoLineBtn = document.querySelector("[data-add-po-line]");
+  const poTaxInput = document.querySelector("[data-po-tax-input]");
+  const poCalcSubtotal = document.querySelector("[data-po-calc-subtotal]");
+  const poCalcTax = document.querySelector("[data-po-calc-tax]");
+  const poCalcTotal = document.querySelector("[data-po-calc-total]");
+
+  // PO Detail Modal
+  const poDetailModal = document.querySelector("[data-po-detail-modal]");
+  const poDetailCloseBtn = document.querySelector("[data-po-detail-close]");
+  const poDetailNum = document.querySelector("[data-po-detail-num]");
+  const poDetailSupplier = document.querySelector("[data-po-detail-supplier]");
+  const poDetailStatusBadge = document.querySelector("[data-po-detail-status-badge]");
+  const poDetailDate = document.querySelector("[data-po-detail-date]");
+  const poDetailExpected = document.querySelector("[data-po-detail-expected]");
+  const poDetailPhone = document.querySelector("[data-po-detail-phone]");
+  const poDetailEmail = document.querySelector("[data-po-detail-email]");
+  const poDetailItemsList = document.querySelector("[data-po-detail-items-list]");
+  const poDetailGrandTotal = document.querySelector("[data-po-detail-grand-total]");
+  const poDetailNotesWrap = document.querySelector("[data-po-detail-notes-wrap]");
+  const poDetailNotes = document.querySelector("[data-po-detail-notes]");
+  const poReceiveBtn = document.querySelector("[data-po-receive-btn]");
+  const poDownloadPdfBtn = document.querySelector("[data-po-download-pdf-btn]");
+  const poEmailBtn = document.querySelector("[data-po-email-btn]");
+  const poCancelBtn = document.querySelector("[data-po-cancel-btn]");
+
+  // GRN Modal
+  const grnModal = document.querySelector("[data-grn-modal]");
+  const grnCloseBtn = document.querySelector("[data-grn-close]");
+  const grnForm = document.querySelector("[data-grn-form]");
+  const grnError = document.querySelector("[data-grn-error]");
+  const grnSubmit = document.querySelector("[data-grn-submit]");
+  const grnPoId = document.querySelector("[data-grn-po-id]");
+  const grnPoNum = document.querySelector("[data-grn-po-num]");
+  const grnItemsContainer = document.querySelector("[data-grn-items-container]");
+  const grnReceiveAllBtn = document.querySelector("[data-grn-receive-all]");
+
+  // 3. Movement Elements
+  const movementsList = document.querySelector("[data-stock-movements-list]");
+  const movementsEmpty = document.querySelector("[data-stock-movements-empty]");
+  const movementsCountBadge = document.querySelector("[data-movements-count-badge]");
+  const movementsSearch = document.querySelector("[data-movements-search]");
+  const movementFilters = document.querySelectorAll("[data-filter-movement]");
+
+  // In-memory state
+  let cachedItems = [];
+  let cachedPOs = [];
+  let cachedSuppliers = [];
+  let currentItem = null;
+  let currentPO = null;
+  let activeItemType = "all";
+  let activePoStatus = "all";
+  let activeMovementType = "all";
+
+  const formatCurrency = (amount, cur = "TZS") => {
+    const val = Number(amount) || 0;
+    return `${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${cur}`;
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    try {
+      const d = new Date(dateStr.replace(" ", "T"));
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  // ----------------------------------------
+  // Section 1: Products & Services Logic
+  // ----------------------------------------
+
+  const setItemTypeChoice = (choice) => {
+    if (itemFormType) itemFormType.value = choice;
+    typeChoiceBtns.forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.typeChoice === choice);
+    });
+    if (productOnlyFields) {
+      productOnlyFields.hidden = (choice === "service");
+    }
+    const unitSelect = itemForm?.elements["unit"];
+    if (unitSelect) {
+      unitSelect.value = choice === "service" ? "service" : "pcs";
+    }
+  };
+
+  typeChoiceBtns.forEach((btn) => {
+    btn.addEventListener("click", () => setItemTypeChoice(btn.dataset.typeChoice));
+  });
+
+  const renderItemsList = (items = []) => {
+    if (!items || !items.length) {
+      if (itemsList) itemsList.replaceChildren();
+      if (itemsEmpty) itemsEmpty.hidden = false;
+      return;
+    }
+
+    if (itemsEmpty) itemsEmpty.hidden = true;
+
+    itemsList?.replaceChildren(...items.map((item) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "settings-list-row stock-item-row";
+      row.dataset.itemId = String(item.id);
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.width = "100%";
+      row.style.padding = "12px 14px";
+      row.style.background = "#fff";
+      row.style.border = "1px solid var(--color-line)";
+      row.style.borderRadius = "10px";
+      row.style.cursor = "pointer";
+      row.style.marginBottom = "8px";
+
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      left.style.gap = "10px";
+      left.style.textAlign = "left";
+
+      const avatar = document.createElement("div");
+      avatar.className = "customer-avatar";
+      avatar.style.width = "38px";
+      avatar.style.height = "38px";
+      avatar.style.fontSize = "1.1rem";
+      avatar.textContent = item.type === "service" ? "⚡" : "📦";
+
+      const info = document.createElement("div");
+      const name = document.createElement("div");
+      name.style.fontWeight = "800";
+      name.style.color = "var(--color-navy)";
+      name.style.fontSize = "0.94rem";
+      name.textContent = item.name;
+
+      const sub = document.createElement("div");
+      sub.style.fontSize = "0.78rem";
+      sub.style.color = "var(--color-muted)";
+      const codePart = item.sku ? `SKU: ${item.sku} • ` : "";
+      sub.textContent = `${codePart}${item.category || "General"} • ${formatCurrency(item.selling_price)}`;
+
+      info.append(name, sub);
+      left.append(avatar, info);
+
+      const right = document.createElement("div");
+      right.style.display = "flex";
+      right.style.alignItems = "center";
+      right.style.gap = "8px";
+
+      const stockBadge = document.createElement("span");
+      if (item.type === "service") {
+        stockBadge.className = "badge-stock service";
+        stockBadge.textContent = "Service";
+      } else if (item.current_stock <= 0) {
+        stockBadge.className = "badge-stock out-of-stock";
+        stockBadge.textContent = `0 ${item.unit}`;
+      } else if (item.is_low_stock) {
+        stockBadge.className = "badge-stock low-stock";
+        stockBadge.textContent = `⚠️ ${item.current_stock} ${item.unit}`;
+      } else {
+        stockBadge.className = "badge-stock in-stock";
+        stockBadge.textContent = `${item.current_stock} ${item.unit}`;
+      }
+
+      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      chevron.setAttribute("viewBox", "0 0 512 512");
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.style.width = "16px";
+      chevron.style.height = "16px";
+      chevron.style.stroke = "var(--color-muted)";
+      chevron.style.fill = "none";
+      chevron.style.strokeWidth = "32";
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M184 112l144 144-144 144");
+      chevron.append(path);
+
+      right.append(stockBadge, chevron);
+      row.append(left, right);
+
+      row.addEventListener("click", () => openItemDetail(item));
+      return row;
+    }));
+  };
+
+  const loadItems = async (query = "") => {
+    try {
+      const params = new URLSearchParams();
+      if (activeItemType === "product" || activeItemType === "service") {
+        params.set("type", activeItemType);
+      } else if (activeItemType === "low_stock") {
+        params.set("low_stock", "1");
+      }
+      if (query) {
+        params.set("q", query);
+      }
+
+      const res = await fetch(`${getBasePath()}api/items.php?${params.toString()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.ok) return;
+
+      cachedItems = Array.isArray(data.items) ? data.items : [];
+      renderItemsList(cachedItems);
+
+      // Update KPI counters
+      if (kpiTotalItems) kpiTotalItems.textContent = String(data.stats?.total || 0);
+      if (kpiLowStock) kpiLowStock.textContent = String(data.stats?.low_stock || 0);
+      if (kpiLowStockCard) {
+        kpiLowStockCard.classList.toggle("alert", (data.stats?.low_stock || 0) > 0);
+      }
+      if (itemsCountBadge) {
+        itemsCountBadge.textContent = `${data.stats?.total || 0} items`;
+      }
+
+      // Populate category datalist
+      if (categoriesDatalist && Array.isArray(data.categories)) {
+        categoriesDatalist.innerHTML = data.categories.map((c) => `<option value="${c}">`).join("");
+      }
+
+      // Also populate adjust product select dropdown
+      if (adjustItemSelect) {
+        const prodItems = cachedItems.filter((i) => i.type === "product");
+        const currentVal = adjustItemSelect.value;
+        adjustItemSelect.innerHTML = `<option value="">Choose a product...</option>` +
+          prodItems.map((p) => `<option value="${p.id}">${p.name} (Stock: ${p.current_stock} ${p.unit})</option>`).join("");
+        adjustItemSelect.value = currentVal;
+      }
+    } catch {
+      // Quiet fail if offline
+    }
+  };
+
+  const openItemDetail = (item) => {
+    currentItem = item;
+    if (itemDetailAvatar) {
+      itemDetailAvatar.textContent = item.type === "service" ? "⚡" : "📦";
+    }
+    if (itemDetailName) itemDetailName.textContent = item.name;
+    if (itemDetailMeta) {
+      itemDetailMeta.textContent = `${item.category || "General"} • ${item.type.toUpperCase()}`;
+    }
+    if (itemDetailType) itemDetailType.textContent = item.type;
+    if (itemStockRow) itemStockRow.hidden = (item.type === "service");
+    if (itemMinStockRow) itemMinStockRow.hidden = (item.type === "service");
+
+    if (itemDetailStock) {
+      const cls = item.current_stock <= 0 ? "out-of-stock" : (item.is_low_stock ? "low-stock" : "in-stock");
+      itemDetailStock.innerHTML = `<span class="badge-stock ${cls}">${item.current_stock} ${item.unit}</span>`;
+    }
+    if (itemDetailSelling) itemDetailSelling.textContent = formatCurrency(item.selling_price);
+    if (itemDetailCost) itemDetailCost.textContent = formatCurrency(item.cost_price);
+    if (itemDetailMargin) {
+      const marginVal = item.margin_percent || 0;
+      itemDetailMargin.textContent = `${marginVal}%`;
+    }
+    if (itemDetailSku) itemDetailSku.textContent = item.sku || "-";
+    if (itemDetailCategory) itemDetailCategory.textContent = item.category || "General";
+    if (itemDetailUnit) itemDetailUnit.textContent = item.unit || "pcs";
+    if (itemDetailMinStock) itemDetailMinStock.textContent = `${item.min_stock_alert} ${item.unit}`;
+    if (itemDetailDescription) itemDetailDescription.textContent = item.description || "No description provided.";
+
+    if (itemDetailAdjustBtn) itemDetailAdjustBtn.hidden = (item.type === "service");
+    if (itemDetailModal) itemDetailModal.hidden = false;
+  };
+
+  const closeItemDetail = () => {
+    if (itemDetailModal) itemDetailModal.hidden = true;
+    currentItem = null;
+  };
+
+  const openCreateItemModal = () => {
+    if (itemFormError) itemFormError.hidden = true;
+    if (itemFormTitle) itemFormTitle.textContent = "Add Product / Service";
+    if (itemFormId) itemFormId.value = "";
+    itemForm?.reset();
+    setItemTypeChoice("product");
+    if (initialStockWrap) initialStockWrap.hidden = false;
+    if (itemFormModal) itemFormModal.hidden = false;
+    itemForm?.querySelector('input[name="name"]')?.focus();
+  };
+
+  const openEditItemModal = (item = currentItem) => {
+    if (!item) return;
+    currentItem = item;
+    if (itemFormError) itemFormError.hidden = true;
+    if (itemFormTitle) itemFormTitle.textContent = `Edit ${item.name}`;
+    if (itemFormId) itemFormId.value = String(item.id);
+    if (initialStockWrap) initialStockWrap.hidden = true;
+
+    setItemTypeChoice(item.type || "product");
+
+    if (itemForm) {
+      itemForm.elements["name"].value = item.name || "";
+      itemForm.elements["category"].value = item.category || "General";
+      itemForm.elements["unit"].value = item.unit || "pcs";
+      itemForm.elements["selling_price"].value = item.selling_price || 0;
+      itemForm.elements["cost_price"].value = item.cost_price || 0;
+      itemForm.elements["min_stock_alert"].value = item.min_stock_alert ?? 5;
+      itemForm.elements["sku"].value = item.sku || "";
+      itemForm.elements["barcode"].value = item.barcode || "";
+      itemForm.elements["description"].value = item.description || "";
+      itemForm.elements["status"].value = item.status || "active";
+    }
+
+    if (itemDetailModal) itemDetailModal.hidden = true;
+    if (itemFormModal) itemFormModal.hidden = false;
+    itemForm?.querySelector('input[name="name"]')?.focus();
+  };
+
+  const closeItemFormModal = () => {
+    if (itemFormModal) itemFormModal.hidden = true;
+    if (itemFormError) itemFormError.hidden = true;
+  };
+
+  // Item Filter Tabs
+  itemTypeFilters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      itemTypeFilters.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeItemType = btn.dataset.filterType || "all";
+      loadItems(itemsSearch?.value.trim() || "");
+    });
+  });
+
+  let itemSearchTimeout;
+  itemsSearch?.addEventListener("input", (e) => {
+    clearTimeout(itemSearchTimeout);
+    itemSearchTimeout = setTimeout(() => {
+      loadItems(e.target.value.trim());
+    }, 250);
+  });
+
+  openCreateItemBtns.forEach((btn) => btn.addEventListener("click", openCreateItemModal));
+  stockQuickAddBtn?.addEventListener("click", openCreateItemModal);
+  itemDetailCloseBtn?.addEventListener("click", closeItemDetail);
+  itemFormCloseBtn?.addEventListener("click", closeItemFormModal);
+
+  itemDetailEditBtn?.addEventListener("click", () => {
+    openEditItemModal(currentItem);
+  });
+
+  itemDetailDeleteBtn?.addEventListener("click", async () => {
+    if (!currentItem) return;
+    const itemToDelete = currentItem;
+    const confirmed = await showConfirmModal({
+      title: "Delete Item",
+      message: `Are you sure you want to delete "${itemToDelete.name}"? If it has purchase order history, it will be deactivated.`,
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    itemDetailDeleteBtn.disabled = true;
+    try {
+      const formData = new FormData();
+      formData.set("action", "delete");
+      formData.set("item_id", String(itemToDelete.id));
+
+      const res = await fetch(`${getBasePath()}api/items.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to delete item.");
+      }
+
+      closeItemDetail();
+      await loadItems(itemsSearch?.value.trim() || "");
+      await showAppModal("Item Removed", data.message || "Item was removed successfully.");
+    } catch (err) {
+      await showAppModal("Error", err.message || "Could not delete item.");
+    } finally {
+      itemDetailDeleteBtn.disabled = false;
+    }
+  });
+
+  itemForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (itemFormError) itemFormError.hidden = true;
+    if (itemFormSubmit) itemFormSubmit.disabled = true;
+
+    try {
+      const isEditing = Boolean(itemFormId?.value);
+      const formData = new FormData(itemForm);
+      formData.set("action", isEditing ? "update" : "create");
+
+      const res = await fetch(`${getBasePath()}api/items.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to save item.");
+      }
+
+      closeItemFormModal();
+      await loadItems(itemsSearch?.value.trim() || "");
+      if (data.item) {
+        openItemDetail(data.item);
+      }
+      await showAppModal("Saved Successfully", data.message || "Item details saved.");
+    } catch (err) {
+      if (itemFormError) {
+        itemFormError.textContent = err.message || "Failed to save item.";
+        itemFormError.hidden = false;
+      }
+    } finally {
+      if (itemFormSubmit) itemFormSubmit.disabled = false;
+    }
+  });
+
+  // ----------------------------------------
+  // Section 2: Stock Adjustment Logic
+  // ----------------------------------------
+
+  const openStockAdjustModal = (preselectedItem = null) => {
+    if (adjustError) adjustError.hidden = true;
+    adjustForm?.reset();
+
+    // Populate select
+    const prodItems = cachedItems.filter((i) => i.type === "product");
+    if (adjustItemSelect) {
+      adjustItemSelect.innerHTML = `<option value="">Choose a product...</option>` +
+        prodItems.map((p) => `<option value="${p.id}">${p.name} (Stock: ${p.current_stock} ${p.unit})</option>`).join("");
+      if (preselectedItem) {
+        adjustItemSelect.value = String(preselectedItem.id);
+      }
+    }
+
+    updateAdjustPreview();
+    if (itemDetailModal) itemDetailModal.hidden = true;
+    if (adjustModal) adjustModal.hidden = false;
+  };
+
+  const updateAdjustPreview = () => {
+    const selectedId = adjustItemSelect?.value;
+    const match = cachedItems.find((i) => String(i.id) === String(selectedId));
+    if (match && adjustPreview && adjustCurrentStock) {
+      adjustCurrentStock.textContent = `${match.current_stock} ${match.unit}`;
+      adjustPreview.hidden = false;
+    } else if (adjustPreview) {
+      adjustPreview.hidden = true;
+    }
+  };
+
+  adjustItemSelect?.addEventListener("change", updateAdjustPreview);
+  openAdjustBtns.forEach((btn) => btn.addEventListener("click", () => openStockAdjustModal()));
+  adjustCloseBtn?.addEventListener("click", () => {
+    if (adjustModal) adjustModal.hidden = true;
+  });
+
+  itemDetailAdjustBtn?.addEventListener("click", () => {
+    openStockAdjustModal(currentItem);
+  });
+
+  adjustForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (adjustError) adjustError.hidden = true;
+    if (adjustSubmit) adjustSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(adjustForm);
+      formData.set("action", "adjust_stock");
+
+      const res = await fetch(`${getBasePath()}api/items.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to adjust stock.");
+      }
+
+      if (adjustModal) adjustModal.hidden = true;
+      await loadItems(itemsSearch?.value.trim() || "");
+      await loadStockMovements();
+      await showAppModal("Stock Adjusted", data.message || "Stock was updated successfully.");
+    } catch (err) {
+      if (adjustError) {
+        adjustError.textContent = err.message || "Failed to adjust stock.";
+        adjustError.hidden = false;
+      }
+    } finally {
+      if (adjustSubmit) adjustSubmit.disabled = false;
+    }
+  });
+
+  // ----------------------------------------
+  // Section 3: Purchasing (PO & GRN) Logic
+  // ----------------------------------------
+
+  const loadSuppliersForPo = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/suppliers.php`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      cachedSuppliers = Array.isArray(data.suppliers) ? data.suppliers : [];
+      if (poSupplierSelect) {
+        poSupplierSelect.innerHTML = `<option value="">Choose supplier...</option>` +
+          cachedSuppliers.map((s) => `<option value="${s.id}">${s.supplier_name || s.full_name} (${s.phone || "No phone"})</option>`).join("");
+      }
+      return cachedSuppliers;
+    } catch {
+      return [];
+    }
+  };
+
+  const calculatePoTotals = () => {
+    let subtotal = 0;
+    poLinesContainer?.querySelectorAll(".po-line-item-row").forEach((row) => {
+      const qtyInput = row.querySelector('input[name="line_qty"]');
+      const costInput = row.querySelector('input[name="line_cost"]');
+      const totalSpan = row.querySelector("[data-line-total]");
+
+      const qty = parseFloat(qtyInput?.value || "0") || 0;
+      const cost = parseFloat(costInput?.value || "0") || 0;
+      const lineTot = qty * cost;
+      subtotal += lineTot;
+
+      if (totalSpan) {
+        totalSpan.textContent = formatCurrency(lineTot);
+      }
+    });
+
+    const taxRate = parseFloat(poTaxInput?.value || "0") || 0;
+    const taxAmt = (subtotal * taxRate) / 100;
+    const grandTot = subtotal + taxAmt;
+
+    if (poCalcSubtotal) poCalcSubtotal.textContent = formatCurrency(subtotal);
+    if (poCalcTax) poCalcTax.textContent = formatCurrency(taxAmt);
+    if (poCalcTotal) poCalcTotal.textContent = formatCurrency(grandTot);
+  };
+
+  poTaxInput?.addEventListener("input", calculatePoTotals);
+
+  const addPoLineItem = () => {
+    if (!poLinesContainer) return;
+    const prodItems = cachedItems.filter((i) => i.type === "product");
+
+    const row = document.createElement("div");
+    row.className = "po-line-item-row";
+
+    const select = document.createElement("select");
+    select.name = "line_item_id";
+    select.required = true;
+    select.innerHTML = `<option value="">Select product...</option>` +
+      prodItems.map((p) => `<option value="${p.id}" data-cost="${p.cost_price}">${p.name}</option>`).join("");
+
+    const qtyInput = document.createElement("input");
+    qtyInput.type = "number";
+    qtyInput.name = "line_qty";
+    qtyInput.min = "1";
+    qtyInput.step = "0.01";
+    qtyInput.value = "1";
+    qtyInput.placeholder = "Qty";
+    qtyInput.style.textAlign = "right";
+
+    const costInput = document.createElement("input");
+    costInput.type = "number";
+    costInput.name = "line_cost";
+    costInput.min = "0";
+    costInput.step = "0.01";
+    costInput.value = "0";
+    costInput.placeholder = "Cost";
+    costInput.style.textAlign = "right";
+
+    select.addEventListener("change", () => {
+      const opt = select.selectedOptions[0];
+      const defaultCost = opt?.dataset.cost || "0";
+      costInput.value = defaultCost;
+      calculatePoTotals();
+    });
+
+    qtyInput.addEventListener("input", calculatePoTotals);
+    costInput.addEventListener("input", calculatePoTotals);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "icon-button";
+    removeBtn.style.padding = "4px";
+    removeBtn.style.color = "var(--color-danger)";
+    removeBtn.innerHTML = `<svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke: currentColor; stroke-width: 48;"><path d="M112 112l288 288M400 112L112 400" /></svg>`;
+    removeBtn.addEventListener("click", () => {
+      row.remove();
+      calculatePoTotals();
+    });
+
+    row.append(select, qtyInput, costInput, removeBtn);
+    poLinesContainer.append(row);
+    calculatePoTotals();
+  };
+
+  addPoLineBtn?.addEventListener("click", addPoLineItem);
+
+  const openCreatePoModal = async () => {
+    if (poCreateError) poCreateError.hidden = true;
+    poCreateForm?.reset();
+    if (poCreateForm) {
+      poCreateForm.elements["order_date"].value = new Date().toISOString().split("T")[0];
+    }
+    await loadSuppliersForPo();
+    if (poLinesContainer) poLinesContainer.replaceChildren();
+    addPoLineItem(); // add initial item row
+    calculatePoTotals();
+    if (poCreateModal) poCreateModal.hidden = false;
+  };
+
+  const closeCreatePoModal = () => {
+    if (poCreateModal) poCreateModal.hidden = true;
+  };
+
+  openCreatePoBtns.forEach((btn) => btn.addEventListener("click", openCreatePoModal));
+  poCreateCloseBtn?.addEventListener("click", closeCreatePoModal);
+
+  poCreateForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (poCreateError) poCreateError.hidden = true;
+    if (poCreateSubmit) poCreateSubmit.disabled = true;
+
+    try {
+      const supplierId = poSupplierSelect?.value;
+      if (!supplierId) {
+        throw new Error("Please select a vendor/supplier.");
+      }
+
+      const items = [];
+      poLinesContainer?.querySelectorAll(".po-line-item-row").forEach((row) => {
+        const select = row.querySelector('select[name="line_item_id"]');
+        const qtyInput = row.querySelector('input[name="line_qty"]');
+        const costInput = row.querySelector('input[name="line_cost"]');
+        const itemId = parseInt(select?.value || "0", 10);
+        const qty = parseFloat(qtyInput?.value || "0");
+        const cost = parseFloat(costInput?.value || "0");
+
+        if (itemId > 0 && qty > 0) {
+          items.push({ item_id: itemId, quantity: qty, unit_cost: cost });
+        }
+      });
+
+      if (!items.length) {
+        throw new Error("Please select at least one valid product for this purchase order.");
+      }
+
+      const formData = new FormData(poCreateForm);
+      formData.set("action", "create_po");
+      formData.set("items", JSON.stringify(items));
+
+      const res = await fetch(`${getBasePath()}api/purchasing.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to create purchase order.");
+      }
+
+      closeCreatePoModal();
+      await loadPurchaseOrders();
+      if (data.po_id) {
+        await loadSinglePoAndOpen(data.po_id);
+      }
+      await showAppModal("Purchase Order Created", data.message || "PO has been recorded.");
+    } catch (err) {
+      if (poCreateError) {
+        poCreateError.textContent = err.message || "Failed to create purchase order.";
+        poCreateError.hidden = false;
+      }
+    } finally {
+      if (poCreateSubmit) poCreateSubmit.disabled = false;
+    }
+  });
+
+  const renderPoList = (orders = []) => {
+    if (!orders || !orders.length) {
+      if (poList) poList.replaceChildren();
+      if (poEmpty) poEmpty.hidden = false;
+      return;
+    }
+
+    if (poEmpty) poEmpty.hidden = true;
+
+    poList?.replaceChildren(...orders.map((po) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "settings-list-row po-row";
+      row.dataset.poId = String(po.id);
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.width = "100%";
+      row.style.padding = "12px 14px";
+      row.style.background = "#fff";
+      row.style.border = "1px solid var(--color-line)";
+      row.style.borderRadius = "10px";
+      row.style.cursor = "pointer";
+      row.style.marginBottom = "8px";
+
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      left.style.gap = "10px";
+      left.style.textAlign = "left";
+
+      const avatar = document.createElement("div");
+      avatar.className = "customer-avatar";
+      avatar.style.width = "38px";
+      avatar.style.height = "38px";
+      avatar.style.fontSize = "1.1rem";
+      avatar.textContent = "📋";
+
+      const info = document.createElement("div");
+      const name = document.createElement("div");
+      name.style.fontWeight = "800";
+      name.style.color = "var(--color-navy)";
+      name.style.fontSize = "0.94rem";
+      name.textContent = po.po_number;
+
+      const sub = document.createElement("div");
+      sub.style.fontSize = "0.78rem";
+      sub.style.color = "var(--color-muted)";
+      sub.textContent = `${po.supplier_name || "Supplier"} • ${formatDate(po.order_date)} • ${po.items_count || 1} items`;
+
+      info.append(name, sub);
+      left.append(avatar, info);
+
+      const right = document.createElement("div");
+      right.style.display = "flex";
+      right.style.alignItems = "center";
+      right.style.gap = "8px";
+
+      const amountBadge = document.createElement("div");
+      amountBadge.style.textAlign = "right";
+
+      const amtVal = document.createElement("strong");
+      amtVal.style.color = "var(--color-navy)";
+      amtVal.style.fontSize = "0.92rem";
+      amtVal.textContent = formatCurrency(po.total_amount);
+
+      const statusTag = document.createElement("span");
+      let statusCls = "pending";
+      if (po.status === "received") statusCls = "approved";
+      if (po.status === "cancelled") statusCls = "rejected";
+      if (po.status === "sent") statusCls = "pending";
+      statusTag.className = `badge-status ${statusCls}`;
+      statusTag.style.display = "block";
+      statusTag.style.marginTop = "2px";
+      statusTag.textContent = (po.status || "draft").toUpperCase();
+
+      amountBadge.append(amtVal, statusTag);
+
+      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      chevron.setAttribute("viewBox", "0 0 512 512");
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.style.width = "16px";
+      chevron.style.height = "16px";
+      chevron.style.stroke = "var(--color-muted)";
+      chevron.style.fill = "none";
+      chevron.style.strokeWidth = "32";
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M184 112l144 144-144 144");
+      chevron.append(path);
+
+      right.append(amountBadge, chevron);
+      row.append(left, right);
+
+      row.addEventListener("click", () => loadSinglePoAndOpen(po.id));
+      return row;
+    }));
+  };
+
+  const loadPurchaseOrders = async (query = "") => {
+    try {
+      const params = new URLSearchParams();
+      if (activePoStatus !== "all") {
+        params.set("status", activePoStatus);
+      }
+      if (query) {
+        params.set("q", query);
+      }
+
+      const res = await fetch(`${getBasePath()}api/purchasing.php?${params.toString()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.ok) return;
+
+      cachedPOs = Array.isArray(data.orders) ? data.orders : [];
+      renderPoList(cachedPOs);
+
+      if (kpiTotalPo) kpiTotalPo.textContent = String(data.stats?.total_orders || 0);
+      if (poCountBadge) poCountBadge.textContent = `${data.stats?.total_orders || 0} orders`;
+    } catch {
+      // Quiet fail if offline
+    }
+  };
+
+  const loadSinglePoAndOpen = async (poId) => {
+    try {
+      const res = await fetch(`${getBasePath()}api/purchasing.php?id=${poId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.ok) return;
+
+      currentPO = data.po;
+      currentPO.items = data.items || [];
+      currentPO.supplier = data.supplier || {};
+      currentPO.goods_received = data.goods_received || [];
+
+      openPoDetail(currentPO);
+    } catch (e) {
+      showAppModal("Error", "Could not load purchase order details: " + e.message);
+    }
+  };
+
+  const openPoDetail = (po) => {
+    if (poDetailNum) poDetailNum.textContent = po.po_number;
+    if (poDetailSupplier) poDetailSupplier.textContent = po.supplier?.supplier_name || po.supplier_name || "Supplier";
+    if (poDetailDate) poDetailDate.textContent = formatDate(po.order_date);
+    if (poDetailExpected) poDetailExpected.textContent = formatDate(po.expected_date);
+    if (poDetailPhone) poDetailPhone.textContent = po.supplier?.phone || "-";
+    if (poDetailEmail) poDetailEmail.textContent = po.supplier?.email || "-";
+    if (poDetailGrandTotal) poDetailGrandTotal.textContent = formatCurrency(po.total_amount);
+
+    if (poDetailStatusBadge) {
+      let statusCls = "pending";
+      if (po.status === "received") statusCls = "approved";
+      if (po.status === "cancelled") statusCls = "rejected";
+      poDetailStatusBadge.className = `badge-status ${statusCls}`;
+      poDetailStatusBadge.textContent = (po.status || "draft").toUpperCase();
+    }
+
+    if (poDetailNotesWrap && poDetailNotes) {
+      if (po.notes) {
+        poDetailNotes.textContent = po.notes;
+        poDetailNotesWrap.hidden = false;
+      } else {
+        poDetailNotesWrap.hidden = true;
+      }
+    }
+
+    // Render line items
+    if (poDetailItemsList) {
+      poDetailItemsList.innerHTML = (po.items || []).map((item, idx) => {
+        const received = parseFloat(item.received_quantity || "0");
+        const ordered = parseFloat(item.quantity || "0");
+        const isFullyReceived = received >= ordered;
+        const recBadge = isFullyReceived
+          ? `<span class="badge-stock in-stock" style="font-size: 0.72rem;">Received ${received}/${ordered}</span>`
+          : (received > 0 ? `<span class="badge-stock low-stock" style="font-size: 0.72rem;">Partial ${received}/${ordered}</span>` : `<span class="badge-stock" style="font-size: 0.72rem; background: #f1f5f9; color: var(--color-muted);">0/${ordered} received</span>`);
+
+        return `
+          <div style="padding: 10px 14px; border-bottom: 1px solid var(--color-line); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong style="color: var(--color-navy); font-size: 0.9rem;">${idx + 1}. ${item.item_name}</strong>
+              <div style="font-size: 0.78rem; color: var(--color-muted); margin-top: 2px;">
+                ${item.quantity} pcs @ ${formatCurrency(item.unit_cost)}
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <strong style="font-size: 0.92rem; color: var(--color-text);">${formatCurrency(item.line_total)}</strong>
+              <div style="margin-top: 3px;">${recBadge}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Toggle Receive Goods button: only if not already received or cancelled
+    if (poReceiveBtn) {
+      poReceiveBtn.hidden = (po.status === "received" || po.status === "cancelled");
+    }
+    if (poCancelBtn) {
+      poCancelBtn.hidden = (po.status === "received" || po.status === "cancelled" || po.status === "partially_received");
+    }
+
+    if (poDetailModal) poDetailModal.hidden = false;
+  };
+
+  poDetailCloseBtn?.addEventListener("click", () => {
+    if (poDetailModal) poDetailModal.hidden = true;
+    currentPO = null;
+  });
+
+  // Action: Download PDF
+  poDownloadPdfBtn?.addEventListener("click", () => {
+    if (!currentPO) return;
+    const url = `${getBasePath()}api/purchasing.php?action=pdf&id=${currentPO.id}`;
+    window.open(url, "_blank");
+  });
+
+  // Action: Email PO to Vendor
+  poEmailBtn?.addEventListener("click", async () => {
+    if (!currentPO) return;
+    const defaultEmail = currentPO.supplier?.email || currentPO.supplier_email || "";
+    const emailTo = window.prompt("Enter vendor email address to send Purchase Order PDF:", defaultEmail);
+    if (!emailTo) return;
+
+    poEmailBtn.disabled = true;
+    const origText = poEmailBtn.textContent;
+    poEmailBtn.textContent = "Sending Email...";
+
+    try {
+      const formData = new FormData();
+      formData.set("action", "email_po");
+      formData.set("po_id", String(currentPO.id));
+      formData.set("email", emailTo.trim());
+
+      const res = await fetch(`${getBasePath()}api/purchasing.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to send email.");
+      }
+
+      await showAppModal("Email Sent", data.message || `Purchase order PDF has been sent to ${emailTo}.`);
+      await loadSinglePoAndOpen(currentPO.id);
+    } catch (e) {
+      await showAppModal("Email Error", e.message || "Could not send email.");
+    } finally {
+      poEmailBtn.disabled = false;
+      poEmailBtn.textContent = origText;
+    }
+  });
+
+  // Action: Cancel PO
+  poCancelBtn?.addEventListener("click", async () => {
+    if (!currentPO) return;
+    const confirmed = await showConfirmModal({
+      title: "Cancel Purchase Order",
+      message: `Are you sure you want to cancel purchase order ${currentPO.po_number}?`,
+      confirmLabel: "Cancel Order",
+      cancelLabel: "Keep Order",
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    try {
+      const formData = new FormData();
+      formData.set("action", "cancel_po");
+      formData.set("po_id", String(currentPO.id));
+
+      const res = await fetch(`${getBasePath()}api/purchasing.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to cancel order.");
+      }
+
+      if (poDetailModal) poDetailModal.hidden = true;
+      await loadPurchaseOrders();
+      await showAppModal("Order Cancelled", "The purchase order has been cancelled.");
+    } catch (e) {
+      showAppModal("Error", e.message);
+    }
+  });
+
+  // Action: Goods Receiving (GRN)
+  const openGrnModal = (po = currentPO) => {
+    if (!po) return;
+    currentPO = po;
+    if (grnError) grnError.hidden = true;
+    grnForm?.reset();
+
+    if (grnPoId) grnPoId.value = String(po.id);
+    if (grnPoNum) grnPoNum.textContent = `${po.po_number} (${po.supplier?.supplier_name || po.supplier_name || "Supplier"})`;
+
+    if (grnForm) {
+      grnForm.elements["received_date"].value = new Date().toISOString().split("T")[0];
+    }
+
+    if (grnItemsContainer) {
+      grnItemsContainer.innerHTML = (po.items || []).map((item) => {
+        const ordered = parseFloat(item.quantity || "0");
+        const received = parseFloat(item.received_quantity || "0");
+        const remaining = Math.max(0, ordered - received);
+        const isDone = remaining <= 0;
+
+        return `
+          <div class="grn-line-row" style="background: #fff; border: 1px solid var(--color-line); border-radius: 8px; padding: 10px; margin-bottom: 8px;" data-poi-id="${item.id}">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <strong style="font-size: 0.92rem; color: var(--color-navy);">${item.item_name}</strong>
+              <span style="font-size: 0.8rem; color: var(--color-muted);">Ordered: ${ordered} | Remaining: <strong style="color: ${isDone ? 'var(--color-muted)' : 'var(--color-blue)'};">${remaining}</strong></span>
+            </div>
+            ${isDone ? `
+              <div style="font-size: 0.82rem; color: #047857; font-weight: 700;">✓ Fully received</div>
+            ` : `
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-size: 0.8rem; color: var(--color-muted); white-space: nowrap;">Receiving now:</label>
+                <input type="number" step="0.01" min="0" max="${remaining}" value="${remaining}" class="grn-qty-input" data-remaining="${remaining}" style="height: 36px; text-align: right;" required>
+                <span style="font-size: 0.82rem; color: var(--color-muted);">${item.unit || "pcs"}</span>
+              </div>
+            `}
+          </div>
+        `;
+      }).join("");
+    }
+
+    if (grnModal) grnModal.hidden = false;
+  };
+
+  poReceiveBtn?.addEventListener("click", () => openGrnModal(currentPO));
+  grnCloseBtn?.addEventListener("click", () => {
+    if (grnModal) grnModal.hidden = true;
+  });
+
+  grnReceiveAllBtn?.addEventListener("click", () => {
+    grnItemsContainer?.querySelectorAll(".grn-line-row").forEach((row) => {
+      const input = row.querySelector(".grn-qty-input");
+      if (input && input.dataset.remaining) {
+        input.value = input.dataset.remaining;
+      }
+    });
+  });
+
+  grnForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (grnError) grnError.hidden = true;
+    if (grnSubmit) grnSubmit.disabled = true;
+
+    try {
+      const itemsToReceive = [];
+      grnItemsContainer?.querySelectorAll(".grn-line-row").forEach((row) => {
+        const poiId = parseInt(row.dataset.poiId || "0", 10);
+        const input = row.querySelector(".grn-qty-input");
+        if (input) {
+          const qty = parseFloat(input.value || "0");
+          if (poiId > 0 && qty > 0) {
+            itemsToReceive.push({ po_item_id: poiId, quantity_received: qty });
+          }
+        }
+      });
+
+      if (!itemsToReceive.length) {
+        throw new Error("Please enter quantities to receive for at least one item.");
+      }
+
+      const formData = new FormData(grnForm);
+      formData.set("action", "receive_goods");
+      formData.set("items", JSON.stringify(itemsToReceive));
+
+      const res = await fetch(`${getBasePath()}api/purchasing.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to receive goods.");
+      }
+
+      if (grnModal) grnModal.hidden = true;
+      await loadItems();
+      await loadStockMovements();
+      await loadPurchaseOrders();
+
+      if (currentPO?.id) {
+        await loadSinglePoAndOpen(currentPO.id);
+      }
+
+      await showAppModal("Goods Received", data.message || "Inventory stock was successfully updated.");
+    } catch (err) {
+      if (grnError) {
+        grnError.textContent = err.message || "Failed to receive goods.";
+        grnError.hidden = false;
+      }
+    } finally {
+      if (grnSubmit) grnSubmit.disabled = false;
+    }
+  });
+
+  // PO Filter Tabs
+  poStatusFilters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      poStatusFilters.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      activePoStatus = btn.dataset.filterPo || "all";
+      loadPurchaseOrders(poSearch?.value.trim() || "");
+    });
+  });
+
+  let poSearchTimeout;
+  poSearch?.addEventListener("input", (e) => {
+    clearTimeout(poSearchTimeout);
+    poSearchTimeout = setTimeout(() => {
+      loadPurchaseOrders(e.target.value.trim());
+    }, 250);
+  });
+
+  // ----------------------------------------
+  // Section 4: Stock Movement Ledger Logic
+  // ----------------------------------------
+
+  const renderMovementsList = (movements = []) => {
+    if (!movements || !movements.length) {
+      if (movementsList) movementsList.replaceChildren();
+      if (movementsEmpty) movementsEmpty.hidden = false;
+      return;
+    }
+
+    if (movementsEmpty) movementsEmpty.hidden = true;
+
+    movementsList?.replaceChildren(...movements.map((m) => {
+      const row = document.createElement("div");
+      row.className = "settings-list-row movement-row";
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.width = "100%";
+      row.style.padding = "12px 14px";
+      row.style.background = "#fff";
+      row.style.border = "1px solid var(--color-line)";
+      row.style.borderRadius = "10px";
+      row.style.marginBottom = "8px";
+
+      const qty = parseFloat(m.quantity || "0");
+      const isPositive = qty > 0;
+
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      left.style.gap = "10px";
+      left.style.textAlign = "left";
+
+      const avatar = document.createElement("div");
+      avatar.className = "customer-avatar";
+      avatar.style.width = "38px";
+      avatar.style.height = "38px";
+      avatar.style.fontSize = "1rem";
+      avatar.style.background = isPositive ? "rgba(16, 185, 129, 0.12)" : "rgba(239, 68, 68, 0.12)";
+      avatar.style.color = isPositive ? "#047857" : "#b91c1c";
+      avatar.textContent = isPositive ? "↑" : "↓";
+
+      const info = document.createElement("div");
+      const name = document.createElement("div");
+      name.style.fontWeight = "800";
+      name.style.color = "var(--color-navy)";
+      name.style.fontSize = "0.92rem";
+      name.textContent = m.item_name || "Item";
+
+      const sub = document.createElement("div");
+      sub.style.fontSize = "0.78rem";
+      sub.style.color = "var(--color-muted)";
+      const refPart = m.reference_id ? `${m.reference_id} • ` : "";
+      sub.textContent = `${refPart}${formatDate(m.created_at)} • by ${m.user_name || "User"}`;
+
+      info.append(name, sub);
+      left.append(avatar, info);
+
+      const right = document.createElement("div");
+      right.style.textAlign = "right";
+
+      const changeVal = document.createElement("strong");
+      changeVal.style.fontSize = "0.95rem";
+      changeVal.style.color = isPositive ? "#047857" : "#b91c1c";
+      changeVal.textContent = `${isPositive ? "+" : ""}${qty} ${m.item_unit || "pcs"}`;
+
+      const balanceVal = document.createElement("div");
+      balanceVal.style.fontSize = "0.75rem";
+      balanceVal.style.color = "var(--color-muted)";
+      balanceVal.textContent = `Balance: ${m.new_stock} ${m.item_unit || "pcs"}`;
+
+      right.append(changeVal, balanceVal);
+      row.append(left, right);
+
+      return row;
+    }));
+  };
+
+  const loadStockMovements = async (query = "") => {
+    try {
+      const params = new URLSearchParams();
+      if (activeMovementType !== "all") {
+        params.set("movement_type", activeMovementType);
+      }
+      if (query) {
+        params.set("q", query);
+      }
+
+      const res = await fetch(`${getBasePath()}api/stock-movements.php?${params.toString()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.ok) return;
+
+      const movements = Array.isArray(data.movements) ? data.movements : [];
+      renderMovementsList(movements);
+
+      if (kpiTodayMovements) kpiTodayMovements.textContent = String(data.stats?.today_movements || 0);
+      if (movementsCountBadge) movementsCountBadge.textContent = `${data.stats?.total_movements || 0} entries`;
+    } catch {
+      // Quiet fail if offline
+    }
+  };
+
+  movementFilters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      movementFilters.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeMovementType = btn.dataset.filterMovement || "all";
+      loadStockMovements(movementsSearch?.value.trim() || "");
+    });
+  });
+
+  let movementSearchTimeout;
+  movementsSearch?.addEventListener("input", (e) => {
+    clearTimeout(movementSearchTimeout);
+    movementSearchTimeout = setTimeout(() => {
+      loadStockMovements(e.target.value.trim());
+    }, 250);
+  });
+
+  // Initial Data Loads
+  loadItems();
+  loadPurchaseOrders();
+  loadStockMovements();
+};
 
 document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll("[data-lang]").forEach((button) => {
-    button.addEventListener("click", () => setLanguage(button.dataset.lang));
-  });
+  setupLanguageSwitcher();
+  setupAppModalClose();
+  setupConnectionBanner();
+  setupTopNav();
+  setupAppNotifications();
+  setupGlobalShortcuts();
 
   setLanguage(getSavedLanguage()).catch(() => setLanguage(DEFAULT_LANGUAGE));
   setupBottomSheet();
@@ -3528,6 +4833,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCustomersPage();
   setupSuppliersPage();
   setupCompanyUsersPage();
+  setupStockPage();
   updateConnectionStatus();
   registerServiceWorker();
 });
