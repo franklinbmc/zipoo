@@ -1,0 +1,353 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/db.php';
+
+session_start();
+
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-store');
+
+function respond(int $status, array $payload): void
+{
+    http_response_code($status);
+    echo json_encode($payload);
+    exit;
+}
+
+function require_user(): int
+{
+    $userId = (int) ($_SESSION['zipoo_user_id'] ?? 0);
+    if ($userId <= 0) {
+        respond(401, ['ok' => false, 'message' => 'Please login first.']);
+    }
+
+    return $userId;
+}
+
+function get_active_business_info(PDO $pdo, int $userId): array
+{
+    $businessId = isset($_SESSION['zipoo_business_id']) ? (int) $_SESSION['zipoo_business_id'] : 0;
+    if ($businessId > 0) {
+        $stmt = $pdo->prepare('SELECT id, owner_user_id, business_name, business_type, region_code, district_code FROM tbl_businesses WHERE id = :bid LIMIT 1');
+        $stmt->execute([':bid' => $businessId]);
+        $biz = $stmt->fetch();
+        if ($biz) {
+            return $biz;
+        }
+    }
+
+    $stmt = $pdo->prepare('SELECT business_id FROM tbl_users WHERE id = :uid LIMIT 1');
+    $stmt->execute([':uid' => $userId]);
+    $userBid = (int) ($stmt->fetchColumn() ?: 0);
+    if ($userBid > 0) {
+        $stmt = $pdo->prepare('SELECT id, owner_user_id, business_name, business_type, region_code, district_code FROM tbl_businesses WHERE id = :bid LIMIT 1');
+        $stmt->execute([':bid' => $userBid]);
+        $biz = $stmt->fetch();
+        if ($biz) {
+            $_SESSION['zipoo_business_id'] = $userBid;
+            return $biz;
+        }
+    }
+
+    $stmt = $pdo->prepare('SELECT id, owner_user_id, business_name, business_type, region_code, district_code FROM tbl_businesses WHERE owner_user_id = :uid ORDER BY id ASC LIMIT 1');
+    $stmt->execute([':uid' => $userId]);
+    $firstBiz = $stmt->fetch();
+    if ($firstBiz) {
+        $_SESSION['zipoo_business_id'] = (int) $firstBiz['id'];
+        return $firstBiz;
+    }
+
+    return [];
+}
+
+function ensure_user_columns(PDO $pdo): void
+{
+    $roleCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'role'")->fetchAll();
+    if (empty($roleCol)) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'staff' AFTER business_id");
+    }
+
+    $statusCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'status'")->fetchAll();
+    if (empty($statusCol)) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN status ENUM('active', 'inactive') NOT NULL DEFAULT 'active' AFTER role");
+    }
+}
+
+function user_payload(array $row, int $ownerId): array
+{
+    return [
+        'id' => (int) $row['id'],
+        'business_id' => (int) ($row['business_id'] ?? 0),
+        'full_name' => (string) $row['full_name'],
+        'phone' => (string) $row['phone'],
+        'email' => (string) ($row['email'] ?? ''),
+        'role' => (string) ($row['role'] ?? 'staff'),
+        'status' => (string) ($row['status'] ?? 'active'),
+        'is_owner' => ((int) $row['id'] === $ownerId),
+        'created_at' => (string) ($row['created_at'] ?? ''),
+        'updated_at' => (string) ($row['updated_at'] ?? ''),
+    ];
+}
+
+try {
+    $currentUserId = require_user();
+    $pdo = db();
+    ensure_user_columns($pdo);
+
+    $biz = get_active_business_info($pdo, $currentUserId);
+    if (empty($biz)) {
+        respond(400, ['ok' => false, 'message' => 'No active business selected.']);
+    }
+
+    $businessId = (int) $biz['id'];
+    $ownerId = (int) ($biz['owner_user_id'] ?? 0);
+
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $userId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        if ($userId > 0) {
+            $stmt = $pdo->prepare('SELECT * FROM tbl_users WHERE id = :id AND business_id = :bid LIMIT 1');
+            $stmt->execute([':id' => $userId, ':bid' => $businessId]);
+            $row = $stmt->fetch();
+            if (!$row) {
+                respond(404, ['ok' => false, 'message' => 'User not found in this company.']);
+            }
+            respond(200, ['ok' => true, 'user' => user_payload($row, $ownerId)]);
+        }
+
+        $search = trim((string) ($_GET['q'] ?? ''));
+        if ($search !== '') {
+            $stmt = $pdo->prepare(
+                'SELECT * FROM tbl_users 
+                 WHERE business_id = :bid AND id != :owner_id AND (full_name LIKE :q OR phone LIKE :q OR email LIKE :q OR role LIKE :q) 
+                 ORDER BY full_name ASC'
+            );
+            $stmt->execute([
+                ':bid' => $businessId,
+                ':owner_id' => $ownerId,
+                ':q' => '%' . $search . '%',
+            ]);
+        } else {
+            $stmt = $pdo->prepare(
+                'SELECT * FROM tbl_users 
+                 WHERE business_id = :bid AND id != :owner_id 
+                 ORDER BY full_name ASC'
+            );
+            $stmt->execute([':bid' => $businessId, ':owner_id' => $ownerId]);
+        }
+
+        $users = array_map(fn($r) => user_payload($r, $ownerId), $stmt->fetchAll());
+
+        respond(200, [
+            'ok' => true,
+            'business_id' => $businessId,
+            'business_name' => $biz['business_name'],
+            'users' => $users,
+            'total' => count($users),
+        ]);
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        respond(405, ['ok' => false, 'message' => 'Method not allowed.']);
+    }
+
+    $action = trim((string) ($_POST['action'] ?? 'create'));
+
+    if ($action === 'create') {
+        $fullName = trim((string) ($_POST['full_name'] ?? ''));
+        $phone = trim((string) ($_POST['phone'] ?? ''));
+        $email = trim((string) ($_POST['email'] ?? ''));
+        $role = trim((string) ($_POST['role'] ?? 'staff'));
+        $status = trim((string) ($_POST['status'] ?? 'active'));
+        $password = (string) ($_POST['password'] ?? '');
+
+        if ($fullName === '') {
+            respond(422, ['ok' => false, 'message' => 'Full name is required.']);
+        }
+
+        if ($phone === '') {
+            respond(422, ['ok' => false, 'message' => 'Phone number is required.']);
+        }
+
+        if ($password === '' || strlen($password) < 4) {
+            respond(422, ['ok' => false, 'message' => 'Password must be at least 4 characters long.']);
+        }
+
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            respond(422, ['ok' => false, 'message' => 'Please provide a valid email address.']);
+        }
+
+        // Check if phone already exists
+        $check = $pdo->prepare('SELECT id FROM tbl_users WHERE phone = :phone LIMIT 1');
+        $check->execute([':phone' => $phone]);
+        if ($check->fetchColumn()) {
+            respond(422, ['ok' => false, 'message' => 'A user with phone number "' . $phone . '" already exists.']);
+        }
+
+        // Check if email already exists
+        if ($email !== '') {
+            $check = $pdo->prepare('SELECT id FROM tbl_users WHERE email = :email LIMIT 1');
+            $check->execute([':email' => $email]);
+            if ($check->fetchColumn()) {
+                respond(422, ['ok' => false, 'message' => 'A user with email "' . $email . '" already exists.']);
+            }
+        }
+
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = $pdo->prepare(
+            'INSERT INTO tbl_users (business_id, role, status, full_name, phone, email, business_name, business_type, region_code, district_code, password_hash) 
+             VALUES (:bid, :role, :status, :full_name, :phone, :email, :bname, :btype, :region, :district, :password_hash)'
+        );
+        $stmt->execute([
+            ':bid' => $businessId,
+            ':role' => $role !== '' ? $role : 'staff',
+            ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
+            ':full_name' => $fullName,
+            ':phone' => $phone,
+            ':email' => $email !== '' ? $email : null,
+            ':bname' => $biz['business_name'] ?? 'Business',
+            ':btype' => $biz['business_type'] ?? 'retail',
+            ':region' => $biz['region_code'] ?? 'TZ-01',
+            ':district' => $biz['district_code'] ?? 'TZ-01-01',
+            ':password_hash' => $passwordHash,
+        ]);
+
+        $newId = (int) $pdo->lastInsertId();
+        $stmt = $pdo->prepare('SELECT * FROM tbl_users WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $newId]);
+        $user = $stmt->fetch();
+
+        respond(201, [
+            'ok' => true,
+            'message' => 'System user added successfully.',
+            'user' => $user ? user_payload($user, $ownerId) : null,
+        ]);
+    }
+
+    if ($action === 'update') {
+        $targetUserId = (int) ($_POST['user_id'] ?? 0);
+        $fullName = trim((string) ($_POST['full_name'] ?? ''));
+        $phone = trim((string) ($_POST['phone'] ?? ''));
+        $email = trim((string) ($_POST['email'] ?? ''));
+        $role = trim((string) ($_POST['role'] ?? 'staff'));
+        $status = trim((string) ($_POST['status'] ?? 'active'));
+        $password = (string) ($_POST['password'] ?? '');
+
+        if ($targetUserId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Invalid user ID.']);
+        }
+
+        if ($targetUserId === $ownerId) {
+            respond(403, ['ok' => false, 'message' => 'Business owner account cannot be edited from this user list.']);
+        }
+
+        if ($fullName === '') {
+            respond(422, ['ok' => false, 'message' => 'Full name is required.']);
+        }
+
+        if ($phone === '') {
+            respond(422, ['ok' => false, 'message' => 'Phone number is required.']);
+        }
+
+        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            respond(422, ['ok' => false, 'message' => 'Please provide a valid email address.']);
+        }
+
+        // Verify target belongs to this business
+        $stmt = $pdo->prepare('SELECT id FROM tbl_users WHERE id = :id AND business_id = :bid LIMIT 1');
+        $stmt->execute([':id' => $targetUserId, ':bid' => $businessId]);
+        if (!$stmt->fetchColumn()) {
+            respond(404, ['ok' => false, 'message' => 'User not found in this company.']);
+        }
+
+        // Check unique phone
+        $check = $pdo->prepare('SELECT id FROM tbl_users WHERE phone = :phone AND id != :id LIMIT 1');
+        $check->execute([':phone' => $phone, ':id' => $targetUserId]);
+        if ($check->fetchColumn()) {
+            respond(422, ['ok' => false, 'message' => 'Another user with phone number "' . $phone . '" already exists.']);
+        }
+
+        // Check unique email
+        if ($email !== '') {
+            $check = $pdo->prepare('SELECT id FROM tbl_users WHERE email = :email AND id != :id LIMIT 1');
+            $check->execute([':email' => $email, ':id' => $targetUserId]);
+            if ($check->fetchColumn()) {
+                respond(422, ['ok' => false, 'message' => 'Another user with email "' . $email . '" already exists.']);
+            }
+        }
+
+        if ($password !== '') {
+            if (strlen($password) < 4) {
+                respond(422, ['ok' => false, 'message' => 'New password must be at least 4 characters long.']);
+            }
+            $stmt = $pdo->prepare(
+                'UPDATE tbl_users 
+                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status, password_hash = :pwd 
+                 WHERE id = :id AND business_id = :bid'
+            );
+            $stmt->execute([
+                ':id' => $targetUserId,
+                ':bid' => $businessId,
+                ':full_name' => $fullName,
+                ':phone' => $phone,
+                ':email' => $email !== '' ? $email : null,
+                ':role' => $role !== '' ? $role : 'staff',
+                ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
+                ':pwd' => password_hash($password, PASSWORD_DEFAULT),
+            ]);
+        } else {
+            $stmt = $pdo->prepare(
+                'UPDATE tbl_users 
+                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status 
+                 WHERE id = :id AND business_id = :bid'
+            );
+            $stmt->execute([
+                ':id' => $targetUserId,
+                ':bid' => $businessId,
+                ':full_name' => $fullName,
+                ':phone' => $phone,
+                ':email' => $email !== '' ? $email : null,
+                ':role' => $role !== '' ? $role : 'staff',
+                ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
+            ]);
+        }
+
+        $stmt = $pdo->prepare('SELECT * FROM tbl_users WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $targetUserId]);
+        $user = $stmt->fetch();
+
+        respond(200, [
+            'ok' => true,
+            'message' => 'System user updated successfully.',
+            'user' => $user ? user_payload($user, $ownerId) : null,
+        ]);
+    }
+
+    if ($action === 'delete') {
+        $targetUserId = (int) ($_POST['user_id'] ?? 0);
+        if ($targetUserId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Invalid user ID.']);
+        }
+
+        if ($targetUserId === $ownerId) {
+            respond(403, ['ok' => false, 'message' => 'Cannot delete the business owner account.']);
+        }
+
+        $stmt = $pdo->prepare('DELETE FROM tbl_users WHERE id = :id AND business_id = :bid');
+        $stmt->execute([':id' => $targetUserId, ':bid' => $businessId]);
+
+        if ($stmt->rowCount() === 0) {
+            respond(404, ['ok' => false, 'message' => 'User not found or already deleted.']);
+        }
+
+        respond(200, [
+            'ok' => true,
+            'message' => 'System user deleted successfully.',
+        ]);
+    }
+
+    respond(400, ['ok' => false, 'message' => 'Unsupported action.']);
+} catch (Throwable $e) {
+    respond(500, ['ok' => false, 'message' => $e->getMessage()]);
+}

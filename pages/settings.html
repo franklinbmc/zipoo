@@ -93,6 +93,34 @@
           </button>
         </div>
       </details>
+
+      <details class="settings-accordion" data-system-users-accordion>
+        <summary>
+          <span>System users</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <strong data-system-users-count style="font-size: 0.85rem; color: var(--color-muted); font-weight: 800;">0 users</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+        </summary>
+        <div class="settings-list flush-list" style="padding: 12px 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 0.84rem; color: var(--color-muted); font-weight: 700;">Company team members</span>
+            <button class="btn btn-primary btn-sm btn-with-icon" type="button" data-open-create-user style="padding: 6px 12px; font-size: 0.82rem;">
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M256 112v288M112 256h288" /></svg>
+              <span>Add User</span>
+            </button>
+          </div>
+
+          <div class="company-users-list" data-company-users-list style="display: grid; gap: 8px;"></div>
+
+          <div class="company-users-empty" hidden data-company-users-empty style="text-align: center; padding: 28px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 6px;">
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">👥</div>
+            <strong style="display: block; color: var(--color-navy); font-size: 0.96rem; margin-bottom: 4px;">No team users yet</strong>
+            <p style="margin: 0 0 12px; font-size: 0.82rem; color: var(--color-muted);">Add cashiers, managers, or staff members to give them access to this business.</p>
+            <button class="btn btn-primary btn-sm" type="button" data-open-create-user>Add User</button>
+          </div>
+        </div>
+      </details>
     </main>
   </div>
 
@@ -488,6 +516,155 @@
     </section>
   </div>
 
+  <!-- User Details Modal -->
+  <div class="fullscreen-modal" hidden data-user-detail-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="user-detail-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-user-detail-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="user-detail-title">User Details</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body customer-detail-body">
+        <div class="customer-detail-hero">
+          <div class="customer-avatar" data-user-detail-avatar>U</div>
+          <h3 data-user-detail-name>-</h3>
+          <span class="customer-meta" data-user-detail-meta>-</span>
+        </div>
+
+        <div class="settings-list flush-list" style="border: 1px solid var(--color-line); border-radius: 12px; margin-top: 14px;">
+          <div class="settings-list-row field-display-row">
+            <span>Role</span>
+            <strong data-user-detail-role style="text-transform: capitalize;">-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Status</span>
+            <strong data-user-detail-status>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Phone</span>
+            <strong data-user-detail-phone>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Email</span>
+            <strong data-user-detail-email>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Added on</span>
+            <strong data-user-detail-created-at>-</strong>
+          </div>
+        </div>
+
+        <div class="customer-detail-actions" style="margin-top: 24px; display: grid; gap: 10px;">
+          <button class="btn btn-primary full" type="button" data-user-detail-edit-btn>Edit user</button>
+          <button class="btn btn-danger-outline full" type="button" data-user-detail-delete-btn>Delete user</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- User Create Modal -->
+  <div class="fullscreen-modal" hidden data-user-create-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="user-create-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-user-create-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="user-create-title">Add System User</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-user-create-form novalidate>
+        <label class="form-field">
+          <span>Full Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="full_name" placeholder="e.g. Baraka Juma" required>
+        </label>
+        <label class="form-field">
+          <span>Phone Number (Login username) <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="tel" name="phone" placeholder="e.g. 0712345678" required>
+        </label>
+        <label class="form-field">
+          <span>Email Address</span>
+          <input type="email" name="email" placeholder="e.g. baraka@company.com">
+        </label>
+        <label class="form-field">
+          <span>User Role <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="role" required>
+            <option value="cashier">Cashier / Sales</option>
+            <option value="manager">Manager</option>
+            <option value="staff" selected>General Staff</option>
+            <option value="storekeeper">Storekeeper / Inventory</option>
+            <option value="accountant">Accountant</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Account Password <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="password" name="password" placeholder="Minimum 4 characters" minlength="4" required>
+        </label>
+        <label class="form-field">
+          <span>Status</span>
+          <select name="status">
+            <option value="active" selected>Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+        <p class="inline-error" hidden data-user-create-error></p>
+        <button class="btn btn-primary full" type="submit" data-user-create-submit>Create User</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- User Edit Modal -->
+  <div class="fullscreen-modal" hidden data-user-edit-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="user-edit-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-user-edit-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="user-edit-title">Edit System User</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-user-edit-form novalidate>
+        <input type="hidden" name="user_id" data-edit-user-id>
+        <label class="form-field">
+          <span>Full Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="full_name" data-edit-user-fullname required>
+        </label>
+        <label class="form-field">
+          <span>Phone Number <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="tel" name="phone" data-edit-user-phone required>
+        </label>
+        <label class="form-field">
+          <span>Email Address</span>
+          <input type="email" name="email" data-edit-user-email>
+        </label>
+        <label class="form-field">
+          <span>User Role <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="role" data-edit-user-role required>
+            <option value="cashier">Cashier / Sales</option>
+            <option value="manager">Manager</option>
+            <option value="staff">General Staff</option>
+            <option value="storekeeper">Storekeeper / Inventory</option>
+            <option value="accountant">Accountant</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Status</span>
+          <select name="status" data-edit-user-status>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>New Password (Leave blank to keep existing)</span>
+          <input type="password" name="password" placeholder="Enter new password if changing" data-edit-user-password>
+        </label>
+        <p class="inline-error" hidden data-user-edit-error></p>
+        <button class="btn btn-primary full" type="submit" data-user-edit-submit>Update User</button>
+      </form>
+    </section>
+  </div>
+
   <div class="modal-backdrop" hidden data-app-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
       <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
@@ -496,6 +673,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=58" defer></script>
+  <script src="/assets/js/app.js?v=59" defer></script>
 </body>
 </html>

@@ -1570,6 +1570,7 @@ const setupSettingsPage = () => {
     renderBusinessManager();
   });
   setupSystemSettings();
+  setupCompanyUsers();
 };
 
 const setupSystemSettings = () => {
@@ -1999,6 +2000,343 @@ const setupSystemSettings = () => {
   // Initial load
   updateLanguageLabel();
   loadSettings();
+};
+
+const setupCompanyUsers = () => {
+  const page = document.querySelector("[data-settings-page]");
+  if (!page) return;
+
+  const usersCountLabel = document.querySelector("[data-system-users-count]");
+  const usersList = document.querySelector("[data-company-users-list]");
+  const usersEmpty = document.querySelector("[data-company-users-empty]");
+  const openCreateButtons = document.querySelectorAll("[data-open-create-user]");
+
+  // Details Modal
+  const detailModal = document.querySelector("[data-user-detail-modal]");
+  const detailCloseBtn = document.querySelector("[data-user-detail-close]");
+  const detailAvatar = document.querySelector("[data-user-detail-avatar]");
+  const detailName = document.querySelector("[data-user-detail-name]");
+  const detailMeta = document.querySelector("[data-user-detail-meta]");
+  const detailRole = document.querySelector("[data-user-detail-role]");
+  const detailStatus = document.querySelector("[data-user-detail-status]");
+  const detailPhone = document.querySelector("[data-user-detail-phone]");
+  const detailEmail = document.querySelector("[data-user-detail-email]");
+  const detailCreatedAt = document.querySelector("[data-user-detail-created-at]");
+  const detailEditBtn = document.querySelector("[data-user-detail-edit-btn]");
+  const detailDeleteBtn = document.querySelector("[data-user-detail-delete-btn]");
+
+  // Create Modal
+  const createModal = document.querySelector("[data-user-create-modal]");
+  const createCloseBtn = document.querySelector("[data-user-create-close]");
+  const createForm = document.querySelector("[data-user-create-form]");
+  const createError = document.querySelector("[data-user-create-error]");
+  const createSubmit = document.querySelector("[data-user-create-submit]");
+
+  // Edit Modal
+  const editModal = document.querySelector("[data-user-edit-modal]");
+  const editCloseBtn = document.querySelector("[data-user-edit-close]");
+  const editForm = document.querySelector("[data-user-edit-form]");
+  const editError = document.querySelector("[data-user-edit-error]");
+  const editSubmit = document.querySelector("[data-user-edit-submit]");
+  const editId = document.querySelector("[data-edit-user-id]");
+  const editFullName = document.querySelector("[data-edit-user-fullname]");
+  const editPhone = document.querySelector("[data-edit-user-phone]");
+  const editEmail = document.querySelector("[data-edit-user-email]");
+  const editRole = document.querySelector("[data-edit-user-role]");
+  const editStatus = document.querySelector("[data-edit-user-status]");
+  const editPassword = document.querySelector("[data-edit-user-password]");
+
+  let cachedUsers = [];
+  let currentUser = null;
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    try {
+      const d = new Date(dateStr.replace(" ", "T"));
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const renderUsersList = (users = []) => {
+    if (usersCountLabel) {
+      usersCountLabel.textContent = `${users.length} ${users.length === 1 ? "user" : "users"}`;
+    }
+
+    if (!users || !users.length) {
+      if (usersList) usersList.replaceChildren();
+      if (usersEmpty) usersEmpty.hidden = false;
+      return;
+    }
+
+    if (usersEmpty) usersEmpty.hidden = true;
+
+    usersList?.replaceChildren(...users.map((user) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "settings-list-row user-row";
+      row.dataset.userId = String(user.id);
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.justifyContent = "space-between";
+      row.style.width = "100%";
+      row.style.padding = "12px 14px";
+      row.style.background = "#fff";
+      row.style.border = "1px solid var(--color-line)";
+      row.style.borderRadius = "10px";
+      row.style.cursor = "pointer";
+
+      const left = document.createElement("div");
+      left.style.display = "flex";
+      left.style.alignItems = "center";
+      left.style.gap = "10px";
+      left.style.textAlign = "left";
+
+      const avatar = document.createElement("div");
+      avatar.className = "customer-avatar";
+      avatar.style.width = "36px";
+      avatar.style.height = "36px";
+      avatar.style.fontSize = "0.9rem";
+      avatar.textContent = (user.full_name ? user.full_name.trim().charAt(0).toUpperCase() : "U");
+
+      const info = document.createElement("div");
+      const name = document.createElement("div");
+      name.style.fontWeight = "800";
+      name.style.color = "var(--color-navy)";
+      name.style.fontSize = "0.92rem";
+      name.textContent = user.full_name;
+
+      const sub = document.createElement("div");
+      sub.style.fontSize = "0.78rem";
+      sub.style.color = "var(--color-muted)";
+      const roleCapitalized = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+      sub.textContent = `${user.phone} • ${roleCapitalized}`;
+
+      info.append(name, sub);
+      left.append(avatar, info);
+
+      const right = document.createElement("div");
+      right.style.display = "flex";
+      right.style.alignItems = "center";
+      right.style.gap = "8px";
+
+      const statusBadge = document.createElement("span");
+      statusBadge.className = `badge-status ${user.status === "active" ? "approved" : "rejected"}`;
+      statusBadge.textContent = user.status;
+
+      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      chevron.setAttribute("viewBox", "0 0 512 512");
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.style.width = "16px";
+      chevron.style.height = "16px";
+      chevron.style.stroke = "var(--color-muted)";
+      chevron.style.fill = "none";
+      chevron.style.strokeWidth = "32";
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M184 112l144 144-144 144");
+      chevron.append(path);
+
+      right.append(statusBadge, chevron);
+      row.append(left, right);
+
+      row.addEventListener("click", () => openUserDetail(user));
+      return row;
+    }));
+  };
+
+  const loadUsers = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/company-users.php`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.ok) return;
+
+      cachedUsers = Array.isArray(data.users) ? data.users : [];
+      renderUsersList(cachedUsers);
+    } catch {
+      // Quiet fail if network/api is offline
+    }
+  };
+
+  const openUserDetail = (user) => {
+    currentUser = user;
+    if (detailAvatar) {
+      detailAvatar.textContent = (user.full_name ? user.full_name.trim().charAt(0).toUpperCase() : "U");
+    }
+    if (detailName) detailName.textContent = user.full_name || "-";
+    if (detailMeta) {
+      const roleCap = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+      detailMeta.textContent = `${roleCap} • ${user.status.toUpperCase()}`;
+    }
+    if (detailRole) detailRole.textContent = user.role;
+    if (detailStatus) {
+      detailStatus.innerHTML = `<span class="badge-status ${user.status === "active" ? "approved" : "rejected"}">${user.status}</span>`;
+    }
+    if (detailPhone) detailPhone.textContent = user.phone || "-";
+    if (detailEmail) detailEmail.textContent = user.email || "-";
+    if (detailCreatedAt) detailCreatedAt.textContent = formatDate(user.created_at);
+
+    if (detailModal) detailModal.hidden = false;
+  };
+
+  const closeUserDetail = () => {
+    if (detailModal) detailModal.hidden = true;
+    currentUser = null;
+  };
+
+  const openCreateModal = () => {
+    if (createError) createError.hidden = true;
+    createForm?.reset();
+    if (createModal) createModal.hidden = false;
+    createForm?.querySelector('input[name="full_name"]')?.focus();
+  };
+
+  const closeCreateModal = () => {
+    if (createModal) createModal.hidden = true;
+    if (createError) createError.hidden = true;
+  };
+
+  const openEditModal = (user = currentUser) => {
+    if (!user) return;
+    currentUser = user;
+    if (editError) editError.hidden = true;
+    if (editId) editId.value = String(user.id);
+    if (editFullName) editFullName.value = user.full_name || "";
+    if (editPhone) editPhone.value = user.phone || "";
+    if (editEmail) editEmail.value = user.email || "";
+    if (editRole) editRole.value = user.role || "staff";
+    if (editStatus) editStatus.value = user.status || "active";
+    if (editPassword) editPassword.value = "";
+    if (editModal) editModal.hidden = false;
+    editFullName?.focus();
+  };
+
+  const closeEditModal = () => {
+    if (editModal) editModal.hidden = true;
+    if (editError) editError.hidden = true;
+  };
+
+  // Event handlers
+  openCreateButtons.forEach((btn) => btn.addEventListener("click", openCreateModal));
+  createCloseBtn?.addEventListener("click", closeCreateModal);
+  detailCloseBtn?.addEventListener("click", closeUserDetail);
+  editCloseBtn?.addEventListener("click", closeEditModal);
+
+  detailEditBtn?.addEventListener("click", () => {
+    const userToEdit = currentUser;
+    if (detailModal) detailModal.hidden = true;
+    openEditModal(userToEdit);
+  });
+
+  detailDeleteBtn?.addEventListener("click", async () => {
+    if (!currentUser) return;
+    const userToDelete = currentUser;
+    const confirmed = await showConfirmModal({
+      title: "Delete User",
+      message: `Are you sure you want to delete user "${userToDelete.full_name}"? They will no longer have access to this company.`,
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+      danger: true,
+    });
+    if (!confirmed) return;
+
+    detailDeleteBtn.disabled = true;
+    try {
+      const formData = new FormData();
+      formData.set("action", "delete");
+      formData.set("user_id", String(userToDelete.id));
+
+      const res = await fetch(`${getBasePath()}api/company-users.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to delete user.");
+      }
+
+      closeUserDetail();
+      await loadUsers();
+      await showAppModal("User Deleted", `User "${userToDelete.full_name}" has been removed from this company.`);
+    } catch (err) {
+      await showAppModal("Error", err.message || "Could not delete user.");
+    } finally {
+      detailDeleteBtn.disabled = false;
+    }
+  });
+
+  createForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (createError) createError.hidden = true;
+    if (createSubmit) createSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(createForm);
+      formData.set("action", "create");
+
+      const res = await fetch(`${getBasePath()}api/company-users.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to add user.");
+      }
+
+      closeCreateModal();
+      createForm.reset();
+      await loadUsers();
+      if (data.user) {
+        openUserDetail(data.user);
+      }
+      await showAppModal("User Added", `${data.user?.full_name || "User"} can now log in and access this company.`);
+    } catch (err) {
+      if (createError) {
+        createError.textContent = err.message || "Failed to add user.";
+        createError.hidden = false;
+      }
+    } finally {
+      if (createSubmit) createSubmit.disabled = false;
+    }
+  });
+
+  editForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (editError) editError.hidden = true;
+    if (editSubmit) editSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(editForm);
+      formData.set("action", "update");
+
+      const res = await fetch(`${getBasePath()}api/company-users.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to update user.");
+      }
+
+      closeEditModal();
+      await loadUsers();
+      if (data.user) {
+        openUserDetail(data.user);
+      }
+      await showAppModal("User Updated", "User details updated successfully.");
+    } catch (err) {
+      if (editError) {
+        editError.textContent = err.message || "Failed to update user.";
+        editError.hidden = false;
+      }
+    } finally {
+      if (editSubmit) editSubmit.disabled = false;
+    }
+  });
+
+  // Initial load
+  loadUsers();
 };
 
 const setupLocationSelects = async () => {
