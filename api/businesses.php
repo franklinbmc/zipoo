@@ -25,6 +25,29 @@ function require_user(): int
     return $userId;
 }
 
+function ensure_business_preference_columns(PDO $pdo): void
+{
+    $cols = $pdo->query("SHOW COLUMNS FROM tbl_businesses LIKE 'currency'")->fetchAll();
+    if (empty($cols)) {
+        $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN currency VARCHAR(10) NOT NULL DEFAULT 'TZS' AFTER plan_name");
+    }
+
+    $cols = $pdo->query("SHOW COLUMNS FROM tbl_businesses LIKE 'timezone'")->fetchAll();
+    if (empty($cols)) {
+        $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN timezone VARCHAR(100) NOT NULL DEFAULT 'Africa/Dar_es_Salaam' AFTER currency");
+    }
+
+    $cols = $pdo->query("SHOW COLUMNS FROM tbl_businesses LIKE 'tax_rate'")->fetchAll();
+    if (empty($cols)) {
+        $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN tax_rate DECIMAL(5, 2) NOT NULL DEFAULT 18.00 AFTER timezone");
+    }
+
+    $cols = $pdo->query("SHOW COLUMNS FROM tbl_businesses LIKE 'receipt_footer'")->fetchAll();
+    if (empty($cols)) {
+        $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN receipt_footer TEXT NULL AFTER tax_rate");
+    }
+}
+
 function business_payload(array $business): array
 {
     return [
@@ -37,6 +60,10 @@ function business_payload(array $business): array
         'district_name' => $business['district_name'] ?? null,
         'plan_name' => $business['plan_name'] ?? null,
         'account_status' => $business['account_status'] ?? null,
+        'currency' => (string) ($business['currency'] ?? 'TZS'),
+        'timezone' => (string) ($business['timezone'] ?? 'Africa/Dar_es_Salaam'),
+        'tax_rate' => (float) ($business['tax_rate'] ?? 18.00),
+        'receipt_footer' => (string) ($business['receipt_footer'] ?? ''),
         'created_at' => $business['created_at'] ?? null,
     ];
 }
@@ -44,7 +71,7 @@ function business_payload(array $business): array
 function business_select_sql(string $where): string
 {
     return "SELECT b.id, b.business_name, b.business_type, b.region_code, l.region_name, b.district_code, l.district_name,
-                   b.plan_name, b.account_status, b.created_at
+                   b.plan_name, b.account_status, b.currency, b.timezone, b.tax_rate, b.receipt_footer, b.created_at
             FROM tbl_businesses b
             LEFT JOIN tbl_tanzania_locations l ON l.region_code = b.region_code AND l.district_code = b.district_code
             WHERE {$where}";
@@ -79,6 +106,7 @@ function load_businesses(PDO $pdo, int $userId, ?int $businessId): array
 try {
     $userId = require_user();
     $pdo = db();
+    ensure_business_preference_columns($pdo);
     $currentBusinessId = isset($_SESSION['zipoo_business_id']) ? (int) $_SESSION['zipoo_business_id'] : null;
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
@@ -296,6 +324,54 @@ try {
         respond(200, [
             'ok' => true,
             'message' => 'Business updated successfully.',
+            'business' => $updatedBusiness,
+            'businesses' => $businesses,
+        ]);
+    }
+
+    if ($action === 'save_preferences') {
+        $businessId = (int) ($_POST['business_id'] ?? 0);
+        $currency = strtoupper(trim((string) ($_POST['currency'] ?? 'TZS')));
+        $timezone = trim((string) ($_POST['timezone'] ?? 'Africa/Dar_es_Salaam'));
+        $taxRate = (float) ($_POST['tax_rate'] ?? 18.00);
+        $receiptFooter = trim((string) ($_POST['receipt_footer'] ?? ''));
+
+        if ($businessId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Choose a business.']);
+        }
+
+        $check = $pdo->prepare('SELECT id FROM tbl_businesses WHERE id = :bid AND owner_user_id = :uid LIMIT 1');
+        $check->execute([':bid' => $businessId, ':uid' => $userId]);
+        if (!$check->fetch()) {
+            respond(403, ['ok' => false, 'message' => 'You cannot edit that business.']);
+        }
+
+        $stmt = $pdo->prepare(
+            'UPDATE tbl_businesses
+             SET currency = :currency, timezone = :timezone, tax_rate = :tax_rate, receipt_footer = :receipt_footer
+             WHERE id = :bid AND owner_user_id = :uid'
+        );
+        $stmt->execute([
+            ':bid' => $businessId,
+            ':uid' => $userId,
+            ':currency' => $currency !== '' ? $currency : 'TZS',
+            ':timezone' => $timezone !== '' ? $timezone : 'Africa/Dar_es_Salaam',
+            ':tax_rate' => $taxRate,
+            ':receipt_footer' => $receiptFooter !== '' ? $receiptFooter : null,
+        ]);
+
+        $businesses = load_businesses($pdo, $userId, $currentBusinessId);
+        $updatedBusiness = null;
+        foreach ($businesses as $b) {
+            if ($b['id'] === $businessId) {
+                $updatedBusiness = $b;
+                break;
+            }
+        }
+
+        respond(200, [
+            'ok' => true,
+            'message' => 'Preferences updated successfully.',
             'business' => $updatedBusiness,
             'businesses' => $businesses,
         ]);

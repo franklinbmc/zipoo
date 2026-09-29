@@ -818,6 +818,39 @@ const setupSettingsPage = () => {
   const createRegionSelect = document.querySelector('[data-create-location="region"]');
   const createDistrictSelect = document.querySelector('[data-create-location="district"]');
   const createError = document.querySelector("[data-create-flow-error]");
+  const generalModal = document.querySelector("[data-general-settings-modal]");
+  const generalTitle = document.querySelector("[data-general-settings-title]");
+  const generalCloseBtn = document.querySelector("[data-general-settings-close]");
+  const generalForm = document.querySelector("[data-general-settings-form]");
+  const generalIdInput = document.querySelector("[data-business-pref-id]");
+  const generalError = document.querySelector("[data-general-settings-error]");
+  const generalSubmit = document.querySelector("[data-general-settings-submit]");
+
+  const openBusinessPreferencesModal = (business) => {
+    if (!business) return;
+    if (generalError) generalError.hidden = true;
+    if (generalTitle) {
+      generalTitle.textContent = `${business.business_name || "Business"} Preferences`;
+    }
+    if (generalIdInput) {
+      generalIdInput.value = business.id || "";
+    }
+    if (generalForm) {
+      if (generalForm.elements["currency"]) {
+        generalForm.elements["currency"].value = business.currency || "TZS";
+      }
+      if (generalForm.elements["timezone"]) {
+        generalForm.elements["timezone"].value = business.timezone || "Africa/Dar_es_Salaam";
+      }
+      if (generalForm.elements["tax_rate"]) {
+        generalForm.elements["tax_rate"].value = business.tax_rate ?? "18.00";
+      }
+      if (generalForm.elements["receipt_footer"]) {
+        generalForm.elements["receipt_footer"].value = business.receipt_footer || "";
+      }
+    }
+    if (generalModal) generalModal.hidden = false;
+  };
   let editField = "";
   let editStep = "request";
   let regions = [];
@@ -1054,6 +1087,35 @@ const setupSettingsPage = () => {
       statusValue.textContent = status.toUpperCase();
       statusRow.append(statusLabel, statusValue);
 
+      // Business General Preferences button row
+      const prefRow = document.createElement("button");
+      prefRow.type = "button";
+      prefRow.className = "settings-list-row";
+      prefRow.style.borderRadius = "var(--radius)";
+      prefRow.style.border = "1px solid var(--color-line)";
+      prefRow.style.background = "#fff";
+      prefRow.style.marginBottom = "8px";
+
+      const prefLabel = document.createElement("span");
+      prefLabel.textContent = "General preferences";
+
+      const prefValue = document.createElement("strong");
+      const bCur = business.currency || "TZS";
+      const bTz = (business.timezone || "Africa/Dar_es_Salaam").split("/").pop();
+      prefValue.textContent = `${bCur} • ${bTz}`;
+
+      const prefSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      prefSvg.setAttribute("viewBox", "0 0 512 512");
+      prefSvg.setAttribute("aria-hidden", "true");
+      const prefPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      prefPath.setAttribute("d", "M184 112l144 144-144 144");
+      prefSvg.append(prefPath);
+
+      prefRow.append(prefLabel, prefValue, prefSvg);
+      prefRow.addEventListener("click", () => {
+        openBusinessPreferencesModal(business);
+      });
+
       // Inline error message
       const errorMsg = document.createElement("p");
       errorMsg.className = "inline-error";
@@ -1131,7 +1193,7 @@ const setupSettingsPage = () => {
         actions.append(servingNotice);
       }
 
-      form.append(idInput, nameRow, typeRow, regionRow, districtRow, planRow, statusRow, errorMsg, actions);
+      form.append(idInput, nameRow, typeRow, regionRow, districtRow, planRow, statusRow, prefRow, errorMsg, actions);
       panel.append(form);
 
       // Accordion toggle behavior
@@ -1563,6 +1625,52 @@ const setupSettingsPage = () => {
     if (businessModal) businessModal.hidden = true;
   });
 
+  generalCloseBtn?.addEventListener("click", () => {
+    if (generalModal) generalModal.hidden = true;
+  });
+
+  generalForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (generalError) generalError.hidden = true;
+    if (generalSubmit) generalSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(generalForm);
+      formData.set("action", "save_preferences");
+
+      const res = await fetch(`${getBasePath()}api/businesses.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to save preferences.");
+      }
+
+      if (Array.isArray(data.businesses)) {
+        localStorage.setItem("zipoo.businesses", JSON.stringify(data.businesses));
+      }
+
+      const updatedId = data.business?.id || generalIdInput?.value;
+      const { selectedBusiness } = getStoredBusinessState();
+      if (selectedBusiness && String(selectedBusiness.id) === String(updatedId)) {
+        localStorage.setItem("zipoo.selected_business", JSON.stringify(data.business));
+      }
+
+      render();
+      renderBusinessManager(updatedId);
+      if (generalModal) generalModal.hidden = true;
+      await showAppModal("Preferences Saved", `Preferences for ${data.business?.business_name || "business"} have been updated.`);
+    } catch (err) {
+      if (generalError) {
+        generalError.textContent = err.message || "Failed to save preferences.";
+        generalError.hidden = false;
+      }
+    } finally {
+      if (generalSubmit) generalSubmit.disabled = false;
+    }
+  });
+
   render();
   refreshAccount().then(render);
   refreshStoredBusinesses().then(() => {
@@ -1582,7 +1690,6 @@ const setupSystemSettings = () => {
   const smsSenderIdLabel = document.querySelector("[data-settings-sms-sender-id]");
   const senderIdCountLabel = document.querySelector("[data-settings-sender-id-count]");
   const languageLabel = document.querySelector("[data-settings-language-label]");
-  const generalSummaryLabel = document.querySelector("[data-settings-general-summary]");
 
   // Triggers
   const openSmtpBtn = document.querySelector("[data-open-smtp-settings]");
@@ -1590,7 +1697,6 @@ const setupSystemSettings = () => {
   const openSenderIdBtn = document.querySelector("[data-open-sender-id-modal]");
   const openSenderIdFromSmsBtn = document.querySelector("[data-open-sender-id-modal-from-sms]");
   const openLanguageBtn = document.querySelector("[data-open-language-modal]");
-  const openGeneralBtn = document.querySelector("[data-open-general-settings]");
 
   // Modals & Forms
   const smtpModal = document.querySelector("[data-smtp-modal]");
@@ -1621,12 +1727,6 @@ const setupSystemSettings = () => {
   const languageModal = document.querySelector("[data-language-modal]");
   const languageCloseBtn = document.querySelector("[data-language-close]");
   const langChoiceButtons = document.querySelectorAll("[data-lang-choice]");
-
-  const generalModal = document.querySelector("[data-general-settings-modal]");
-  const generalCloseBtn = document.querySelector("[data-general-settings-close]");
-  const generalForm = document.querySelector("[data-general-settings-form]");
-  const generalError = document.querySelector("[data-general-settings-error]");
-  const generalSubmit = document.querySelector("[data-general-settings-submit]");
 
   let cachedSettings = { smtp: {}, sms: {}, general: {}, sender_id_requests: [] };
 
@@ -1700,13 +1800,6 @@ const setupSystemSettings = () => {
         } else {
           senderIdCountLabel.textContent = "Request";
         }
-      }
-
-      // Update General summary
-      if (generalSummaryLabel) {
-        const cur = data.general?.currency || "TZS";
-        const tz = (data.general?.timezone || "Dar_es_Salaam").split("/").pop();
-        generalSummaryLabel.textContent = `${cur} • ${tz}`;
       }
 
       renderSenderIdRequests(data.sender_id_requests || []);
@@ -1948,53 +2041,6 @@ const setupSystemSettings = () => {
       const langDesc = lang === "sw" ? "Mfumo sasa unatumia Kiswahili." : "Application language updated to English.";
       await showAppModal(langTitle, langDesc);
     });
-  });
-
-  // General Settings Modal
-  openGeneralBtn?.addEventListener("click", () => {
-    if (generalError) generalError.hidden = true;
-    if (generalForm) {
-      generalForm.elements["currency"].value = cachedSettings.general?.currency || "TZS";
-      generalForm.elements["timezone"].value = cachedSettings.general?.timezone || "Africa/Dar_es_Salaam";
-      generalForm.elements["tax_rate"].value = cachedSettings.general?.tax_rate || "18";
-      generalForm.elements["receipt_footer"].value = cachedSettings.general?.receipt_footer || "";
-    }
-    if (generalModal) generalModal.hidden = false;
-  });
-
-  generalCloseBtn?.addEventListener("click", () => {
-    if (generalModal) generalModal.hidden = true;
-  });
-
-  generalForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    if (generalError) generalError.hidden = true;
-    if (generalSubmit) generalSubmit.disabled = true;
-
-    try {
-      const formData = new FormData(generalForm);
-      formData.set("action", "save_general");
-
-      const res = await fetch(`${getBasePath()}api/settings.php`, {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
-        throw new Error(data.message || "Failed to save preferences.");
-      }
-
-      await loadSettings();
-      if (generalModal) generalModal.hidden = true;
-      await showAppModal("Preferences Saved", "Your general preferences have been updated.");
-    } catch (err) {
-      if (generalError) {
-        generalError.textContent = err.message || "Failed to save preferences.";
-        generalError.hidden = false;
-      }
-    } finally {
-      if (generalSubmit) generalSubmit.disabled = false;
-    }
   });
 
   // Initial load

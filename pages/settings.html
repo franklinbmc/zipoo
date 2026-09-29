@@ -86,11 +86,6 @@
             <strong data-settings-language-label>English</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </button>
-          <button class="settings-list-row" type="button" data-open-general-settings>
-            <span>General preferences</span>
-            <strong data-settings-general-summary>TZS • Africa/Dar_es_Salaam</strong>
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </button>
         </div>
       </details>
 
@@ -481,10 +476,11 @@
         <button class="icon-button" type="button" data-general-settings-close aria-label="Close">
           <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
         </button>
-        <h2 id="general-settings-title">General Preferences</h2>
+        <h2 id="general-settings-title" data-general-settings-title>Business Preferences</h2>
         <span class="topbar-spacer" aria-hidden="true"></span>
       </header>
       <form class="fullscreen-body" data-general-settings-form novalidate>
+        <input type="hidden" name="business_id" data-business-pref-id>
         <label class="form-field">
           <span>Operating Currency</span>
           <select name="currency">
@@ -673,6 +669,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=59" defer></script>
+  <script src="/assets/js/app.js?v=60" defer></script>
 </body>
 </html>
