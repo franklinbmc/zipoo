@@ -2058,6 +2058,300 @@ const setupRegisterFlow = () => {
   showStep(index);
 };
 
+const setupCustomersPage = () => {
+  const page = document.querySelector("[data-customers-page]");
+  if (!page) {
+    return;
+  }
+
+  const customersList = document.querySelector("[data-customers-list]");
+  const customersEmpty = document.querySelector("[data-customers-empty]");
+  const searchInput = document.querySelector("[data-customers-search]");
+  const openCreateButtons = document.querySelectorAll("[data-open-create-customer]");
+
+  // Create Modal elements
+  const createModal = document.querySelector("[data-customer-create-modal]");
+  const createCloseBtn = document.querySelector("[data-customer-create-close]");
+  const createForm = document.querySelector("[data-customer-create-form]");
+  const createError = document.querySelector("[data-customer-create-error]");
+  const createSubmit = document.querySelector("[data-customer-create-submit]");
+
+  // Detail Modal elements
+  const detailModal = document.querySelector("[data-customer-detail-modal]");
+  const detailCloseBtn = document.querySelector("[data-customer-detail-close]");
+  const detailAvatar = document.querySelector("[data-detail-avatar]");
+  const detailFullName = document.querySelector("[data-detail-full-name]");
+  const detailPhoneEmail = document.querySelector("[data-detail-phone-email]");
+  const detailTotalSales = document.querySelector("[data-detail-total-sales]");
+  const detailSalesCount = document.querySelector("[data-detail-sales-count]");
+  const detailPhone = document.querySelector("[data-detail-phone]");
+  const detailEmail = document.querySelector("[data-detail-email]");
+  const detailAddress = document.querySelector("[data-detail-address]");
+  const detailNotes = document.querySelector("[data-detail-notes]");
+  const detailCreatedAt = document.querySelector("[data-detail-created-at]");
+  const detailEditBtn = document.querySelector("[data-detail-edit-btn]");
+  const detailDeleteBtn = document.querySelector("[data-detail-delete-btn]");
+
+  // Edit Modal elements
+  const editModal = document.querySelector("[data-customer-edit-modal]");
+  const editCloseBtn = document.querySelector("[data-customer-edit-close]");
+  const editForm = document.querySelector("[data-customer-edit-form]");
+  const editError = document.querySelector("[data-customer-edit-error]");
+  const editSubmit = document.querySelector("[data-customer-edit-submit]");
+  const editId = document.querySelector("[data-edit-customer-id]");
+  const editFullName = document.querySelector("[data-edit-full-name]");
+  const editPhone = document.querySelector("[data-edit-phone]");
+  const editEmail = document.querySelector("[data-edit-email]");
+  const editAddress = document.querySelector("[data-edit-address]");
+  const editNotes = document.querySelector("[data-edit-notes]");
+
+  let currentCustomer = null;
+  let cachedCustomers = [];
+
+  const formatTzs = (amount) => {
+    const val = Number(amount) || 0;
+    return "TZS " + val.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    try {
+      const d = new Date(dateStr.replace(" ", "T"));
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const renderCustomerRows = (customers) => {
+    if (!customers || !customers.length) {
+      if (customersList) customersList.replaceChildren();
+      if (customersEmpty) customersEmpty.hidden = false;
+      return;
+    }
+
+    if (customersEmpty) customersEmpty.hidden = true;
+
+    customersList?.replaceChildren(...customers.map((customer) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "settings-list-row customer-row";
+      row.dataset.customerId = String(customer.id);
+
+      const name = document.createElement("span");
+      name.className = "customer-row-name";
+      name.textContent = customer.full_name;
+
+      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      chevron.setAttribute("viewBox", "0 0 512 512");
+      chevron.setAttribute("aria-hidden", "true");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M184 112l144 144-144 144");
+      chevron.append(path);
+
+      row.append(name, chevron);
+      row.addEventListener("click", () => openCustomerDetail(customer));
+      return row;
+    }));
+  };
+
+  const loadCustomers = async (searchQuery = "") => {
+    try {
+      const url = `${getBasePath()}api/customers.php` + (searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : "");
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to load customers.");
+      }
+      cachedCustomers = Array.isArray(data.customers) ? data.customers : [];
+      renderCustomerRows(cachedCustomers);
+    } catch (err) {
+      if (customersList) customersList.replaceChildren();
+      if (customersEmpty) {
+        customersEmpty.hidden = false;
+        const msg = customersEmpty.querySelector("p");
+        if (msg) msg.textContent = err.message || "Unable to load customers.";
+      }
+    }
+  };
+
+  const openCustomerDetail = (customer) => {
+    currentCustomer = customer;
+    if (detailAvatar) {
+      detailAvatar.textContent = (customer.full_name ? customer.full_name.trim().charAt(0).toUpperCase() : "C");
+    }
+    if (detailFullName) detailFullName.textContent = customer.full_name || "-";
+    if (detailPhoneEmail) {
+      detailPhoneEmail.textContent = [customer.phone, customer.email].filter(Boolean).join(" • ") || "No contact info";
+    }
+    if (detailTotalSales) detailTotalSales.textContent = formatTzs(customer.total_sales);
+    if (detailSalesCount) detailSalesCount.textContent = String(customer.sales_count || 0);
+    if (detailPhone) detailPhone.textContent = customer.phone || "-";
+    if (detailEmail) detailEmail.textContent = customer.email || "-";
+    if (detailAddress) detailAddress.textContent = customer.address || "-";
+    if (detailNotes) detailNotes.textContent = customer.notes || "-";
+    if (detailCreatedAt) detailCreatedAt.textContent = formatDate(customer.created_at);
+
+    if (detailModal) detailModal.hidden = false;
+  };
+
+  const closeDetail = () => {
+    if (detailModal) detailModal.hidden = true;
+    currentCustomer = null;
+  };
+
+  const openCreateModal = () => {
+    if (createError) createError.hidden = true;
+    createForm?.reset();
+    if (createModal) createModal.hidden = false;
+    createForm?.querySelector('input[name="full_name"]')?.focus();
+  };
+
+  const closeCreateModal = () => {
+    if (createModal) createModal.hidden = true;
+    if (createError) createError.hidden = true;
+  };
+
+  const openEditModal = () => {
+    if (!currentCustomer) return;
+    if (editError) editError.hidden = true;
+    if (editId) editId.value = String(currentCustomer.id);
+    if (editFullName) editFullName.value = currentCustomer.full_name || "";
+    if (editPhone) editPhone.value = currentCustomer.phone || "";
+    if (editEmail) editEmail.value = currentCustomer.email || "";
+    if (editAddress) editAddress.value = currentCustomer.address || "";
+    if (editNotes) editNotes.value = currentCustomer.notes || "";
+    if (editModal) editModal.hidden = false;
+    editFullName?.focus();
+  };
+
+  const closeEditModal = () => {
+    if (editModal) editModal.hidden = true;
+    if (editError) editError.hidden = true;
+  };
+
+  // Event handlers
+  openCreateButtons.forEach((btn) => btn.addEventListener("click", openCreateModal));
+  createCloseBtn?.addEventListener("click", closeCreateModal);
+  detailCloseBtn?.addEventListener("click", closeDetail);
+  editCloseBtn?.addEventListener("click", closeEditModal);
+
+  detailEditBtn?.addEventListener("click", () => {
+    closeDetail();
+    openEditModal();
+  });
+
+  detailDeleteBtn?.addEventListener("click", async () => {
+    if (!currentCustomer) return;
+    const confirmDelete = window.confirm(`Are you sure you want to delete customer "${currentCustomer.full_name}"?`);
+    if (!confirmDelete) return;
+
+    detailDeleteBtn.disabled = true;
+    try {
+      const formData = new FormData();
+      formData.set("action", "delete");
+      formData.set("customer_id", String(currentCustomer.id));
+
+      const res = await fetch(`${getBasePath()}api/customers.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to delete customer.");
+      }
+
+      closeDetail();
+      await loadCustomers(searchInput?.value || "");
+      await showAppModal("Customer Deleted", "Customer has been successfully removed.");
+    } catch (err) {
+      await showAppModal("Error", err.message || "Could not delete customer.");
+    } finally {
+      detailDeleteBtn.disabled = false;
+    }
+  });
+
+  createForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (createError) createError.hidden = true;
+    if (createSubmit) createSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(createForm);
+      formData.set("action", "create");
+
+      const res = await fetch(`${getBasePath()}api/customers.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to add customer.");
+      }
+
+      closeCreateModal();
+      createForm.reset();
+      await loadCustomers();
+      if (data.customer) {
+        openCustomerDetail(data.customer);
+      }
+      await showAppModal("Customer Added", `${data.customer?.full_name || "Customer"} has been added successfully.`);
+    } catch (err) {
+      if (createError) {
+        createError.textContent = err.message || "Failed to save customer.";
+        createError.hidden = false;
+      }
+    } finally {
+      if (createSubmit) createSubmit.disabled = false;
+    }
+  });
+
+  editForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (editError) editError.hidden = true;
+    if (editSubmit) editSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(editForm);
+      formData.set("action", "update");
+
+      const res = await fetch(`${getBasePath()}api/customers.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to update customer.");
+      }
+
+      closeEditModal();
+      await loadCustomers(searchInput?.value || "");
+      if (data.customer) {
+        openCustomerDetail(data.customer);
+      }
+      await showAppModal("Customer Updated", "Customer details updated successfully.");
+    } catch (err) {
+      if (editError) {
+        editError.textContent = err.message || "Failed to update customer.";
+        editError.hidden = false;
+      }
+    } finally {
+      if (editSubmit) editSubmit.disabled = false;
+    }
+  });
+
+  let searchTimeout;
+  searchInput?.addEventListener("input", (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      loadCustomers(e.target.value.trim());
+    }, 250);
+  });
+
+  // Initial load
+  loadCustomers();
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.lang));
@@ -2071,6 +2365,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupLoginFlow();
   setupLocationSelects().finally(setupRegisterFlow);
   setupSettingsPage();
+  setupCustomersPage();
   updateConnectionStatus();
   registerServiceWorker();
 });

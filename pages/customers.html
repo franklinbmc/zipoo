@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#F6F8FC">
+  <meta name="description" content="Manage Zipoo customers and sales.">
+  <title>Customers - Zipoo</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=52">
+</head>
+<body>
+  <div class="app-shell customers-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
+      </a>
+      <h1>Customers</h1>
+      <button class="btn btn-primary btn-sm btn-with-icon" type="button" data-open-create-customer>
+        <svg viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;stroke-width:54px;fill:none;stroke:currentColor;margin-right:2px;">
+          <path d="M256 112v288M112 256h288" />
+        </svg>
+        <span>+ Customer</span>
+      </button>
+    </header>
+
+    <main class="customers-page" data-customers-page>
+      <div class="customers-search-wrap">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+        </svg>
+        <input type="search" class="customers-search-input" data-customers-search placeholder="Search customers by name, phone...">
+      </div>
+
+      <div class="settings-list flush-list customers-list" data-customers-list></div>
+
+      <div class="customers-empty-state" hidden data-customers-empty style="text-align: center; padding: 48px 16px; background: #fff; border: 1px solid var(--color-line); border-radius: 12px;">
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">👥</div>
+        <h3 style="margin: 0 0 6px; color: var(--color-navy); font-size: 1.15rem; font-weight: 800;">No customers found</h3>
+        <p style="margin: 0 0 16px; color: var(--color-muted); font-size: 0.9rem;">Add your first customer to start tracking their details and sales.</p>
+        <button class="btn btn-primary btn-sm" type="button" data-open-create-customer>+ Customer</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Customer Full Details Modal -->
+  <div class="fullscreen-modal" hidden data-customer-detail-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="customer-detail-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-customer-detail-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="customer-detail-title">Customer Details</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body customer-detail-body">
+        <div class="customer-detail-hero">
+          <div class="customer-avatar" data-detail-avatar>C</div>
+          <h3 data-detail-full-name>-</h3>
+          <span class="customer-meta" data-detail-phone-email>-</span>
+        </div>
+
+        <div class="customer-sales-card">
+          <div class="sales-stat-item">
+            <span class="stat-label">Total Sale Done</span>
+            <strong class="stat-value" data-detail-total-sales>TZS 0</strong>
+          </div>
+          <div class="sales-stat-item">
+            <span class="stat-label">Transactions</span>
+            <strong class="stat-value" data-detail-sales-count>0</strong>
+          </div>
+        </div>
+
+        <div class="settings-list flush-list" style="border: 1px solid var(--color-line); border-radius: 12px; margin-top: 14px;">
+          <div class="settings-list-row field-display-row">
+            <span>Phone</span>
+            <strong data-detail-phone>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Email</span>
+            <strong data-detail-email>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Address</span>
+            <strong data-detail-address>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Notes</span>
+            <strong data-detail-notes>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Registered</span>
+            <strong data-detail-created-at>-</strong>
+          </div>
+        </div>
+
+        <div class="customer-detail-actions" style="margin-top: 24px; display: grid; gap: 10px;">
+          <button class="btn btn-primary full" type="button" data-detail-edit-btn>Edit customer</button>
+          <button class="btn btn-danger-outline full" type="button" data-detail-delete-btn>Delete customer</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Customer Create Modal -->
+  <div class="fullscreen-modal" hidden data-customer-create-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="customer-create-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-customer-create-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="customer-create-title">Add Customer</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-customer-create-form novalidate>
+        <label class="form-field">
+          <span>Full Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="full_name" placeholder="e.g. Ally Mwinyi" required>
+        </label>
+        <label class="form-field">
+          <span>Phone</span>
+          <input type="tel" name="phone" placeholder="e.g. 0712345678">
+        </label>
+        <label class="form-field">
+          <span>Email</span>
+          <input type="email" name="email" placeholder="e.g. ally@example.com">
+        </label>
+        <label class="form-field">
+          <span>Address</span>
+          <input type="text" name="address" placeholder="e.g. Sinza, Dar es Salaam">
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="3" placeholder="Optional notes..."></textarea>
+        </label>
+        <p class="inline-error" hidden data-customer-create-error></p>
+        <button class="btn btn-primary full" type="submit" data-customer-create-submit>Save Customer</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Customer Edit Modal -->
+  <div class="fullscreen-modal" hidden data-customer-edit-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="customer-edit-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-customer-edit-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="customer-edit-title">Edit Customer</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-customer-edit-form novalidate>
+        <input type="hidden" name="customer_id" data-edit-customer-id>
+        <label class="form-field">
+          <span>Full Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="full_name" data-edit-full-name required>
+        </label>
+        <label class="form-field">
+          <span>Phone</span>
+          <input type="tel" name="phone" data-edit-phone>
+        </label>
+        <label class="form-field">
+          <span>Email</span>
+          <input type="email" name="email" data-edit-email>
+        </label>
+        <label class="form-field">
+          <span>Address</span>
+          <input type="text" name="address" data-edit-address>
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="3" data-edit-notes></textarea>
+        </label>
+        <p class="inline-error" hidden data-customer-edit-error></p>
+        <button class="btn btn-primary full" type="submit" data-customer-edit-submit>Update Customer</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- App Notice Modal -->
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-close>OK</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=54" defer></script>
+</body>
+</html>
