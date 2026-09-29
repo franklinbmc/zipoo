@@ -817,11 +817,15 @@ input[type="file"] {
   stroke-width: 52px;
 }
 
+.search-select.is-open {
+  z-index: 30;
+}
+
 .search-select-panel {
   position: absolute;
   inset-inline: 0;
   top: calc(100% + 8px);
-  z-index: 15;
+  z-index: 35;
   display: grid;
   gap: 8px;
   border: 1px solid var(--color-line);
@@ -2616,6 +2620,74 @@ button.settings-list-row:focus-visible {
   cursor: wait;
   opacity: 0.65;
 }
+
+/* My Businesses Accordion Form Fields */
+.business-accordion-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.business-field-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--color-navy);
+}
+
+.business-field-input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 0 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.business-field-input:focus {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 3px rgba(14, 116, 219, 0.08);
+}
+
+.business-accordion-field .search-select.is-open {
+  z-index: 30;
+}
+
+/* Create New Business Modal & Flow */
+[data-business-create-modal] {
+  z-index: 55;
+}
+
+.business-create-trigger-wrapper {
+  padding: 16px 12px 24px;
+}
+
+.fullscreen-flow-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 24px;
+}
+
+.business-create-flow {
+  width: min(390px, 100%);
+  margin: 0 auto;
+}
+
+.business-create-flow .flow-title {
+  margin: 0;
+  color: var(--color-navy);
+  font-size: 1.45rem;
+  line-height: 1.2;
+  text-align: center;
+  font-weight: 900;
+}
+
 @media (max-width: 900px) {
   .desktop-nav {
     display: none;

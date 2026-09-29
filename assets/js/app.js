@@ -437,6 +437,220 @@ const setupQuickPanel = () => {
   });
 };
 
+const initSearchSelect = (select) => {
+  if (!select || select.dataset.searchSelectInitialized === "true") return;
+  select.dataset.searchSelectInitialized = "true";
+
+  const trigger = select.querySelector("[data-search-select-trigger]");
+  const panel = select.querySelector("[data-search-select-panel]");
+  const search = select.querySelector("[data-search-select-search]");
+  const valueInput = select.querySelector("[data-search-select-value]");
+  const label = select.querySelector("[data-search-select-label]");
+  if (!trigger || !panel || !search || !valueInput || !label) return;
+
+  const getOptions = () => [...select.querySelectorAll("[data-search-select-option]")];
+
+  const close = () => {
+    panel.hidden = true;
+    trigger.setAttribute("aria-expanded", "false");
+    select.classList.remove("is-open");
+  };
+
+  const open = () => {
+    document.querySelectorAll("[data-search-select-panel]:not([hidden])").forEach((otherPanel) => {
+      if (otherPanel !== panel) {
+        otherPanel.hidden = true;
+        const otherSelect = otherPanel.closest("[data-search-select]");
+        otherSelect?.classList.remove("is-open");
+        otherSelect?.querySelector("[data-search-select-trigger]")?.setAttribute("aria-expanded", "false");
+      }
+    });
+    panel.hidden = false;
+    trigger.setAttribute("aria-expanded", "true");
+    select.classList.add("is-open");
+    search.value = "";
+    getOptions().forEach((option) => {
+      option.hidden = false;
+    });
+    search.focus();
+  };
+
+  const choose = (option) => {
+    valueInput.value = option.dataset.value;
+    valueInput.setAttribute("value", option.dataset.value);
+    label.textContent = option.textContent.trim();
+    label.removeAttribute("data-i18n");
+    getOptions().forEach((item) => item.classList.toggle("active", item === option));
+    valueInput.dispatchEvent(new Event("change", { bubbles: true }));
+    close();
+    trigger.focus();
+  };
+
+  trigger.addEventListener("click", (e) => {
+    e.preventDefault();
+    panel.hidden ? open() : close();
+  });
+
+  search.addEventListener("input", () => {
+    const query = search.value.trim().toLowerCase();
+    getOptions().forEach((option) => {
+      const haystack = `${option.textContent} ${option.dataset.value} ${option.dataset.labelKey || ""}`.toLowerCase();
+      option.hidden = Boolean(query) && !haystack.includes(query);
+    });
+  });
+
+  search.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      close();
+      trigger.focus();
+    }
+  });
+
+  select.addEventListener("click", (event) => {
+    const option = event.target.closest("[data-search-select-option]");
+    if (option && select.contains(option)) {
+      choose(option);
+    }
+  });
+
+  valueInput.addEventListener("change", () => {
+    const option = getOptions().find((item) => item.dataset.value === valueInput.value);
+    if (option) {
+      label.textContent = option.textContent.trim();
+      label.removeAttribute("data-i18n");
+      getOptions().forEach((item) => item.classList.toggle("active", item === option));
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!select.contains(event.target)) {
+      close();
+    }
+  });
+};
+
+const setupSearchSelects = (container = document) => {
+  container.querySelectorAll("[data-search-select]").forEach(initSearchSelect);
+};
+
+const createSearchSelectElement = ({
+  name,
+  value = "",
+  placeholder = "Select...",
+  options = [],
+  required = false,
+  extraClass = "",
+}) => {
+  const wrapper = document.createElement("div");
+  wrapper.className = `search-select ${extraClass}`.trim();
+  wrapper.dataset.searchSelect = "";
+
+  const hiddenInput = document.createElement("input");
+  hiddenInput.type = "hidden";
+  hiddenInput.name = name;
+  hiddenInput.value = value || "";
+  if (value) hiddenInput.setAttribute("value", value);
+  if (required) hiddenInput.required = true;
+  hiddenInput.dataset.searchSelectValue = "";
+
+  const trigger = document.createElement("button");
+  trigger.className = "search-select-trigger";
+  trigger.type = "button";
+  trigger.dataset.searchSelectTrigger = "";
+  trigger.setAttribute("aria-expanded", "false");
+
+  const labelSpan = document.createElement("span");
+  labelSpan.dataset.searchSelectLabel = "";
+  const selectedOpt = options.find((o) => String(o.value) === String(value));
+  labelSpan.textContent = selectedOpt ? selectedOpt.label : placeholder;
+
+  const chevronSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  chevronSvg.setAttribute("viewBox", "0 0 512 512");
+  chevronSvg.setAttribute("aria-hidden", "true");
+  const chevronPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  chevronPath.setAttribute("d", "M112 184l144 144 144-144");
+  chevronSvg.append(chevronPath);
+  trigger.append(labelSpan, chevronSvg);
+
+  const panel = document.createElement("div");
+  panel.className = "search-select-panel";
+  panel.hidden = true;
+  panel.dataset.searchSelectPanel = "";
+
+  const searchInput = document.createElement("input");
+  searchInput.type = "search";
+  searchInput.dataset.searchSelectSearch = "";
+  searchInput.placeholder = "Search";
+
+  const optionsContainer = document.createElement("div");
+  optionsContainer.className = "search-select-options";
+  optionsContainer.dataset.searchSelectOptions = "";
+
+  options.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.dataset.searchSelectOption = "";
+    btn.dataset.value = opt.value;
+    btn.textContent = opt.label;
+    if (opt.labelKey) btn.dataset.labelKey = opt.labelKey;
+    if (String(opt.value) === String(value)) {
+      btn.classList.add("active");
+    }
+    optionsContainer.append(btn);
+  });
+
+  panel.append(searchInput, optionsContainer);
+  wrapper.append(hiddenInput, trigger, panel);
+
+  initSearchSelect(wrapper);
+  return wrapper;
+};
+
+const setSearchSelectOptions = (select, options, placeholderKey, selectedValue = null) => {
+  const optionsNode = select?.querySelector("[data-search-select-options]");
+  const valueInput = select?.querySelector("[data-search-select-value]");
+  const label = select?.querySelector("[data-search-select-label]");
+  const trigger = select?.querySelector("[data-search-select-trigger]");
+  if (!select || !optionsNode || !valueInput || !label || !trigger) {
+    return;
+  }
+
+  optionsNode.replaceChildren(...options.map((option) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.searchSelectOption = "";
+    button.dataset.value = option.value;
+    button.textContent = option.label;
+    if (option.labelKey) button.dataset.labelKey = option.labelKey;
+    return button;
+  }));
+
+  trigger.disabled = options.length === 0;
+
+  const targetValue = selectedValue !== null && selectedValue !== undefined ? selectedValue : valueInput.value;
+  const selected = options.find((option) => String(option.value) === String(targetValue));
+  if (selected) {
+    valueInput.value = selected.value;
+    valueInput.setAttribute("value", selected.value);
+    label.textContent = selected.label;
+    label.removeAttribute("data-i18n");
+    optionsNode.querySelectorAll("[data-search-select-option]").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.value === String(selected.value));
+    });
+  } else {
+    valueInput.value = "";
+    valueInput.removeAttribute("value");
+    if (placeholderKey && (placeholderKey.startsWith("register.") || placeholderKey.startsWith("common."))) {
+      label.dataset.i18n = placeholderKey;
+      setLanguage(getSavedLanguage());
+    } else {
+      label.textContent = placeholderKey || "Select...";
+      label.removeAttribute("data-i18n");
+    }
+  }
+};
+
 const setupSettingsPage = () => {
   const page = document.querySelector("[data-settings-page]");
   if (!page) {
@@ -467,10 +681,13 @@ const setupSettingsPage = () => {
   const businessModal = document.querySelector("[data-business-manager-modal]");
   const businessClose = document.querySelector("[data-business-manager-close]");
   const businessManagerList = document.querySelector("[data-business-manager-list]");
-  const businessCreateForm = document.querySelector("[data-business-manager-create-form]");
-  const businessRegion = document.querySelector("[data-business-region]");
-  const businessDistrict = document.querySelector("[data-business-district]");
-  const businessError = document.querySelector("[data-business-manager-error]");
+  const openCreateBusinessBtn = document.querySelector("[data-open-create-business]");
+  const createBusinessModal = document.querySelector("[data-business-create-modal]");
+  const closeCreateBusinessBtn = document.querySelector("[data-business-create-close]");
+  const createFlowForm = document.querySelector("[data-business-create-flow]");
+  const createRegionSelect = document.querySelector('[data-create-location="region"]');
+  const createDistrictSelect = document.querySelector('[data-create-location="district"]');
+  const createError = document.querySelector("[data-create-flow-error]");
   let editField = "";
   let editStep = "request";
   let regions = [];
@@ -487,35 +704,6 @@ const setupSettingsPage = () => {
       regions = [];
     }
     return regions;
-  };
-
-  const populateLocationSelects = (regionEl, districtEl, selectedRegionCode, selectedDistrictCode) => {
-    if (!regionEl || !districtEl) return;
-    regionEl.replaceChildren(...regions.map((r) => {
-      const opt = document.createElement("option");
-      opt.value = r.value;
-      opt.textContent = r.label;
-      if (r.value === selectedRegionCode) opt.selected = true;
-      return opt;
-    }));
-
-    const updateDistricts = () => {
-      const currentReg = regions.find((r) => r.value === regionEl.value);
-      const districts = Array.isArray(currentReg?.districts) ? currentReg.districts : [];
-      districtEl.replaceChildren(...districts.map((d) => {
-        const opt = document.createElement("option");
-        opt.value = d.value;
-        opt.textContent = d.label;
-        return opt;
-      }));
-    };
-
-    updateDistricts();
-    if (selectedDistrictCode) {
-      districtEl.value = selectedDistrictCode;
-    }
-
-    regionEl.onchange = updateDistricts;
   };
 
   const labels = {
@@ -631,64 +819,89 @@ const setupSettingsPage = () => {
 
       // Business name field
       const nameRow = document.createElement("label");
-      nameRow.className = "settings-list-row field-row";
+      nameRow.className = "business-accordion-field";
       const nameLabel = document.createElement("span");
+      nameLabel.className = "business-field-label";
       nameLabel.textContent = "Business name";
       const nameInput = document.createElement("input");
       nameInput.type = "text";
       nameInput.name = "business_name";
+      nameInput.className = "business-field-input";
       nameInput.value = business.business_name || "";
       nameInput.required = true;
       nameRow.append(nameLabel, nameInput);
 
-      // Business type field
-      const typeRow = document.createElement("label");
-      typeRow.className = "settings-list-row field-row";
+      // Business type field (css formatted select with search)
+      const typeRow = document.createElement("div");
+      typeRow.className = "business-accordion-field";
       const typeLabel = document.createElement("span");
+      typeLabel.className = "business-field-label";
       typeLabel.textContent = "Business type";
-      const typeSelect = document.createElement("select");
-      typeSelect.name = "business_type";
-      [
-        { value: "retail", label: "Retail" },
-        { value: "service", label: "Service" },
-        { value: "wholesale", label: "Wholesale" },
-      ].forEach((opt) => {
-        const option = document.createElement("option");
-        option.value = opt.value;
-        option.textContent = opt.label;
-        if (opt.value === (business.business_type || "service")) {
-          option.selected = true;
-        }
-        typeSelect.append(option);
+      const typeSelect = createSearchSelectElement({
+        name: "business_type",
+        value: business.business_type || "service",
+        options: [
+          { value: "retail", label: "Retail" },
+          { value: "service", label: "Service" },
+          { value: "wholesale", label: "Wholesale" },
+        ],
+        required: true,
       });
       typeRow.append(typeLabel, typeSelect);
 
-      // Region field
-      const regionRow = document.createElement("label");
-      regionRow.className = "settings-list-row field-row";
+      // Region field (css formatted select with search)
+      const regionRow = document.createElement("div");
+      regionRow.className = "business-accordion-field";
       const regionLabel = document.createElement("span");
+      regionLabel.className = "business-field-label";
       regionLabel.textContent = "Region";
-      const regionSelect = document.createElement("select");
-      regionSelect.name = "region";
-      regionSelect.required = true;
+      const regionSelect = createSearchSelectElement({
+        name: "region",
+        value: business.region_code || "",
+        placeholder: "Select region",
+        options: regions.map((r) => ({ value: r.value, label: r.label })),
+        required: true,
+      });
       regionRow.append(regionLabel, regionSelect);
 
-      // District field
-      const districtRow = document.createElement("label");
-      districtRow.className = "settings-list-row field-row";
+      // District field (css formatted select with search)
+      const districtRow = document.createElement("div");
+      districtRow.className = "business-accordion-field";
       const districtLabel = document.createElement("span");
+      districtLabel.className = "business-field-label";
       districtLabel.textContent = "District";
-      const districtSelect = document.createElement("select");
-      districtSelect.name = "district";
-      districtSelect.required = true;
+      const currentReg = regions.find((r) => r.value === (business.region_code || ""));
+      const districtOptions = currentReg?.districts || [];
+      const districtSelect = createSearchSelectElement({
+        name: "district",
+        value: business.district_code || "",
+        placeholder: "Select district",
+        options: districtOptions.map((d) => ({ value: d.value, label: d.label })),
+        required: true,
+      });
       districtRow.append(districtLabel, districtSelect);
 
-      // Populate locations
-      if (regions.length) {
-        populateLocationSelects(regionSelect, districtSelect, business.region_code, business.district_code);
-      } else {
-        ensureBusinessLocations().then(() => {
-          populateLocationSelects(regionSelect, districtSelect, business.region_code, business.district_code);
+      const regionValInput = regionSelect.querySelector("[data-search-select-value]");
+      regionValInput?.addEventListener("change", () => {
+        const found = regions.find((r) => r.value === regionValInput.value);
+        setSearchSelectOptions(districtSelect, found?.districts || [], "Select district");
+      });
+
+      if (!regions.length) {
+        ensureBusinessLocations().then((loadedRegions) => {
+          setSearchSelectOptions(
+            regionSelect,
+            loadedRegions.map((r) => ({ value: r.value, label: r.label })),
+            "Select region",
+            business.region_code
+          );
+          const currentLoadedReg = loadedRegions.find((r) => r.value === (business.region_code || regionValInput?.value));
+          setSearchSelectOptions(
+            districtSelect,
+            currentLoadedReg?.districts || [],
+            "Select district",
+            business.district_code
+          );
         });
       }
 
@@ -969,50 +1182,257 @@ const setupSettingsPage = () => {
     }
   });
 
+  // Create Business One-by-One Flow Setup
+  const setupCreateBusinessFlow = () => {
+    if (!createFlowForm) return null;
+
+    const fields = [...createFlowForm.querySelectorAll("[data-create-flow-field]")];
+    const dots = [...createFlowForm.querySelectorAll(".flow-dot")];
+    const counter = createFlowForm.querySelector("[data-create-flow-count]");
+    const eyebrow = createFlowForm.querySelector("[data-create-flow-eyebrow]");
+    const title = createFlowForm.querySelector("[data-create-flow-title]");
+    const helper = createFlowForm.querySelector("[data-create-flow-helper]");
+    const backBtn = createFlowForm.querySelector("[data-create-flow-back]");
+    const nextBtn = createFlowForm.querySelector("[data-create-flow-next]");
+    const nextLabel = createFlowForm.querySelector("[data-create-flow-next-label]");
+    const actions = createFlowForm.querySelector(".flow-actions");
+
+    const stepsMeta = [
+      {
+        eyebrow: "Business Information",
+        title: "Name your business",
+        helper: "Enter the official trading name of your business.",
+      },
+      {
+        eyebrow: "Business Information",
+        title: "Select business type",
+        helper: "Choose whether your business is retail, service, or wholesale.",
+      },
+      {
+        eyebrow: "Business Location",
+        title: "Choose your region",
+        helper: "Select the region in Tanzania where your business operates.",
+      },
+      {
+        eyebrow: "Business Location",
+        title: "Choose your district",
+        helper: "Select the specific district for this business.",
+      },
+    ];
+
+    let currentStep = 0;
+
+    const showStep = (step) => {
+      currentStep = step;
+      fields.forEach((field, i) => {
+        const isActive = i === step;
+        field.hidden = !isActive;
+        field.classList.toggle("active", isActive);
+      });
+
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i <= step);
+      });
+
+      if (counter) {
+        counter.textContent = `${step + 1} / ${fields.length}`;
+      }
+
+      const meta = stepsMeta[step] || stepsMeta[0];
+      if (eyebrow) eyebrow.textContent = meta.eyebrow;
+      if (title) title.textContent = meta.title;
+      if (helper) helper.textContent = meta.helper;
+
+      if (backBtn) {
+        backBtn.hidden = step === 0;
+      }
+      actions?.classList.toggle("first-step", step === 0);
+
+      if (nextLabel) {
+        nextLabel.textContent = step === fields.length - 1 ? "Create business" : "Next";
+      }
+
+      if (createError) {
+        createError.hidden = true;
+      }
+
+      const targetInput = fields[step]?.querySelector("input:not([type=hidden]), [data-search-select-trigger]");
+      setTimeout(() => targetInput?.focus(), 50);
+    };
+
+    const validateActiveField = () => {
+      const activeField = fields[currentStep];
+      if (!activeField) return true;
+
+      const input = activeField.querySelector("[data-search-select-value], input:not([type=hidden])");
+      const val = input ? input.value.trim() : "";
+
+      if (currentStep === 0) {
+        if (!val) {
+          if (createError) {
+            createError.textContent = "Please enter your business name.";
+            createError.hidden = false;
+          }
+          activeField.querySelector("input")?.focus();
+          return false;
+        }
+      } else if (currentStep === 1) {
+        if (!val) {
+          if (createError) {
+            createError.textContent = "Please select a business type.";
+            createError.hidden = false;
+          }
+          activeField.querySelector("[data-search-select-trigger]")?.focus();
+          return false;
+        }
+      } else if (currentStep === 2) {
+        if (!val) {
+          if (createError) {
+            createError.textContent = "Please select a region.";
+            createError.hidden = false;
+          }
+          activeField.querySelector("[data-search-select-trigger]")?.focus();
+          return false;
+        }
+      } else if (currentStep === 3) {
+        if (!val) {
+          if (createError) {
+            createError.textContent = "Please select a district.";
+            createError.hidden = false;
+          }
+          activeField.querySelector("[data-search-select-trigger]")?.focus();
+          return false;
+        }
+      }
+
+      if (createError) createError.hidden = true;
+      return true;
+    };
+
+    backBtn?.addEventListener("click", () => {
+      if (currentStep > 0) {
+        showStep(currentStep - 1);
+      }
+    });
+
+    const submitCreateForm = async () => {
+      if (nextBtn) nextBtn.disabled = true;
+      if (nextLabel) nextLabel.textContent = "Creating...";
+
+      const body = new FormData(createFlowForm);
+      body.set("action", "create");
+
+      try {
+        const response = await fetch(`${getBasePath()}api/businesses.php`, { method: "POST", body });
+        const payload = await response.json();
+        if (!response.ok || !payload.ok) {
+          throw new Error(payload.message || "Unable to create business.");
+        }
+
+        const { knownBusinesses } = getStoredBusinessState();
+        const nextBusinesses = Array.isArray(payload.businesses)
+          ? payload.businesses
+          : [...knownBusinesses, payload.business].filter(Boolean);
+        localStorage.setItem("zipoo.businesses", JSON.stringify(nextBusinesses));
+        if (payload.business?.id) {
+          localStorage.setItem("zipoo.currentBusinessId", String(payload.business.id));
+        }
+
+        createFlowForm.reset();
+        if (createBusinessModal) createBusinessModal.hidden = true;
+        render();
+        renderBusinessManager(payload.business?.id);
+        await showAppModal("Business created", `${payload.business?.business_name || "New business"} is now serving.`);
+      } catch (err) {
+        if (createError) {
+          createError.textContent = err.message || "Unable to create business.";
+          createError.hidden = false;
+        }
+      } finally {
+        if (nextBtn) nextBtn.disabled = false;
+        if (nextLabel) nextLabel.textContent = currentStep === fields.length - 1 ? "Create business" : "Next";
+      }
+    };
+
+    const advanceOrSubmit = async () => {
+      if (!validateActiveField()) return;
+
+      if (currentStep < fields.length - 1) {
+        showStep(currentStep + 1);
+      } else {
+        await submitCreateForm();
+      }
+    };
+
+    nextBtn?.addEventListener("click", (e) => {
+      e.preventDefault();
+      advanceOrSubmit();
+    });
+
+    createFlowForm.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.target.matches("textarea") && !e.target.matches("[data-search-select-search]")) {
+        e.preventDefault();
+        advanceOrSubmit();
+      }
+    });
+
+    // Handle Region & District search-selects in Create Flow
+    const regionValInput = createRegionSelect?.querySelector("[data-search-select-value]");
+    const districtValInput = createDistrictSelect?.querySelector("[data-search-select-value]");
+
+    const updateCreateDistricts = () => {
+      if (!createDistrictSelect || !regionValInput) return;
+      const foundReg = regions.find((r) => r.value === regionValInput.value);
+      const districts = foundReg?.districts || [];
+      setSearchSelectOptions(createDistrictSelect, districts, "Select District");
+    };
+
+    regionValInput?.addEventListener("change", () => {
+      if (districtValInput) {
+        districtValInput.value = "";
+        districtValInput.removeAttribute("value");
+      }
+      updateCreateDistricts();
+    });
+
+    return {
+      reset: async () => {
+        createFlowForm.reset();
+        await ensureBusinessLocations();
+        if (createRegionSelect) {
+          setSearchSelectOptions(
+            createRegionSelect,
+            regions.map((r) => ({ value: r.value, label: r.label })),
+            "Select Region"
+          );
+        }
+        if (createDistrictSelect) {
+          setSearchSelectOptions(createDistrictSelect, [], "Select District");
+        }
+        showStep(0);
+      },
+    };
+  };
+
+  const createFlowController = setupCreateBusinessFlow();
+
+  openCreateBusinessBtn?.addEventListener("click", async () => {
+    await createFlowController?.reset();
+    if (createBusinessModal) createBusinessModal.hidden = false;
+  });
+
+  closeCreateBusinessBtn?.addEventListener("click", () => {
+    if (createBusinessModal) createBusinessModal.hidden = true;
+  });
+
   businessOpen?.addEventListener("click", async () => {
     if (businessModal) businessModal.hidden = false;
     await ensureBusinessLocations();
     renderBusinessManager();
-    await loadBusinessLocations();
   });
 
   businessClose?.addEventListener("click", () => {
     if (businessModal) businessModal.hidden = true;
-  });
-
-  businessCreateForm?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (businessError) businessError.hidden = true;
-    const submitButton = businessCreateForm.querySelector('button[type="submit"]');
-    const body = new FormData(businessCreateForm);
-    body.set("action", "create");
-    if (submitButton) submitButton.disabled = true;
-
-    try {
-      const response = await fetch(`${getBasePath()}api/businesses.php`, { method: "POST", body });
-      const payload = await response.json();
-      if (!response.ok || !payload.ok) {
-        throw new Error(payload.message || "Unable to create business.");
-      }
-      const { knownBusinesses } = getStoredBusinessState();
-      const nextBusinesses = Array.isArray(payload.businesses) ? payload.businesses : [...knownBusinesses, payload.business].filter(Boolean);
-      localStorage.setItem("zipoo.businesses", JSON.stringify(nextBusinesses));
-      if (payload.business?.id) {
-        localStorage.setItem("zipoo.currentBusinessId", String(payload.business.id));
-      }
-      businessCreateForm.reset();
-      businessRegion?.dispatchEvent(new Event("change"));
-      render();
-      renderBusinessManager();
-      await showAppModal("Business created", `${payload.business?.business_name || "New business"} is now serving.`);
-    } catch (error) {
-      if (businessError) {
-        businessError.textContent = error.message || "Unable to create business.";
-        businessError.hidden = false;
-      }
-    } finally {
-      if (submitButton) submitButton.disabled = false;
-    }
   });
 
   render();
@@ -1021,104 +1441,6 @@ const setupSettingsPage = () => {
     render();
     renderBusinessManager();
   });
-};
-const setupSearchSelects = () => {
-  document.querySelectorAll("[data-search-select]").forEach((select) => {
-    const trigger = select.querySelector("[data-search-select-trigger]");
-    const panel = select.querySelector("[data-search-select-panel]");
-    const search = select.querySelector("[data-search-select-search]");
-    const valueInput = select.querySelector("[data-search-select-value]");
-    const label = select.querySelector("[data-search-select-label]");
-    const getOptions = () => [...select.querySelectorAll("[data-search-select-option]")];
-
-    const close = () => {
-      panel.hidden = true;
-      trigger.setAttribute("aria-expanded", "false");
-    };
-
-    const open = () => {
-      panel.hidden = false;
-      trigger.setAttribute("aria-expanded", "true");
-      search.value = "";
-      getOptions().forEach((option) => {
-        option.hidden = false;
-      });
-      search.focus();
-    };
-
-    const choose = (option) => {
-      valueInput.value = option.dataset.value;
-      valueInput.setAttribute("value", option.dataset.value);
-      label.textContent = option.textContent.trim();
-      getOptions().forEach((item) => item.classList.toggle("active", item === option));
-      valueInput.dispatchEvent(new Event("change", { bubbles: true }));
-      close();
-      trigger.focus();
-    };
-
-    trigger.addEventListener("click", () => {
-      panel.hidden ? open() : close();
-    });
-
-    search.addEventListener("input", () => {
-      const query = search.value.trim().toLowerCase();
-      getOptions().forEach((option) => {
-        const haystack = `${option.textContent} ${option.dataset.value} ${option.dataset.labelKey}`.toLowerCase();
-        option.hidden = Boolean(query) && !haystack.includes(query);
-      });
-    });
-
-    select.addEventListener("click", (event) => {
-      const option = event.target.closest("[data-search-select-option]");
-      if (option && select.contains(option)) {
-        choose(option);
-      }
-    });
-
-    valueInput.addEventListener("change", () => {
-      const option = getOptions().find((item) => item.dataset.value === valueInput.value);
-      if (option) {
-        label.textContent = option.textContent.trim();
-        getOptions().forEach((item) => item.classList.toggle("active", item === option));
-      }
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!select.contains(event.target)) {
-        close();
-      }
-    });
-  });
-};
-
-const setSearchSelectOptions = (select, options, placeholderKey) => {
-  const optionsNode = select?.querySelector("[data-search-select-options]");
-  const valueInput = select?.querySelector("[data-search-select-value]");
-  const label = select?.querySelector("[data-search-select-label]");
-  const trigger = select?.querySelector("[data-search-select-trigger]");
-  if (!select || !optionsNode || !valueInput || !label || !trigger) {
-    return;
-  }
-
-  optionsNode.replaceChildren(...options.map((option) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.dataset.searchSelectOption = "";
-    button.dataset.value = option.value;
-    button.textContent = option.label;
-    return button;
-  }));
-
-  trigger.disabled = options.length === 0;
-  const selected = options.find((option) => option.value === valueInput.value);
-  if (selected) {
-    label.textContent = selected.label;
-  } else {
-    valueInput.value = "";
-    valueInput.removeAttribute("value");
-    label.dataset.i18n = placeholderKey;
-    setLanguage(getSavedLanguage());
-  }
 };
 
 const setupLocationSelects = async () => {

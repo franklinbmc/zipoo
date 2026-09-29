@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=45">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=46">
 </head>
 <body>
   <div class="app-shell settings-page-shell">
@@ -115,30 +115,119 @@
       </header>
       <div class="fullscreen-body">
         <div class="settings-list flush-list" data-business-manager-list></div>
-        <form class="settings-list nested-list business-create-form" data-business-manager-create-form>
-          <div class="settings-list-subhead">Create new business</div>
-          <label class="settings-list-row field-row">
-            <span>Business name</span>
-            <input type="text" name="business_name" placeholder="New company" required>
+        <div class="business-create-trigger-wrapper">
+          <button class="btn btn-primary full btn-with-icon" type="button" data-open-create-business>
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M256 112v288M112 256h288" />
+            </svg>
+            <span>Create new business</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="fullscreen-modal" hidden data-business-create-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="business-create-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-business-create-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="business-create-title">Create Business</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body fullscreen-flow-body">
+        <form class="entry-login register-flow business-create-flow" action="/api/businesses.php" method="post" novalidate data-business-create-flow>
+          <div class="flow-progress" aria-label="Creation progress">
+            <span class="flow-dot active"></span>
+            <span class="flow-dot"></span>
+            <span class="flow-dot"></span>
+            <span class="flow-dot"></span>
+          </div>
+          <span class="flow-count" data-create-flow-count>1 / 4</span>
+          <span class="eyebrow centered" data-create-flow-eyebrow>Business Information</span>
+          <h2 class="flow-title" data-create-flow-title>Name your business</h2>
+          <p class="flow-helper" data-create-flow-helper>Enter the official trading name of your business.</p>
+
+          <!-- Step 1: Business Name -->
+          <label class="flow-field active" data-create-flow-field>
+            <span>Business Name</span>
+            <input type="text" name="business_name" placeholder="e.g. Mwenge Supermarket" autocomplete="organization" required>
           </label>
-          <label class="settings-list-row field-row">
-            <span>Business type</span>
-            <select name="business_type">
-              <option value="retail">Retail</option>
-              <option value="service" selected>Service</option>
-              <option value="wholesale">Wholesale</option>
-            </select>
+
+          <!-- Step 2: Business Type (Search Select) -->
+          <label class="flow-field" data-create-flow-field hidden>
+            <span>Business Type</span>
+            <div class="search-select" data-search-select data-create-business-type>
+              <input type="hidden" name="business_type" value="service" required data-search-select-value>
+              <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+                <span data-search-select-label>Service</span>
+                <svg viewBox="0 0 512 512" aria-hidden="true">
+                  <path d="M112 184l144 144 144-144" />
+                </svg>
+              </button>
+              <div class="search-select-panel" hidden data-search-select-panel>
+                <input type="search" data-search-select-search placeholder="Search business type">
+                <div class="search-select-options" data-search-select-options>
+                  <button type="button" data-search-select-option data-value="retail">Retail</button>
+                  <button type="button" data-search-select-option data-value="service" class="active">Service</button>
+                  <button type="button" data-search-select-option data-value="wholesale">Wholesale</button>
+                </div>
+              </div>
+            </div>
           </label>
-          <label class="settings-list-row field-row">
+
+          <!-- Step 3: Region (Search Select) -->
+          <label class="flow-field" data-create-flow-field hidden>
             <span>Region</span>
-            <select name="region" required data-business-region></select>
+            <div class="search-select" data-search-select data-create-location="region">
+              <input type="hidden" name="region" required data-search-select-value>
+              <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+                <span data-search-select-label>Select Region</span>
+                <svg viewBox="0 0 512 512" aria-hidden="true">
+                  <path d="M112 184l144 144 144-144" />
+                </svg>
+              </button>
+              <div class="search-select-panel" hidden data-search-select-panel>
+                <input type="search" data-search-select-search placeholder="Search region">
+                <div class="search-select-options" data-search-select-options></div>
+              </div>
+            </div>
           </label>
-          <label class="settings-list-row field-row">
+
+          <!-- Step 4: District (Search Select) -->
+          <label class="flow-field" data-create-flow-field hidden>
             <span>District</span>
-            <select name="district" required data-business-district></select>
+            <div class="search-select" data-search-select data-create-location="district">
+              <input type="hidden" name="district" required data-search-select-value>
+              <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false" disabled>
+                <span data-search-select-label>Select District</span>
+                <svg viewBox="0 0 512 512" aria-hidden="true">
+                  <path d="M112 184l144 144 144-144" />
+                </svg>
+              </button>
+              <div class="search-select-panel" hidden data-search-select-panel>
+                <input type="search" data-search-select-search placeholder="Search district">
+                <div class="search-select-options" data-search-select-options></div>
+              </div>
+            </div>
           </label>
-          <p class="inline-error" hidden data-business-manager-error></p>
-          <button class="btn btn-primary full" type="submit">Create business</button>
+
+          <p class="inline-error" hidden data-create-flow-error></p>
+
+          <div class="flow-actions first-step">
+            <button class="btn btn-secondary icon-only" type="button" data-create-flow-back aria-label="Go back" hidden>
+              <svg viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M328 112L184 256l144 144" />
+              </svg>
+            </button>
+            <button class="btn btn-primary btn-with-icon" type="button" data-create-flow-next>
+              <span data-create-flow-next-label>Next</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true">
+                <path d="M184 112l144 144-144 144" />
+              </svg>
+            </button>
+          </div>
         </form>
       </div>
     </section>
@@ -152,6 +241,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=46" defer></script>
+  <script src="/assets/js/app.js?v=47" defer></script>
 </body>
 </html>
