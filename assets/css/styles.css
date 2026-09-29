@@ -2766,6 +2766,15 @@ button.settings-list-row:focus-visible {
 }
 
 @media (max-width: 640px) {
+  .fullscreen-flow-body {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .business-create-flow {
+    width: min(390px, 94vw);
+    max-width: 94vw;
+  }
   .quick-backdrop {
     padding: 0 0 10px;
   }
