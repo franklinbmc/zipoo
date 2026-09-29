@@ -1,4 +1,4 @@
-const CACHE_NAME = "zipoo-phase-1-v86";
+const CACHE_NAME = "zipoo-phase-1-v87";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -102,6 +102,7 @@ const APP_SHELL = [
   "./assets/js/app.js?v=52",
   "./assets/js/app.js?v=53",
   "./assets/js/app.js?v=54",
+  "./assets/js/app.js?v=55",
   "./assets/js/app.js?v=29",
   "./assets/js/app.js?v=30",
   "./assets/js/saas.js",
@@ -210,6 +211,7 @@ self.addEventListener("fetch", (event) => {
     )))
   );
 });
+
 
 
 

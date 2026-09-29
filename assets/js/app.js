@@ -293,6 +293,7 @@ const showConfirmModal = ({ title, message, confirmLabel = "Confirm", cancelLabe
     closeButton.removeEventListener("click", confirm);
     cancelButton.removeEventListener("click", cancel);
     actions.remove();
+    dialog.append(closeButton);
     closeButton.textContent = "OK";
     closeButton.className = "btn btn-primary full";
     resolve(value);
@@ -2212,15 +2213,16 @@ const setupCustomersPage = () => {
     if (createError) createError.hidden = true;
   };
 
-  const openEditModal = () => {
-    if (!currentCustomer) return;
+  const openEditModal = (customer = currentCustomer) => {
+    if (!customer) return;
+    currentCustomer = customer;
     if (editError) editError.hidden = true;
-    if (editId) editId.value = String(currentCustomer.id);
-    if (editFullName) editFullName.value = currentCustomer.full_name || "";
-    if (editPhone) editPhone.value = currentCustomer.phone || "";
-    if (editEmail) editEmail.value = currentCustomer.email || "";
-    if (editAddress) editAddress.value = currentCustomer.address || "";
-    if (editNotes) editNotes.value = currentCustomer.notes || "";
+    if (editId) editId.value = String(customer.id);
+    if (editFullName) editFullName.value = customer.full_name || "";
+    if (editPhone) editPhone.value = customer.phone || "";
+    if (editEmail) editEmail.value = customer.email || "";
+    if (editAddress) editAddress.value = customer.address || "";
+    if (editNotes) editNotes.value = customer.notes || "";
     if (editModal) editModal.hidden = false;
     editFullName?.focus();
   };
@@ -2237,20 +2239,28 @@ const setupCustomersPage = () => {
   editCloseBtn?.addEventListener("click", closeEditModal);
 
   detailEditBtn?.addEventListener("click", () => {
-    closeDetail();
-    openEditModal();
+    const cust = currentCustomer;
+    if (detailModal) detailModal.hidden = true;
+    openEditModal(cust);
   });
 
   detailDeleteBtn?.addEventListener("click", async () => {
     if (!currentCustomer) return;
-    const confirmDelete = window.confirm(`Are you sure you want to delete customer "${currentCustomer.full_name}"?`);
+    const customerToDelete = currentCustomer;
+    const confirmDelete = await showConfirmModal({
+      title: "Delete Customer",
+      message: `Are you sure you want to delete customer "${customerToDelete.full_name}"?`,
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+      danger: true,
+    });
     if (!confirmDelete) return;
 
     detailDeleteBtn.disabled = true;
     try {
       const formData = new FormData();
       formData.set("action", "delete");
-      formData.set("customer_id", String(currentCustomer.id));
+      formData.set("customer_id", String(customerToDelete.id));
 
       const res = await fetch(`${getBasePath()}api/customers.php`, {
         method: "POST",
@@ -2263,7 +2273,7 @@ const setupCustomersPage = () => {
 
       closeDetail();
       await loadCustomers(searchInput?.value || "");
-      await showAppModal("Customer Deleted", "Customer has been successfully removed.");
+      await showAppModal("Customer Deleted", `Customer "${customerToDelete.full_name}" has been removed.`);
     } catch (err) {
       await showAppModal("Error", err.message || "Could not delete customer.");
     } finally {
