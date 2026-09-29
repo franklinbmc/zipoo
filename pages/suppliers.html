@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#F6F8FC">
+  <meta name="description" content="Manage Zipoo suppliers and purchases.">
+  <title>Suppliers - Zipoo</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=55">
+</head>
+<body>
+  <div class="app-shell customers-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
+      </a>
+      <h1>Suppliers</h1>
+      <button class="icon-button" type="button" data-open-create-supplier aria-label="Add supplier">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M256 112v288M112 256h288" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="customers-page" data-suppliers-page>
+      <div class="customers-search-wrap">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+        </svg>
+        <input type="search" class="customers-search-input" data-suppliers-search placeholder="Search suppliers by name, phone...">
+      </div>
+
+      <div class="settings-list flush-list customers-list" data-suppliers-list></div>
+
+      <div class="customers-empty-state" hidden data-suppliers-empty style="text-align: center; padding: 48px 16px; background: #fff; border: 1px solid var(--color-line); border-radius: 12px;">
+        <div style="font-size: 2.2rem; margin-bottom: 8px;">🚚</div>
+        <h3 style="margin: 0 0 6px; color: var(--color-navy); font-size: 1.15rem; font-weight: 800;">No suppliers found</h3>
+        <p style="margin: 0 0 16px; color: var(--color-muted); font-size: 0.9rem;">Add your first supplier to start tracking their details and purchases.</p>
+        <button class="btn btn-primary btn-sm" type="button" data-open-create-supplier>Add Supplier</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- Supplier Full Details Modal -->
+  <div class="fullscreen-modal" hidden data-supplier-detail-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="supplier-detail-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-supplier-detail-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="supplier-detail-title">Supplier Details</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body customer-detail-body">
+        <div class="customer-detail-hero">
+          <div class="customer-avatar" data-supplier-detail-avatar>S</div>
+          <h3 data-supplier-detail-name>-</h3>
+          <span class="customer-meta" data-supplier-detail-contact>-</span>
+        </div>
+
+        <div class="customer-sales-card">
+          <div class="sales-stat-item">
+            <span class="stat-label">Total Purchases Done</span>
+            <strong class="stat-value" data-supplier-detail-total-purchases>TZS 0</strong>
+          </div>
+          <div class="sales-stat-item">
+            <span class="stat-label">Transactions</span>
+            <strong class="stat-value" data-supplier-detail-purchases-count>0</strong>
+          </div>
+        </div>
+
+        <div class="settings-list flush-list" style="border: 1px solid var(--color-line); border-radius: 12px; margin-top: 14px;">
+          <div class="settings-list-row field-display-row">
+            <span>Phone</span>
+            <strong data-supplier-detail-phone>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Email</span>
+            <strong data-supplier-detail-email>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Address</span>
+            <strong data-supplier-detail-address>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Notes</span>
+            <strong data-supplier-detail-notes>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>Registered</span>
+            <strong data-supplier-detail-created-at>-</strong>
+          </div>
+        </div>
+
+        <div class="customer-detail-actions" style="margin-top: 24px; display: grid; gap: 10px;">
+          <button class="btn btn-primary full" type="button" data-supplier-detail-edit-btn>Edit supplier</button>
+          <button class="btn btn-danger-outline full" type="button" data-supplier-detail-delete-btn>Delete supplier</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Supplier Create Modal -->
+  <div class="fullscreen-modal" hidden data-supplier-create-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="supplier-create-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-supplier-create-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="supplier-create-title">Add Supplier</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-supplier-create-form novalidate>
+        <label class="form-field">
+          <span>Supplier / Company Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="supplier_name" placeholder="e.g. ABC Wholesalers Ltd" required>
+        </label>
+        <label class="form-field">
+          <span>Phone</span>
+          <input type="tel" name="phone" placeholder="e.g. 0712345678">
+        </label>
+        <label class="form-field">
+          <span>Email</span>
+          <input type="email" name="email" placeholder="e.g. info@supplier.com">
+        </label>
+        <label class="form-field">
+          <span>Address</span>
+          <input type="text" name="address" placeholder="e.g. Kariakoo, Dar es Salaam">
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="3" placeholder="Optional notes..."></textarea>
+        </label>
+        <p class="inline-error" hidden data-supplier-create-error></p>
+        <button class="btn btn-primary full" type="submit" data-supplier-create-submit>Save Supplier</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Supplier Edit Modal -->
+  <div class="fullscreen-modal" hidden data-supplier-edit-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="supplier-edit-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-supplier-edit-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="supplier-edit-title">Edit Supplier</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-supplier-edit-form novalidate>
+        <input type="hidden" name="supplier_id" data-edit-supplier-id>
+        <label class="form-field">
+          <span>Supplier / Company Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="supplier_name" data-edit-supplier-name required>
+        </label>
+        <label class="form-field">
+          <span>Phone</span>
+          <input type="tel" name="phone" data-edit-supplier-phone>
+        </label>
+        <label class="form-field">
+          <span>Email</span>
+          <input type="email" name="email" data-edit-supplier-email>
+        </label>
+        <label class="form-field">
+          <span>Address</span>
+          <input type="text" name="address" data-edit-supplier-address>
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="3" data-edit-supplier-notes></textarea>
+        </label>
+        <p class="inline-error" hidden data-supplier-edit-error></p>
+        <button class="btn btn-primary full" type="submit" data-supplier-edit-submit>Update Supplier</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- App Notice Modal -->
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-close>OK</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=57" defer></script>
+</body>
+</html>

@@ -2383,6 +2383,312 @@ const setupCustomersPage = () => {
   loadCustomers();
 };
 
+const setupSuppliersPage = () => {
+  const page = document.querySelector("[data-suppliers-page]");
+  if (!page) {
+    return;
+  }
+
+  const suppliersList = document.querySelector("[data-suppliers-list]");
+  const suppliersEmpty = document.querySelector("[data-suppliers-empty]");
+  const searchInput = document.querySelector("[data-suppliers-search]");
+  const openCreateButtons = document.querySelectorAll("[data-open-create-supplier]");
+
+  // Create Modal elements
+  const createModal = document.querySelector("[data-supplier-create-modal]");
+  const createCloseBtn = document.querySelector("[data-supplier-create-close]");
+  const createForm = document.querySelector("[data-supplier-create-form]");
+  const createError = document.querySelector("[data-supplier-create-error]");
+  const createSubmit = document.querySelector("[data-supplier-create-submit]");
+
+  // Detail Modal elements
+  const detailModal = document.querySelector("[data-supplier-detail-modal]");
+  const detailCloseBtn = document.querySelector("[data-supplier-detail-close]");
+  const detailAvatar = document.querySelector("[data-supplier-detail-avatar]");
+  const detailName = document.querySelector("[data-supplier-detail-name]");
+  const detailContact = document.querySelector("[data-supplier-detail-contact]");
+  const detailTotalPurchases = document.querySelector("[data-supplier-detail-total-purchases]");
+  const detailPurchasesCount = document.querySelector("[data-supplier-detail-purchases-count]");
+  const detailPhone = document.querySelector("[data-supplier-detail-phone]");
+  const detailEmail = document.querySelector("[data-supplier-detail-email]");
+  const detailAddress = document.querySelector("[data-supplier-detail-address]");
+  const detailNotes = document.querySelector("[data-supplier-detail-notes]");
+  const detailCreatedAt = document.querySelector("[data-supplier-detail-created-at]");
+  const detailEditBtn = document.querySelector("[data-supplier-detail-edit-btn]");
+  const detailDeleteBtn = document.querySelector("[data-supplier-detail-delete-btn]");
+
+  // Edit Modal elements
+  const editModal = document.querySelector("[data-supplier-edit-modal]");
+  const editCloseBtn = document.querySelector("[data-supplier-edit-close]");
+  const editForm = document.querySelector("[data-supplier-edit-form]");
+  const editError = document.querySelector("[data-supplier-edit-error]");
+  const editSubmit = document.querySelector("[data-supplier-edit-submit]");
+  const editId = document.querySelector("[data-edit-supplier-id]");
+  const editSupplierName = document.querySelector("[data-edit-supplier-name]");
+  const editPhone = document.querySelector("[data-edit-supplier-phone]");
+  const editEmail = document.querySelector("[data-edit-supplier-email]");
+  const editAddress = document.querySelector("[data-edit-supplier-address]");
+  const editNotes = document.querySelector("[data-edit-supplier-notes]");
+
+  let currentSupplier = null;
+  let cachedSuppliers = [];
+
+  const formatTzs = (amount) => {
+    const val = Number(amount) || 0;
+    return "TZS " + val.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    try {
+      const d = new Date(dateStr.replace(" ", "T"));
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const renderSupplierRows = (suppliers) => {
+    if (!suppliers || !suppliers.length) {
+      if (suppliersList) suppliersList.replaceChildren();
+      if (suppliersEmpty) suppliersEmpty.hidden = false;
+      return;
+    }
+
+    if (suppliersEmpty) suppliersEmpty.hidden = true;
+
+    suppliersList?.replaceChildren(...suppliers.map((supplier) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "settings-list-row customer-row";
+      row.dataset.supplierId = String(supplier.id);
+
+      const name = document.createElement("span");
+      name.className = "customer-row-name";
+      name.textContent = supplier.supplier_name || supplier.full_name;
+
+      const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      chevron.setAttribute("viewBox", "0 0 512 512");
+      chevron.setAttribute("aria-hidden", "true");
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", "M184 112l144 144-144 144");
+      chevron.append(path);
+
+      row.append(name, chevron);
+      row.addEventListener("click", () => openSupplierDetail(supplier));
+      return row;
+    }));
+  };
+
+  const loadSuppliers = async (searchQuery = "") => {
+    try {
+      const url = `${getBasePath()}api/suppliers.php` + (searchQuery ? `?q=${encodeURIComponent(searchQuery)}` : "");
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to load suppliers.");
+      }
+      cachedSuppliers = Array.isArray(data.suppliers) ? data.suppliers : [];
+      renderSupplierRows(cachedSuppliers);
+    } catch (err) {
+      if (suppliersList) suppliersList.replaceChildren();
+      if (suppliersEmpty) {
+        suppliersEmpty.hidden = false;
+        const msg = suppliersEmpty.querySelector("p");
+        if (msg) msg.textContent = err.message || "Unable to load suppliers.";
+      }
+    }
+  };
+
+  const openSupplierDetail = (supplier) => {
+    currentSupplier = supplier;
+    const name = supplier.supplier_name || supplier.full_name || "-";
+    if (detailAvatar) {
+      detailAvatar.textContent = (name ? name.trim().charAt(0).toUpperCase() : "S");
+    }
+    if (detailName) detailName.textContent = name;
+    if (detailContact) {
+      detailContact.textContent = [supplier.phone, supplier.email].filter(Boolean).join(" • ") || "No contact info";
+    }
+    if (detailTotalPurchases) detailTotalPurchases.textContent = formatTzs(supplier.total_purchases);
+    if (detailPurchasesCount) detailPurchasesCount.textContent = String(supplier.purchases_count || 0);
+    if (detailPhone) detailPhone.textContent = supplier.phone || "-";
+    if (detailEmail) detailEmail.textContent = supplier.email || "-";
+    if (detailAddress) detailAddress.textContent = supplier.address || "-";
+    if (detailNotes) detailNotes.textContent = supplier.notes || "-";
+    if (detailCreatedAt) detailCreatedAt.textContent = formatDate(supplier.created_at);
+
+    if (detailModal) detailModal.hidden = false;
+  };
+
+  const closeDetail = () => {
+    if (detailModal) detailModal.hidden = true;
+    currentSupplier = null;
+  };
+
+  const openCreateModal = () => {
+    if (createError) createError.hidden = true;
+    createForm?.reset();
+    if (createModal) createModal.hidden = false;
+    createForm?.querySelector('input[name="supplier_name"]')?.focus();
+  };
+
+  const closeCreateModal = () => {
+    if (createModal) createModal.hidden = true;
+    if (createError) createError.hidden = true;
+  };
+
+  const openEditModal = (supplier = currentSupplier) => {
+    if (!supplier) return;
+    currentSupplier = supplier;
+    if (editError) editError.hidden = true;
+    if (editId) editId.value = String(supplier.id);
+    if (editSupplierName) editSupplierName.value = supplier.supplier_name || supplier.full_name || "";
+    if (editPhone) editPhone.value = supplier.phone || "";
+    if (editEmail) editEmail.value = supplier.email || "";
+    if (editAddress) editAddress.value = supplier.address || "";
+    if (editNotes) editNotes.value = supplier.notes || "";
+    if (editModal) editModal.hidden = false;
+    editSupplierName?.focus();
+  };
+
+  const closeEditModal = () => {
+    if (editModal) editModal.hidden = true;
+    if (editError) editError.hidden = true;
+  };
+
+  // Event handlers
+  openCreateButtons.forEach((btn) => btn.addEventListener("click", openCreateModal));
+  createCloseBtn?.addEventListener("click", closeCreateModal);
+  detailCloseBtn?.addEventListener("click", closeDetail);
+  editCloseBtn?.addEventListener("click", closeEditModal);
+
+  detailEditBtn?.addEventListener("click", () => {
+    const supp = currentSupplier;
+    if (detailModal) detailModal.hidden = true;
+    openEditModal(supp);
+  });
+
+  detailDeleteBtn?.addEventListener("click", async () => {
+    if (!currentSupplier) return;
+    const supplierToDelete = currentSupplier;
+    const displayName = supplierToDelete.supplier_name || supplierToDelete.full_name;
+    const confirmDelete = await showConfirmModal({
+      title: "Delete Supplier",
+      message: `Are you sure you want to delete supplier "${displayName}"?`,
+      confirmLabel: "Delete",
+      cancelLabel: "Cancel",
+      danger: true,
+    });
+    if (!confirmDelete) return;
+
+    detailDeleteBtn.disabled = true;
+    try {
+      const formData = new FormData();
+      formData.set("action", "delete");
+      formData.set("supplier_id", String(supplierToDelete.id));
+
+      const res = await fetch(`${getBasePath()}api/suppliers.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to delete supplier.");
+      }
+
+      closeDetail();
+      await loadSuppliers(searchInput?.value || "");
+      await showAppModal("Supplier Deleted", `Supplier "${displayName}" has been removed.`);
+    } catch (err) {
+      await showAppModal("Error", err.message || "Could not delete supplier.");
+    } finally {
+      detailDeleteBtn.disabled = false;
+    }
+  });
+
+  createForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (createError) createError.hidden = true;
+    if (createSubmit) createSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(createForm);
+      formData.set("action", "create");
+
+      const res = await fetch(`${getBasePath()}api/suppliers.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to add supplier.");
+      }
+
+      closeCreateModal();
+      createForm.reset();
+      await loadSuppliers();
+      if (data.supplier) {
+        openSupplierDetail(data.supplier);
+      }
+      const sName = data.supplier?.supplier_name || data.supplier?.full_name || "Supplier";
+      await showAppModal("Supplier Added", `${sName} has been added successfully.`);
+    } catch (err) {
+      if (createError) {
+        createError.textContent = err.message || "Failed to save supplier.";
+        createError.hidden = false;
+      }
+    } finally {
+      if (createSubmit) createSubmit.disabled = false;
+    }
+  });
+
+  editForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (editError) editError.hidden = true;
+    if (editSubmit) editSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(editForm);
+      formData.set("action", "update");
+
+      const res = await fetch(`${getBasePath()}api/suppliers.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to update supplier.");
+      }
+
+      closeEditModal();
+      await loadSuppliers(searchInput?.value || "");
+      if (data.supplier) {
+        openSupplierDetail(data.supplier);
+      }
+      await showAppModal("Supplier Updated", "Supplier details updated successfully.");
+    } catch (err) {
+      if (editError) {
+        editError.textContent = err.message || "Failed to update supplier.";
+        editError.hidden = false;
+      }
+    } finally {
+      if (editSubmit) editSubmit.disabled = false;
+    }
+  });
+
+  let searchTimeout;
+  searchInput?.addEventListener("input", (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      loadSuppliers(e.target.value.trim());
+    }, 250);
+  });
+
+  // Initial load
+  loadSuppliers();
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.lang));
@@ -2397,6 +2703,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupLocationSelects().finally(setupRegisterFlow);
   setupSettingsPage();
   setupCustomersPage();
+  setupSuppliersPage();
   updateConnectionStatus();
   registerServiceWorker();
 });
