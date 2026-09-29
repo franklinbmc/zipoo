@@ -72,9 +72,32 @@ function customer_payload(array $row): array
     ];
 }
 
+function ensure_customers_table(PDO $pdo): void
+{
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS tbl_customers (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            business_id BIGINT UNSIGNED NOT NULL,
+            full_name VARCHAR(190) NOT NULL,
+            phone VARCHAR(50) NULL,
+            email VARCHAR(190) NULL,
+            address VARCHAR(255) NULL,
+            notes TEXT NULL,
+            total_sales DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+            sales_count INT UNSIGNED NOT NULL DEFAULT 0,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            KEY idx_business (business_id),
+            KEY idx_business_name (business_id, full_name),
+            KEY idx_phone (phone)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+}
+
 try {
     $userId = require_user();
     $pdo = db();
+    ensure_customers_table($pdo);
     $businessId = get_active_business_id($pdo, $userId);
 
     if ($businessId <= 0) {
