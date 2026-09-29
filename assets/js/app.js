@@ -276,11 +276,16 @@ const showConfirmModal = ({ title, message, confirmLabel = "Confirm", cancelLabe
 
   const actions = document.createElement("div");
   actions.className = "modal-actions";
+  actions.style.display = "grid";
+  actions.style.gridTemplateColumns = "1fr 1fr";
+  actions.style.gap = "10px";
+  actions.style.marginTop = "8px";
+  actions.style.width = "100%";
   actions.dataset.appModalExtra = "";
 
   const cancelButton = document.createElement("button");
   cancelButton.type = "button";
-  cancelButton.className = "btn btn-secondary";
+  cancelButton.className = "btn btn-secondary full";
   cancelButton.textContent = cancelLabel;
 
   closeButton.textContent = confirmLabel;
@@ -288,22 +293,38 @@ const showConfirmModal = ({ title, message, confirmLabel = "Confirm", cancelLabe
   actions.append(cancelButton, closeButton);
   dialog.append(actions);
 
+  let finished = false;
   const finish = (value) => {
+    if (finished) return;
+    finished = true;
     modal.hidden = true;
     closeButton.removeEventListener("click", confirm);
     cancelButton.removeEventListener("click", cancel);
+    document.removeEventListener("keydown", onKeydown);
     actions.remove();
     dialog.append(closeButton);
     closeButton.textContent = "OK";
     closeButton.className = "btn btn-primary full";
     resolve(value);
   };
-  const confirm = () => finish(true);
-  const cancel = () => finish(false);
+  const confirm = (e) => {
+    e?.preventDefault();
+    finish(true);
+  };
+  const cancel = (e) => {
+    e?.preventDefault();
+    finish(false);
+  };
+  const onKeydown = (e) => {
+    if (e.key === "Escape") {
+      finish(false);
+    }
+  };
 
   titleEl.textContent = title;
   messageEl.textContent = message;
   modal.hidden = false;
+  document.addEventListener("keydown", onKeydown);
   closeButton.addEventListener("click", confirm);
   cancelButton.addEventListener("click", cancel);
   cancelButton.focus();

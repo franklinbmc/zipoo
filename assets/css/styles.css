@@ -1331,11 +1331,12 @@ body.offline .status-dot {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 40;
+  z-index: 100;
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgba(18, 35, 63, 0.36);
+  background: rgba(18, 35, 63, 0.45);
+  backdrop-filter: blur(4px);
 }
 
 .modal-backdrop[hidden] {
@@ -1375,10 +1376,17 @@ body.offline .status-dot {
 }
 
 .modal-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 4px;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: center;
+  gap: 10px !important;
+  width: 100% !important;
+  margin-top: 8px !important;
+}
+
+.modal-actions .btn {
+  width: 100% !important;
+  min-height: 44px;
 }
 
 .settings-modal-header {
