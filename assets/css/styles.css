@@ -3154,4 +3154,85 @@ button.settings-list-row:focus-visible {
   word-break: break-word;
 }
 
+.settings-subcard {
+  background: #f8fafc;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.settings-subcard-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-navy);
+}
+
+.settings-subcard-desc {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  line-height: 1.4;
+}
+
+.badge-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge-status.pending {
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
+}
+
+.badge-status.approved {
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+}
+
+.badge-status.rejected {
+  background: rgba(239, 68, 68, 0.14);
+  color: #b91c1c;
+}
+
+.lang-option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--color-navy);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.lang-option-row.active {
+  border-color: var(--color-blue);
+  background: rgba(20, 119, 255, 0.06);
+  color: var(--color-blue);
+}
+
+.lang-check-icon {
+  width: 20px;
+  height: 20px;
+  stroke: var(--color-blue);
+  stroke-width: 32;
+  fill: none;
+}
+
 

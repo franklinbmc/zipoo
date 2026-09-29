@@ -1569,6 +1569,436 @@ const setupSettingsPage = () => {
     render();
     renderBusinessManager();
   });
+  setupSystemSettings();
+};
+
+const setupSystemSettings = () => {
+  const page = document.querySelector("[data-settings-page]");
+  if (!page) return;
+
+  // Indicators
+  const smtpStatusLabel = document.querySelector("[data-settings-smtp-status]");
+  const smsSenderIdLabel = document.querySelector("[data-settings-sms-sender-id]");
+  const senderIdCountLabel = document.querySelector("[data-settings-sender-id-count]");
+  const languageLabel = document.querySelector("[data-settings-language-label]");
+  const generalSummaryLabel = document.querySelector("[data-settings-general-summary]");
+
+  // Triggers
+  const openSmtpBtn = document.querySelector("[data-open-smtp-settings]");
+  const openSmsBtn = document.querySelector("[data-open-sms-settings]");
+  const openSenderIdBtn = document.querySelector("[data-open-sender-id-modal]");
+  const openSenderIdFromSmsBtn = document.querySelector("[data-open-sender-id-modal-from-sms]");
+  const openLanguageBtn = document.querySelector("[data-open-language-modal]");
+  const openGeneralBtn = document.querySelector("[data-open-general-settings]");
+
+  // Modals & Forms
+  const smtpModal = document.querySelector("[data-smtp-modal]");
+  const smtpCloseBtn = document.querySelector("[data-smtp-close]");
+  const smtpForm = document.querySelector("[data-smtp-form]");
+  const smtpError = document.querySelector("[data-smtp-error]");
+  const smtpSubmit = document.querySelector("[data-smtp-submit]");
+  const smtpTestForm = document.querySelector("[data-smtp-test-form]");
+  const smtpTestError = document.querySelector("[data-smtp-test-error]");
+  const smtpTestSubmit = document.querySelector("[data-smtp-test-submit]");
+
+  const smsModal = document.querySelector("[data-sms-modal]");
+  const smsCloseBtn = document.querySelector("[data-sms-close]");
+  const smsForm = document.querySelector("[data-sms-form]");
+  const smsError = document.querySelector("[data-sms-error]");
+  const smsSubmit = document.querySelector("[data-sms-submit]");
+  const smsTestForm = document.querySelector("[data-sms-test-form]");
+  const smsTestError = document.querySelector("[data-sms-test-error]");
+  const smsTestSubmit = document.querySelector("[data-sms-test-submit]");
+
+  const senderIdModal = document.querySelector("[data-sender-id-modal]");
+  const senderIdCloseBtn = document.querySelector("[data-sender-id-close]");
+  const senderIdForm = document.querySelector("[data-sender-id-form]");
+  const senderIdError = document.querySelector("[data-sender-id-error]");
+  const senderIdSubmit = document.querySelector("[data-sender-id-submit]");
+  const senderIdRequestsList = document.querySelector("[data-sender-id-requests-list]");
+
+  const languageModal = document.querySelector("[data-language-modal]");
+  const languageCloseBtn = document.querySelector("[data-language-close]");
+  const langChoiceButtons = document.querySelectorAll("[data-lang-choice]");
+
+  const generalModal = document.querySelector("[data-general-settings-modal]");
+  const generalCloseBtn = document.querySelector("[data-general-settings-close]");
+  const generalForm = document.querySelector("[data-general-settings-form]");
+  const generalError = document.querySelector("[data-general-settings-error]");
+  const generalSubmit = document.querySelector("[data-general-settings-submit]");
+
+  let cachedSettings = { smtp: {}, sms: {}, general: {}, sender_id_requests: [] };
+
+  const updateLanguageLabel = () => {
+    const lang = getSavedLanguage();
+    if (languageLabel) {
+      languageLabel.textContent = lang === "sw" ? "Kiswahili" : "English";
+    }
+    langChoiceButtons.forEach((btn) => {
+      const isActive = btn.dataset.langChoice === lang;
+      btn.classList.toggle("active", isActive);
+      const icon = btn.querySelector(".lang-check-icon");
+      if (icon) icon.style.opacity = isActive ? "1" : "0";
+    });
+  };
+
+  const renderSenderIdRequests = (requests = []) => {
+    if (!senderIdRequestsList) return;
+    if (!requests || !requests.length) {
+      senderIdRequestsList.innerHTML = `
+        <div style="padding: 16px; text-align: center; color: var(--color-muted); font-size: 0.88rem;">
+          No Sender ID requests submitted yet.
+        </div>`;
+      return;
+    }
+
+    senderIdRequestsList.innerHTML = requests.map((req) => {
+      const statusClass = req.status === "approved" ? "approved" : (req.status === "rejected" ? "rejected" : "pending");
+      const statusText = req.status === "approved" ? "Approved" : (req.status === "rejected" ? "Rejected" : "Pending Approval");
+      const dateText = req.created_at ? req.created_at.split(" ")[0] : "";
+      return `
+        <div class="settings-list-row field-display-row" style="display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <strong style="color: var(--color-navy); font-size: 1rem; letter-spacing: 0.04em;">${req.sender_id}</strong>
+            <span class="badge-status ${statusClass}">${statusText}</span>
+          </div>
+          <div style="font-size: 0.82rem; color: var(--color-text);">${req.company_name} &bull; ${req.purpose}</div>
+          ${dateText ? `<div style="font-size: 0.75rem; color: var(--color-muted);">Submitted: ${dateText}</div>` : ""}
+          ${req.admin_notes ? `<div style="font-size: 0.78rem; color: var(--color-danger); background: rgba(239, 68, 68, 0.08); padding: 4px 8px; border-radius: 4px;">Note: ${req.admin_notes}</div>` : ""}
+        </div>
+      `;
+    }).join("");
+  };
+
+  const loadSettings = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/settings.php`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.ok) return;
+
+      cachedSettings = data;
+
+      // Update SMTP label
+      if (smtpStatusLabel) {
+        smtpStatusLabel.textContent = data.smtp?.smtp_host ? "Configured" : "Configure";
+      }
+
+      // Update SMS label
+      if (smsSenderIdLabel) {
+        smsSenderIdLabel.textContent = data.sms?.sender_id || "MEGASMS";
+      }
+
+      // Update Sender ID count
+      if (senderIdCountLabel) {
+        const pendingCount = (data.sender_id_requests || []).filter(r => r.status === "pending").length;
+        if (pendingCount > 0) {
+          senderIdCountLabel.textContent = `${pendingCount} pending`;
+        } else if ((data.sender_id_requests || []).length > 0) {
+          senderIdCountLabel.textContent = `${data.sender_id_requests.length} requests`;
+        } else {
+          senderIdCountLabel.textContent = "Request";
+        }
+      }
+
+      // Update General summary
+      if (generalSummaryLabel) {
+        const cur = data.general?.currency || "TZS";
+        const tz = (data.general?.timezone || "Dar_es_Salaam").split("/").pop();
+        generalSummaryLabel.textContent = `${cur} • ${tz}`;
+      }
+
+      renderSenderIdRequests(data.sender_id_requests || []);
+    } catch {
+      // Quiet fail if network/api is offline
+    }
+  };
+
+  // Open modals & populate
+  openSmtpBtn?.addEventListener("click", () => {
+    if (smtpError) smtpError.hidden = true;
+    if (smtpForm) {
+      smtpForm.elements["smtp_host"].value = cachedSettings.smtp?.smtp_host || "";
+      smtpForm.elements["smtp_port"].value = cachedSettings.smtp?.smtp_port || "587";
+      smtpForm.elements["smtp_username"].value = cachedSettings.smtp?.smtp_username || "";
+      smtpForm.elements["smtp_password"].value = "";
+      smtpForm.elements["from_email"].value = cachedSettings.smtp?.from_email || "";
+      smtpForm.elements["smtp_encryption"].value = cachedSettings.smtp?.smtp_encryption || "tls";
+    }
+    if (smtpModal) smtpModal.hidden = false;
+  });
+
+  smtpCloseBtn?.addEventListener("click", () => {
+    if (smtpModal) smtpModal.hidden = true;
+  });
+
+  smtpForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (smtpError) smtpError.hidden = true;
+    if (smtpSubmit) smtpSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(smtpForm);
+      formData.set("action", "save_smtp");
+
+      const res = await fetch(`${getBasePath()}api/settings.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to save SMTP settings.");
+      }
+
+      await loadSettings();
+      if (smtpModal) smtpModal.hidden = true;
+      await showAppModal("SMTP Settings Saved", "Your SMTP server settings have been updated.");
+    } catch (err) {
+      if (smtpError) {
+        smtpError.textContent = err.message || "Failed to save SMTP settings.";
+        smtpError.hidden = false;
+      }
+    } finally {
+      if (smtpSubmit) smtpSubmit.disabled = false;
+    }
+  });
+
+  smtpTestForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (smtpTestError) smtpTestError.hidden = true;
+    if (smtpTestSubmit) smtpTestSubmit.disabled = true;
+    const origText = smtpTestSubmit?.textContent;
+    if (smtpTestSubmit) smtpTestSubmit.textContent = "Sending test email...";
+
+    try {
+      const formData = new FormData(smtpTestForm);
+      formData.set("action", "test_smtp");
+
+      const res = await fetch(`${getBasePath()}api/settings.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Test email failed.");
+      }
+
+      await showAppModal("Test Email Sent", data.message || "Check your recipient inbox to confirm delivery.");
+    } catch (err) {
+      if (smtpTestError) {
+        smtpTestError.textContent = err.message || "Test email failed.";
+        smtpTestError.hidden = false;
+      }
+    } finally {
+      if (smtpTestSubmit) {
+        smtpTestSubmit.disabled = false;
+        smtpTestSubmit.textContent = origText;
+      }
+    }
+  });
+
+  // SMS Modal
+  openSmsBtn?.addEventListener("click", () => {
+    if (smsError) smsError.hidden = true;
+    if (smsForm) {
+      smsForm.elements["api_url"].value = cachedSettings.sms?.api_url || "https://megasms.co.tz/api/v1";
+      smsForm.elements["api_key"].value = "";
+      smsForm.elements["sender_id"].value = cachedSettings.sms?.sender_id || "MEGASMS";
+    }
+    if (smsModal) smsModal.hidden = false;
+  });
+
+  smsCloseBtn?.addEventListener("click", () => {
+    if (smsModal) smsModal.hidden = true;
+  });
+
+  smsForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (smsError) smsError.hidden = true;
+    if (smsSubmit) smsSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(smsForm);
+      formData.set("action", "save_sms");
+
+      const res = await fetch(`${getBasePath()}api/settings.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to save SMS settings.");
+      }
+
+      await loadSettings();
+      if (smsModal) smsModal.hidden = true;
+      await showAppModal("SMS Settings Saved", "MegaSMS gateway settings have been updated.");
+    } catch (err) {
+      if (smsError) {
+        smsError.textContent = err.message || "Failed to save SMS settings.";
+        smsError.hidden = false;
+      }
+    } finally {
+      if (smsSubmit) smsSubmit.disabled = false;
+    }
+  });
+
+  smsTestForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (smsTestError) smsTestError.hidden = true;
+    if (smsTestSubmit) smsTestSubmit.disabled = true;
+    const origText = smsTestSubmit?.textContent;
+    if (smsTestSubmit) smsTestSubmit.textContent = "Sending test SMS...";
+
+    try {
+      const formData = new FormData(smsTestForm);
+      formData.set("action", "test_sms");
+
+      const res = await fetch(`${getBasePath()}api/settings.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Test SMS failed.");
+      }
+
+      await showAppModal("Test SMS Sent", data.message || "Check the mobile handset for delivery.");
+    } catch (err) {
+      if (smsTestError) {
+        smsTestError.textContent = err.message || "Test SMS failed.";
+        smsTestError.hidden = false;
+      }
+    } finally {
+      if (smsTestSubmit) {
+        smsTestSubmit.disabled = false;
+        smsTestSubmit.textContent = origText;
+      }
+    }
+  });
+
+  // Sender ID Modal
+  const openSenderIdModal = () => {
+    if (senderIdError) senderIdError.hidden = true;
+    senderIdForm?.reset();
+    renderSenderIdRequests(cachedSettings.sender_id_requests || []);
+    if (senderIdModal) senderIdModal.hidden = false;
+  };
+
+  openSenderIdBtn?.addEventListener("click", openSenderIdModal);
+  openSenderIdFromSmsBtn?.addEventListener("click", () => {
+    if (smsModal) smsModal.hidden = true;
+    openSenderIdModal();
+  });
+
+  senderIdCloseBtn?.addEventListener("click", () => {
+    if (senderIdModal) senderIdModal.hidden = true;
+  });
+
+  senderIdForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (senderIdError) senderIdError.hidden = true;
+    if (senderIdSubmit) senderIdSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(senderIdForm);
+      formData.set("action", "request_sender_id");
+
+      const res = await fetch(`${getBasePath()}api/settings.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to submit Sender ID request.");
+      }
+
+      senderIdForm.reset();
+      await loadSettings();
+      await showAppModal("Request Submitted", data.message || "Your Sender ID request was submitted to MegaSMS for telecom operator approval.");
+    } catch (err) {
+      if (senderIdError) {
+        senderIdError.textContent = err.message || "Failed to submit request.";
+        senderIdError.hidden = false;
+      }
+    } finally {
+      if (senderIdSubmit) senderIdSubmit.disabled = false;
+    }
+  });
+
+  // Language Modal
+  openLanguageBtn?.addEventListener("click", () => {
+    updateLanguageLabel();
+    if (languageModal) languageModal.hidden = false;
+  });
+
+  languageCloseBtn?.addEventListener("click", () => {
+    if (languageModal) languageModal.hidden = true;
+  });
+
+  langChoiceButtons.forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const lang = btn.dataset.langChoice;
+      if (!lang) return;
+      await setLanguage(lang);
+      updateLanguageLabel();
+      if (languageModal) languageModal.hidden = true;
+      const langTitle = lang === "sw" ? "Lugha Imebadilishwa" : "Language Changed";
+      const langDesc = lang === "sw" ? "Mfumo sasa unatumia Kiswahili." : "Application language updated to English.";
+      await showAppModal(langTitle, langDesc);
+    });
+  });
+
+  // General Settings Modal
+  openGeneralBtn?.addEventListener("click", () => {
+    if (generalError) generalError.hidden = true;
+    if (generalForm) {
+      generalForm.elements["currency"].value = cachedSettings.general?.currency || "TZS";
+      generalForm.elements["timezone"].value = cachedSettings.general?.timezone || "Africa/Dar_es_Salaam";
+      generalForm.elements["tax_rate"].value = cachedSettings.general?.tax_rate || "18";
+      generalForm.elements["receipt_footer"].value = cachedSettings.general?.receipt_footer || "";
+    }
+    if (generalModal) generalModal.hidden = false;
+  });
+
+  generalCloseBtn?.addEventListener("click", () => {
+    if (generalModal) generalModal.hidden = true;
+  });
+
+  generalForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (generalError) generalError.hidden = true;
+    if (generalSubmit) generalSubmit.disabled = true;
+
+    try {
+      const formData = new FormData(generalForm);
+      formData.set("action", "save_general");
+
+      const res = await fetch(`${getBasePath()}api/settings.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to save preferences.");
+      }
+
+      await loadSettings();
+      if (generalModal) generalModal.hidden = true;
+      await showAppModal("Preferences Saved", "Your general preferences have been updated.");
+    } catch (err) {
+      if (generalError) {
+        generalError.textContent = err.message || "Failed to save preferences.";
+        generalError.hidden = false;
+      }
+    } finally {
+      if (generalSubmit) generalSubmit.disabled = false;
+    }
+  });
+
+  // Initial load
+  updateLanguageLabel();
+  loadSettings();
 };
 
 const setupLocationSelects = async () => {

@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=53">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=56">
 </head>
 <body>
   <div class="app-shell settings-page-shell">
@@ -55,6 +55,40 @@
           <button class="settings-list-row" type="button" data-business-manager-open>
             <span>Current serving business</span>
             <strong data-settings-current-business>-</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </button>
+        </div>
+      </details>
+
+      <details class="settings-accordion" data-system-settings-accordion>
+        <summary>
+          <span>System settings</span>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+        </summary>
+        <div class="settings-list flush-list">
+          <button class="settings-list-row" type="button" data-open-smtp-settings>
+            <span>SMTP Settings</span>
+            <strong data-settings-smtp-status>Configure</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </button>
+          <button class="settings-list-row" type="button" data-open-sms-settings>
+            <span>SMS Settings (MegaSMS)</span>
+            <strong data-settings-sms-sender-id>MEGASMS</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </button>
+          <button class="settings-list-row" type="button" data-open-sender-id-modal>
+            <span>Request Sender ID to MegaSMS</span>
+            <strong data-settings-sender-id-count>Request</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </button>
+          <button class="settings-list-row" type="button" data-open-language-modal>
+            <span>Language change</span>
+            <strong data-settings-language-label>English</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </button>
+          <button class="settings-list-row" type="button" data-open-general-settings>
+            <span>General preferences</span>
+            <strong data-settings-general-summary>TZS • Africa/Dar_es_Salaam</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </button>
         </div>
@@ -221,6 +255,239 @@
     </section>
   </div>
 
+  <!-- SMTP Settings Modal -->
+  <div class="fullscreen-modal" hidden data-smtp-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="smtp-modal-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-smtp-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="smtp-modal-title">SMTP Settings</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body">
+        <form data-smtp-form novalidate>
+          <label class="form-field">
+            <span>SMTP Host</span>
+            <input type="text" name="smtp_host" placeholder="e.g. smtp.gmail.com or mail.domain.com" required>
+          </label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <label class="form-field">
+              <span>Port</span>
+              <input type="number" name="smtp_port" placeholder="587" required>
+            </label>
+            <label class="form-field">
+              <span>Encryption</span>
+              <select name="smtp_encryption">
+                <option value="tls">TLS (STARTTLS)</option>
+                <option value="ssl">SSL</option>
+                <option value="none">None</option>
+              </select>
+            </label>
+          </div>
+          <label class="form-field">
+            <span>SMTP Username</span>
+            <input type="text" name="smtp_username" placeholder="e.g. info@domain.com">
+          </label>
+          <label class="form-field">
+            <span>SMTP Password</span>
+            <input type="password" name="smtp_password" placeholder="Leave blank to keep current">
+          </label>
+          <label class="form-field">
+            <span>From Email Address</span>
+            <input type="email" name="from_email" placeholder="e.g. no-reply@domain.com">
+          </label>
+          <p class="inline-error" hidden data-smtp-error></p>
+          <button class="btn btn-primary full" type="submit" data-smtp-submit>Save SMTP Settings</button>
+        </form>
+
+        <div class="settings-subcard">
+          <h4 class="settings-subcard-title">Test SMTP Connection</h4>
+          <p class="settings-subcard-desc">Send a real test email to confirm that your SMTP server configuration works properly.</p>
+          <form data-smtp-test-form style="display: grid; gap: 10px;" novalidate>
+            <input type="email" name="test_email" placeholder="Recipient email address (e.g. you@gmail.com)" required>
+            <p class="inline-error" hidden data-smtp-test-error></p>
+            <button class="btn btn-secondary full" type="submit" data-smtp-test-submit>Send Test Email</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- SMS Settings Modal (MegaSMS) -->
+  <div class="fullscreen-modal" hidden data-sms-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="sms-modal-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-sms-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="sms-modal-title">SMS Settings (MegaSMS)</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body">
+        <div style="background: rgba(20, 119, 255, 0.08); border-left: 4px solid var(--color-blue); padding: 12px 14px; border-radius: 8px; margin-bottom: 16px;">
+          <strong style="color: var(--color-blue); font-size: 0.9rem; display: block; margin-bottom: 4px;">MegaSMS Gateway</strong>
+          <span style="font-size: 0.82rem; color: var(--color-text);">Integrated for customer receipts, sales notifications, and OTP delivery.</span>
+        </div>
+
+        <form data-sms-form novalidate>
+          <label class="form-field">
+            <span>MegaSMS API Base URL</span>
+            <input type="url" name="api_url" value="https://megasms.co.tz/api/v1" required>
+          </label>
+          <label class="form-field">
+            <span>MegaSMS Bearer API Key / Token</span>
+            <input type="password" name="api_key" placeholder="Enter API Token (Leave blank to keep current)">
+          </label>
+          <label class="form-field">
+            <span>Active Sender ID</span>
+            <input type="text" name="sender_id" placeholder="e.g. MEGASMS or YOURBRAND" maxlength="11" style="text-transform: uppercase;" required>
+          </label>
+          <p class="inline-error" hidden data-sms-error></p>
+          <button class="btn btn-primary full" type="submit" data-sms-submit>Save SMS Settings</button>
+        </form>
+
+        <div style="margin-top: 16px;">
+          <button class="btn btn-secondary full btn-with-icon" type="button" data-open-sender-id-modal-from-sms>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+            <span>Request Custom Sender ID to MegaSMS</span>
+          </button>
+        </div>
+
+        <div class="settings-subcard">
+          <h4 class="settings-subcard-title">Test MegaSMS Gateway</h4>
+          <p class="settings-subcard-desc">Send a real SMS to verify that your MegaSMS account credentials and active Sender ID are delivering.</p>
+          <form data-sms-test-form style="display: grid; gap: 10px;" novalidate>
+            <input type="tel" name="test_phone" placeholder="e.g. 255712345678" required>
+            <p class="inline-error" hidden data-sms-test-error></p>
+            <button class="btn btn-secondary full" type="submit" data-sms-test-submit>Send Test SMS</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Request Sender ID to MegaSMS Modal -->
+  <div class="fullscreen-modal" hidden data-sender-id-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="sender-id-modal-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-sender-id-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="sender-id-modal-title">Request Sender ID to MegaSMS</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body">
+        <div style="background: #f8fafc; border: 1px solid var(--color-line); padding: 14px; border-radius: 10px; margin-bottom: 16px;">
+          <strong style="color: var(--color-navy); font-size: 0.92rem; display: block; margin-bottom: 4px;">Operator Sender ID Guidelines</strong>
+          <p style="margin: 0; font-size: 0.82rem; color: var(--color-muted); line-height: 1.45;">TCRA and mobile operators (Vodacom, Airtel, Tigo, Halotel) require sender IDs to match your registered business/brand name. Max 11 alphanumeric characters, uppercase, no spaces.</p>
+        </div>
+
+        <form data-sender-id-form novalidate>
+          <label class="form-field">
+            <span>Requested Sender ID (Max 11 chars) <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+            <input type="text" name="sender_id" placeholder="e.g. MYSHOP" maxlength="11" style="text-transform: uppercase;" required>
+          </label>
+          <label class="form-field">
+            <span>Registered Business / Company Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+            <input type="text" name="company_name" placeholder="e.g. MyShop Tanzania Limited" required>
+          </label>
+          <label class="form-field">
+            <span>Purpose of Messaging <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+            <select name="purpose" required>
+              <option value="Customer Sales Receipts & Invoices">Customer Sales Receipts & Invoices</option>
+              <option value="Account Security & Login OTPs">Account Security & Login OTPs</option>
+              <option value="Order & Delivery Tracking Alerts">Order & Delivery Tracking Alerts</option>
+              <option value="Customer Loyalty & Promotions">Customer Loyalty & Promotions</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Sample SMS Message</span>
+            <textarea name="sample_message" rows="3" placeholder="e.g. Ndugu mteja, asante kwa kununua MyShop. Risiti yako #0421 ya TZS 45,000 imekamilika."></textarea>
+          </label>
+          <p class="inline-error" hidden data-sender-id-error></p>
+          <button class="btn btn-primary full" type="submit" data-sender-id-submit>Submit to MegaSMS</button>
+        </form>
+
+        <div style="margin-top: 24px;">
+          <h4 style="margin: 0 0 10px; font-size: 0.95rem; font-weight: 800; color: var(--color-navy);">Your Sender ID Requests</h4>
+          <div class="settings-list flush-list" data-sender-id-requests-list style="border: 1px solid var(--color-line); border-radius: 12px;"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Language Change Modal -->
+  <div class="fullscreen-modal" hidden data-language-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="language-modal-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-language-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="language-modal-title">Language Change</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body" style="display: grid; gap: 12px;">
+        <button class="lang-option-row" type="button" data-lang-choice="en">
+          <div>
+            <div style="font-size: 1rem; font-weight: 800;">English</div>
+            <div style="font-size: 0.8rem; font-weight: normal; color: var(--color-muted);">Default application language</div>
+          </div>
+          <svg class="lang-check-icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M416 128L192 384l-96-96" /></svg>
+        </button>
+        <button class="lang-option-row" type="button" data-lang-choice="sw">
+          <div>
+            <div style="font-size: 1rem; font-weight: 800;">Kiswahili</div>
+            <div style="font-size: 0.8rem; font-weight: normal; color: var(--color-muted);">Lugha ya Kiswahili kwa urahisi wa biashara</div>
+          </div>
+          <svg class="lang-check-icon" viewBox="0 0 512 512" aria-hidden="true"><path d="M416 128L192 384l-96-96" /></svg>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- General Preferences Modal -->
+  <div class="fullscreen-modal" hidden data-general-settings-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="general-settings-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-general-settings-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="general-settings-title">General Preferences</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-general-settings-form novalidate>
+        <label class="form-field">
+          <span>Operating Currency</span>
+          <select name="currency">
+            <option value="TZS">TZS - Tanzanian Shilling</option>
+            <option value="USD">USD - US Dollar</option>
+            <option value="KES">KES - Kenyan Shilling</option>
+            <option value="UGX">UGX - Ugandan Shilling</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Timezone</span>
+          <select name="timezone">
+            <option value="Africa/Dar_es_Salaam">Africa/Dar es Salaam (EAT, GMT+3)</option>
+            <option value="Africa/Nairobi">Africa/Nairobi (EAT, GMT+3)</option>
+            <option value="UTC">UTC (Universal Coordinated Time)</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Default VAT / Tax Rate (%)</span>
+          <input type="number" name="tax_rate" min="0" max="100" step="0.1" value="18">
+        </label>
+        <label class="form-field">
+          <span>Receipt / Invoice Footer Note</span>
+          <textarea name="receipt_footer" rows="3" placeholder="e.g. Thank you for your business! Goods once sold are not returnable without receipt."></textarea>
+        </label>
+        <p class="inline-error" hidden data-general-settings-error></p>
+        <button class="btn btn-primary full" type="submit" data-general-settings-submit>Save Preferences</button>
+      </form>
+    </section>
+  </div>
+
   <div class="modal-backdrop" hidden data-app-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
       <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
@@ -229,6 +496,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=57" defer></script>
+  <script src="/assets/js/app.js?v=58" defer></script>
 </body>
 </html>
