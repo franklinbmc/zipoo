@@ -2256,7 +2256,8 @@ textarea {
 }
 
 .settings-accordion summary svg,
-.settings-list-row svg {
+.settings-list-row svg,
+.settings-accordion-link svg {
   width: 18px;
   height: 18px;
   fill: none;
@@ -2264,6 +2265,27 @@ textarea {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 54px;
+}
+
+.settings-accordion-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 0 12px;
+  color: var(--color-text);
+  font-weight: 900;
+  text-decoration: none;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: #fff;
+  transition: background 0.15s ease;
+}
+
+.settings-accordion-link:hover,
+.settings-accordion-link:focus-visible {
+  background: #f8fafc;
 }
 
 .settings-accordion[open] summary > svg {

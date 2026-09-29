@@ -1678,7 +1678,6 @@ const setupSettingsPage = () => {
     renderBusinessManager();
   });
   setupSystemSettings();
-  setupCompanyUsers();
 };
 
 const setupSystemSettings = () => {
@@ -2048,13 +2047,14 @@ const setupSystemSettings = () => {
   loadSettings();
 };
 
-const setupCompanyUsers = () => {
-  const page = document.querySelector("[data-settings-page]");
+const setupCompanyUsersPage = () => {
+  const page = document.querySelector("[data-company-users-page]");
   if (!page) return;
 
   const usersCountLabel = document.querySelector("[data-system-users-count]");
   const usersList = document.querySelector("[data-company-users-list]");
   const usersEmpty = document.querySelector("[data-company-users-empty]");
+  const searchInput = document.querySelector("[data-company-users-search]");
   const openCreateButtons = document.querySelectorAll("[data-open-create-user]");
 
   // Details Modal
@@ -2191,9 +2191,10 @@ const setupCompanyUsers = () => {
     }));
   };
 
-  const loadUsers = async () => {
+  const loadUsers = async (query = "") => {
     try {
-      const res = await fetch(`${getBasePath()}api/company-users.php`);
+      const url = query ? `${getBasePath()}api/company-users.php?q=${encodeURIComponent(query)}` : `${getBasePath()}api/company-users.php`;
+      const res = await fetch(url);
       if (!res.ok) return;
       const data = await res.json();
       if (!data || !data.ok) return;
@@ -2303,7 +2304,7 @@ const setupCompanyUsers = () => {
       }
 
       closeUserDetail();
-      await loadUsers();
+      await loadUsers(searchInput?.value || "");
       await showAppModal("User Deleted", `User "${userToDelete.full_name}" has been removed from this company.`);
     } catch (err) {
       await showAppModal("Error", err.message || "Could not delete user.");
@@ -2332,7 +2333,7 @@ const setupCompanyUsers = () => {
 
       closeCreateModal();
       createForm.reset();
-      await loadUsers();
+      await loadUsers(searchInput?.value || "");
       if (data.user) {
         openUserDetail(data.user);
       }
@@ -2366,7 +2367,7 @@ const setupCompanyUsers = () => {
       }
 
       closeEditModal();
-      await loadUsers();
+      await loadUsers(searchInput?.value || "");
       if (data.user) {
         openUserDetail(data.user);
       }
@@ -2379,6 +2380,14 @@ const setupCompanyUsers = () => {
     } finally {
       if (editSubmit) editSubmit.disabled = false;
     }
+  });
+
+  let searchTimeout;
+  searchInput?.addEventListener("input", (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      loadUsers(e.target.value.trim());
+    }, 250);
   });
 
   // Initial load
@@ -3518,6 +3527,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSettingsPage();
   setupCustomersPage();
   setupSuppliersPage();
+  setupCompanyUsersPage();
   updateConnectionStatus();
   registerServiceWorker();
 });
