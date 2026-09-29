@@ -191,8 +191,22 @@ try {
 
         $businessId = (int) $pdo->lastInsertId();
         $_SESSION['zipoo_business_id'] = $businessId;
-        $pdo->prepare('UPDATE tbl_users SET business_id = :business_id WHERE id = :user_id')
-            ->execute([':business_id' => $businessId, ':user_id' => $userId]);
+        $pdo->prepare(
+            'UPDATE tbl_users
+             SET business_id = :business_id,
+                 business_name = :business_name,
+                 business_type = :business_type,
+                 region_code = :region_code,
+                 district_code = :district_code
+             WHERE id = :user_id'
+        )->execute([
+            ':business_id' => $businessId,
+            ':business_name' => $businessName,
+            ':business_type' => $businessType !== '' ? $businessType : 'service',
+            ':region_code' => $defaults['region_code'],
+            ':district_code' => $defaults['district_code'],
+            ':user_id' => $userId,
+        ]);
 
         $business = [
             'id' => $businessId,
