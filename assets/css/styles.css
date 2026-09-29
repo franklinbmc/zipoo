@@ -225,7 +225,9 @@ select {
 .entry-login {
   display: grid;
   gap: 13px;
-  width: min(390px, 100%);
+  width: min(390px, 95%);
+  max-width: 95%;
+  margin: 0 auto;
 }
 
 .entry-login h1 {
@@ -675,8 +677,11 @@ label {
 }
 
 input,
-select {
+select,
+textarea {
   width: 100%;
+  max-width: 95vw;
+  box-sizing: border-box;
   min-height: 44px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
@@ -1527,7 +1532,9 @@ body.offline .status-dot {
 .saas-login-card {
   display: grid;
   gap: 14px;
-  width: min(390px, 100%);
+  width: min(390px, 95%);
+  max-width: 95%;
+  margin: 0 auto;
 }
 
 .saas-login-card h1 {
@@ -2195,7 +2202,8 @@ textarea {
   display: grid;
   align-content: start;
   gap: 12px;
-  width: min(640px, 100%);
+  width: min(640px, 95%);
+  max-width: 95%;
   margin: 0 auto;
   padding: 16px 0 32px;
 }
@@ -2428,17 +2436,15 @@ button.settings-list-row:focus-visible {
   display: grid;
   align-content: start;
   gap: 14px;
-  width: min(640px, 100%);
+  width: min(640px, 95%);
+  max-width: 95%;
   margin: 0 auto;
   padding: 16px 0 max(28px, env(safe-area-inset-bottom));
   overflow: auto;
 }
 
 
-.fullscreen-body[data-account-edit-form] {
-  width: 97%;
-  max-width: 97%;
-}.otp-grid {
+.otp-grid {
   display: grid;
   gap: 12px;
 }
@@ -2766,14 +2772,41 @@ button.settings-list-row:focus-visible {
 }
 
 @media (max-width: 640px) {
+    /* Ensure input box never exceeds 95% width on mobile */
+  input,
+  select,
+  textarea,
+  .search-select,
+  .search-select-trigger,
+  .password-field,
+  .form-field,
+  .entry-login,
+  .fullscreen-body,
+  .settings-page,
+  .customers-page,
+  .customers-search-wrap,
+  .saas-login-card {
+    max-width: 95vw !important;
+    box-sizing: border-box !important;
+  }
+
+  .fullscreen-body,
+  .entry-login,
+  .settings-page,
+  .customers-page,
+  .saas-login-card {
+    width: 95% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
   .fullscreen-flow-body {
     padding-right: 12px;
     padding-left: 12px;
   }
 
   .business-create-flow {
-    width: min(390px, 94vw);
-    max-width: 94vw;
+    width: min(390px, 95vw); max-width: 95vw;
   }
   .quick-backdrop {
     padding: 0 0 10px;
@@ -2948,7 +2981,8 @@ button.settings-list-row:focus-visible {
   display: grid;
   align-content: start;
   gap: 12px;
-  width: min(640px, 100%);
+  width: min(640px, 95%);
+  max-width: 95%;
   margin: 0 auto;
   padding: 16px 0 32px;
 }
@@ -3104,3 +3138,5 @@ button.settings-list-row:focus-visible {
   text-align: right;
   word-break: break-word;
 }
+
+
