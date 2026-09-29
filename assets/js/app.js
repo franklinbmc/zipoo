@@ -252,11 +252,61 @@ const showAppModal = (title, message) => new Promise((resolve) => {
 
   titleEl.textContent = title;
   messageEl.textContent = message;
+  closeButton.textContent = "OK";
+  closeButton.className = "btn btn-primary full";
+  modal.querySelectorAll("[data-app-modal-extra]").forEach((node) => node.remove());
   modal.hidden = false;
   closeButton.addEventListener("click", close);
   closeButton.focus();
 });
 
+const showConfirmModal = ({ title, message, confirmLabel = "Confirm", cancelLabel = "Cancel", danger = false }) => new Promise((resolve) => {
+  const modal = document.querySelector("[data-app-modal]");
+  const titleEl = modal?.querySelector("[data-app-modal-title]");
+  const messageEl = modal?.querySelector("[data-app-modal-message]");
+  const closeButton = modal?.querySelector("[data-app-modal-close]");
+  const dialog = modal?.querySelector(".app-modal");
+
+  if (!modal || !titleEl || !messageEl || !closeButton || !dialog) {
+    resolve(false);
+    return;
+  }
+
+  modal.querySelectorAll("[data-app-modal-extra]").forEach((node) => node.remove());
+
+  const actions = document.createElement("div");
+  actions.className = "modal-actions";
+  actions.dataset.appModalExtra = "";
+
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "btn btn-secondary";
+  cancelButton.textContent = cancelLabel;
+
+  closeButton.textContent = confirmLabel;
+  closeButton.className = danger ? "btn btn-danger full" : "btn btn-primary full";
+  actions.append(cancelButton, closeButton);
+  dialog.append(actions);
+
+  const finish = (value) => {
+    modal.hidden = true;
+    closeButton.removeEventListener("click", confirm);
+    cancelButton.removeEventListener("click", cancel);
+    actions.remove();
+    closeButton.textContent = "OK";
+    closeButton.className = "btn btn-primary full";
+    resolve(value);
+  };
+  const confirm = () => finish(true);
+  const cancel = () => finish(false);
+
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+  modal.hidden = false;
+  closeButton.addEventListener("click", confirm);
+  cancelButton.addEventListener("click", cancel);
+  cancelButton.focus();
+});
 const readStoredJson = (key, fallback) => {
   try {
     return JSON.parse(localStorage.getItem(key) || "");
@@ -711,6 +761,10 @@ const setupSettingsPage = () => {
   if (!page) {
     return;
   }
+
+  page.querySelectorAll("details.settings-accordion").forEach((details) => {
+    details.open = false;
+  });
 
   const ownerAvatar = document.querySelector("[data-owner-avatar]");
   const ownerProfileName = document.querySelector("[data-owner-profile-name]");
