@@ -362,23 +362,40 @@ const setupQuickPanel = () => {
   const closeButton = document.querySelector("[data-quick-close]");
   const logoutButton = document.querySelector("[data-logout]");
   const currentBusiness = document.querySelector("[data-current-business]");
+  const companySwitcher = document.querySelector("[data-company-switcher]");
+  const companyCurrent = document.querySelector(".company-current");
   const companySelectWrap = document.querySelector("[data-company-select-wrap]");
-  const companySelect = document.querySelector("[data-company-select]");
+  const companyOptions = document.querySelector("[data-company-select-options]");
+
+  const closeCompanyMenu = () => {
+    if (companySelectWrap) companySelectWrap.hidden = true;
+    companySwitcher?.classList.remove("is-open");
+    companyCurrent?.setAttribute("aria-expanded", "false");
+  };
 
   const syncQuickBusinessUi = () => {
     const { knownBusinesses, selectedBusiness } = getStoredBusinessState();
     if (currentBusiness) {
       currentBusiness.textContent = selectedBusiness?.business_name || "Business";
     }
-    if (companySelect && companySelectWrap) {
-      companySelect.replaceChildren(...knownBusinesses.map((business) => {
-        const option = document.createElement("option");
-        option.value = String(business.id);
-        option.textContent = business.business_name || `Business ${business.id}`;
-        option.selected = String(business.id) === String(selectedBusiness?.id || "");
-        return option;
+    if (companySelectWrap && companyOptions) {
+      companyOptions.replaceChildren(...knownBusinesses.map((business) => {
+        const isSelected = String(business.id) === String(selectedBusiness?.id || "");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `company-option${isSelected ? " active" : ""}`;
+        button.dataset.businessId = String(business.id);
+        button.textContent = business.business_name || `Business ${business.id}`;
+        button.setAttribute("aria-pressed", isSelected ? "true" : "false");
+        return button;
       }));
-      companySelectWrap.hidden = knownBusinesses.length <= 1;
+      companySelectWrap.hidden = true;
+      companySwitcher?.classList.toggle("can-switch", knownBusinesses.length > 1);
+      if (companyCurrent) {
+        companyCurrent.tabIndex = knownBusinesses.length > 1 ? 0 : -1;
+        companyCurrent.setAttribute("role", knownBusinesses.length > 1 ? "button" : "presentation");
+        companyCurrent.setAttribute("aria-expanded", "false");
+      }
     }
   };
 
@@ -399,7 +416,17 @@ const setupQuickPanel = () => {
   const closePanel = () => {
     panel.hidden = true;
     openButton.setAttribute("aria-expanded", "false");
+    closeCompanyMenu();
     openButton.focus();
+  };
+
+  const toggleCompanyMenu = () => {
+    const { knownBusinesses } = getStoredBusinessState();
+    if (knownBusinesses.length <= 1 || !companySelectWrap) return;
+    const willOpen = companySelectWrap.hidden;
+    companySelectWrap.hidden = !willOpen;
+    companySwitcher?.classList.toggle("is-open", willOpen);
+    companyCurrent?.setAttribute("aria-expanded", willOpen ? "true" : "false");
   };
 
   openButton.addEventListener("click", openPanel);
@@ -410,24 +437,53 @@ const setupQuickPanel = () => {
     }
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !panel.hidden) {
-      closePanel();
+    if (event.key === "Escape") {
+      if (companySelectWrap && !companySelectWrap.hidden) {
+        closeCompanyMenu();
+        companyCurrent?.focus();
+        return;
+      }
+      if (!panel.hidden) {
+        closePanel();
+      }
     }
   });
 
-  companySelect?.addEventListener("change", async () => {
+  companyCurrent?.addEventListener("click", toggleCompanyMenu);
+  companyCurrent?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggleCompanyMenu();
+    }
+  });
+
+  companyOptions?.addEventListener("click", async (event) => {
+    const option = event.target.closest("[data-business-id]");
+    if (!option || !companyOptions.contains(option)) return;
     const previousValue = String(getStoredBusinessState().selectedBusiness?.id || "");
-    companySelect.disabled = true;
+    const nextValue = option.dataset.businessId;
+    if (!nextValue || nextValue === previousValue) {
+      closeCompanyMenu();
+      return;
+    }
+
+    companyOptions.querySelectorAll("button").forEach((button) => {
+      button.disabled = true;
+    });
     try {
-      await switchStoredBusiness(companySelect.value);
+      await switchStoredBusiness(nextValue);
       await refreshStoredBusinesses();
       syncQuickBusinessUi();
       closePanel();
     } catch (error) {
-      companySelect.value = previousValue;
       await showAppModal("Unable to switch business", error.message || "Please try again.");
-    } finally {
-      companySelect.disabled = false;
+      syncQuickBusinessUi();
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (companySwitcher && !companySwitcher.contains(event.target)) {
+      closeCompanyMenu();
     }
   });
 
@@ -436,7 +492,6 @@ const setupQuickPanel = () => {
     window.location.href = `${getBasePath()}login`;
   });
 };
-
 const initSearchSelect = (select) => {
   if (!select || select.dataset.searchSelectInitialized === "true") return;
   select.dataset.searchSelectInitialized = "true";
@@ -660,7 +715,6 @@ const setupSettingsPage = () => {
   const ownerAvatar = document.querySelector("[data-owner-avatar]");
   const ownerProfileName = document.querySelector("[data-owner-profile-name]");
   const ownerProfileMeta = document.querySelector("[data-owner-profile-meta]");
-  const settingsBusinessName = document.querySelector("[data-settings-business-name]");
   const settingsName = document.querySelector("[data-settings-name]");
   const settingsPhone = document.querySelector("[data-settings-phone]");
   const settingsEmail = document.querySelector("[data-settings-email]");
@@ -1087,12 +1141,10 @@ const setupSettingsPage = () => {
   const render = () => {
     const { user, selectedBusiness } = getStoredBusinessState();
     const ownerName = user.full_name || "Owner profile";
-    const profileBusinessName = user.business_name || selectedBusiness?.business_name || "-";
-    const businessName = selectedBusiness?.business_name || profileBusinessName;
+    const businessName = selectedBusiness?.business_name || user.business_name || "Business";
     if (ownerAvatar) ownerAvatar.textContent = (user.full_name ? user.full_name.trim().charAt(0).toUpperCase() : "U");
     if (ownerProfileName) ownerProfileName.textContent = ownerName;
     if (ownerProfileMeta) ownerProfileMeta.textContent = [user.phone, user.email].filter(Boolean).join(" - ") || "-";
-    if (settingsBusinessName) settingsBusinessName.textContent = profileBusinessName;
     if (settingsName) settingsName.textContent = user.full_name || "-";
     if (settingsPhone) settingsPhone.textContent = user.phone || "-";
     if (settingsEmail) settingsEmail.textContent = user.email || "-";
