@@ -322,23 +322,43 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <label class="form-field">
             <span>Category</span>
-            <select name="category" data-category-select>
-              <option value="General" selected>General</option>
-              <option value="__new__">+ New Category</option>
-            </select>
+            <div class="search-select" data-search-select data-category-select>
+              <input type="hidden" name="category" value="General" data-search-select-value data-category-value>
+              <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+                <span data-search-select-label>General</span>
+                <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+              </button>
+              <div class="search-select-panel" hidden data-search-select-panel>
+                <input type="search" data-search-select-search placeholder="Search categories...">
+                <div class="search-select-options" data-search-select-options>
+                  <button type="button" data-search-select-option data-value="General" class="active">General</button>
+                  <button type="button" data-search-select-option data-value="__new__">+ New Category</button>
+                </div>
+              </div>
+            </div>
             <input type="text" class="new-category-input" data-new-category-input placeholder="Enter new category name" hidden>
           </label>
           <label class="form-field">
             <span>Unit of Measure</span>
-            <select name="unit">
-              <option value="pcs" selected>pcs (Pieces)</option>
-              <option value="box">box (Boxes)</option>
-              <option value="kg">kg (Kilograms)</option>
-              <option value="litre">litre (Litres)</option>
-              <option value="meter">meter (Meters)</option>
-              <option value="hours">hours (Hours)</option>
-              <option value="service">service (Fixed service)</option>
-            </select>
+            <div class="search-select" data-search-select data-unit-select>
+              <input type="hidden" name="unit" value="pcs" data-search-select-value>
+              <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+                <span data-search-select-label>pcs (Pieces)</span>
+                <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+              </button>
+              <div class="search-select-panel" hidden data-search-select-panel>
+                <input type="search" data-search-select-search placeholder="Search units...">
+                <div class="search-select-options" data-search-select-options>
+                  <button type="button" data-search-select-option data-value="pcs" class="active">pcs (Pieces)</button>
+                  <button type="button" data-search-select-option data-value="box">box (Boxes)</button>
+                  <button type="button" data-search-select-option data-value="kg">kg (Kilograms)</button>
+                  <button type="button" data-search-select-option data-value="litre">litre (Litres)</button>
+                  <button type="button" data-search-select-option data-value="meter">meter (Meters)</button>
+                  <button type="button" data-search-select-option data-value="hours">hours (Hours)</button>
+                  <button type="button" data-search-select-option data-value="service">service (Fixed service)</button>
+                </div>
+              </div>
+            </div>
           </label>
         </div>
 
@@ -628,6 +648,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=64" defer></script>
+  <script src="/assets/js/app.js?v=65" defer></script>
 </body>
 </html>
