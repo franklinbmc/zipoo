@@ -68,9 +68,15 @@ function get_active_business(PDO $pdo, int $userId): array
 
 function load_group_settings(PDO $pdo, string $group): array
 {
-    $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_system_settings WHERE setting_group = :grp');
-    $stmt->execute([':grp' => $group]);
-    $rows = $stmt->fetchAll();
+    // System settings (SMTP, SMS, etc.) are stored in tbl_saas_settings by api/settings.php.
+    try {
+        $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = :grp');
+        $stmt->execute([':grp' => $group]);
+        $rows = $stmt->fetchAll();
+    } catch (Throwable $e) {
+        // Table not created yet (settings never saved) — treat as unconfigured.
+        return [];
+    }
     $out = [];
     foreach ($rows as $r) {
         $out[$r['setting_key']] = $r['setting_value'];
@@ -791,6 +797,29 @@ try {
             $pdo->prepare('UPDATE tbl_purchase_orders SET status = "cancelled" WHERE id = :id')->execute([':id' => $poId]);
 
             respond(200, ['ok' => true, 'message' => 'Purchase order cancelled.']);
+        }
+
+        if ($action === 'uncancel_po') {
+            $poId = (int) ($_POST['po_id'] ?? 0);
+            if ($poId <= 0) {
+                respond(422, ['ok' => false, 'message' => 'Invalid Purchase Order ID.']);
+            }
+
+            $stmt = $pdo->prepare('SELECT id, status FROM tbl_purchase_orders WHERE id = :id AND business_id = :bid LIMIT 1');
+            $stmt->execute([':id' => $poId, ':bid' => $businessId]);
+            $po = $stmt->fetch();
+            if (!$po) {
+                respond(404, ['ok' => false, 'message' => 'Purchase order not found.']);
+            }
+
+            if ($po['status'] !== 'cancelled') {
+                respond(422, ['ok' => false, 'message' => 'Only a cancelled purchase order can be reactivated.']);
+            }
+
+            // Reactivate back to draft so it can be edited, sent or received again.
+            $pdo->prepare('UPDATE tbl_purchase_orders SET status = "draft" WHERE id = :id')->execute([':id' => $poId]);
+
+            respond(200, ['ok' => true, 'message' => 'Purchase order reactivated.']);
         }
 
         respond(422, ['ok' => false, 'message' => 'Unknown purchasing action.']);

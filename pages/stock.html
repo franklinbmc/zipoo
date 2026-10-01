@@ -365,11 +365,11 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <label class="form-field">
             <span>Selling Price <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-            <input type="number" name="selling_price" step="0.01" min="0" placeholder="0.00" required>
+            <input type="text" inputmode="numeric" name="selling_price" step="0.01" min="0" placeholder="0.00" required>
           </label>
           <label class="form-field">
             <span>Cost Price</span>
-            <input type="number" name="cost_price" step="0.01" min="0" placeholder="0.00">
+            <input type="text" inputmode="numeric" name="cost_price" step="0.01" min="0" placeholder="0.00">
           </label>
         </div>
 
@@ -377,11 +377,11 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <label class="form-field" data-initial-stock-wrap>
               <span>Opening Stock</span>
-              <input type="number" name="initial_stock" step="0.01" min="0" placeholder="0">
+              <input type="text" inputmode="numeric" name="initial_stock" step="0.01" min="0" placeholder="0">
             </label>
             <label class="form-field">
               <span>Min Stock Alert</span>
-              <input type="number" name="min_stock_alert" step="0.01" min="0" value="5">
+              <input type="text" inputmode="numeric" name="min_stock_alert" step="0.01" min="0" value="5">
             </label>
           </div>
 
@@ -429,9 +429,17 @@
       <form class="fullscreen-body" data-stock-adjust-form novalidate>
         <label class="form-field">
           <span>Select Product <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select name="item_id" data-adjust-item-select required>
-            <option value="">Choose a product...</option>
-          </select>
+          <div class="search-select" data-search-select data-adjust-item-select>
+            <input type="hidden" name="item_id" required data-search-select-value data-adjust-item-value>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Choose a product...</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search products...">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
         </label>
 
         <div style="background: #f8fafc; border: 1px solid var(--color-line); border-radius: 8px; padding: 12px; margin-bottom: 12px;" data-adjust-preview hidden>
@@ -441,15 +449,25 @@
 
         <label class="form-field">
           <span>Adjustment Type <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select name="adjustment_type" required>
-            <option value="add" selected>+ Add Stock (Stock In / Found / Correction)</option>
-            <option value="subtract">- Deduct Stock (Damage / Lost / Expired / Correction)</option>
-          </select>
+          <div class="search-select" data-search-select data-adjust-type-select>
+            <input type="hidden" name="adjustment_type" value="add" required data-search-select-value>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>+ Add Stock (Stock In / Found / Correction)</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search...">
+              <div class="search-select-options" data-search-select-options>
+                <button type="button" data-search-select-option data-value="add" class="active">+ Add Stock (Stock In / Found / Correction)</button>
+                <button type="button" data-search-select-option data-value="subtract">- Deduct Stock (Damage / Lost / Expired / Correction)</button>
+              </div>
+            </div>
+          </div>
         </label>
 
         <label class="form-field">
           <span>Quantity <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <input type="number" name="quantity" step="0.01" min="0.01" placeholder="Enter quantity" required>
+          <input type="text" inputmode="numeric" name="quantity" step="0.01" min="0.01" placeholder="Enter quantity" required>
         </label>
 
         <label class="form-field">
@@ -476,9 +494,17 @@
       <form class="fullscreen-body" data-po-create-form novalidate>
         <label class="form-field">
           <span>Select Vendor / Supplier <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select name="supplier_id" data-po-supplier-select required>
-            <option value="">Choose supplier...</option>
-          </select>
+          <div class="search-select" data-search-select data-po-supplier-select>
+            <input type="hidden" name="supplier_id" required data-search-select-value data-po-supplier-value>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Choose supplier...</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search suppliers...">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
         </label>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -512,7 +538,7 @@
           </div>
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; margin-bottom: 6px;">
             <span style="color: var(--color-muted);">Tax Rate (%):</span>
-            <input type="number" name="tax_rate" step="0.1" min="0" value="0" data-po-tax-input style="width: 70px; text-align: right; height: 32px; padding: 2px 6px;">
+            <input type="text" inputmode="numeric" name="tax_rate" step="0.1" min="0" value="0" data-po-tax-input style="width: 70px; text-align: right; height: 32px; padding: 2px 6px;">
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 8px;">
             <span style="color: var(--color-muted);">Tax Amount:</span>
@@ -593,6 +619,7 @@
             </button>
           </div>
           <button class="btn btn-danger-outline full" type="button" data-po-cancel-btn>Cancel Order</button>
+          <button class="btn btn-primary full" type="button" data-po-uncancel-btn hidden>Reactivate Order</button>
         </div>
       </div>
     </section>
@@ -648,6 +675,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=65" defer></script>
+  <script src="/assets/js/app.js?v=66" defer></script>
 </body>
 </html>

@@ -274,7 +274,7 @@
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <label class="form-field">
               <span>Port</span>
-              <input type="number" name="smtp_port" placeholder="587" required>
+              <input type="text" inputmode="numeric" name="smtp_port" placeholder="587" required>
             </label>
             <label class="form-field">
               <span>Encryption</span>
@@ -477,7 +477,7 @@
         </label>
         <label class="form-field">
           <span>Default VAT / Tax Rate (%)</span>
-          <input type="number" name="tax_rate" min="0" max="100" step="0.1" value="18">
+          <input type="text" inputmode="numeric" name="tax_rate" min="0" max="100" step="0.1" value="18">
         </label>
         <label class="form-field">
           <span>Receipt / Invoice Footer Note</span>
@@ -497,6 +497,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=65" defer></script>
+  <script src="/assets/js/app.js?v=66" defer></script>
 </body>
 </html>

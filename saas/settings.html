@@ -129,7 +129,7 @@
             <form class="settings-form" action="/api/saas-settings.php" method="post" data-settings-form>
               <input type="hidden" name="group" value="smtp">
               <label><span>SMTP Host</span><input type="text" name="smtp_host" placeholder="smtp.example.com" data-setting="smtp.smtp_host"></label>
-              <label><span>SMTP Port</span><input type="number" name="smtp_port" placeholder="587" data-setting="smtp.smtp_port"></label>
+              <label><span>SMTP Port</span><input type="text" inputmode="numeric" name="smtp_port" placeholder="587" data-setting="smtp.smtp_port"></label>
               <label><span>SMTP Username</span><input type="text" name="smtp_username" placeholder="mailer@example.com" data-setting="smtp.smtp_username"></label>
               <label><span>SMTP Password</span><input type="password" name="smtp_password" placeholder="••••••••" data-setting="smtp.smtp_password"></label>
               <label><span>From Email</span><input type="email" name="from_email" placeholder="no-reply@zipoo.local" data-setting="smtp.from_email"></label>

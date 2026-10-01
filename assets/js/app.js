@@ -329,6 +329,104 @@ const showConfirmModal = ({ title, message, confirmLabel = "Confirm", cancelLabe
   cancelButton.addEventListener("click", cancel);
   cancelButton.focus();
 });
+
+const showPromptModal = ({
+  title,
+  message = "",
+  placeholder = "",
+  defaultValue = "",
+  confirmLabel = "OK",
+  cancelLabel = "Cancel",
+  inputType = "text",
+}) => new Promise((resolve) => {
+  const modal = document.querySelector("[data-app-modal]");
+  const titleEl = modal?.querySelector("[data-app-modal-title]");
+  const messageEl = modal?.querySelector("[data-app-modal-message]");
+  const closeButton = modal?.querySelector("[data-app-modal-close]");
+  const dialog = modal?.querySelector(".app-modal");
+
+  if (!modal || !titleEl || !messageEl || !closeButton || !dialog) {
+    resolve(null);
+    return;
+  }
+
+  modal.querySelectorAll("[data-app-modal-extra]").forEach((node) => node.remove());
+
+  const input = document.createElement("input");
+  input.type = inputType;
+  input.className = "app-modal-input";
+  input.placeholder = placeholder;
+  input.value = defaultValue || "";
+  input.dataset.appModalExtra = "";
+  input.style.marginTop = "4px";
+
+  const actions = document.createElement("div");
+  actions.className = "modal-actions";
+  actions.style.display = "grid";
+  actions.style.gridTemplateColumns = "1fr 1fr";
+  actions.style.gap = "10px";
+  actions.style.marginTop = "12px";
+  actions.style.width = "100%";
+  actions.dataset.appModalExtra = "";
+
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "btn btn-secondary full";
+  cancelButton.textContent = cancelLabel;
+
+  closeButton.textContent = confirmLabel;
+  closeButton.className = "btn btn-primary full";
+
+  messageEl.insertAdjacentElement("afterend", input);
+  actions.append(cancelButton, closeButton);
+  dialog.append(actions);
+
+  let finished = false;
+  const finish = (value) => {
+    if (finished) return;
+    finished = true;
+    modal.hidden = true;
+    closeButton.removeEventListener("click", confirm);
+    cancelButton.removeEventListener("click", cancel);
+    input.removeEventListener("keydown", onInputKeydown);
+    document.removeEventListener("keydown", onKeydown);
+    actions.remove();
+    input.remove();
+    dialog.append(closeButton);
+    closeButton.textContent = "OK";
+    closeButton.className = "btn btn-primary full";
+    resolve(value);
+  };
+  const confirm = (e) => {
+    e?.preventDefault();
+    finish(input.value.trim() || null);
+  };
+  const cancel = (e) => {
+    e?.preventDefault();
+    finish(null);
+  };
+  const onKeydown = (e) => {
+    if (e.key === "Escape") {
+      finish(null);
+    }
+  };
+  const onInputKeydown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      confirm();
+    }
+  };
+
+  titleEl.textContent = title;
+  messageEl.textContent = message;
+  modal.hidden = false;
+  document.addEventListener("keydown", onKeydown);
+  input.addEventListener("keydown", onInputKeydown);
+  closeButton.addEventListener("click", confirm);
+  cancelButton.addEventListener("click", cancel);
+  input.focus();
+  input.select();
+});
 const readStoredJson = (key, fallback) => {
   try {
     return JSON.parse(localStorage.getItem(key) || "");
@@ -3578,6 +3676,8 @@ const setupStockPage = () => {
   const adjustError = document.querySelector("[data-stock-adjust-error]");
   const adjustSubmit = document.querySelector("[data-stock-adjust-submit]");
   const adjustItemSelect = document.querySelector("[data-adjust-item-select]");
+  const adjustItemValue = document.querySelector("[data-adjust-item-value]");
+  const adjustTypeSelect = document.querySelector("[data-adjust-type-select]");
   const adjustPreview = document.querySelector("[data-adjust-preview]");
   const adjustCurrentStock = document.querySelector("[data-adjust-current-stock]");
   const openAdjustBtns = document.querySelectorAll("[data-open-stock-adjust]");
@@ -3597,6 +3697,7 @@ const setupStockPage = () => {
   const poCreateError = document.querySelector("[data-po-create-error]");
   const poCreateSubmit = document.querySelector("[data-po-create-submit]");
   const poSupplierSelect = document.querySelector("[data-po-supplier-select]");
+  const poSupplierValue = document.querySelector("[data-po-supplier-value]");
   const poLinesContainer = document.querySelector("[data-po-lines-container]");
   const addPoLineBtn = document.querySelector("[data-add-po-line]");
   const poTaxInput = document.querySelector("[data-po-tax-input]");
@@ -3622,6 +3723,7 @@ const setupStockPage = () => {
   const poDownloadPdfBtn = document.querySelector("[data-po-download-pdf-btn]");
   const poEmailBtn = document.querySelector("[data-po-email-btn]");
   const poCancelBtn = document.querySelector("[data-po-cancel-btn]");
+  const poUncancelBtn = document.querySelector("[data-po-uncancel-btn]");
 
   // GRN Modal
   const grnModal = document.querySelector("[data-grn-modal]");
@@ -3857,13 +3959,15 @@ const setupStockPage = () => {
         }
       }
 
-      // Also populate adjust product select dropdown
+      // Also populate adjust product search-select
       if (adjustItemSelect) {
         const prodItems = cachedItems.filter((i) => i.type === "product");
-        const currentVal = adjustItemSelect.value;
-        adjustItemSelect.innerHTML = `<option value="">Choose a product...</option>` +
-          prodItems.map((p) => `<option value="${p.id}">${p.name} (Stock: ${p.current_stock} ${p.unit})</option>`).join("");
-        adjustItemSelect.value = currentVal;
+        const currentVal = adjustItemValue?.value || "";
+        const options = prodItems.map((p) => ({
+          value: String(p.id),
+          label: `${p.name} (Stock: ${p.current_stock} ${p.unit})`,
+        }));
+        setSearchSelectOptions(adjustItemSelect, options, "Choose a product...", currentVal);
       }
     } catch {
       // Quiet fail if offline
@@ -4073,15 +4177,17 @@ const setupStockPage = () => {
     if (adjustError) adjustError.hidden = true;
     adjustForm?.reset();
 
-    // Populate select
+    // Populate the product search-select
     const prodItems = cachedItems.filter((i) => i.type === "product");
     if (adjustItemSelect) {
-      adjustItemSelect.innerHTML = `<option value="">Choose a product...</option>` +
-        prodItems.map((p) => `<option value="${p.id}">${p.name} (Stock: ${p.current_stock} ${p.unit})</option>`).join("");
-      if (preselectedItem) {
-        adjustItemSelect.value = String(preselectedItem.id);
-      }
+      const options = prodItems.map((p) => ({
+        value: String(p.id),
+        label: `${p.name} (Stock: ${p.current_stock} ${p.unit})`,
+      }));
+      setSearchSelectOptions(adjustItemSelect, options, "Choose a product...", preselectedItem ? String(preselectedItem.id) : "");
     }
+    // Reset the adjustment-type search-select label to its default ("add")
+    setSearchSelectValue(adjustTypeSelect, "add");
 
     updateAdjustPreview();
     if (itemDetailModal) itemDetailModal.hidden = true;
@@ -4089,7 +4195,7 @@ const setupStockPage = () => {
   };
 
   const updateAdjustPreview = () => {
-    const selectedId = adjustItemSelect?.value;
+    const selectedId = adjustItemValue?.value;
     const match = cachedItems.find((i) => String(i.id) === String(selectedId));
     if (match && adjustPreview && adjustCurrentStock) {
       adjustCurrentStock.textContent = `${match.current_stock} ${match.unit}`;
@@ -4099,7 +4205,7 @@ const setupStockPage = () => {
     }
   };
 
-  adjustItemSelect?.addEventListener("change", updateAdjustPreview);
+  adjustItemValue?.addEventListener("change", updateAdjustPreview);
   openAdjustBtns.forEach((btn) => btn.addEventListener("click", () => openStockAdjustModal()));
   adjustCloseBtn?.addEventListener("click", () => {
     if (adjustModal) adjustModal.hidden = true;
@@ -4152,8 +4258,11 @@ const setupStockPage = () => {
       const data = await res.json();
       cachedSuppliers = Array.isArray(data.suppliers) ? data.suppliers : [];
       if (poSupplierSelect) {
-        poSupplierSelect.innerHTML = `<option value="">Choose supplier...</option>` +
-          cachedSuppliers.map((s) => `<option value="${s.id}">${s.supplier_name || s.full_name} (${s.phone || "No phone"})</option>`).join("");
+        const options = cachedSuppliers.map((s) => ({
+          value: String(s.id),
+          label: `${s.supplier_name || s.full_name} (${s.phone || "No phone"})`,
+        }));
+        setSearchSelectOptions(poSupplierSelect, options, "Choose supplier...", "");
       }
       return cachedSuppliers;
     } catch {
@@ -4196,34 +4305,33 @@ const setupStockPage = () => {
     const row = document.createElement("div");
     row.className = "po-line-item-row";
 
-    const select = document.createElement("select");
-    select.name = "line_item_id";
-    select.required = true;
-    select.innerHTML = `<option value="">Select product...</option>` +
-      prodItems.map((p) => `<option value="${p.id}" data-cost="${p.cost_price}">${p.name}</option>`).join("");
+    const select = createSearchSelectElement({
+      name: "line_item_id",
+      placeholder: "Select product...",
+      required: true,
+      options: prodItems.map((p) => ({ value: String(p.id), label: p.name })),
+    });
+    const selectValue = select.querySelector("[data-search-select-value]");
 
     const qtyInput = document.createElement("input");
-    qtyInput.type = "number";
+    qtyInput.type = "text";
+    qtyInput.inputMode = "numeric";
     qtyInput.name = "line_qty";
-    qtyInput.min = "1";
-    qtyInput.step = "0.01";
     qtyInput.value = "1";
     qtyInput.placeholder = "Qty";
     qtyInput.style.textAlign = "right";
 
     const costInput = document.createElement("input");
-    costInput.type = "number";
+    costInput.type = "text";
+    costInput.inputMode = "numeric";
     costInput.name = "line_cost";
-    costInput.min = "0";
-    costInput.step = "0.01";
     costInput.value = "0";
     costInput.placeholder = "Cost";
     costInput.style.textAlign = "right";
 
-    select.addEventListener("change", () => {
-      const opt = select.selectedOptions[0];
-      const defaultCost = opt?.dataset.cost || "0";
-      costInput.value = defaultCost;
+    selectValue?.addEventListener("change", () => {
+      const chosen = prodItems.find((p) => String(p.id) === String(selectValue.value));
+      costInput.value = chosen ? (chosen.cost_price || 0) : 0;
       calculatePoTotals();
     });
 
@@ -4274,14 +4382,14 @@ const setupStockPage = () => {
     if (poCreateSubmit) poCreateSubmit.disabled = true;
 
     try {
-      const supplierId = poSupplierSelect?.value;
+      const supplierId = poSupplierValue?.value;
       if (!supplierId) {
         throw new Error("Please select a vendor/supplier.");
       }
 
       const items = [];
       poLinesContainer?.querySelectorAll(".po-line-item-row").forEach((row) => {
-        const select = row.querySelector('select[name="line_item_id"]');
+        const select = row.querySelector('[name="line_item_id"]');
         const qtyInput = row.querySelector('input[name="line_qty"]');
         const costInput = row.querySelector('input[name="line_cost"]');
         const itemId = parseInt(select?.value || "0", 10);
@@ -4519,12 +4627,16 @@ const setupStockPage = () => {
       }).join("");
     }
 
-    // Toggle Receive Goods button: only if not already received or cancelled
+    // Toggle action buttons by status
+    const isCancelled = po.status === "cancelled";
     if (poReceiveBtn) {
-      poReceiveBtn.hidden = (po.status === "received" || po.status === "cancelled");
+      poReceiveBtn.hidden = (po.status === "received" || isCancelled);
     }
     if (poCancelBtn) {
-      poCancelBtn.hidden = (po.status === "received" || po.status === "cancelled" || po.status === "partially_received");
+      poCancelBtn.hidden = (po.status === "received" || isCancelled || po.status === "partially_received");
+    }
+    if (poUncancelBtn) {
+      poUncancelBtn.hidden = !isCancelled;
     }
 
     if (poDetailModal) poDetailModal.hidden = false;
@@ -4546,7 +4658,14 @@ const setupStockPage = () => {
   poEmailBtn?.addEventListener("click", async () => {
     if (!currentPO) return;
     const defaultEmail = currentPO.supplier?.email || currentPO.supplier_email || "";
-    const emailTo = window.prompt("Enter vendor email address to send Purchase Order PDF:", defaultEmail);
+    const emailTo = await showPromptModal({
+      title: "Email Purchase Order",
+      message: "Enter the vendor email address to send the PO PDF:",
+      placeholder: "vendor@example.com",
+      defaultValue: defaultEmail,
+      confirmLabel: "Send",
+      inputType: "email",
+    });
     if (!emailTo) return;
 
     poEmailBtn.disabled = true;
@@ -4612,6 +4731,39 @@ const setupStockPage = () => {
     }
   });
 
+  // Action: Reactivate (uncancel) PO
+  poUncancelBtn?.addEventListener("click", async () => {
+    if (!currentPO) return;
+    const confirmed = await showConfirmModal({
+      title: "Reactivate Purchase Order",
+      message: `Reactivate purchase order ${currentPO.po_number}? It will return to Draft status.`,
+      confirmLabel: "Reactivate",
+      cancelLabel: "Keep Cancelled",
+    });
+    if (!confirmed) return;
+
+    try {
+      const formData = new FormData();
+      formData.set("action", "uncancel_po");
+      formData.set("po_id", String(currentPO.id));
+
+      const res = await fetch(`${getBasePath()}api/purchasing.php`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Failed to reactivate order.");
+      }
+
+      await loadPurchaseOrders();
+      await loadSinglePoAndOpen(currentPO.id);
+      await showAppModal("Order Reactivated", "The purchase order is back to Draft status.");
+    } catch (e) {
+      showAppModal("Error", e.message);
+    }
+  });
+
   // Action: Goods Receiving (GRN)
   const openGrnModal = (po = currentPO) => {
     if (!po) return;
@@ -4644,7 +4796,7 @@ const setupStockPage = () => {
             ` : `
               <div style="display: flex; align-items: center; gap: 8px;">
                 <label style="font-size: 0.8rem; color: var(--color-muted); white-space: nowrap;">Receiving now:</label>
-                <input type="number" step="0.01" min="0" max="${remaining}" value="${remaining}" class="grn-qty-input" data-remaining="${remaining}" style="height: 36px; text-align: right;" required>
+                <input type="text" inputmode="numeric" max="${remaining}" value="${remaining}" class="grn-qty-input" data-remaining="${remaining}" style="height: 36px; text-align: right;" required>
                 <span style="font-size: 0.82rem; color: var(--color-muted);">${item.unit || "pcs"}</span>
               </div>
             `}
