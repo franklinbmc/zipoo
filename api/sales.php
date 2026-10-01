@@ -2,6 +2,10 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 session_start();
 
@@ -141,6 +145,194 @@ function present_sale(array $row, int $itemsCount = 0): array
     ];
 }
 
+function generate_invoice_pdf_html(array $sale, array $items, array $customer, array $biz): string
+{
+    $currency = (string) ($biz['currency'] ?? 'TZS');
+    $invNumber = htmlspecialchars((string) ($sale['invoice_number'] ?? ''));
+    $issueDate = htmlspecialchars((string) ($sale['issue_date'] ?? ''));
+    $dueDate = htmlspecialchars((string) ($sale['due_date'] ?? ''));
+    $status = strtoupper((string) ($sale['status'] ?? 'DRAFT'));
+
+    $bizName = htmlspecialchars((string) ($biz['business_name'] ?? 'Zipoo Business'));
+    $bizType = htmlspecialchars((string) ($biz['business_type'] ?? ''));
+    $bizTin = htmlspecialchars((string) ($biz['tin'] ?? ''));
+    $bizVrn = htmlspecialchars((string) ($biz['vrn'] ?? ''));
+    $footerNote = htmlspecialchars((string) ($biz['receipt_footer'] ?? 'Thank you for your business!'));
+
+    $custName = htmlspecialchars((string) ($customer['full_name'] ?? ($sale['customer_name'] ?? 'Walk-in Customer')));
+    $custPhone = htmlspecialchars((string) ($customer['phone'] ?? ''));
+    $custEmail = htmlspecialchars((string) ($customer['email'] ?? ''));
+    $custAddress = htmlspecialchars((string) ($customer['address'] ?? ''));
+    $custTin = htmlspecialchars((string) ($customer['tin'] ?? ''));
+    $custVrn = htmlspecialchars((string) ($customer['vrn'] ?? ''));
+
+    $subtotal = (float) ($sale['subtotal'] ?? 0);
+    $discount = (float) ($sale['discount'] ?? 0);
+    $taxRate = (float) ($sale['tax_rate'] ?? 0);
+    $taxAmount = (float) ($sale['tax_amount'] ?? 0);
+    $totalAmount = (float) ($sale['total_amount'] ?? 0);
+    $notes = htmlspecialchars((string) ($sale['notes'] ?? ''));
+
+    $itemsHtml = '';
+    $i = 1;
+    foreach ($items as $item) {
+        $name = htmlspecialchars((string) ($item['item_name'] ?? ''));
+        $qty = number_format((float) ($item['quantity'] ?? 0), 2);
+        $price = number_format((float) ($item['unit_price'] ?? 0), 2);
+        $total = number_format((float) ($item['line_total'] ?? 0), 2);
+        $vatTag = ((int) ($item['vat_applicable'] ?? 0) === 1) ? " <span style='color:#64748b;font-size:10px;'>(VAT)</span>" : '';
+
+        $itemsHtml .= "
+        <tr>
+            <td style='text-align: center; border-bottom: 1px solid #e2e8f0; padding: 8px 6px;'>{$i}</td>
+            <td style='border-bottom: 1px solid #e2e8f0; padding: 8px 10px;'>{$name}{$vatTag}</td>
+            <td style='text-align: right; border-bottom: 1px solid #e2e8f0; padding: 8px 10px;'>{$qty}</td>
+            <td style='text-align: right; border-bottom: 1px solid #e2e8f0; padding: 8px 10px;'>{$price} {$currency}</td>
+            <td style='text-align: right; border-bottom: 1px solid #e2e8f0; padding: 8px 10px; font-weight: bold;'>{$total} {$currency}</td>
+        </tr>";
+        $i++;
+    }
+
+    return "
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset='utf-8'>
+        <style>
+            body { font-family: Helvetica, Arial, sans-serif; color: #1e293b; font-size: 13px; line-height: 1.5; margin: 0; padding: 24px; }
+            .header { border-bottom: 2px solid #0e74db; padding-bottom: 16px; margin-bottom: 24px; }
+            .biz-title { font-size: 24px; font-weight: bold; color: #0e74db; margin: 0; }
+            .doc-title { font-size: 20px; font-weight: bold; color: #0f172a; text-align: right; margin: 0; }
+            .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; background: #e0f2fe; color: #0369a1; }
+            .grid { width: 100%; margin-bottom: 24px; }
+            .grid td { vertical-align: top; }
+            .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; }
+            .box-title { font-size: 11px; text-transform: uppercase; color: #64748b; font-weight: bold; margin-bottom: 6px; }
+            table.items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            table.items th { background: #0e74db; color: #ffffff; text-align: left; padding: 8px 10px; font-size: 12px; }
+            .totals { width: 45%; margin-left: auto; border-collapse: collapse; }
+            .totals td { padding: 6px 10px; }
+            .grand-total { font-size: 16px; font-weight: bold; color: #0e74db; border-top: 2px solid #0e74db; }
+            .footer { margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 12px; font-size: 11px; color: #64748b; text-align: center; }
+        </style>
+    </head>
+    <body>
+        <table class='header' style='width: 100%;'>
+            <tr>
+                <td>
+                    <h1 class='biz-title'>{$bizName}</h1>
+                    <div style='color: #64748b; font-size: 12px;'>{$bizType}</div>
+                    " . ($bizTin ? "<div style='color: #64748b; font-size: 12px;'>TIN: {$bizTin}</div>" : "") . "
+                    " . ($bizVrn ? "<div style='color: #64748b; font-size: 12px;'>VRN: {$bizVrn}</div>" : "") . "
+                </td>
+                <td style='text-align: right;'>
+                    <h2 class='doc-title'>" . ($taxRate > 0 ? "TAX INVOICE" : "INVOICE") . "</h2>
+                    <div style='font-size: 15px; font-weight: bold; color: #0e74db; margin-top: 4px;'>{$invNumber}</div>
+                    <div style='color: #64748b; font-size: 12px; margin-top: 4px;'>Issue Date: {$issueDate}</div>
+                    " . ($dueDate ? "<div style='color: #64748b; font-size: 12px;'>Due: {$dueDate}</div>" : "") . "
+                </td>
+            </tr>
+        </table>
+
+        <table class='grid'>
+            <tr>
+                <td style='width: 50%; padding-right: 12px;'>
+                    <div class='box'>
+                        <div class='box-title'>Bill To</div>
+                        <div style='font-size: 14px; font-weight: bold; color: #0f172a;'>{$custName}</div>
+                        " . ($custPhone ? "<div>Phone: {$custPhone}</div>" : "") . "
+                        " . ($custEmail ? "<div>Email: {$custEmail}</div>" : "") . "
+                        " . ($custAddress ? "<div>Address: {$custAddress}</div>" : "") . "
+                        " . ($custTin ? "<div>TIN: {$custTin}</div>" : "") . "
+                        " . ($custVrn ? "<div>VRN: {$custVrn}</div>" : "") . "
+                    </div>
+                </td>
+                <td style='width: 50%; padding-left: 12px;'>
+                    <div class='box'>
+                        <div class='box-title'>From</div>
+                        <div style='font-size: 14px; font-weight: bold; color: #0f172a;'>{$bizName}</div>
+                        " . ($bizTin ? "<div>TIN: {$bizTin}</div>" : "") . "
+                        " . ($bizVrn ? "<div>VRN: {$bizVrn}</div>" : "") . "
+                        <div>Status: <span class='badge'>{$status}</span></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <table class='items'>
+            <thead>
+                <tr>
+                    <th style='width: 30px; text-align: center;'>#</th>
+                    <th>Item Description</th>
+                    <th style='width: 80px; text-align: right;'>Qty</th>
+                    <th style='width: 120px; text-align: right;'>Unit Price</th>
+                    <th style='width: 130px; text-align: right;'>Line Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {$itemsHtml}
+            </tbody>
+        </table>
+
+        <table style='width: 100%;'>
+            <tr>
+                <td style='vertical-align: top; width: 55%; padding-right: 20px;'>
+                    " . ($notes ? "
+                    <div class='box' style='background: #fff; border-color: #cbd5e1;'>
+                        <div class='box-title'>Notes</div>
+                        <div style='font-size: 12px;'>{$notes}</div>
+                    </div>" : "") . "
+                </td>
+                <td style='vertical-align: top; width: 45%;'>
+                    <table class='totals'>
+                        <tr>
+                            <td>Subtotal:</td>
+                            <td style='text-align: right;'>" . number_format($subtotal, 2) . " {$currency}</td>
+                        </tr>
+                        " . ($discount > 0 ? "
+                        <tr>
+                            <td>Discount:</td>
+                            <td style='text-align: right;'>-" . number_format($discount, 2) . " {$currency}</td>
+                        </tr>" : "") . "
+                        " . ($taxRate > 0 ? "
+                        <tr>
+                            <td>VAT ({$taxRate}%):</td>
+                            <td style='text-align: right;'>" . number_format($taxAmount, 2) . " {$currency}</td>
+                        </tr>" : "") . "
+                        <tr class='grand-total'>
+                            <td>Total:</td>
+                            <td style='text-align: right;'>" . number_format($totalAmount, 2) . " {$currency}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+        <div class='footer'>
+            <div>{$footerNote}</div>
+            <div style='margin-top: 4px;'>Generated by Zipoo POS &bull; " . date('Y-m-d H:i:s') . "</div>
+        </div>
+    </body>
+    </html>
+    ";
+}
+
+function render_invoice_pdf(array $sale, array $items, array $customer, array $biz): string
+{
+    $html = generate_invoice_pdf_html($sale, $items, $customer, $biz);
+    $options = new Options();
+    $options->set('isHtml5ParserEnabled', true);
+    $options->set('isRemoteEnabled', true);
+    $options->set('defaultFont', 'Helvetica');
+
+    $dompdf = new Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    return $dompdf->output();
+}
+
 try {
     $pdo = db();
     $userId = require_user();
@@ -169,9 +361,20 @@ try {
 
             $customer = null;
             if (!empty($sale['customer_id'])) {
-                $cStmt = $pdo->prepare('SELECT id, full_name, phone, email, address FROM tbl_customers WHERE id = :cid AND business_id = :bid LIMIT 1');
+                $cStmt = $pdo->prepare('SELECT id, full_name, phone, email, address, tin, vrn FROM tbl_customers WHERE id = :cid AND business_id = :bid LIMIT 1');
                 $cStmt->execute([':cid' => (int) $sale['customer_id'], ':bid' => $businessId]);
                 $customer = $cStmt->fetch() ?: null;
+            }
+
+            // Printable invoice PDF
+            if (($_GET['action'] ?? '') === 'pdf') {
+                $pdfData = render_invoice_pdf($sale, $items, $customer ?: [], $biz);
+                $filename = 'Invoice-' . preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $sale['invoice_number']) . '.pdf';
+                header('Content-Type: application/pdf');
+                header('Content-Disposition: inline; filename="' . $filename . '"');
+                header('Content-Length: ' . strlen($pdfData));
+                echo $pdfData;
+                exit;
             }
 
             $out = present_sale($sale, count($items));
@@ -183,6 +386,7 @@ try {
                     'quantity' => (float) $it['quantity'],
                     'unit_price' => (float) $it['unit_price'],
                     'line_total' => (float) $it['line_total'],
+                    'vat_applicable' => (int) ($it['vat_applicable'] ?? 1),
                 ];
             }, $items);
             $out['customer'] = $customer ? [
@@ -191,6 +395,8 @@ try {
                 'phone' => (string) ($customer['phone'] ?? ''),
                 'email' => (string) ($customer['email'] ?? ''),
                 'address' => (string) ($customer['address'] ?? ''),
+                'tin' => (string) ($customer['tin'] ?? ''),
+                'vrn' => (string) ($customer['vrn'] ?? ''),
             ] : null;
 
             respond(200, ['ok' => true, 'invoice' => $out]);
@@ -274,7 +480,9 @@ try {
             $issueDate = trim((string) ($_POST['issue_date'] ?? date('Y-m-d')));
             $dueDate = trim((string) ($_POST['due_date'] ?? ''));
             $notes = trim((string) ($_POST['notes'] ?? ''));
-            $taxRate = (float) ($_POST['tax_rate'] ?? 0);
+            // VAT is automatic: rate comes from business settings, applied only to VAT-applicable items.
+            $vatEnabled = (int) ($biz['vat_enabled'] ?? 0) === 1;
+            $taxRate = $vatEnabled ? (float) ($biz['tax_rate'] ?? 0) : 0.0;
             $discount = (float) ($_POST['discount'] ?? 0);
             $itemsRaw = $_POST['items'] ?? '[]';
             $items = is_string($itemsRaw) ? json_decode($itemsRaw, true) : $itemsRaw;
@@ -302,6 +510,7 @@ try {
 
             // Validate line items
             $subtotal = 0.0;
+            $vatBase = 0.0;
             $validatedItems = [];
             foreach ($items as $item) {
                 $itemId = (int) ($item['item_id'] ?? 0);
@@ -315,13 +524,15 @@ try {
 
                 $itemName = $nameFallback;
                 $resolvedItemId = null;
+                $itemVat = 1; // free-text lines default to VAT-applicable when VAT is on
                 if ($itemId > 0) {
-                    $iStmt = $pdo->prepare('SELECT id, name FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
+                    $iStmt = $pdo->prepare('SELECT id, name, vat_applicable FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
                     $iStmt->execute([':id' => $itemId, ':bid' => $businessId]);
                     $iRow = $iStmt->fetch();
                     if ($iRow) {
                         $resolvedItemId = (int) $iRow['id'];
                         $itemName = (string) $iRow['name'];
+                        $itemVat = (int) ($iRow['vat_applicable'] ?? 1);
                     }
                 }
 
@@ -331,12 +542,17 @@ try {
 
                 $lineTotal = round($qty * $price, 2);
                 $subtotal += $lineTotal;
+                $lineVat = ($vatEnabled && $itemVat === 1) ? 1 : 0;
+                if ($lineVat === 1) {
+                    $vatBase += $lineTotal;
+                }
                 $validatedItems[] = [
                     'item_id' => $resolvedItemId,
                     'item_name' => $itemName,
                     'quantity' => $qty,
                     'unit_price' => $price,
                     'line_total' => $lineTotal,
+                    'vat_applicable' => $lineVat,
                 ];
             }
 
@@ -347,9 +563,14 @@ try {
             if ($discount < 0) {
                 $discount = 0.0;
             }
-            $taxableBase = max(0.0, $subtotal - $discount);
-            $taxAmount = round(($taxableBase * $taxRate) / 100, 2);
-            $totalAmount = round($taxableBase + $taxAmount, 2);
+            if ($discount > $subtotal) {
+                $discount = $subtotal;
+            }
+            // Discount reduces the VAT base proportionally so tax stays consistent with the net amount.
+            $discountRatio = $subtotal > 0 ? ($discount / $subtotal) : 0.0;
+            $effectiveVatBase = $vatBase * (1 - $discountRatio);
+            $taxAmount = round(($effectiveVatBase * $taxRate) / 100, 2);
+            $totalAmount = round(($subtotal - $discount) + $taxAmount, 2);
 
             $pdo->beginTransaction();
             try {
@@ -419,8 +640,8 @@ try {
                 }
 
                 $liStmt = $pdo->prepare(
-                    'INSERT INTO tbl_sale_items (sale_id, item_id, item_name, quantity, unit_price, line_total)
-                     VALUES (:sid, :iid, :iname, :qty, :price, :ltot)'
+                    'INSERT INTO tbl_sale_items (sale_id, item_id, item_name, quantity, unit_price, line_total, vat_applicable)
+                     VALUES (:sid, :iid, :iname, :qty, :price, :ltot, :vat)'
                 );
                 foreach ($validatedItems as $v) {
                     $liStmt->execute([
@@ -430,6 +651,7 @@ try {
                         ':qty' => $v['quantity'],
                         ':price' => $v['unit_price'],
                         ':ltot' => $v['line_total'],
+                        ':vat' => $v['vat_applicable'],
                     ]);
                 }
 
@@ -443,6 +665,185 @@ try {
                 'ok' => true,
                 'message' => $isEditing ? 'Invoice updated.' : "Invoice {$invoiceNumber} created.",
                 'invoice_id' => $saleId,
+            ]);
+        }
+
+        if ($action === 'create_pos_sale') {
+            $customerId = (int) ($_POST['customer_id'] ?? 0);
+            $customerNameInput = trim((string) ($_POST['customer_name'] ?? ''));
+            $paymentMethod = trim((string) ($_POST['payment_method'] ?? 'cash'));
+            $amountPaidInput = isset($_POST['amount_paid']) ? (float) $_POST['amount_paid'] : null;
+            $itemsRaw = $_POST['items'] ?? '[]';
+            $items = is_string($itemsRaw) ? json_decode($itemsRaw, true) : $itemsRaw;
+
+            if (!is_array($items) || empty($items)) {
+                respond(422, ['ok' => false, 'message' => 'Add at least one product to the cart.']);
+            }
+
+            // VAT is automatic from business settings.
+            $vatEnabled = (int) ($biz['vat_enabled'] ?? 0) === 1;
+            $taxRate = $vatEnabled ? (float) ($biz['tax_rate'] ?? 0) : 0.0;
+
+            // Resolve customer (optional; POS defaults to walk-in)
+            $customerName = $customerNameInput;
+            if ($customerId > 0) {
+                $cStmt = $pdo->prepare('SELECT id, full_name FROM tbl_customers WHERE id = :cid AND business_id = :bid LIMIT 1');
+                $cStmt->execute([':cid' => $customerId, ':bid' => $businessId]);
+                $cRow = $cStmt->fetch();
+                if (!$cRow) {
+                    respond(404, ['ok' => false, 'message' => 'Selected customer not found.']);
+                }
+                $customerName = (string) $cRow['full_name'];
+            } else {
+                $customerId = 0;
+                if ($customerName === '') {
+                    $customerName = 'Walk-in Customer';
+                }
+            }
+
+            // Validate items, compute totals, and check stock for products.
+            $subtotal = 0.0;
+            $vatBase = 0.0;
+            $validatedItems = [];
+            foreach ($items as $item) {
+                $itemId = (int) ($item['item_id'] ?? 0);
+                $qty = (float) ($item['quantity'] ?? 0);
+                $price = (float) ($item['unit_price'] ?? 0);
+                if ($itemId <= 0 || $qty <= 0) {
+                    continue;
+                }
+
+                $iStmt = $pdo->prepare('SELECT id, name, type, current_stock, cost_price, vat_applicable FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
+                $iStmt->execute([':id' => $itemId, ':bid' => $businessId]);
+                $iRow = $iStmt->fetch();
+                if (!$iRow) {
+                    continue;
+                }
+
+                if ($iRow['type'] !== 'service' && (float) $iRow['current_stock'] < $qty) {
+                    respond(422, ['ok' => false, 'message' => 'Not enough stock for "' . $iRow['name'] . '". Available: ' . rtrim(rtrim(number_format((float) $iRow['current_stock'], 2), '0'), '.') . '.']);
+                }
+
+                $lineTotal = round($qty * $price, 2);
+                $subtotal += $lineTotal;
+                $lineVat = ($vatEnabled && (int) ($iRow['vat_applicable'] ?? 1) === 1) ? 1 : 0;
+                if ($lineVat === 1) {
+                    $vatBase += $lineTotal;
+                }
+
+                $validatedItems[] = [
+                    'item_id' => (int) $iRow['id'],
+                    'item_name' => (string) $iRow['name'],
+                    'type' => (string) $iRow['type'],
+                    'cost_price' => (float) $iRow['cost_price'],
+                    'quantity' => $qty,
+                    'unit_price' => $price,
+                    'line_total' => $lineTotal,
+                    'vat_applicable' => $lineVat,
+                ];
+            }
+
+            if (empty($validatedItems)) {
+                respond(422, ['ok' => false, 'message' => 'No valid products in the cart.']);
+            }
+
+            $taxAmount = round(($vatBase * $taxRate) / 100, 2);
+            $totalAmount = round($subtotal + $taxAmount, 2);
+            // POS sales are settled immediately; default paid = total.
+            $amountPaid = ($amountPaidInput !== null && $amountPaidInput >= $totalAmount) ? $amountPaidInput : $totalAmount;
+            $changeDue = round($amountPaid - $totalAmount, 2);
+
+            $pdo->beginTransaction();
+            try {
+                $countStmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_sales WHERE business_id = :bid AND sale_type = "pos"');
+                $countStmt->execute([':bid' => $businessId]);
+                $seq = ((int) $countStmt->fetchColumn()) + 1;
+                $receiptNumber = 'POS-' . date('Ym') . '-' . str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
+                $today = date('Y-m-d');
+
+                $ins = $pdo->prepare(
+                    'INSERT INTO tbl_sales
+                        (business_id, sale_type, invoice_number, customer_id, customer_name, status, issue_date, due_date,
+                         subtotal, discount, tax_rate, tax_amount, total_amount, amount_paid, notes, created_by)
+                     VALUES (:bid, "pos", :inv, :cid, :cname, "paid", :idate, NULL,
+                         :sub, 0.00, :trate, :tamt, :tot, :paid, :notes, :uid)'
+                );
+                $ins->execute([
+                    ':bid' => $businessId,
+                    ':inv' => $receiptNumber,
+                    ':cid' => $customerId > 0 ? $customerId : null,
+                    ':cname' => $customerName,
+                    ':idate' => $today,
+                    ':sub' => $subtotal,
+                    ':trate' => $taxRate,
+                    ':tamt' => $taxAmount,
+                    ':tot' => $totalAmount,
+                    ':paid' => min($amountPaid, $totalAmount), // store settled amount, not change
+                    ':notes' => 'POS sale (' . $paymentMethod . ')',
+                    ':uid' => $userId,
+                ]);
+                $saleId = (int) $pdo->lastInsertId();
+
+                $liStmt = $pdo->prepare(
+                    'INSERT INTO tbl_sale_items (sale_id, item_id, item_name, quantity, unit_price, line_total, vat_applicable)
+                     VALUES (:sid, :iid, :iname, :qty, :price, :ltot, :vat)'
+                );
+                $updStock = $pdo->prepare('UPDATE tbl_items SET current_stock = current_stock - :qty WHERE id = :id AND business_id = :bid');
+                $moveStmt = $pdo->prepare(
+                    'INSERT INTO tbl_stock_movements
+                     (business_id, item_id, movement_type, quantity, previous_stock, new_stock, unit_cost, reference_type, reference_id, notes, created_by)
+                     VALUES (:bid, :item_id, "sale", :qty, :prev, :new, :cost, "POS", :ref, :notes, :uid)'
+                );
+
+                foreach ($validatedItems as $v) {
+                    $liStmt->execute([
+                        ':sid' => $saleId,
+                        ':iid' => $v['item_id'],
+                        ':iname' => $v['item_name'],
+                        ':qty' => $v['quantity'],
+                        ':price' => $v['unit_price'],
+                        ':ltot' => $v['line_total'],
+                        ':vat' => $v['vat_applicable'],
+                    ]);
+
+                    if ($v['type'] !== 'service') {
+                        $sStmt = $pdo->prepare('SELECT current_stock FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
+                        $sStmt->execute([':id' => $v['item_id'], ':bid' => $businessId]);
+                        $prevStock = (float) ($sStmt->fetchColumn() ?: 0);
+                        $newStock = $prevStock - $v['quantity'];
+
+                        $updStock->execute([':qty' => $v['quantity'], ':id' => $v['item_id'], ':bid' => $businessId]);
+                        $moveStmt->execute([
+                            ':bid' => $businessId,
+                            ':item_id' => $v['item_id'],
+                            ':qty' => -1 * $v['quantity'],
+                            ':prev' => $prevStock,
+                            ':new' => $newStock,
+                            ':cost' => $v['cost_price'],
+                            ':ref' => $receiptNumber,
+                            ':notes' => 'Sold via POS ' . $receiptNumber,
+                            ':uid' => $userId,
+                        ]);
+                    }
+                }
+
+                $pdo->commit();
+            } catch (Throwable $e) {
+                $pdo->rollBack();
+                throw $e;
+            }
+
+            respond(201, [
+                'ok' => true,
+                'message' => "Sale {$receiptNumber} completed.",
+                'sale_id' => $saleId,
+                'receipt_number' => $receiptNumber,
+                'subtotal' => $subtotal,
+                'tax_rate' => $taxRate,
+                'tax_amount' => $taxAmount,
+                'total_amount' => $totalAmount,
+                'amount_paid' => $amountPaid,
+                'change_due' => $changeDue,
             ]);
         }
 

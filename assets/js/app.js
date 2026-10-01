@@ -943,12 +943,30 @@ const setupSettingsPage = () => {
       if (generalForm.elements["tax_rate"]) {
         generalForm.elements["tax_rate"].value = business.tax_rate ?? "18.00";
       }
+      if (generalForm.elements["vat_enabled"]) {
+        generalForm.elements["vat_enabled"].checked = Number(business.vat_enabled) === 1;
+      }
+      if (generalForm.elements["tin"]) {
+        generalForm.elements["tin"].value = business.tin || "";
+      }
+      if (generalForm.elements["vrn"]) {
+        generalForm.elements["vrn"].value = business.vrn || "";
+      }
       if (generalForm.elements["receipt_footer"]) {
         generalForm.elements["receipt_footer"].value = business.receipt_footer || "";
       }
+      syncVatRateField();
     }
     if (generalModal) generalModal.hidden = false;
   };
+
+  const vatEnabledToggle = document.querySelector("[data-vat-enabled-toggle]");
+  const vatRateField = document.querySelector("[data-vat-rate-field]");
+  function syncVatRateField() {
+    if (vatRateField) vatRateField.hidden = !(vatEnabledToggle && vatEnabledToggle.checked);
+  }
+  vatEnabledToggle?.addEventListener("change", syncVatRateField);
+
   let editField = "";
   let editStep = "request";
   let regions = [];
@@ -3046,6 +3064,8 @@ const setupCustomersPage = () => {
   const editPhone = document.querySelector("[data-edit-phone]");
   const editEmail = document.querySelector("[data-edit-email]");
   const editAddress = document.querySelector("[data-edit-address]");
+  const editTin = document.querySelector("[data-edit-tin]");
+  const editVrn = document.querySelector("[data-edit-vrn]");
   const editNotes = document.querySelector("[data-edit-notes]");
 
   let currentCustomer = null;
@@ -3164,6 +3184,8 @@ const setupCustomersPage = () => {
     if (editPhone) editPhone.value = customer.phone || "";
     if (editEmail) editEmail.value = customer.email || "";
     if (editAddress) editAddress.value = customer.address || "";
+    if (editTin) editTin.value = customer.tin || "";
+    if (editVrn) editVrn.value = customer.vrn || "";
     if (editNotes) editNotes.value = customer.notes || "";
     if (editModal) editModal.hidden = false;
     editFullName?.focus();
@@ -3349,6 +3371,8 @@ const setupSuppliersPage = () => {
   const editPhone = document.querySelector("[data-edit-supplier-phone]");
   const editEmail = document.querySelector("[data-edit-supplier-email]");
   const editAddress = document.querySelector("[data-edit-supplier-address]");
+  const editTin = document.querySelector("[data-edit-supplier-tin]");
+  const editVrn = document.querySelector("[data-edit-supplier-vrn]");
   const editNotes = document.querySelector("[data-edit-supplier-notes]");
 
   let currentSupplier = null;
@@ -3468,6 +3492,8 @@ const setupSuppliersPage = () => {
     if (editPhone) editPhone.value = supplier.phone || "";
     if (editEmail) editEmail.value = supplier.email || "";
     if (editAddress) editAddress.value = supplier.address || "";
+    if (editTin) editTin.value = supplier.tin || "";
+    if (editVrn) editVrn.value = supplier.vrn || "";
     if (editNotes) editNotes.value = supplier.notes || "";
     if (editModal) editModal.hidden = false;
     editSupplierName?.focus();
@@ -3668,6 +3694,8 @@ const setupStockPage = () => {
   const unitSelectEl = document.querySelector("[data-unit-select]");
   const newCategoryInput = document.querySelector("[data-new-category-input]");
   const statusField = document.querySelector("[data-status-field]");
+  const itemVatField = document.querySelector("[data-item-vat-field]");
+  const itemVatCheckbox = document.querySelector("[data-item-vat-checkbox]");
 
   // Stock Adjust Modal
   const adjustModal = document.querySelector("[data-stock-adjust-modal]");
@@ -3700,7 +3728,8 @@ const setupStockPage = () => {
   const poSupplierValue = document.querySelector("[data-po-supplier-value]");
   const poLinesContainer = document.querySelector("[data-po-lines-container]");
   const addPoLineBtn = document.querySelector("[data-add-po-line]");
-  const poTaxInput = document.querySelector("[data-po-tax-input]");
+  const poVatRow = document.querySelector("[data-po-vat-row]");
+  const poVatRateLabel = document.querySelector("[data-po-vat-rate]");
   const poCalcSubtotal = document.querySelector("[data-po-calc-subtotal]");
   const poCalcTax = document.querySelector("[data-po-calc-tax]");
   const poCalcTotal = document.querySelector("[data-po-calc-total]");
@@ -3745,6 +3774,7 @@ const setupStockPage = () => {
 
   // In-memory state
   let cachedItems = [];
+  let vatConfig = { enabled: false, rate: 0 };
   let cachedPOs = [];
   let cachedSuppliers = [];
   let cachedCategories = [];
@@ -3939,6 +3969,7 @@ const setupStockPage = () => {
       if (!data || !data.ok) return;
 
       cachedItems = Array.isArray(data.items) ? data.items : [];
+      if (data.vat) vatConfig = { enabled: !!data.vat.enabled, rate: Number(data.vat.rate) || 0 };
       renderItemsList(cachedItems);
 
       // Update KPI counters
@@ -4021,6 +4052,8 @@ const setupStockPage = () => {
     populateCategorySelect(cachedCategories, "General");
     if (statusField) statusField.hidden = true;
     if (initialStockWrap) initialStockWrap.hidden = false;
+    if (itemVatField) itemVatField.hidden = !vatConfig.enabled;
+    if (itemVatCheckbox) itemVatCheckbox.checked = vatConfig.enabled; // default VAT-applicable when VAT is on
     if (itemFormModal) itemFormModal.hidden = false;
     itemForm?.querySelector('input[name="name"]')?.focus();
   };
@@ -4048,6 +4081,9 @@ const setupStockPage = () => {
       itemForm.elements["description"].value = item.description || "";
       itemForm.elements["status"].value = item.status || "active";
     }
+
+    if (itemVatField) itemVatField.hidden = !vatConfig.enabled;
+    if (itemVatCheckbox) itemVatCheckbox.checked = Number(item.vat_applicable ?? 1) === 1;
 
     if (itemDetailModal) itemDetailModal.hidden = true;
     if (itemFormModal) itemFormModal.hidden = false;
@@ -4143,6 +4179,9 @@ const setupStockPage = () => {
       if (usingNewCategory) {
         formData.set("category", newCat);
       }
+      // When VAT is enabled, honour the checkbox; when it's off, keep items VAT-applicable by default
+      // so enabling VAT later works without re-editing every item.
+      formData.set("vat_applicable", vatConfig.enabled ? (itemVatCheckbox && itemVatCheckbox.checked ? "1" : "0") : "1");
 
       const res = await fetch(`${getBasePath()}api/items.php`, {
         method: "POST",
@@ -4272,9 +4311,11 @@ const setupStockPage = () => {
 
   const calculatePoTotals = () => {
     let subtotal = 0;
+    let vatBase = 0;
     poLinesContainer?.querySelectorAll(".po-line-item-row").forEach((row) => {
       const qtyInput = row.querySelector('input[name="line_qty"]');
       const costInput = row.querySelector('input[name="line_cost"]');
+      const selectValue = row.querySelector('[name="line_item_id"]');
       const totalSpan = row.querySelector("[data-line-total]");
 
       const qty = parseFloat(qtyInput?.value || "0") || 0;
@@ -4282,21 +4323,28 @@ const setupStockPage = () => {
       const lineTot = qty * cost;
       subtotal += lineTot;
 
+      if (vatConfig.enabled) {
+        const chosen = cachedItems.find((p) => String(p.id) === String(selectValue?.value || ""));
+        if (chosen && Number(chosen.vat_applicable ?? 1) === 1) {
+          vatBase += lineTot;
+        }
+      }
+
       if (totalSpan) {
         totalSpan.textContent = formatCurrency(lineTot);
       }
     });
 
-    const taxRate = parseFloat(poTaxInput?.value || "0") || 0;
-    const taxAmt = (subtotal * taxRate) / 100;
+    const taxRate = vatConfig.enabled ? vatConfig.rate : 0;
+    const taxAmt = (vatBase * taxRate) / 100;
     const grandTot = subtotal + taxAmt;
 
+    if (poVatRow) poVatRow.hidden = !vatConfig.enabled;
+    if (poVatRateLabel) poVatRateLabel.textContent = String(taxRate);
     if (poCalcSubtotal) poCalcSubtotal.textContent = formatCurrency(subtotal);
     if (poCalcTax) poCalcTax.textContent = formatCurrency(taxAmt);
     if (poCalcTotal) poCalcTotal.textContent = formatCurrency(grandTot);
   };
-
-  poTaxInput?.addEventListener("input", calculatePoTotals);
 
   const addPoLineItem = () => {
     if (!poLinesContainer) return;
@@ -5092,7 +5140,6 @@ const setupSalesPage = () => {
   const openWorkspace = (el) => { if (el) el.hidden = false; };
   const closeWorkspace = (el) => { if (el) el.hidden = true; };
 
-  document.querySelectorAll("[data-open-pos-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(posWorkspace)));
   document.querySelector("[data-pos-workspace-close]")?.addEventListener("click", () => closeWorkspace(posWorkspace));
   document.querySelectorAll("[data-open-invoices-workspace]").forEach((btn) => btn.addEventListener("click", () => { openWorkspace(invoicesWorkspace); loadInvoices(invoicesSearch?.value.trim() || ""); }));
   document.querySelector("[data-invoices-workspace-close]")?.addEventListener("click", () => closeWorkspace(invoicesWorkspace));
@@ -5132,7 +5179,8 @@ const setupSalesPage = () => {
   const invoiceLinesContainer = document.querySelector("[data-invoice-lines-container]");
   const addInvoiceLineBtn = document.querySelector("[data-add-invoice-line]");
   const invoiceDiscountInput = document.querySelector("[data-invoice-discount-input]");
-  const invoiceTaxInput = document.querySelector("[data-invoice-tax-input]");
+  const invoiceVatRow = document.querySelector("[data-invoice-vat-row]");
+  const invoiceVatRateLabel = document.querySelector("[data-invoice-vat-rate]");
   const invoiceCalcSubtotal = document.querySelector("[data-invoice-calc-subtotal]");
   const invoiceCalcTax = document.querySelector("[data-invoice-calc-tax]");
   const invoiceCalcTotal = document.querySelector("[data-invoice-calc-total]");
@@ -5157,12 +5205,14 @@ const setupSalesPage = () => {
   const invoiceMarkSentBtn = document.querySelector("[data-invoice-mark-sent-btn]");
   const invoiceMarkPaidBtn = document.querySelector("[data-invoice-mark-paid-btn]");
   const invoiceEditBtn = document.querySelector("[data-invoice-edit-btn]");
+  const invoiceDownloadPdfBtn = document.querySelector("[data-invoice-download-pdf-btn]");
   const invoiceCancelBtn = document.querySelector("[data-invoice-cancel-btn]");
   const invoiceUncancelBtn = document.querySelector("[data-invoice-uncancel-btn]");
   const invoiceDeleteBtn = document.querySelector("[data-invoice-delete-btn]");
 
   // ---- State ----
   let cachedProducts = [];
+  let invVatConfig = { enabled: false, rate: 0 };
   let cachedCustomers = [];
   let activeInvoiceStatus = "all";
   let currentInvoice = null;
@@ -5173,7 +5223,10 @@ const setupSalesPage = () => {
       const res = await fetch(`${getBasePath()}api/items.php`);
       if (!res.ok) return;
       const data = await res.json();
-      if (data && data.ok) cachedProducts = Array.isArray(data.items) ? data.items : [];
+      if (data && data.ok) {
+        cachedProducts = Array.isArray(data.items) ? data.items : [];
+        if (data.vat) invVatConfig = { enabled: !!data.vat.enabled, rate: Number(data.vat.rate) || 0 };
+      }
     } catch { /* offline */ }
   };
 
@@ -5268,25 +5321,35 @@ const setupSalesPage = () => {
   // ---- Invoice form: line items ----
   const calculateInvoiceTotals = () => {
     let subtotal = 0;
+    let vatBase = 0;
     invoiceLinesContainer?.querySelectorAll(".po-line-item-row").forEach((row) => {
       const qty = num(row.querySelector('input[name="line_qty"]')?.value);
       const price = num(row.querySelector('input[name="line_price"]')?.value);
+      const selectValue = row.querySelector('[name="line_item_id"]');
       const lineTot = qty * price;
       subtotal += lineTot;
+      if (invVatConfig.enabled) {
+        const chosen = cachedProducts.find((p) => String(p.id) === String(selectValue?.value || ""));
+        // Known items follow their flag; free-text lines default to VAT-applicable.
+        if (!chosen || Number(chosen.vat_applicable ?? 1) === 1) {
+          vatBase += lineTot;
+        }
+      }
       const totSpan = row.querySelector("[data-line-total]");
       if (totSpan) totSpan.textContent = formatCurrency(lineTot);
     });
-    const discount = Math.max(0, num(invoiceDiscountInput?.value));
-    const taxRate = num(invoiceTaxInput?.value);
-    const taxable = Math.max(0, subtotal - discount);
-    const taxAmt = (taxable * taxRate) / 100;
-    const total = taxable + taxAmt;
+    const discount = Math.min(Math.max(0, num(invoiceDiscountInput?.value)), subtotal);
+    const taxRate = invVatConfig.enabled ? invVatConfig.rate : 0;
+    const discountRatio = subtotal > 0 ? discount / subtotal : 0;
+    const taxAmt = (vatBase * (1 - discountRatio) * taxRate) / 100;
+    const total = (subtotal - discount) + taxAmt;
+    if (invoiceVatRow) invoiceVatRow.hidden = !invVatConfig.enabled;
+    if (invoiceVatRateLabel) invoiceVatRateLabel.textContent = String(taxRate);
     if (invoiceCalcSubtotal) invoiceCalcSubtotal.textContent = formatCurrency(subtotal);
     if (invoiceCalcTax) invoiceCalcTax.textContent = formatCurrency(taxAmt);
     if (invoiceCalcTotal) invoiceCalcTotal.textContent = formatCurrency(total);
   };
   invoiceDiscountInput?.addEventListener("input", calculateInvoiceTotals);
-  invoiceTaxInput?.addEventListener("input", calculateInvoiceTotals);
 
   const addInvoiceLineItem = (preset = null) => {
     if (!invoiceLinesContainer) return;
@@ -5363,7 +5426,6 @@ const setupSalesPage = () => {
       invoiceForm.elements["issue_date"].value = inv.issue_date || new Date().toISOString().split("T")[0];
       invoiceForm.elements["due_date"].value = inv.due_date || "";
       invoiceForm.elements["discount"].value = inv.discount || 0;
-      invoiceForm.elements["tax_rate"].value = inv.tax_rate || 0;
       invoiceForm.elements["notes"].value = inv.notes || "";
     }
     setSSValue(invoiceCustomerSelect, inv.customer_id ? String(inv.customer_id) : "");
@@ -5473,6 +5535,10 @@ const setupSalesPage = () => {
 
   invoiceDetailCloseBtn?.addEventListener("click", () => { if (invoiceDetailModal) invoiceDetailModal.hidden = true; currentInvoice = null; });
   invoiceEditBtn?.addEventListener("click", () => openEditInvoiceModal(currentInvoice));
+  invoiceDownloadPdfBtn?.addEventListener("click", () => {
+    if (!currentInvoice) return;
+    window.open(`${getBasePath()}api/sales.php?action=pdf&id=${currentInvoice.id}`, "_blank");
+  });
 
   const postInvoiceAction = async (body, successTitle, successMsg, reopen = true) => {
     try {
@@ -5546,6 +5612,346 @@ const setupSalesPage = () => {
     clearTimeout(invoiceSearchTimeout);
     invoiceSearchTimeout = setTimeout(() => loadInvoices(e.target.value.trim()), 250);
   });
+
+  // =========================================================
+  //  Point of Sale
+  // =========================================================
+  const posCustomerNameEl = document.querySelector("[data-pos-customer-name]");
+  const posChangeCustomerBtn = document.querySelector("[data-pos-change-customer]");
+  const posSearch = document.querySelector("[data-pos-search]");
+  const posCartWrap = document.querySelector("[data-pos-cart-wrap]");
+  const posCartBody = document.querySelector("[data-pos-cart-body]");
+  const posCartEmpty = document.querySelector("[data-pos-cart-empty]");
+  const posCategoryFilters = document.querySelector("[data-pos-category-filters]");
+  const posProductList = document.querySelector("[data-pos-product-list]");
+  const posProductEmpty = document.querySelector("[data-pos-product-empty]");
+  const posTotalEl = document.querySelector("[data-pos-total]");
+  const posClearBtn = document.querySelector("[data-pos-clear]");
+  const posCheckoutBtn = document.querySelector("[data-pos-checkout]");
+
+  // Customer modal
+  const posCustomerModal = document.querySelector("[data-pos-customer-modal]");
+  const posCustomerSelect = document.querySelector("[data-pos-customer-select]");
+  const posCustomerSelectValue = posCustomerSelect?.querySelector("[data-search-select-value]");
+  const posCustomerConfirmBtn = document.querySelector("[data-pos-customer-confirm]");
+  const posCustomerCancelBtn = document.querySelector("[data-pos-customer-cancel]");
+
+  // Checkout modal
+  const posCheckoutModal = document.querySelector("[data-pos-checkout-modal]");
+  const posCheckoutCloseBtn = document.querySelector("[data-pos-checkout-close]");
+  const posCheckoutCustomer = document.querySelector("[data-pos-checkout-customer]");
+  const posCheckoutSubtotal = document.querySelector("[data-pos-checkout-subtotal]");
+  const posCheckoutVatRow = document.querySelector("[data-pos-checkout-vat-row]");
+  const posCheckoutVatRate = document.querySelector("[data-pos-checkout-vat-rate]");
+  const posCheckoutVat = document.querySelector("[data-pos-checkout-vat]");
+  const posCheckoutTotal = document.querySelector("[data-pos-checkout-total]");
+  const posPaymentMethods = document.querySelector("[data-pos-payment-methods]");
+  const posAmountPaid = document.querySelector("[data-pos-amount-paid]");
+  const posChangeDue = document.querySelector("[data-pos-change-due]");
+  const posCheckoutError = document.querySelector("[data-pos-checkout-error]");
+  const posCompleteSaleBtn = document.querySelector("[data-pos-complete-sale]");
+
+  // Receipt modal
+  const posReceiptModal = document.querySelector("[data-pos-receipt-modal]");
+  const posReceiptNumber = document.querySelector("[data-pos-receipt-number]");
+  const posReceiptTotal = document.querySelector("[data-pos-receipt-total]");
+  const posReceiptPaid = document.querySelector("[data-pos-receipt-paid]");
+  const posReceiptChange = document.querySelector("[data-pos-receipt-change]");
+  const posReceiptPrintBtn = document.querySelector("[data-pos-receipt-print]");
+  const posNewSaleBtn = document.querySelector("[data-pos-new-sale]");
+
+  let posCart = [];
+  let posCustomer = { id: 0, name: "Walk-in Customer" };
+  let posCategory = "all";
+  let posPayment = "cash";
+  let lastSale = null;
+
+  const posTotals = () => {
+    let subtotal = 0;
+    let vatBase = 0;
+    posCart.forEach((l) => {
+      const lineTot = l.price * l.qty;
+      subtotal += lineTot;
+      if (invVatConfig.enabled && Number(l.vat_applicable) === 1) vatBase += lineTot;
+    });
+    const rate = invVatConfig.enabled ? invVatConfig.rate : 0;
+    const tax = (vatBase * rate) / 100;
+    return { subtotal, tax, rate, total: subtotal + tax };
+  };
+
+  const buildPosCartRow = (line) => {
+    const tr = document.createElement("tr");
+
+    const nameTd = document.createElement("td");
+    nameTd.innerHTML = `<div class="pos-cart-item-name">${line.name}</div>`;
+
+    const priceTd = document.createElement("td");
+    priceTd.style.textAlign = "right";
+    priceTd.textContent = formatCurrency(line.price);
+
+    const qtyTd = document.createElement("td");
+    qtyTd.style.textAlign = "center";
+    const stepper = document.createElement("div");
+    stepper.className = "pos-qty-stepper";
+    const minus = document.createElement("button");
+    minus.type = "button";
+    minus.textContent = "−";
+    const qtyVal = document.createElement("span");
+    qtyVal.className = "pos-qty-value";
+    qtyVal.textContent = String(line.qty);
+    const plus = document.createElement("button");
+    plus.type = "button";
+    plus.textContent = "+";
+    minus.addEventListener("click", () => changePosQty(line.id, line.qty - 1));
+    plus.addEventListener("click", () => changePosQty(line.id, line.qty + 1));
+    stepper.append(minus, qtyVal, plus);
+    qtyTd.append(stepper);
+
+    const actTd = document.createElement("td");
+    actTd.style.textAlign = "center";
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "pos-cart-remove";
+    removeBtn.setAttribute("aria-label", "Remove");
+    removeBtn.innerHTML = `<svg viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320"/><path d="M80 112h352M192 112V72h128v40M256 176v224M184 176l8 224M328 176l-8 224"/></svg>`;
+    removeBtn.addEventListener("click", () => removeFromPosCart(line.id));
+    actTd.append(removeBtn);
+
+    tr.append(nameTd, priceTd, qtyTd, actTd);
+    return tr;
+  };
+
+  const renderPosCart = () => {
+    const has = posCart.length > 0;
+    if (posCartWrap) posCartWrap.hidden = !has;
+    if (posCartEmpty) posCartEmpty.hidden = has;
+    if (posCartBody) posCartBody.replaceChildren(...posCart.map(buildPosCartRow));
+    const { total } = posTotals();
+    if (posTotalEl) posTotalEl.textContent = formatCurrency(total);
+    if (posCheckoutBtn) posCheckoutBtn.disabled = !has;
+    if (posClearBtn) posClearBtn.disabled = !has;
+  };
+
+  const addToPosCart = (product) => {
+    const stock = Number(product.current_stock) || 0;
+    const isProduct = product.type !== "service";
+    const existing = posCart.find((l) => l.id === product.id);
+    if (existing) {
+      changePosQty(product.id, existing.qty + 1);
+      return;
+    }
+    if (isProduct && stock <= 0) {
+      showAppModal("Out of stock", `"${product.name}" has no stock available.`);
+      return;
+    }
+    posCart.push({
+      id: product.id,
+      name: product.name,
+      unit: product.unit || "pcs",
+      price: Number(product.selling_price) || 0,
+      qty: 1,
+      vat_applicable: Number(product.vat_applicable ?? 1),
+      type: product.type,
+      stock,
+    });
+    renderPosCart();
+  };
+
+  const changePosQty = (id, newQty) => {
+    const line = posCart.find((l) => l.id === id);
+    if (!line) return;
+    if (newQty <= 0) {
+      removeFromPosCart(id);
+      return;
+    }
+    if (line.type !== "service" && newQty > line.stock) {
+      showAppModal("Not enough stock", `Only ${line.stock} ${line.unit} of "${line.name}" available.`);
+      newQty = line.stock;
+    }
+    line.qty = newQty;
+    renderPosCart();
+  };
+
+  const removeFromPosCart = (id) => {
+    posCart = posCart.filter((l) => l.id !== id);
+    renderPosCart();
+  };
+
+  const clearPosCart = () => {
+    posCart = [];
+    renderPosCart();
+  };
+
+  const renderPosCategories = () => {
+    if (!posCategoryFilters) return;
+    const cats = Array.from(new Set(cachedProducts.map((p) => p.category || "General"))).sort();
+    const all = [{ key: "all", label: "All Category" }].concat(cats.map((c) => ({ key: c, label: c })));
+    posCategoryFilters.replaceChildren(...all.map((c) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "filter-pill" + (posCategory === c.key ? " active" : "");
+      btn.textContent = c.label;
+      btn.addEventListener("click", () => {
+        posCategory = c.key;
+        renderPosCategories();
+        renderPosProducts();
+      });
+      return btn;
+    }));
+  };
+
+  const renderPosProducts = () => {
+    if (!posProductList) return;
+    const q = (posSearch?.value || "").trim().toLowerCase();
+    const matches = cachedProducts.filter((p) => {
+      if (p.status && p.status !== "active") return false;
+      if (posCategory !== "all" && (p.category || "General") !== posCategory) return false;
+      if (!q) return true;
+      return [p.name, p.sku, p.barcode, p.category].some((f) => String(f || "").toLowerCase().includes(q));
+    });
+
+    if (posProductEmpty) posProductEmpty.hidden = matches.length > 0;
+
+    posProductList.replaceChildren(...matches.map((p) => {
+      const isProduct = p.type !== "service";
+      const stock = Number(p.current_stock) || 0;
+      const out = isProduct && stock <= 0;
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "pos-product-row" + (out ? " is-out" : "");
+      const meta = isProduct ? `${p.category || "General"} • ${stock} ${p.unit || "pcs"} in stock` : `${p.category || "General"} • Service`;
+      row.innerHTML = `<span><span class="pos-product-name">${p.name}</span><span class="pos-product-meta">${meta}${out ? " — Out of stock" : ""}</span></span><span class="pos-product-price">${formatCurrency(p.selling_price)}</span>`;
+      if (!out) row.addEventListener("click", () => addToPosCart(p));
+      return row;
+    }));
+  };
+
+  const refreshPosCatalogue = async () => {
+    await loadProducts();
+    renderPosCategories();
+    renderPosProducts();
+    renderPosCart();
+  };
+
+  // Open / close POS
+  document.querySelectorAll("[data-open-pos-workspace]").forEach((btn) => {
+    btn.addEventListener("click", () => { openWorkspace(posWorkspace); refreshPosCatalogue(); });
+  });
+
+  let posSearchTimer;
+  posSearch?.addEventListener("input", () => {
+    clearTimeout(posSearchTimer);
+    posSearchTimer = setTimeout(renderPosProducts, 150);
+  });
+
+  posClearBtn?.addEventListener("click", async () => {
+    if (!posCart.length) return;
+    const ok = await showConfirmModal({ title: "Clear Cart", message: "Remove all items from this sale?", confirmLabel: "Clear", cancelLabel: "Keep", danger: true });
+    if (ok) clearPosCart();
+  });
+
+  // Customer selection
+  const setPosCustomer = (id, name) => {
+    posCustomer = { id: Number(id) || 0, name: name || "Walk-in Customer" };
+    if (posCustomerNameEl) posCustomerNameEl.textContent = posCustomer.name;
+  };
+
+  posChangeCustomerBtn?.addEventListener("click", () => {
+    const options = [{ value: "", label: "Walk-in Customer" }].concat(
+      cachedCustomers.map((c) => ({ value: String(c.id), label: `${c.full_name}${c.phone ? ` (${c.phone})` : ""}` }))
+    );
+    setSearchSelectOptions(posCustomerSelect, options, null, posCustomer.id ? String(posCustomer.id) : "");
+    if (posCustomerModal) posCustomerModal.hidden = false;
+  });
+  posCustomerCancelBtn?.addEventListener("click", () => { if (posCustomerModal) posCustomerModal.hidden = true; });
+  posCustomerConfirmBtn?.addEventListener("click", () => {
+    const id = posCustomerSelectValue?.value || "";
+    const cust = cachedCustomers.find((c) => String(c.id) === String(id));
+    setPosCustomer(id, cust ? cust.full_name : "Walk-in Customer");
+    if (posCustomerModal) posCustomerModal.hidden = true;
+  });
+
+  // Checkout flow
+  const updatePosChange = () => {
+    const { total } = posTotals();
+    const paid = num(posAmountPaid?.value);
+    const change = paid > total ? paid - total : 0;
+    if (posChangeDue) posChangeDue.textContent = formatCurrency(change);
+  };
+
+  const openPosCheckout = () => {
+    if (!posCart.length) return;
+    const { subtotal, tax, rate, total } = posTotals();
+    if (posCheckoutCustomer) posCheckoutCustomer.textContent = posCustomer.name;
+    if (posCheckoutSubtotal) posCheckoutSubtotal.textContent = formatCurrency(subtotal);
+    if (posCheckoutVatRow) posCheckoutVatRow.hidden = !invVatConfig.enabled;
+    if (posCheckoutVatRate) posCheckoutVatRate.textContent = String(rate);
+    if (posCheckoutVat) posCheckoutVat.textContent = formatCurrency(tax);
+    if (posCheckoutTotal) posCheckoutTotal.textContent = formatCurrency(total);
+    if (posCheckoutError) posCheckoutError.hidden = true;
+    if (posAmountPaid) posAmountPaid.value = "";
+    updatePosChange();
+    if (posCheckoutModal) posCheckoutModal.hidden = false;
+  };
+
+  posCheckoutBtn?.addEventListener("click", openPosCheckout);
+  posCheckoutCloseBtn?.addEventListener("click", () => { if (posCheckoutModal) posCheckoutModal.hidden = true; });
+  posAmountPaid?.addEventListener("input", updatePosChange);
+
+  posPaymentMethods?.querySelectorAll(".filter-pill").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      posPaymentMethods.querySelectorAll(".filter-pill").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      posPayment = btn.dataset.posPayment || "cash";
+    });
+  });
+
+  posCompleteSaleBtn?.addEventListener("click", async () => {
+    if (!posCart.length) return;
+    if (posCheckoutError) posCheckoutError.hidden = true;
+    posCompleteSaleBtn.disabled = true;
+    try {
+      const items = posCart.map((l) => ({ item_id: l.id, quantity: l.qty, unit_price: l.price }));
+      const body = new FormData();
+      body.set("action", "create_pos_sale");
+      body.set("items", JSON.stringify(items));
+      body.set("customer_id", String(posCustomer.id || 0));
+      body.set("payment_method", posPayment);
+      const paid = num(posAmountPaid?.value);
+      if (paid > 0) body.set("amount_paid", String(paid));
+
+      const res = await fetch(`${getBasePath()}api/sales.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not complete the sale.");
+
+      lastSale = data;
+      if (posCheckoutModal) posCheckoutModal.hidden = true;
+      if (posReceiptNumber) posReceiptNumber.textContent = data.receipt_number || "";
+      if (posReceiptTotal) posReceiptTotal.textContent = formatCurrency(data.total_amount);
+      if (posReceiptPaid) posReceiptPaid.textContent = formatCurrency(data.amount_paid);
+      if (posReceiptChange) posReceiptChange.textContent = formatCurrency(data.change_due);
+      if (posReceiptModal) posReceiptModal.hidden = false;
+
+      // Reset for next sale and refresh stock-aware catalogue.
+      clearPosCart();
+      setPosCustomer(0, "Walk-in Customer");
+      await refreshPosCatalogue();
+      loadInvoices(invoicesSearch?.value.trim() || "");
+    } catch (err) {
+      if (posCheckoutError) {
+        posCheckoutError.textContent = err.message || "Could not complete the sale.";
+        posCheckoutError.hidden = false;
+      }
+    } finally {
+      posCompleteSaleBtn.disabled = false;
+    }
+  });
+
+  posReceiptPrintBtn?.addEventListener("click", () => {
+    if (!lastSale) return;
+    window.open(`${getBasePath()}api/sales.php?action=pdf&id=${lastSale.sale_id}`, "_blank");
+  });
+  posNewSaleBtn?.addEventListener("click", () => { if (posReceiptModal) posReceiptModal.hidden = true; });
 
   // ---- Init ----
   loadProducts();

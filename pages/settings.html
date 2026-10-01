@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=59">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
 </head>
 <body>
   <div class="app-shell settings-page-shell">
@@ -475,10 +475,25 @@
             <option value="UTC">UTC (Universal Coordinated Time)</option>
           </select>
         </label>
-        <label class="form-field">
-          <span>Default VAT / Tax Rate (%)</span>
+        <label class="checkbox-label" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:4px;">
+          <input type="checkbox" name="vat_enabled" value="1" data-vat-enabled-toggle style="width:18px;height:18px;min-height:0;flex:0 0 auto;">
+          <span style="font-weight:700;">Charge VAT on products &amp; services</span>
+        </label>
+        <p style="font-size:0.8rem;color:var(--color-muted);margin:0 0 10px;">When enabled, VAT is added automatically on sales and purchase orders for items marked as VAT-applicable.</p>
+        <label class="form-field" data-vat-rate-field hidden>
+          <span>VAT Rate (%)</span>
           <input type="text" inputmode="numeric" name="tax_rate" min="0" max="100" step="0.1" value="18">
         </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="form-field">
+            <span>TIN (Taxpayer ID)</span>
+            <input type="text" name="tin" placeholder="e.g. 123-456-789">
+          </label>
+          <label class="form-field">
+            <span>VRN (VAT Reg. No.)</span>
+            <input type="text" name="vrn" placeholder="e.g. 40-123456-A">
+          </label>
+        </div>
         <label class="form-field">
           <span>Receipt / Invoice Footer Note</span>
           <textarea name="receipt_footer" rows="3" placeholder="e.g. Thank you for your business! Goods once sold are not returnable without receipt."></textarea>
@@ -497,6 +512,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=68" defer></script>
+  <script src="/assets/js/app.js?v=71" defer></script>
 </body>
 </html>

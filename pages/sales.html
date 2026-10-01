@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=59">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -94,31 +94,149 @@
         <h2 id="pos-workspace-title">Point of Sale</h2>
         <span class="topbar-spacer" aria-hidden="true"></span>
       </header>
-      <div class="fullscreen-body stock-workspace-body">
+      <div class="fullscreen-body stock-workspace-body pos-body">
+        <!-- Customer bar -->
+        <div class="pos-customer-bar">
+          <div class="pos-customer-current">
+            <span aria-hidden="true">👤</span>
+            <strong data-pos-customer-name>Walk-in Customer</strong>
+          </div>
+          <button class="btn btn-outline btn-sm" type="button" data-pos-change-customer>Change</button>
+        </div>
+
         <!-- Product search -->
-        <div class="customers-search-wrap" style="margin-bottom: 12px;">
+        <div class="customers-search-wrap pos-search-wrap">
           <svg viewBox="0 0 512 512" aria-hidden="true">
             <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
           </svg>
-          <input type="search" class="customers-search-input" data-pos-search placeholder="Search products to add to cart...">
+          <input type="search" class="customers-search-input" data-pos-search placeholder="Search products by name, SKU or barcode...">
         </div>
 
-        <!-- Cart -->
-        <div class="stock-list" data-pos-cart></div>
-        <div class="company-users-empty" data-pos-cart-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+        <!-- Cart table -->
+        <div class="pos-cart-wrap" data-pos-cart-wrap hidden>
+          <table class="pos-cart-table">
+            <thead>
+              <tr>
+                <th style="text-align:left;">Item</th>
+                <th style="text-align:right;">Price</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:center;">Action</th>
+              </tr>
+            </thead>
+            <tbody data-pos-cart-body></tbody>
+          </table>
+        </div>
+        <div class="company-users-empty" data-pos-cart-empty style="text-align: center; padding: 28px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px;">
           <div style="font-size: 2rem; margin-bottom: 6px;">🛒</div>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">Cart is empty</strong>
-          <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Search and tap products to add them to this sale.</p>
+          <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Tap products below to add them to this sale.</p>
         </div>
 
-        <!-- Totals + checkout -->
-        <div style="background: #f8fafc; border: 1px solid var(--color-line); border-radius: 12px; padding: 14px; margin-top: 14px;">
-          <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; color: var(--color-blue);">
-            <span>Total</span>
-            <strong data-pos-total>TZS 0</strong>
+        <!-- Category filter pills -->
+        <div class="filter-bar pos-category-filters" data-pos-category-filters></div>
+
+        <!-- Product catalogue (tap to add) -->
+        <div class="pos-product-list" data-pos-product-list></div>
+        <div class="pos-product-empty" data-pos-product-empty hidden>No products match your search.</div>
+      </div>
+
+      <!-- Sticky footer: grand total + actions -->
+      <div class="pos-footer">
+        <div class="pos-total-bar">
+          <span>Grand Total</span>
+          <strong data-pos-total>TZS 0</strong>
+        </div>
+        <div class="pos-actions">
+          <button class="btn btn-danger-outline" type="button" data-pos-clear disabled>Clear</button>
+          <button class="btn btn-primary" type="button" data-pos-checkout disabled>Checkout</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- POS: Change Customer Modal -->
+  <div class="modal-backdrop" hidden data-pos-customer-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="pos-customer-title">
+      <h2 id="pos-customer-title">Select Customer</h2>
+      <label class="form-field">
+        <span>Customer</span>
+        <div class="search-select" data-search-select data-pos-customer-select>
+          <input type="hidden" name="pos_customer_id" value="" data-search-select-value>
+          <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+            <span data-search-select-label>Walk-in Customer</span>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+          </button>
+          <div class="search-select-panel" hidden data-search-select-panel>
+            <input type="search" data-search-select-search placeholder="Search customer">
+            <div class="search-select-options" data-search-select-options></div>
           </div>
         </div>
-        <button class="btn btn-primary full" type="button" data-pos-checkout style="margin-top: 14px;" disabled>Complete Sale</button>
+      </label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;">
+        <button class="btn btn-outline" type="button" data-pos-customer-cancel>Cancel</button>
+        <button class="btn btn-primary" type="button" data-pos-customer-confirm>Use Customer</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- POS: Checkout Modal -->
+  <div class="fullscreen-modal" hidden data-pos-checkout-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="pos-checkout-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-pos-checkout-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="pos-checkout-title">Checkout</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body">
+        <div style="background:#f8fafc;border:1px solid var(--color-line);border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;"><span style="color:var(--color-muted);">Customer</span><strong data-pos-checkout-customer>Walk-in Customer</strong></div>
+          <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;"><span style="color:var(--color-muted);">Subtotal</span><span data-pos-checkout-subtotal>TZS 0</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;" data-pos-checkout-vat-row hidden><span style="color:var(--color-muted);">VAT (<span data-pos-checkout-vat-rate>0</span>%)</span><span data-pos-checkout-vat>TZS 0</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:800;color:var(--color-blue);border-top:1px dashed var(--color-line);padding-top:8px;margin-top:2px;"><span>Total</span><strong data-pos-checkout-total>TZS 0</strong></div>
+        </div>
+
+        <label class="form-field">
+          <span>Payment Method</span>
+          <div class="filter-bar" data-pos-payment-methods style="margin-bottom:0;">
+            <button type="button" class="filter-pill active" data-pos-payment="cash">Cash</button>
+            <button type="button" class="filter-pill" data-pos-payment="mobile">Mobile Money</button>
+            <button type="button" class="filter-pill" data-pos-payment="card">Card</button>
+          </div>
+        </label>
+
+        <label class="form-field">
+          <span>Amount Received</span>
+          <input type="text" inputmode="numeric" data-pos-amount-paid placeholder="0">
+        </label>
+        <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:800;margin:4px 2px 14px;">
+          <span style="color:var(--color-muted);">Change Due</span>
+          <strong data-pos-change-due style="color:var(--color-teal);">TZS 0</strong>
+        </div>
+
+        <p class="inline-error" hidden data-pos-checkout-error></p>
+        <button class="btn btn-primary full" type="button" data-pos-complete-sale>Complete Sale</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- POS: Receipt / Success Modal -->
+  <div class="modal-backdrop" hidden data-pos-receipt-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="pos-receipt-title">
+      <div style="text-align:center;margin-bottom:10px;">
+        <div style="font-size:2.4rem;line-height:1;">✅</div>
+        <h2 id="pos-receipt-title" style="margin:8px 0 2px;">Sale Completed</h2>
+        <p style="margin:0;color:var(--color-muted);font-size:0.85rem;" data-pos-receipt-number>POS-000</p>
+      </div>
+      <div style="background:#f8fafc;border:1px solid var(--color-line);border-radius:12px;padding:12px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;"><span style="color:var(--color-muted);">Total</span><strong data-pos-receipt-total>TZS 0</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;"><span style="color:var(--color-muted);">Paid</span><span data-pos-receipt-paid>TZS 0</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.95rem;font-weight:800;"><span style="color:var(--color-muted);">Change</span><strong data-pos-receipt-change style="color:var(--color-teal);">TZS 0</strong></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button class="btn btn-outline" type="button" data-pos-receipt-print>Print Receipt</button>
+        <button class="btn btn-primary" type="button" data-pos-new-sale>New Sale</button>
       </div>
     </section>
   </div>
@@ -277,12 +395,8 @@
             <span style="color: var(--color-muted);">Discount:</span>
             <input type="text" inputmode="numeric" name="discount" value="0" data-invoice-discount-input style="width: 90px; text-align: right; height: 32px; padding: 2px 6px;">
           </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; margin-bottom: 6px;">
-            <span style="color: var(--color-muted);">Tax Rate (%):</span>
-            <input type="text" inputmode="numeric" name="tax_rate" value="0" data-invoice-tax-input style="width: 70px; text-align: right; height: 32px; padding: 2px 6px;">
-          </div>
-          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 8px;">
-            <span style="color: var(--color-muted);">Tax Amount:</span>
+          <div data-invoice-vat-row hidden style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 8px;">
+            <span style="color: var(--color-muted);">VAT (<span data-invoice-vat-rate>0</span>%):</span>
             <span data-invoice-calc-tax>0.00 TZS</span>
           </div>
           <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; border-top: 1px dashed var(--color-line); padding-top: 8px; color: var(--color-blue);">
@@ -348,6 +462,7 @@
             <button class="btn btn-outline full" type="button" data-invoice-mark-sent-btn>Mark as Sent</button>
             <button class="btn btn-primary full" type="button" data-invoice-mark-paid-btn>Mark as Paid</button>
           </div>
+          <button class="btn btn-outline full" type="button" data-invoice-download-pdf-btn>Download Invoice PDF</button>
           <button class="btn btn-outline full" type="button" data-invoice-edit-btn>Edit Invoice</button>
           <button class="btn btn-danger-outline full" type="button" data-invoice-cancel-btn>Cancel Invoice</button>
           <button class="btn btn-primary full" type="button" data-invoice-uncancel-btn hidden>Reactivate Invoice</button>
@@ -366,6 +481,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=68" defer></script>
+  <script src="/assets/js/app.js?v=71" defer></script>
 </body>
 </html>

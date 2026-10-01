@@ -96,6 +96,10 @@ function generate_po_pdf_html(array $po, array $supplier, array $items, array $b
     $supplierPhone = htmlspecialchars((string) ($supplier['phone'] ?? ''));
     $supplierEmail = htmlspecialchars((string) ($supplier['email'] ?? ''));
     $supplierAddress = htmlspecialchars((string) ($supplier['address'] ?? ''));
+    $supplierTin = htmlspecialchars((string) ($supplier['tin'] ?? ''));
+    $supplierVrn = htmlspecialchars((string) ($supplier['vrn'] ?? ''));
+    $bizTin = htmlspecialchars((string) ($biz['tin'] ?? ''));
+    $bizVrn = htmlspecialchars((string) ($biz['vrn'] ?? ''));
     $notes = htmlspecialchars((string) ($po['notes'] ?? ''));
     $footerNote = htmlspecialchars((string) ($biz['receipt_footer'] ?? 'Thank you for doing business with us!'));
 
@@ -152,6 +156,8 @@ function generate_po_pdf_html(array $po, array $supplier, array $items, array $b
                 <td>
                     <h1 class='biz-title'>{$bizName}</h1>
                     <div style='color: #64748b; font-size: 12px;'>{$bizType}</div>
+                    " . ($bizTin ? "<div style='color: #64748b; font-size: 12px;'>TIN: {$bizTin}</div>" : "") . "
+                    " . ($bizVrn ? "<div style='color: #64748b; font-size: 12px;'>VRN: {$bizVrn}</div>" : "") . "
                 </td>
                 <td style='text-align: right;'>
                     <h2 class='po-title'>PURCHASE ORDER</h2>
@@ -171,6 +177,8 @@ function generate_po_pdf_html(array $po, array $supplier, array $items, array $b
                         " . ($supplierPhone ? "<div>Phone: {$supplierPhone}</div>" : "") . "
                         " . ($supplierEmail ? "<div>Email: {$supplierEmail}</div>" : "") . "
                         " . ($supplierAddress ? "<div>Address: {$supplierAddress}</div>" : "") . "
+                        " . ($supplierTin ? "<div>TIN: {$supplierTin}</div>" : "") . "
+                        " . ($supplierVrn ? "<div>VRN: {$supplierVrn}</div>" : "") . "
                     </div>
                 </td>
                 <td style='width: 50%; padding-left: 12px;'>
@@ -270,7 +278,8 @@ try {
 
         if ($poId > 0) {
             $stmt = $pdo->prepare(
-                'SELECT po.*, s.supplier_name, s.phone as supplier_phone, s.email as supplier_email, s.address as supplier_address
+                'SELECT po.*, s.supplier_name, s.phone as supplier_phone, s.email as supplier_email, s.address as supplier_address,
+                        s.tin as supplier_tin, s.vrn as supplier_vrn
                  FROM tbl_purchase_orders po
                  LEFT JOIN tbl_suppliers s ON s.id = po.supplier_id
                  WHERE po.id = :id AND po.business_id = :bid LIMIT 1'
@@ -292,6 +301,8 @@ try {
                 'phone' => $po['supplier_phone'],
                 'email' => $po['supplier_email'],
                 'address' => $po['supplier_address'],
+                'tin' => $po['supplier_tin'] ?? '',
+                'vrn' => $po['supplier_vrn'] ?? '',
             ];
 
             if ($isPdf) {
@@ -389,7 +400,9 @@ try {
             $orderDate = trim((string) ($_POST['order_date'] ?? date('Y-m-d')));
             $expectedDate = trim((string) ($_POST['expected_date'] ?? ''));
             $notes = trim((string) ($_POST['notes'] ?? ''));
-            $taxRate = (float) ($_POST['tax_rate'] ?? ($biz['tax_rate'] ?? 0));
+            // VAT is automatic: rate comes from business settings, applied only to VAT-applicable items.
+            $vatEnabled = (int) ($biz['vat_enabled'] ?? 0) === 1;
+            $taxRate = $vatEnabled ? (float) ($biz['tax_rate'] ?? 0) : 0.0;
             $itemsRaw = $_POST['items'] ?? '[]';
             $items = is_string($itemsRaw) ? json_decode($itemsRaw, true) : $itemsRaw;
 
@@ -411,6 +424,7 @@ try {
 
             // Calculate totals
             $subtotal = 0.0;
+            $vatBase = 0.0;
             $validatedItems = [];
             foreach ($items as $item) {
                 $itemId = (int) ($item['item_id'] ?? 0);
@@ -421,7 +435,7 @@ try {
                     continue;
                 }
 
-                $iStmt = $pdo->prepare('SELECT id, name FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
+                $iStmt = $pdo->prepare('SELECT id, name, vat_applicable FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
                 $iStmt->execute([':id' => $itemId, ':bid' => $businessId]);
                 $iRow = $iStmt->fetch();
                 if (!$iRow) {
@@ -430,6 +444,10 @@ try {
 
                 $lineTotal = $qty * $cost;
                 $subtotal += $lineTotal;
+                $lineVat = ($vatEnabled && (int) ($iRow['vat_applicable'] ?? 1) === 1) ? 1 : 0;
+                if ($lineVat === 1) {
+                    $vatBase += $lineTotal;
+                }
 
                 $validatedItems[] = [
                     'item_id' => $itemId,
@@ -437,6 +455,7 @@ try {
                     'quantity' => $qty,
                     'unit_cost' => $cost,
                     'line_total' => $lineTotal,
+                    'vat_applicable' => $lineVat,
                 ];
             }
 
@@ -444,7 +463,7 @@ try {
                 respond(422, ['ok' => false, 'message' => 'No valid items provided in the order.']);
             }
 
-            $taxAmount = round(($subtotal * $taxRate) / 100, 2);
+            $taxAmount = round(($vatBase * $taxRate) / 100, 2);
             $totalAmount = $subtotal + $taxAmount;
 
             // Generate PO Number
@@ -479,8 +498,8 @@ try {
 
                 $poiStmt = $pdo->prepare(
                     'INSERT INTO tbl_purchase_order_items
-                     (purchase_order_id, item_id, item_name, quantity, unit_cost, line_total, received_quantity)
-                     VALUES (:poid, :item_id, :item_name, :qty, :cost, :line_total, 0.00)'
+                     (purchase_order_id, item_id, item_name, quantity, unit_cost, line_total, vat_applicable, received_quantity)
+                     VALUES (:poid, :item_id, :item_name, :qty, :cost, :line_total, :vat, 0.00)'
                 );
 
                 foreach ($validatedItems as $v) {
@@ -491,6 +510,7 @@ try {
                         ':qty' => $v['quantity'],
                         ':cost' => $v['unit_cost'],
                         ':line_total' => $v['line_total'],
+                        ':vat' => $v['vat_applicable'],
                     ]);
                 }
 
@@ -517,7 +537,8 @@ try {
             }
 
             $stmt = $pdo->prepare(
-                'SELECT po.*, s.supplier_name, s.phone as supplier_phone, s.email as supplier_email, s.address as supplier_address
+                'SELECT po.*, s.supplier_name, s.phone as supplier_phone, s.email as supplier_email, s.address as supplier_address,
+                        s.tin as supplier_tin, s.vrn as supplier_vrn
                  FROM tbl_purchase_orders po
                  LEFT JOIN tbl_suppliers s ON s.id = po.supplier_id
                  WHERE po.id = :id AND po.business_id = :bid LIMIT 1'
@@ -543,6 +564,8 @@ try {
                 'phone' => $po['supplier_phone'],
                 'email' => $po['supplier_email'],
                 'address' => $po['supplier_address'],
+                'tin' => $po['supplier_tin'] ?? '',
+                'vrn' => $po['supplier_vrn'] ?? '',
             ];
 
             // Render PDF

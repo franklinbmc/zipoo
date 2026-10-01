@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=59">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
 </head>
 <body>
   <div class="app-shell customers-page-shell">
@@ -132,6 +132,16 @@
           <span>Address</span>
           <input type="text" name="address" placeholder="e.g. Kariakoo, Dar es Salaam">
         </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="form-field">
+            <span>TIN</span>
+            <input type="text" name="tin" placeholder="Taxpayer ID">
+          </label>
+          <label class="form-field">
+            <span>VRN</span>
+            <input type="text" name="vrn" placeholder="VAT Reg. No.">
+          </label>
+        </div>
         <label class="form-field">
           <span>Notes</span>
           <textarea name="notes" rows="3" placeholder="Optional notes..."></textarea>
@@ -170,6 +180,16 @@
           <span>Address</span>
           <input type="text" name="address" data-edit-supplier-address>
         </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="form-field">
+            <span>TIN</span>
+            <input type="text" name="tin" data-edit-supplier-tin>
+          </label>
+          <label class="form-field">
+            <span>VRN</span>
+            <input type="text" name="vrn" data-edit-supplier-vrn>
+          </label>
+        </div>
         <label class="form-field">
           <span>Notes</span>
           <textarea name="notes" rows="3" data-edit-supplier-notes></textarea>
@@ -189,6 +209,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=68" defer></script>
+  <script src="/assets/js/app.js?v=71" defer></script>
 </body>
 </html>

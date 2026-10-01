@@ -67,6 +67,8 @@ function supplier_payload(array $row): array
         'phone' => (string) ($row['phone'] ?? ''),
         'email' => (string) ($row['email'] ?? ''),
         'address' => (string) ($row['address'] ?? ''),
+        'tin' => (string) ($row['tin'] ?? ''),
+        'vrn' => (string) ($row['vrn'] ?? ''),
         'notes' => (string) ($row['notes'] ?? ''),
         'total_purchases' => (float) ($row['total_purchases'] ?? 0),
         'purchases_count' => (int) ($row['purchases_count'] ?? 0),
@@ -154,6 +156,8 @@ try {
         $phone = trim((string) ($_POST['phone'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
         $address = trim((string) ($_POST['address'] ?? ''));
+        $tin = trim((string) ($_POST['tin'] ?? ''));
+        $vrn = trim((string) ($_POST['vrn'] ?? ''));
         $notes = trim((string) ($_POST['notes'] ?? ''));
 
         if ($supplierName === '') {
@@ -165,8 +169,8 @@ try {
         }
 
         $stmt = $pdo->prepare(
-            'INSERT INTO tbl_suppliers (business_id, supplier_name, contact_person, phone, email, address, notes, total_purchases, purchases_count) 
-             VALUES (:bid, :supplier_name, :contact_person, :phone, :email, :address, :notes, 0.00, 0)'
+            'INSERT INTO tbl_suppliers (business_id, supplier_name, contact_person, phone, email, address, tin, vrn, notes, total_purchases, purchases_count)
+             VALUES (:bid, :supplier_name, :contact_person, :phone, :email, :address, :tin, :vrn, :notes, 0.00, 0)'
         );
         $stmt->execute([
             ':bid' => $businessId,
@@ -175,6 +179,8 @@ try {
             ':phone' => $phone !== '' ? $phone : null,
             ':email' => $email !== '' ? $email : null,
             ':address' => $address !== '' ? $address : null,
+            ':tin' => $tin !== '' ? $tin : null,
+            ':vrn' => $vrn !== '' ? $vrn : null,
             ':notes' => $notes !== '' ? $notes : null,
         ]);
 
@@ -197,6 +203,8 @@ try {
         $phone = trim((string) ($_POST['phone'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
         $address = trim((string) ($_POST['address'] ?? ''));
+        $tin = trim((string) ($_POST['tin'] ?? ''));
+        $vrn = trim((string) ($_POST['vrn'] ?? ''));
         $notes = trim((string) ($_POST['notes'] ?? ''));
 
         if ($supplierId <= 0) {
@@ -212,8 +220,8 @@ try {
         }
 
         $stmt = $pdo->prepare(
-            'UPDATE tbl_suppliers 
-             SET supplier_name = :supplier_name, contact_person = :contact_person, phone = :phone, email = :email, address = :address, notes = :notes 
+            'UPDATE tbl_suppliers
+             SET supplier_name = :supplier_name, contact_person = :contact_person, phone = :phone, email = :email, address = :address, tin = :tin, vrn = :vrn, notes = :notes
              WHERE id = :id AND business_id = :bid'
         );
         $stmt->execute([
@@ -224,6 +232,8 @@ try {
             ':phone' => $phone !== '' ? $phone : null,
             ':email' => $email !== '' ? $email : null,
             ':address' => $address !== '' ? $address : null,
+            ':tin' => $tin !== '' ? $tin : null,
+            ':vrn' => $vrn !== '' ? $vrn : null,
             ':notes' => $notes !== '' ? $notes : null,
         ]);
 

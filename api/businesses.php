@@ -46,6 +46,11 @@ function ensure_business_preference_columns(PDO $pdo): void
     if (empty($cols)) {
         $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN receipt_footer TEXT NULL AFTER tax_rate");
     }
+
+    $cols = $pdo->query("SHOW COLUMNS FROM tbl_businesses LIKE 'vat_enabled'")->fetchAll();
+    if (empty($cols)) {
+        $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN vat_enabled TINYINT(1) NOT NULL DEFAULT 0 AFTER tax_rate");
+    }
 }
 
 function business_payload(array $business): array
@@ -63,6 +68,9 @@ function business_payload(array $business): array
         'currency' => (string) ($business['currency'] ?? 'TZS'),
         'timezone' => (string) ($business['timezone'] ?? 'Africa/Dar_es_Salaam'),
         'tax_rate' => (float) ($business['tax_rate'] ?? 18.00),
+        'vat_enabled' => (int) ($business['vat_enabled'] ?? 0),
+        'tin' => (string) ($business['tin'] ?? ''),
+        'vrn' => (string) ($business['vrn'] ?? ''),
         'receipt_footer' => (string) ($business['receipt_footer'] ?? ''),
         'created_at' => $business['created_at'] ?? null,
     ];
@@ -71,7 +79,7 @@ function business_payload(array $business): array
 function business_select_sql(string $where): string
 {
     return "SELECT b.id, b.business_name, b.business_type, b.region_code, l.region_name, b.district_code, l.district_name,
-                   b.plan_name, b.account_status, b.currency, b.timezone, b.tax_rate, b.receipt_footer, b.created_at
+                   b.plan_name, b.account_status, b.currency, b.timezone, b.tax_rate, b.vat_enabled, b.tin, b.vrn, b.receipt_footer, b.created_at
             FROM tbl_businesses b
             LEFT JOIN tbl_tanzania_locations l ON l.region_code = b.region_code AND l.district_code = b.district_code
             WHERE {$where}";
@@ -334,6 +342,9 @@ try {
         $currency = strtoupper(trim((string) ($_POST['currency'] ?? 'TZS')));
         $timezone = trim((string) ($_POST['timezone'] ?? 'Africa/Dar_es_Salaam'));
         $taxRate = (float) ($_POST['tax_rate'] ?? 18.00);
+        $vatEnabled = !empty($_POST['vat_enabled']) && $_POST['vat_enabled'] !== '0' ? 1 : 0;
+        $tin = trim((string) ($_POST['tin'] ?? ''));
+        $vrn = trim((string) ($_POST['vrn'] ?? ''));
         $receiptFooter = trim((string) ($_POST['receipt_footer'] ?? ''));
 
         if ($businessId <= 0) {
@@ -348,7 +359,8 @@ try {
 
         $stmt = $pdo->prepare(
             'UPDATE tbl_businesses
-             SET currency = :currency, timezone = :timezone, tax_rate = :tax_rate, receipt_footer = :receipt_footer
+             SET currency = :currency, timezone = :timezone, tax_rate = :tax_rate, vat_enabled = :vat_enabled,
+                 tin = :tin, vrn = :vrn, receipt_footer = :receipt_footer
              WHERE id = :bid AND owner_user_id = :uid'
         );
         $stmt->execute([
@@ -357,6 +369,9 @@ try {
             ':currency' => $currency !== '' ? $currency : 'TZS',
             ':timezone' => $timezone !== '' ? $timezone : 'Africa/Dar_es_Salaam',
             ':tax_rate' => $taxRate,
+            ':vat_enabled' => $vatEnabled,
+            ':tin' => $tin !== '' ? $tin : null,
+            ':vrn' => $vrn !== '' ? $vrn : null,
             ':receipt_footer' => $receiptFooter !== '' ? $receiptFooter : null,
         ]);
 

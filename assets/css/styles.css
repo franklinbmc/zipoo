@@ -683,12 +683,13 @@ textarea {
   max-width: 95vw;
   box-sizing: border-box;
   min-height: 44px;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-navy);
   border-radius: var(--radius);
   padding: 0 12px;
   color: var(--color-text);
   font-size: 16px;
   background: #fff;
+  box-shadow: none;
 }
 
 input[type="file"] {
@@ -815,7 +816,7 @@ select::-ms-expand {
   gap: 10px;
   width: 100%;
   min-height: 44px;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-navy);
   border-radius: var(--radius);
   padding: 0 12px;
   color: var(--color-text);
@@ -888,11 +889,31 @@ select::-ms-expand {
 }
 
 input:focus,
+input:focus-visible,
 select:focus,
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+.search-select-trigger:focus,
+.search-select-trigger:focus-visible,
+.business-field-input:focus,
+.business-field-input:focus-visible,
+.customers-search-input:focus,
+.customers-search-input:focus-visible {
+  outline: none;
+  border-color: var(--color-navy);
+  box-shadow: none;
+}
+
 button:focus-visible,
 a:focus-visible {
   outline: 3px solid rgba(20, 119, 255, 0.24);
   outline-offset: 2px;
+}
+
+/* Search-select trigger is a button but behaves as an input — keep the thin line, no glow */
+.search-select-trigger:focus-visible {
+  outline: none;
 }
 
 .toast-demo {
@@ -2613,7 +2634,7 @@ button.settings-list-row:focus-visible {
 }
 
 .business-accordion-panel .settings-list-row.field-row {
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-navy);
   border-radius: var(--radius);
   background: #fff;
   margin-bottom: 8px;
@@ -2621,8 +2642,8 @@ button.settings-list-row:focus-visible {
 }
 
 .business-accordion-panel .settings-list-row.field-row:focus-within {
-  border-color: var(--color-blue);
-  box-shadow: 0 0 0 3px rgba(14, 116, 219, 0.08);
+  border-color: var(--color-navy);
+  box-shadow: none;
 }
 
 .business-accordion-panel .settings-list-row.read-only-row {
@@ -2756,7 +2777,7 @@ button.settings-list-row:focus-visible {
 .business-field-input {
   width: 100%;
   min-height: 44px;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-navy);
   border-radius: var(--radius);
   padding: 0 12px;
   font-size: 0.95rem;
@@ -2767,8 +2788,8 @@ button.settings-list-row:focus-visible {
 }
 
 .business-field-input:focus {
-  border-color: var(--color-blue);
-  box-shadow: 0 0 0 3px rgba(14, 116, 219, 0.08);
+  border-color: var(--color-navy);
+  box-shadow: none;
 }
 
 .business-accordion-field .search-select.is-open {
@@ -3051,7 +3072,7 @@ button.settings-list-row:focus-visible {
   width: 100%;
   min-height: 44px;
   padding: 10px 14px 10px 38px;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-navy);
   border-radius: var(--radius);
   background: #fff;
   font-size: 0.95rem;
@@ -3502,6 +3523,241 @@ button.settings-list-row:focus-visible {
 
 .new-category-input {
   margin-top: 8px;
+}
+
+/* ---------------------------------------------------------
+   Point of Sale (POS)
+--------------------------------------------------------- */
+[data-pos-workspace] .fullscreen-panel {
+  position: relative;
+}
+
+.pos-body {
+  padding-bottom: 150px; /* room for sticky footer */
+}
+
+.pos-customer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--color-navy);
+  color: #fff;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.pos-customer-current {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  min-width: 0;
+}
+
+.pos-customer-current strong {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pos-customer-bar .btn-outline {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+  flex: 0 0 auto;
+}
+
+.pos-search-wrap {
+  margin-bottom: 12px;
+}
+
+.pos-cart-wrap {
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+.pos-cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.pos-cart-table thead th {
+  background: var(--color-navy);
+  color: #fff;
+  padding: 9px 10px;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  font-weight: 800;
+}
+
+.pos-cart-table tbody td {
+  padding: 9px 10px;
+  border-top: 1px solid var(--color-line);
+  vertical-align: middle;
+}
+
+.pos-cart-item-name {
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.pos-qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.pos-qty-stepper button {
+  width: 30px;
+  height: 30px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: #f1f5fb;
+  color: var(--color-navy);
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.pos-qty-stepper button:active {
+  background: #e2e8f4;
+}
+
+.pos-qty-stepper .pos-qty-value {
+  min-width: 30px;
+  text-align: center;
+  font-weight: 800;
+  color: var(--color-navy);
+}
+
+.pos-cart-remove {
+  border: 0;
+  background: none;
+  color: var(--color-danger);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.pos-cart-remove svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 36;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pos-category-filters {
+  margin-bottom: 10px;
+}
+
+.pos-product-list {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pos-product-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 14px;
+  background: #fff;
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  cursor: pointer;
+  text-align: left;
+}
+
+.pos-product-row:first-child {
+  border-top: 0;
+}
+
+.pos-product-row:active {
+  background: #f1f5fb;
+}
+
+.pos-product-row .pos-product-name {
+  font-weight: 800;
+  color: var(--color-navy);
+  font-size: 0.92rem;
+}
+
+.pos-product-row .pos-product-meta {
+  font-size: 0.76rem;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+
+.pos-product-row .pos-product-price {
+  font-weight: 800;
+  color: var(--color-teal);
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.pos-product-row.is-out {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pos-product-empty {
+  text-align: center;
+  padding: 18px;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.pos-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-line);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  box-shadow: 0 -10px 24px rgba(13, 43, 91, 0.08);
+}
+
+.pos-total-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-navy);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 800;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.pos-actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+}
+
+.pos-actions .btn {
+  min-height: 48px;
 }
 
 
