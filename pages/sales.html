@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#F6F8FC">
+  <meta name="description" content="Zipoo Sales: point of sale, invoices and sales reports.">
+  <title>Sales - Zipoo</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=59">
+</head>
+<body>
+  <div class="app-shell stock-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
+      </a>
+      <h1>Sales</h1>
+      <button class="icon-button" type="button" data-open-pos-workspace aria-label="Open point of sale">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M256 112v288M112 256h288" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="settings-page stock-page" data-sales-page>
+      <!-- KPI Overview Cards -->
+      <section class="stock-kpi-grid">
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Sales Today</span>
+          <strong class="kpi-val" data-kpi-sales-today>TZS 0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Transactions</span>
+          <strong class="kpi-val" data-kpi-sales-count>0</strong>
+        </div>
+        <div class="stock-kpi-card" data-kpi-invoices-due-card>
+          <span class="kpi-label">Invoices Due</span>
+          <strong class="kpi-val" data-kpi-invoices-due>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Sales This Month</span>
+          <strong class="kpi-val" data-kpi-sales-month>TZS 0</strong>
+        </div>
+      </section>
+
+      <!-- Sales hub: each row opens its own fullscreen workspace -->
+      <nav class="stock-hub">
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-pos-workspace>
+          <span class="stock-hub-label">
+            <strong>POS</strong>
+            <small>Ring up a sale at the counter</small>
+          </span>
+          <span class="stock-summary-meta">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-invoices-workspace>
+          <span class="stock-hub-label">
+            <strong>Invoices</strong>
+            <small>Create &amp; track customer invoices</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-invoices-count-badge>0 invoices</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-reports-workspace>
+          <span class="stock-hub-label">
+            <strong>Reports</strong>
+            <small>Sales performance &amp; insights</small>
+          </span>
+          <span class="stock-summary-meta">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+      </nav>
+    </main>
+  </div>
+
+  <!-- Workspace: POS -->
+  <div class="fullscreen-modal" hidden data-pos-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="pos-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-pos-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="pos-workspace-title">Point of Sale</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <!-- Product search -->
+        <div class="customers-search-wrap" style="margin-bottom: 12px;">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+          </svg>
+          <input type="search" class="customers-search-input" data-pos-search placeholder="Search products to add to cart...">
+        </div>
+
+        <!-- Cart -->
+        <div class="stock-list" data-pos-cart></div>
+        <div class="company-users-empty" data-pos-cart-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">🛒</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">Cart is empty</strong>
+          <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Search and tap products to add them to this sale.</p>
+        </div>
+
+        <!-- Totals + checkout -->
+        <div style="background: #f8fafc; border: 1px solid var(--color-line); border-radius: 12px; padding: 14px; margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; color: var(--color-blue);">
+            <span>Total</span>
+            <strong data-pos-total>TZS 0</strong>
+          </div>
+        </div>
+        <button class="btn btn-primary full" type="button" data-pos-checkout style="margin-top: 14px;" disabled>Complete Sale</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Invoices -->
+  <div class="fullscreen-modal" hidden data-invoices-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="invoices-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-invoices-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="invoices-workspace-title">Invoices</h2>
+        <button class="icon-button" type="button" data-open-create-invoice aria-label="New invoice">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <!-- Filter Pills -->
+        <div class="filter-bar" data-invoice-status-filters>
+          <button type="button" class="filter-pill active" data-filter-invoice="all">All</button>
+          <button type="button" class="filter-pill" data-filter-invoice="draft">Draft</button>
+          <button type="button" class="filter-pill" data-filter-invoice="sent">Sent</button>
+          <button type="button" class="filter-pill" data-filter-invoice="paid">Paid</button>
+          <button type="button" class="filter-pill" data-filter-invoice="overdue">Overdue</button>
+        </div>
+
+        <!-- Search -->
+        <div class="customers-search-wrap" style="margin-bottom: 12px;">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+          </svg>
+          <input type="search" class="customers-search-input" data-invoices-search placeholder="Search by invoice number or customer...">
+        </div>
+
+        <!-- List -->
+        <div class="stock-list" data-invoices-list></div>
+
+        <!-- Empty State -->
+        <div class="company-users-empty" data-invoices-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">🧾</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No invoices yet</strong>
+          <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create an invoice to bill a customer and track payment.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-invoice>New Invoice</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Reports -->
+  <div class="fullscreen-modal" hidden data-reports-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="reports-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-reports-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="reports-workspace-title">Sales Reports</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <!-- Range Pills -->
+        <div class="filter-bar" data-report-range-filters>
+          <button type="button" class="filter-pill active" data-filter-range="today">Today</button>
+          <button type="button" class="filter-pill" data-filter-range="week">This Week</button>
+          <button type="button" class="filter-pill" data-filter-range="month">This Month</button>
+          <button type="button" class="filter-pill" data-filter-range="year">This Year</button>
+        </div>
+
+        <!-- Summary cards -->
+        <section class="stock-kpi-grid" style="margin-top: 4px;">
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Total Sales</span>
+            <strong class="kpi-val" data-report-total-sales>TZS 0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Transactions</span>
+            <strong class="kpi-val" data-report-txn-count>0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Avg. Sale</span>
+            <strong class="kpi-val" data-report-avg-sale>TZS 0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Items Sold</span>
+            <strong class="kpi-val" data-report-items-sold>0</strong>
+          </div>
+        </section>
+
+        <!-- Placeholder -->
+        <div class="company-users-empty" style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 14px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">📈</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No sales data yet</strong>
+          <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Reports will populate here once you start recording sales.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- App Notice / Confirm Modal -->
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-close>OK</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=67" defer></script>
+</body>
+</html>

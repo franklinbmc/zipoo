@@ -19,6 +19,7 @@ DirectoryIndex index.html
   RewriteRule ^suppliers/?$ pages/suppliers.html [L]
   RewriteRule ^users/?$ pages/users.html [L]
   RewriteRule ^stock/?$ pages/stock.html [L]
+  RewriteRule ^sales/?$ pages/sales.html [L]
 
   # SaaS admin routes.
   RewriteRule ^saas/?$ saas/index.html [L]

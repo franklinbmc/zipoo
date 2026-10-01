@@ -1,4 +1,4 @@
-const CACHE_NAME = "zipoo-phase-1-v100";
+const CACHE_NAME = "zipoo-phase-1-v101";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -7,6 +7,7 @@ const APP_SHELL = [
   "./pages/customers.html",
   "./pages/suppliers.html",
   "./pages/stock.html",
+  "./pages/sales.html",
   "./pages/users.html",
   "./pages/login.html",
   "./pages/register.html",
@@ -123,6 +124,7 @@ const APP_SHELL = [
   "./assets/js/app.js?v=64",
   "./assets/js/app.js?v=65",
   "./assets/js/app.js?v=66",
+  "./assets/js/app.js?v=67",
   "./assets/js/app.js?v=29",
   "./assets/js/app.js?v=30",
   "./assets/js/saas.js",
@@ -213,6 +215,10 @@ self.addEventListener("fetch", (event) => {
           ? "./pages/dashboard.html"
           : url.pathname.includes("settings")
             ? "./pages/settings.html"
+            : url.pathname.includes("sales")
+            ? "./pages/sales.html"
+            : url.pathname.includes("stock")
+            ? "./pages/stock.html"
             : url.pathname.includes("register")
             ? "./pages/register.html"
             : url.pathname.includes("login")

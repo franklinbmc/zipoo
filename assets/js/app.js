@@ -5053,6 +5053,46 @@ const setupStockPage = () => {
   loadStockMovements();
 };
 
+const setupSalesPage = () => {
+  const page = document.querySelector("[data-sales-page]");
+  if (!page) return;
+
+  const posWorkspace = document.querySelector("[data-pos-workspace]");
+  const invoicesWorkspace = document.querySelector("[data-invoices-workspace]");
+  const reportsWorkspace = document.querySelector("[data-reports-workspace]");
+
+  const openWorkspace = (el) => {
+    if (el) el.hidden = false;
+  };
+  const closeWorkspace = (el) => {
+    if (el) el.hidden = true;
+  };
+
+  document.querySelectorAll("[data-open-pos-workspace]").forEach((btn) => {
+    btn.addEventListener("click", () => openWorkspace(posWorkspace));
+  });
+  document.querySelector("[data-pos-workspace-close]")?.addEventListener("click", () => closeWorkspace(posWorkspace));
+
+  document.querySelectorAll("[data-open-invoices-workspace]").forEach((btn) => {
+    btn.addEventListener("click", () => openWorkspace(invoicesWorkspace));
+  });
+  document.querySelector("[data-invoices-workspace-close]")?.addEventListener("click", () => closeWorkspace(invoicesWorkspace));
+
+  document.querySelectorAll("[data-open-reports-workspace]").forEach((btn) => {
+    btn.addEventListener("click", () => openWorkspace(reportsWorkspace));
+  });
+  document.querySelector("[data-reports-workspace-close]")?.addEventListener("click", () => closeWorkspace(reportsWorkspace));
+
+  // Invoice & report filter pills (visual state only until the sales backend is wired)
+  document.querySelectorAll("[data-invoice-status-filters] .filter-pill, [data-report-range-filters] .filter-pill").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const group = btn.closest(".filter-bar");
+      group?.querySelectorAll(".filter-pill").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+    });
+  });
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.lang));
@@ -5070,6 +5110,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSuppliersPage();
   setupCompanyUsersPage();
   setupStockPage();
+  setupSalesPage();
   updateConnectionStatus();
   registerServiceWorker();
 });
