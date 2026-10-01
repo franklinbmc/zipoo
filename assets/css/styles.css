@@ -3346,14 +3346,6 @@ button.settings-list-row:focus-visible {
   color: var(--color-blue);
 }
 
-.stock-action-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
 .po-line-item-row {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) 70px 100px 32px;
@@ -3366,7 +3358,7 @@ button.settings-list-row:focus-visible {
   margin-bottom: 8px;
 }
 
-/* Stock page layout — aligns with the settings/customers accordion pattern */
+/* Stock page layout — aligns with the settings/customers page pattern */
 .stock-page-shell {
   grid-template-rows: auto 1fr;
   overflow: auto;
@@ -3378,11 +3370,6 @@ button.settings-list-row:focus-visible {
 
 .stock-page .stock-kpi-grid {
   margin-bottom: 0;
-}
-
-/* Summaries carry a count badge + chevron, so give column 2 room to size itself */
-.stock-page .settings-accordion summary {
-  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .stock-summary-meta {
@@ -3397,18 +3384,50 @@ button.settings-list-row:focus-visible {
   font-weight: 800;
 }
 
-.stock-page .settings-accordion[open] summary .stock-summary-meta svg {
-  transform: rotate(90deg);
-}
-
-.stock-accordion-body {
-  padding: 14px;
-  border-top: 1px solid var(--color-line);
-}
-
 .stock-list {
   display: grid;
   gap: 8px;
+}
+
+/* Stock hub — tap-to-open section rows */
+.stock-hub {
+  display: grid;
+  gap: 12px;
+}
+
+.stock-page .settings-accordion-link.stock-hub-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  min-height: 64px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.stock-page .settings-accordion-link.stock-hub-row:hover,
+.stock-page .settings-accordion-link.stock-hub-row:focus-visible {
+  background: #f8fafc;
+}
+
+.stock-hub-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.stock-hub-label strong {
+  color: var(--color-navy);
+  font-weight: 900;
+}
+
+.stock-hub-label small {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* Section workspace body */
+.stock-workspace-body {
+  padding-top: 16px;
 }
 
 

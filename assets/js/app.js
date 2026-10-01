@@ -4805,7 +4805,38 @@ const setupStockPage = () => {
     }, 250);
   });
 
-  // Initial Data Loads
+  // ----------------------------------------
+  // Section workspaces (tap-to-open fullscreen)
+  // ----------------------------------------
+  const itemsWorkspace = document.querySelector("[data-items-workspace]");
+  const purchasingWorkspace = document.querySelector("[data-purchasing-workspace]");
+  const movementsWorkspace = document.querySelector("[data-movements-workspace]");
+
+  const openWorkspace = (el, refresh) => {
+    if (!el) return;
+    el.hidden = false;
+    if (typeof refresh === "function") refresh();
+  };
+  const closeWorkspace = (el) => {
+    if (el) el.hidden = true;
+  };
+
+  document.querySelectorAll("[data-open-items-workspace]").forEach((btn) => {
+    btn.addEventListener("click", () => openWorkspace(itemsWorkspace, () => loadItems(itemsSearch?.value.trim() || "")));
+  });
+  document.querySelector("[data-items-workspace-close]")?.addEventListener("click", () => closeWorkspace(itemsWorkspace));
+
+  document.querySelectorAll("[data-open-purchasing-workspace]").forEach((btn) => {
+    btn.addEventListener("click", () => openWorkspace(purchasingWorkspace, () => loadPurchaseOrders(poSearch?.value.trim() || "")));
+  });
+  document.querySelector("[data-purchasing-workspace-close]")?.addEventListener("click", () => closeWorkspace(purchasingWorkspace));
+
+  document.querySelectorAll("[data-open-movements-workspace]").forEach((btn) => {
+    btn.addEventListener("click", () => openWorkspace(movementsWorkspace, () => loadStockMovements(movementsSearch?.value.trim() || "")));
+  });
+  document.querySelector("[data-movements-workspace-close]")?.addEventListener("click", () => closeWorkspace(movementsWorkspace));
+
+  // Initial Data Loads (populate KPIs + hub counters)
   loadItems();
   loadPurchaseOrders();
   loadStockMovements();

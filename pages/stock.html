@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=57">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=58">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -48,148 +48,172 @@
         </div>
       </section>
 
-      <!-- 1. Products & Services Accordion -->
-      <details class="settings-accordion" data-accordion="items" open>
-        <summary>
-          <span>Products & Services</span>
-          <div class="stock-summary-meta">
+      <!-- Stock hub: each row opens its own fullscreen workspace -->
+      <nav class="stock-hub">
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-items-workspace>
+          <span class="stock-hub-label">
+            <strong>Products & Services</strong>
+            <small>Catalog, pricing &amp; inventory levels</small>
+          </span>
+          <span class="stock-summary-meta">
             <strong class="stock-count-badge" data-items-count-badge>0 items</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </div>
-        </summary>
-        <div class="stock-accordion-body">
-          <div class="stock-action-header">
-            <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Catalog & Inventory</span>
-            <button class="btn btn-primary btn-sm btn-with-icon" type="button" data-open-create-item>
-              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M256 112v288M112 256h288" /></svg>
-              <span>Add Product / Service</span>
-            </button>
-          </div>
+          </span>
+        </button>
 
-          <!-- Filter Pills -->
-          <div class="filter-bar" data-item-type-filters>
-            <button type="button" class="filter-pill active" data-filter-type="all">All Items</button>
-            <button type="button" class="filter-pill" data-filter-type="product">Products</button>
-            <button type="button" class="filter-pill" data-filter-type="service">Services</button>
-            <button type="button" class="filter-pill" data-filter-type="low_stock">⚠️ Low Stock</button>
-          </div>
-
-          <!-- Search Input -->
-          <div class="customers-search-wrap" style="margin-bottom: 12px;">
-            <svg viewBox="0 0 512 512" aria-hidden="true">
-              <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
-            </svg>
-            <input type="search" class="customers-search-input" data-items-search placeholder="Search items by name, SKU, category...">
-          </div>
-
-          <!-- Items List Container -->
-          <div class="stock-list" data-stock-items-list></div>
-
-          <!-- Empty State -->
-          <div class="company-users-empty" hidden data-stock-items-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-            <div style="font-size: 2rem; margin-bottom: 6px;">📦</div>
-            <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No items found</strong>
-            <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Add physical products to track stock, or services to bill clients.</p>
-            <button class="btn btn-primary btn-sm" type="button" data-open-create-item>Add Item</button>
-          </div>
-        </div>
-      </details>
-
-      <!-- 2. Purchasing Accordion (PO & Goods Receiving) -->
-      <details class="settings-accordion" data-accordion="purchasing">
-        <summary>
-          <span>Purchasing (PO & Receiving)</span>
-          <div class="stock-summary-meta">
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-purchasing-workspace>
+          <span class="stock-hub-label">
+            <strong>Purchasing</strong>
+            <small>Purchase orders, PDFs &amp; goods receiving</small>
+          </span>
+          <span class="stock-summary-meta">
             <strong class="stock-count-badge" data-po-count-badge>0 orders</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </div>
-        </summary>
-        <div class="stock-accordion-body">
-          <div class="stock-action-header">
-            <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Purchase Orders & GRN</span>
-            <button class="btn btn-primary btn-sm btn-with-icon" type="button" data-open-create-po>
-              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M256 112v288M112 256h288" /></svg>
-              <span>New Purchase Order</span>
-            </button>
-          </div>
+          </span>
+        </button>
 
-          <!-- PO Filter Pills -->
-          <div class="filter-bar" data-po-status-filters>
-            <button type="button" class="filter-pill active" data-filter-po="all">All Orders</button>
-            <button type="button" class="filter-pill" data-filter-po="draft">Draft</button>
-            <button type="button" class="filter-pill" data-filter-po="sent">Sent</button>
-            <button type="button" class="filter-pill" data-filter-po="partially_received">Partial</button>
-            <button type="button" class="filter-pill" data-filter-po="received">Received</button>
-          </div>
-
-          <!-- PO Search Input -->
-          <div class="customers-search-wrap" style="margin-bottom: 12px;">
-            <svg viewBox="0 0 512 512" aria-hidden="true">
-              <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
-            </svg>
-            <input type="search" class="customers-search-input" data-po-search placeholder="Search by PO number or supplier name...">
-          </div>
-
-          <!-- PO List Container -->
-          <div class="stock-list" data-po-list></div>
-
-          <!-- Empty State -->
-          <div class="company-users-empty" hidden data-po-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-            <div style="font-size: 2rem; margin-bottom: 6px;">📋</div>
-            <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No purchase orders yet</strong>
-            <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create purchase orders to procure items, generate PDFs, and receive goods.</p>
-            <button class="btn btn-primary btn-sm" type="button" data-open-create-po>New Purchase Order</button>
-          </div>
-        </div>
-      </details>
-
-      <!-- 3. Stock Movement Accordion -->
-      <details class="settings-accordion" data-accordion="movements">
-        <summary>
-          <span>Stock Movement</span>
-          <div class="stock-summary-meta">
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-movements-workspace>
+          <span class="stock-hub-label">
+            <strong>Stock Movement</strong>
+            <small>Inventory ledger &amp; audit trail</small>
+          </span>
+          <span class="stock-summary-meta">
             <strong class="stock-count-badge" data-movements-count-badge>Ledger</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </div>
-        </summary>
-        <div class="stock-accordion-body">
-          <div class="stock-action-header">
-            <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Inventory Ledger & Audit</span>
-            <button class="btn btn-outline btn-sm btn-with-icon" type="button" data-open-stock-adjust>
-              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M384 256H128M256 128v256" /></svg>
-              <span>Adjust Stock</span>
-            </button>
-          </div>
-
-          <!-- Movement Filter Pills -->
-          <div class="filter-bar" data-movement-filters>
-            <button type="button" class="filter-pill active" data-filter-movement="all">All Movements</button>
-            <button type="button" class="filter-pill" data-filter-movement="purchase_receive">Goods Received</button>
-            <button type="button" class="filter-pill" data-filter-movement="adjustment_add">+ Stock Added</button>
-            <button type="button" class="filter-pill" data-filter-movement="adjustment_subtract">- Stock Deducted</button>
-            <button type="button" class="filter-pill" data-filter-movement="sale">Sales</button>
-          </div>
-
-          <!-- Movement Search Input -->
-          <div class="customers-search-wrap" style="margin-bottom: 12px;">
-            <svg viewBox="0 0 512 512" aria-hidden="true">
-              <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
-            </svg>
-            <input type="search" class="customers-search-input" data-movements-search placeholder="Search by item name, reference, notes...">
-          </div>
-
-          <!-- Movements List Container -->
-          <div class="stock-list" data-stock-movements-list></div>
-
-          <!-- Empty State -->
-          <div class="company-users-empty" hidden data-stock-movements-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-            <div style="font-size: 2rem; margin-bottom: 6px;">📊</div>
-            <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No movements recorded</strong>
-            <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Inventory movements will automatically appear here when receiving goods or making adjustments.</p>
-          </div>
-        </div>
-      </details>
+          </span>
+        </button>
+      </nav>
     </main>
+  </div>
+
+  <!-- Workspace: Products & Services -->
+  <div class="fullscreen-modal" hidden data-items-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="items-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-items-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="items-workspace-title">Products & Services</h2>
+        <button class="icon-button" type="button" data-open-create-item aria-label="Add product or service">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <!-- Filter Pills -->
+        <div class="filter-bar" data-item-type-filters>
+          <button type="button" class="filter-pill active" data-filter-type="all">All Items</button>
+          <button type="button" class="filter-pill" data-filter-type="product">Products</button>
+          <button type="button" class="filter-pill" data-filter-type="service">Services</button>
+          <button type="button" class="filter-pill" data-filter-type="low_stock">⚠️ Low Stock</button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="customers-search-wrap" style="margin-bottom: 12px;">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+          </svg>
+          <input type="search" class="customers-search-input" data-items-search placeholder="Search items by name, SKU, category...">
+        </div>
+
+        <!-- Items List Container -->
+        <div class="stock-list" data-stock-items-list></div>
+
+        <!-- Empty State -->
+        <div class="company-users-empty" hidden data-stock-items-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">📦</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No items found</strong>
+          <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Add physical products to track stock, or services to bill clients.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-item>Add Item</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Purchasing (PO & Goods Receiving) -->
+  <div class="fullscreen-modal" hidden data-purchasing-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="purchasing-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-purchasing-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="purchasing-workspace-title">Purchasing</h2>
+        <button class="icon-button" type="button" data-open-create-po aria-label="New purchase order">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <!-- PO Filter Pills -->
+        <div class="filter-bar" data-po-status-filters>
+          <button type="button" class="filter-pill active" data-filter-po="all">All Orders</button>
+          <button type="button" class="filter-pill" data-filter-po="draft">Draft</button>
+          <button type="button" class="filter-pill" data-filter-po="sent">Sent</button>
+          <button type="button" class="filter-pill" data-filter-po="partially_received">Partial</button>
+          <button type="button" class="filter-pill" data-filter-po="received">Received</button>
+        </div>
+
+        <!-- PO Search Input -->
+        <div class="customers-search-wrap" style="margin-bottom: 12px;">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+          </svg>
+          <input type="search" class="customers-search-input" data-po-search placeholder="Search by PO number or supplier name...">
+        </div>
+
+        <!-- PO List Container -->
+        <div class="stock-list" data-po-list></div>
+
+        <!-- Empty State -->
+        <div class="company-users-empty" hidden data-po-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">📋</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No purchase orders yet</strong>
+          <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create purchase orders to procure items, generate PDFs, and receive goods.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-po>New Purchase Order</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Stock Movement -->
+  <div class="fullscreen-modal" hidden data-movements-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="movements-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-movements-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="movements-workspace-title">Stock Movement</h2>
+        <button class="icon-button" type="button" data-open-stock-adjust aria-label="Adjust stock">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M384 256H128M256 128v256" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <!-- Movement Filter Pills -->
+        <div class="filter-bar" data-movement-filters>
+          <button type="button" class="filter-pill active" data-filter-movement="all">All Movements</button>
+          <button type="button" class="filter-pill" data-filter-movement="purchase_receive">Goods Received</button>
+          <button type="button" class="filter-pill" data-filter-movement="adjustment_add">+ Stock Added</button>
+          <button type="button" class="filter-pill" data-filter-movement="adjustment_subtract">- Stock Deducted</button>
+          <button type="button" class="filter-pill" data-filter-movement="sale">Sales</button>
+        </div>
+
+        <!-- Movement Search Input -->
+        <div class="customers-search-wrap" style="margin-bottom: 12px;">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+          </svg>
+          <input type="search" class="customers-search-input" data-movements-search placeholder="Search by item name, reference, notes...">
+        </div>
+
+        <!-- Movements List Container -->
+        <div class="stock-list" data-stock-movements-list></div>
+
+        <!-- Empty State -->
+        <div class="company-users-empty" hidden data-stock-movements-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">📊</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No movements recorded</strong>
+          <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Inventory movements will automatically appear here when receiving goods or making adjustments.</p>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- Modal 1: Item Details Modal -->
@@ -595,6 +619,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=61" defer></script>
+  <script src="/assets/js/app.js?v=62" defer></script>
 </body>
 </html>
