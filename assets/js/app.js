@@ -4843,12 +4843,9 @@ const setupStockPage = () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  setupLanguageSwitcher();
-  setupAppModalClose();
-  setupConnectionBanner();
-  setupTopNav();
-  setupAppNotifications();
-  setupGlobalShortcuts();
+  document.querySelectorAll("[data-lang]").forEach((button) => {
+    button.addEventListener("click", () => setLanguage(button.dataset.lang));
+  });
 
   setLanguage(getSavedLanguage()).catch(() => setLanguage(DEFAULT_LANGUAGE));
   setupBottomSheet();
