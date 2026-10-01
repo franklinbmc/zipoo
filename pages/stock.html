@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=58">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=59">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -301,9 +301,15 @@
         <!-- Item Type Toggle -->
         <label class="form-field">
           <span>Item Type <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;">
-            <button type="button" class="btn btn-outline btn-sm active" data-type-choice="product" style="padding: 10px; font-weight: 800;">📦 Physical Product</button>
-            <button type="button" class="btn btn-outline btn-sm" data-type-choice="service" style="padding: 10px; font-weight: 800;">⚡ Service</button>
+          <div class="type-choice-group">
+            <button type="button" class="type-choice active" data-type-choice="product">
+              <span class="type-choice-dot" aria-hidden="true"></span>
+              <span>Physical Product</span>
+            </button>
+            <button type="button" class="type-choice" data-type-choice="service">
+              <span class="type-choice-dot" aria-hidden="true"></span>
+              <span>Service</span>
+            </button>
           </div>
           <input type="hidden" name="type" value="product" data-item-form-type>
         </label>
@@ -316,8 +322,11 @@
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
           <label class="form-field">
             <span>Category</span>
-            <input type="text" name="category" placeholder="e.g. Electronics, Services" list="categories-list" value="General">
-            <datalist id="categories-list" data-categories-datalist></datalist>
+            <select name="category" data-category-select>
+              <option value="General" selected>General</option>
+              <option value="__new__">+ New Category</option>
+            </select>
+            <input type="text" class="new-category-input" data-new-category-input placeholder="Enter new category name" hidden>
           </label>
           <label class="form-field">
             <span>Unit of Measure</span>
@@ -373,7 +382,7 @@
           <textarea name="description" rows="2" placeholder="Optional details..."></textarea>
         </label>
 
-        <label class="form-field">
+        <label class="form-field" data-status-field>
           <span>Status</span>
           <select name="status">
             <option value="active" selected>Active</option>
@@ -619,6 +628,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=63" defer></script>
+  <script src="/assets/js/app.js?v=64" defer></script>
 </body>
 </html>

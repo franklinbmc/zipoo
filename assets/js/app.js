@@ -3565,7 +3565,9 @@ const setupStockPage = () => {
   const typeChoiceBtns = document.querySelectorAll("[data-type-choice]");
   const productOnlyFields = document.querySelector("[data-product-only-fields]");
   const initialStockWrap = document.querySelector("[data-initial-stock-wrap]");
-  const categoriesDatalist = document.querySelector("[data-categories-datalist]");
+  const categorySelect = document.querySelector("[data-category-select]");
+  const newCategoryInput = document.querySelector("[data-new-category-input]");
+  const statusField = document.querySelector("[data-status-field]");
 
   // Stock Adjust Modal
   const adjustModal = document.querySelector("[data-stock-adjust-modal]");
@@ -3641,6 +3643,7 @@ const setupStockPage = () => {
   let cachedItems = [];
   let cachedPOs = [];
   let cachedSuppliers = [];
+  let cachedCategories = [];
   let currentItem = null;
   let currentPO = null;
   let activeItemType = "all";
@@ -3683,6 +3686,38 @@ const setupStockPage = () => {
   typeChoiceBtns.forEach((btn) => {
     btn.addEventListener("click", () => setItemTypeChoice(btn.dataset.typeChoice));
   });
+
+  const CATEGORY_NEW_VALUE = "__new__";
+
+  const toggleNewCategoryInput = () => {
+    if (!categorySelect || !newCategoryInput) return;
+    const isNew = categorySelect.value === CATEGORY_NEW_VALUE;
+    newCategoryInput.hidden = !isNew;
+    if (isNew) {
+      newCategoryInput.focus();
+    } else {
+      newCategoryInput.value = "";
+    }
+  };
+
+  const populateCategorySelect = (categories = [], selected = "General") => {
+    if (!categorySelect) return;
+    const list = Array.isArray(categories) ? categories.slice() : [];
+    if (!list.includes("General")) list.unshift("General");
+    if (selected && selected !== CATEGORY_NEW_VALUE && !list.includes(selected)) {
+      list.push(selected);
+    }
+    const seen = new Set();
+    const options = list
+      .filter((c) => c && !seen.has(c) && seen.add(c))
+      .map((c) => `<option value="${c}">${c}</option>`)
+      .join("");
+    categorySelect.innerHTML = options + `<option value="${CATEGORY_NEW_VALUE}">+ New Category</option>`;
+    categorySelect.value = (selected && selected !== CATEGORY_NEW_VALUE) ? selected : "General";
+    toggleNewCategoryInput();
+  };
+
+  categorySelect?.addEventListener("change", toggleNewCategoryInput);
 
   const renderItemsList = (items = []) => {
     if (!items || !items.length) {
@@ -3807,9 +3842,12 @@ const setupStockPage = () => {
         itemsCountBadge.textContent = `${data.stats?.total || 0} items`;
       }
 
-      // Populate category datalist
-      if (categoriesDatalist && Array.isArray(data.categories)) {
-        categoriesDatalist.innerHTML = data.categories.map((c) => `<option value="${c}">`).join("");
+      // Cache categories and refresh the category select (keep the user's current pick)
+      if (Array.isArray(data.categories)) {
+        cachedCategories = data.categories;
+        if (categorySelect && categorySelect.value !== CATEGORY_NEW_VALUE) {
+          populateCategorySelect(cachedCategories, categorySelect.value || "General");
+        }
       }
 
       // Also populate adjust product select dropdown
@@ -3869,6 +3907,8 @@ const setupStockPage = () => {
     if (itemFormId) itemFormId.value = "";
     itemForm?.reset();
     setItemTypeChoice("product");
+    populateCategorySelect(cachedCategories, "General");
+    if (statusField) statusField.hidden = true;
     if (initialStockWrap) initialStockWrap.hidden = false;
     if (itemFormModal) itemFormModal.hidden = false;
     itemForm?.querySelector('input[name="name"]')?.focus();
@@ -3881,12 +3921,13 @@ const setupStockPage = () => {
     if (itemFormTitle) itemFormTitle.textContent = `Edit ${item.name}`;
     if (itemFormId) itemFormId.value = String(item.id);
     if (initialStockWrap) initialStockWrap.hidden = true;
+    if (statusField) statusField.hidden = false;
 
     setItemTypeChoice(item.type || "product");
+    populateCategorySelect(cachedCategories, item.category || "General");
 
     if (itemForm) {
       itemForm.elements["name"].value = item.name || "";
-      itemForm.elements["category"].value = item.category || "General";
       itemForm.elements["unit"].value = item.unit || "pcs";
       itemForm.elements["selling_price"].value = item.selling_price || 0;
       itemForm.elements["cost_price"].value = item.cost_price || 0;
@@ -3978,8 +4019,19 @@ const setupStockPage = () => {
 
     try {
       const isEditing = Boolean(itemFormId?.value);
+
+      // Resolve a brand-new category typed by the user
+      const usingNewCategory = categorySelect && categorySelect.value === CATEGORY_NEW_VALUE;
+      const newCat = (newCategoryInput?.value || "").trim();
+      if (usingNewCategory && !newCat) {
+        throw new Error("Please enter a name for the new category.");
+      }
+
       const formData = new FormData(itemForm);
       formData.set("action", isEditing ? "update" : "create");
+      if (usingNewCategory) {
+        formData.set("category", newCat);
+      }
 
       const res = await fetch(`${getBasePath()}api/items.php`, {
         method: "POST",
