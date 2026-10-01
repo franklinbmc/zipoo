@@ -216,6 +216,147 @@
     </section>
   </div>
 
+  <!-- Invoice Create / Edit Modal -->
+  <div class="fullscreen-modal" hidden data-invoice-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="invoice-form-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-invoice-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="invoice-form-title" data-invoice-form-title>New Invoice</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-invoice-form novalidate>
+        <input type="hidden" name="invoice_id" data-invoice-form-id>
+
+        <label class="form-field">
+          <span>Customer</span>
+          <div class="search-select" data-search-select data-invoice-customer-select>
+            <input type="hidden" name="customer_id" data-search-select-value data-invoice-customer-value>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Walk-in Customer</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search customers...">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
+        </label>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="form-field">
+            <span>Issue Date <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+            <input type="date" name="issue_date" required>
+          </label>
+          <label class="form-field">
+            <span>Due Date</span>
+            <input type="date" name="due_date">
+          </label>
+        </div>
+
+        <!-- Line Items -->
+        <div style="margin: 16px 0 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 0.9rem; color: var(--color-navy);">Invoice Items</strong>
+            <button class="btn btn-outline btn-sm btn-with-icon" type="button" data-add-invoice-line>
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width: 14px; height: 14px; stroke-width: 48;"><path d="M256 112v288M112 256h288" /></svg>
+              <span>Add Item</span>
+            </button>
+          </div>
+          <div data-invoice-lines-container style="display: grid; gap: 8px;"></div>
+        </div>
+
+        <!-- Summary -->
+        <div style="background: #f8fafc; border: 1px solid var(--color-line); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 6px;">
+            <span style="color: var(--color-muted);">Subtotal:</span>
+            <strong data-invoice-calc-subtotal>0.00 TZS</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; margin-bottom: 6px;">
+            <span style="color: var(--color-muted);">Discount:</span>
+            <input type="text" inputmode="numeric" name="discount" value="0" data-invoice-discount-input style="width: 90px; text-align: right; height: 32px; padding: 2px 6px;">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; margin-bottom: 6px;">
+            <span style="color: var(--color-muted);">Tax Rate (%):</span>
+            <input type="text" inputmode="numeric" name="tax_rate" value="0" data-invoice-tax-input style="width: 70px; text-align: right; height: 32px; padding: 2px 6px;">
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 8px;">
+            <span style="color: var(--color-muted);">Tax Amount:</span>
+            <span data-invoice-calc-tax>0.00 TZS</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; border-top: 1px dashed var(--color-line); padding-top: 8px; color: var(--color-blue);">
+            <span>Total:</span>
+            <strong data-invoice-calc-total>0.00 TZS</strong>
+          </div>
+        </div>
+
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="2" placeholder="Optional notes for the customer..."></textarea>
+        </label>
+
+        <p class="inline-error" hidden data-invoice-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-invoice-form-submit>Save Invoice</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Invoice Detail Modal -->
+  <div class="fullscreen-modal" hidden data-invoice-detail-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="invoice-detail-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-invoice-detail-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="invoice-detail-title" data-invoice-detail-num>Invoice</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body" style="padding: 16px;">
+        <div style="background: #fff; border: 1px solid var(--color-line); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="font-size: 1.05rem; color: var(--color-navy);" data-invoice-detail-customer>-</strong>
+            <span class="badge-status" data-invoice-detail-status-badge>DRAFT</span>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem; color: var(--color-muted);">
+            <div>Issue Date: <strong data-invoice-detail-issue style="color: var(--color-text);">-</strong></div>
+            <div>Due Date: <strong data-invoice-detail-due style="color: var(--color-text);">-</strong></div>
+            <div>Phone: <span data-invoice-detail-phone>-</span></div>
+            <div>Email: <span data-invoice-detail-email>-</span></div>
+          </div>
+        </div>
+
+        <div style="border: 1px solid var(--color-line); border-radius: 12px; overflow: hidden; background: #fff; margin-bottom: 14px;">
+          <div style="background: #f8fafc; padding: 10px 14px; font-size: 0.84rem; font-weight: 800; color: var(--color-navy); border-bottom: 1px solid var(--color-line);">Invoice Items</div>
+          <div data-invoice-detail-items-list style="display: grid;"></div>
+          <div style="padding: 12px 14px; background: #f8fafc; border-top: 1px solid var(--color-line); display: grid; gap: 4px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--color-muted);"><span>Subtotal</span><span data-invoice-detail-subtotal>-</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--color-muted);"><span>Discount</span><span data-invoice-detail-discount>-</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--color-muted);"><span>Tax</span><span data-invoice-detail-tax>-</span></div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.05rem; font-weight: 800; color: var(--color-blue); border-top: 1px dashed var(--color-line); padding-top: 6px; margin-top: 2px;"><span>Total</span><strong data-invoice-detail-total>-</strong></div>
+          </div>
+        </div>
+
+        <div style="background: #fff; border: 1px solid var(--color-line); border-radius: 12px; padding: 12px; margin-bottom: 16px;" data-invoice-detail-notes-wrap hidden>
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--color-muted); font-weight: 800; margin-bottom: 4px;">Notes</div>
+          <p data-invoice-detail-notes style="margin: 0; font-size: 0.85rem; color: var(--color-text);"></p>
+        </div>
+
+        <!-- Actions -->
+        <div style="display: grid; gap: 10px; margin-bottom: 16px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button class="btn btn-outline full" type="button" data-invoice-mark-sent-btn>Mark as Sent</button>
+            <button class="btn btn-primary full" type="button" data-invoice-mark-paid-btn>Mark as Paid</button>
+          </div>
+          <button class="btn btn-outline full" type="button" data-invoice-edit-btn>Edit Invoice</button>
+          <button class="btn btn-danger-outline full" type="button" data-invoice-cancel-btn>Cancel Invoice</button>
+          <button class="btn btn-primary full" type="button" data-invoice-uncancel-btn hidden>Reactivate Invoice</button>
+          <button class="btn btn-danger-outline full" type="button" data-invoice-delete-btn>Delete Invoice</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <!-- App Notice / Confirm Modal -->
   <div class="modal-backdrop" hidden data-app-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
@@ -225,6 +366,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=67" defer></script>
+  <script src="/assets/js/app.js?v=68" defer></script>
 </body>
 </html>

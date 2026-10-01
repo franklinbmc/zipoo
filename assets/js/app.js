@@ -5057,40 +5057,500 @@ const setupSalesPage = () => {
   const page = document.querySelector("[data-sales-page]");
   if (!page) return;
 
+  // ---- Local helpers ----
+  const formatCurrency = (amount, cur = "TZS") => {
+    const val = Number(amount) || 0;
+    return `${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${cur}`;
+  };
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "-";
+    try {
+      const d = new Date(String(dateStr).replace(" ", "T"));
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return dateStr;
+    }
+  };
+  const num = (v) => parseFloat(String(v ?? "").replace(/[^0-9.\-]/g, "")) || 0;
+  const setSSValue = (wrapper, value) => {
+    const input = wrapper?.querySelector("[data-search-select-value]");
+    if (!input) return;
+    input.value = value;
+    input.setAttribute("value", value);
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+  const statusClass = (eff) => {
+    if (eff === "paid") return "approved";
+    if (eff === "overdue" || eff === "cancelled") return "rejected";
+    return "pending";
+  };
+
+  // ---- Workspaces ----
   const posWorkspace = document.querySelector("[data-pos-workspace]");
   const invoicesWorkspace = document.querySelector("[data-invoices-workspace]");
   const reportsWorkspace = document.querySelector("[data-reports-workspace]");
+  const openWorkspace = (el) => { if (el) el.hidden = false; };
+  const closeWorkspace = (el) => { if (el) el.hidden = true; };
 
-  const openWorkspace = (el) => {
-    if (el) el.hidden = false;
-  };
-  const closeWorkspace = (el) => {
-    if (el) el.hidden = true;
-  };
-
-  document.querySelectorAll("[data-open-pos-workspace]").forEach((btn) => {
-    btn.addEventListener("click", () => openWorkspace(posWorkspace));
-  });
+  document.querySelectorAll("[data-open-pos-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(posWorkspace)));
   document.querySelector("[data-pos-workspace-close]")?.addEventListener("click", () => closeWorkspace(posWorkspace));
-
-  document.querySelectorAll("[data-open-invoices-workspace]").forEach((btn) => {
-    btn.addEventListener("click", () => openWorkspace(invoicesWorkspace));
-  });
+  document.querySelectorAll("[data-open-invoices-workspace]").forEach((btn) => btn.addEventListener("click", () => { openWorkspace(invoicesWorkspace); loadInvoices(invoicesSearch?.value.trim() || ""); }));
   document.querySelector("[data-invoices-workspace-close]")?.addEventListener("click", () => closeWorkspace(invoicesWorkspace));
-
-  document.querySelectorAll("[data-open-reports-workspace]").forEach((btn) => {
-    btn.addEventListener("click", () => openWorkspace(reportsWorkspace));
-  });
+  document.querySelectorAll("[data-open-reports-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(reportsWorkspace)));
   document.querySelector("[data-reports-workspace-close]")?.addEventListener("click", () => closeWorkspace(reportsWorkspace));
 
-  // Invoice & report filter pills (visual state only until the sales backend is wired)
-  document.querySelectorAll("[data-invoice-status-filters] .filter-pill, [data-report-range-filters] .filter-pill").forEach((btn) => {
+  document.querySelectorAll("[data-report-range-filters] .filter-pill").forEach((btn) => {
     btn.addEventListener("click", () => {
       const group = btn.closest(".filter-bar");
       group?.querySelectorAll(".filter-pill").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
     });
   });
+
+  // ---- KPI + list refs ----
+  const kpiSalesToday = document.querySelector("[data-kpi-sales-today]");
+  const kpiSalesCount = document.querySelector("[data-kpi-sales-count]");
+  const kpiInvoicesDue = document.querySelector("[data-kpi-invoices-due]");
+  const kpiSalesMonth = document.querySelector("[data-kpi-sales-month]");
+  const invoicesCountBadge = document.querySelector("[data-invoices-count-badge]");
+  const invoicesList = document.querySelector("[data-invoices-list]");
+  const invoicesEmpty = document.querySelector("[data-invoices-empty]");
+  const invoicesSearch = document.querySelector("[data-invoices-search]");
+  const invoiceStatusFilters = document.querySelectorAll("[data-filter-invoice]");
+  const openCreateInvoiceBtns = document.querySelectorAll("[data-open-create-invoice]");
+
+  // ---- Invoice form modal refs ----
+  const invoiceFormModal = document.querySelector("[data-invoice-form-modal]");
+  const invoiceFormCloseBtn = document.querySelector("[data-invoice-form-close]");
+  const invoiceFormTitle = document.querySelector("[data-invoice-form-title]");
+  const invoiceForm = document.querySelector("[data-invoice-form]");
+  const invoiceFormId = document.querySelector("[data-invoice-form-id]");
+  const invoiceFormError = document.querySelector("[data-invoice-form-error]");
+  const invoiceFormSubmit = document.querySelector("[data-invoice-form-submit]");
+  const invoiceCustomerSelect = document.querySelector("[data-invoice-customer-select]");
+  const invoiceCustomerValue = document.querySelector("[data-invoice-customer-value]");
+  const invoiceLinesContainer = document.querySelector("[data-invoice-lines-container]");
+  const addInvoiceLineBtn = document.querySelector("[data-add-invoice-line]");
+  const invoiceDiscountInput = document.querySelector("[data-invoice-discount-input]");
+  const invoiceTaxInput = document.querySelector("[data-invoice-tax-input]");
+  const invoiceCalcSubtotal = document.querySelector("[data-invoice-calc-subtotal]");
+  const invoiceCalcTax = document.querySelector("[data-invoice-calc-tax]");
+  const invoiceCalcTotal = document.querySelector("[data-invoice-calc-total]");
+
+  // ---- Invoice detail modal refs ----
+  const invoiceDetailModal = document.querySelector("[data-invoice-detail-modal]");
+  const invoiceDetailCloseBtn = document.querySelector("[data-invoice-detail-close]");
+  const invoiceDetailNum = document.querySelector("[data-invoice-detail-num]");
+  const invoiceDetailCustomer = document.querySelector("[data-invoice-detail-customer]");
+  const invoiceDetailStatusBadge = document.querySelector("[data-invoice-detail-status-badge]");
+  const invoiceDetailIssue = document.querySelector("[data-invoice-detail-issue]");
+  const invoiceDetailDue = document.querySelector("[data-invoice-detail-due]");
+  const invoiceDetailPhone = document.querySelector("[data-invoice-detail-phone]");
+  const invoiceDetailEmail = document.querySelector("[data-invoice-detail-email]");
+  const invoiceDetailItemsList = document.querySelector("[data-invoice-detail-items-list]");
+  const invoiceDetailSubtotal = document.querySelector("[data-invoice-detail-subtotal]");
+  const invoiceDetailDiscount = document.querySelector("[data-invoice-detail-discount]");
+  const invoiceDetailTax = document.querySelector("[data-invoice-detail-tax]");
+  const invoiceDetailTotal = document.querySelector("[data-invoice-detail-total]");
+  const invoiceDetailNotesWrap = document.querySelector("[data-invoice-detail-notes-wrap]");
+  const invoiceDetailNotes = document.querySelector("[data-invoice-detail-notes]");
+  const invoiceMarkSentBtn = document.querySelector("[data-invoice-mark-sent-btn]");
+  const invoiceMarkPaidBtn = document.querySelector("[data-invoice-mark-paid-btn]");
+  const invoiceEditBtn = document.querySelector("[data-invoice-edit-btn]");
+  const invoiceCancelBtn = document.querySelector("[data-invoice-cancel-btn]");
+  const invoiceUncancelBtn = document.querySelector("[data-invoice-uncancel-btn]");
+  const invoiceDeleteBtn = document.querySelector("[data-invoice-delete-btn]");
+
+  // ---- State ----
+  let cachedProducts = [];
+  let cachedCustomers = [];
+  let activeInvoiceStatus = "all";
+  let currentInvoice = null;
+
+  // ---- Data loads ----
+  const loadProducts = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/items.php`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data && data.ok) cachedProducts = Array.isArray(data.items) ? data.items : [];
+    } catch { /* offline */ }
+  };
+
+  const loadCustomers = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/customers.php`);
+      if (!res.ok) return;
+      const data = await res.json();
+      cachedCustomers = Array.isArray(data.customers) ? data.customers : [];
+      if (invoiceCustomerSelect) {
+        const options = [{ value: "", label: "Walk-in Customer" }].concat(
+          cachedCustomers.map((c) => ({ value: String(c.id), label: `${c.full_name}${c.phone ? ` (${c.phone})` : ""}` }))
+        );
+        setSearchSelectOptions(invoiceCustomerSelect, options, "Walk-in Customer", invoiceCustomerValue?.value || "");
+      }
+    } catch { /* offline */ }
+  };
+
+  const applyInvoiceStats = (stats = {}) => {
+    if (kpiSalesToday) kpiSalesToday.textContent = formatCurrency(stats.sales_today || 0);
+    if (kpiSalesCount) kpiSalesCount.textContent = String(stats.txn_today || 0);
+    if (kpiInvoicesDue) kpiInvoicesDue.textContent = String(stats.overdue || 0);
+    if (kpiSalesMonth) kpiSalesMonth.textContent = formatCurrency(stats.sales_month || 0);
+    if (invoicesCountBadge) invoicesCountBadge.textContent = `${stats.total || 0} invoices`;
+  };
+
+  const renderInvoicesList = (invoices = []) => {
+    if (!invoices.length) {
+      invoicesList?.replaceChildren();
+      if (invoicesEmpty) invoicesEmpty.hidden = false;
+      return;
+    }
+    if (invoicesEmpty) invoicesEmpty.hidden = true;
+
+    invoicesList?.replaceChildren(...invoices.map((inv) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "settings-list-row";
+      row.style.cssText = "display:flex;align-items:center;justify-content:space-between;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;";
+
+      const left = document.createElement("div");
+      left.style.cssText = "display:flex;align-items:center;gap:10px;text-align:left;min-width:0;";
+      const avatar = document.createElement("div");
+      avatar.className = "customer-avatar";
+      avatar.style.cssText = "width:38px;height:38px;font-size:1.1rem;";
+      avatar.textContent = "🧾";
+      const info = document.createElement("div");
+      info.style.minWidth = "0";
+      const name = document.createElement("div");
+      name.style.cssText = "font-weight:800;color:var(--color-navy);font-size:0.94rem;";
+      name.textContent = inv.invoice_number;
+      const sub = document.createElement("div");
+      sub.style.cssText = "font-size:0.78rem;color:var(--color-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
+      sub.textContent = `${inv.customer_name || "Walk-in"} • ${formatDate(inv.issue_date)} • ${inv.items_count || 0} items`;
+      info.append(name, sub);
+      left.append(avatar, info);
+
+      const right = document.createElement("div");
+      right.style.cssText = "display:flex;align-items:center;gap:8px;";
+      const amtBox = document.createElement("div");
+      amtBox.style.textAlign = "right";
+      const amt = document.createElement("strong");
+      amt.style.cssText = "color:var(--color-navy);font-size:0.92rem;";
+      amt.textContent = formatCurrency(inv.total_amount);
+      const badge = document.createElement("span");
+      badge.className = `badge-status ${statusClass(inv.effective_status)}`;
+      badge.style.cssText = "display:block;margin-top:2px;";
+      badge.textContent = (inv.effective_status || "draft").toUpperCase();
+      amtBox.append(amt, badge);
+      right.append(amtBox);
+
+      row.append(left, right);
+      row.addEventListener("click", () => loadSingleInvoiceAndOpen(inv.id));
+      return row;
+    }));
+  };
+
+  const loadInvoices = async (query = "") => {
+    try {
+      const params = new URLSearchParams();
+      if (activeInvoiceStatus !== "all") params.set("status", activeInvoiceStatus);
+      if (query) params.set("q", query);
+      const res = await fetch(`${getBasePath()}api/sales.php?${params.toString()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data || !data.ok) return;
+      renderInvoicesList(Array.isArray(data.invoices) ? data.invoices : []);
+      applyInvoiceStats(data.stats || {});
+    } catch { /* offline */ }
+  };
+
+  // ---- Invoice form: line items ----
+  const calculateInvoiceTotals = () => {
+    let subtotal = 0;
+    invoiceLinesContainer?.querySelectorAll(".po-line-item-row").forEach((row) => {
+      const qty = num(row.querySelector('input[name="line_qty"]')?.value);
+      const price = num(row.querySelector('input[name="line_price"]')?.value);
+      const lineTot = qty * price;
+      subtotal += lineTot;
+      const totSpan = row.querySelector("[data-line-total]");
+      if (totSpan) totSpan.textContent = formatCurrency(lineTot);
+    });
+    const discount = Math.max(0, num(invoiceDiscountInput?.value));
+    const taxRate = num(invoiceTaxInput?.value);
+    const taxable = Math.max(0, subtotal - discount);
+    const taxAmt = (taxable * taxRate) / 100;
+    const total = taxable + taxAmt;
+    if (invoiceCalcSubtotal) invoiceCalcSubtotal.textContent = formatCurrency(subtotal);
+    if (invoiceCalcTax) invoiceCalcTax.textContent = formatCurrency(taxAmt);
+    if (invoiceCalcTotal) invoiceCalcTotal.textContent = formatCurrency(total);
+  };
+  invoiceDiscountInput?.addEventListener("input", calculateInvoiceTotals);
+  invoiceTaxInput?.addEventListener("input", calculateInvoiceTotals);
+
+  const addInvoiceLineItem = (preset = null) => {
+    if (!invoiceLinesContainer) return;
+    const row = document.createElement("div");
+    row.className = "po-line-item-row";
+
+    const select = createSearchSelectElement({
+      name: "line_item_id",
+      placeholder: "Select product...",
+      required: true,
+      options: cachedProducts.map((p) => ({ value: String(p.id), label: p.name })),
+    });
+    const selectValue = select.querySelector("[data-search-select-value]");
+
+    const qtyInput = document.createElement("input");
+    qtyInput.type = "text";
+    qtyInput.inputMode = "numeric";
+    qtyInput.name = "line_qty";
+    qtyInput.value = preset ? String(preset.quantity) : "1";
+    qtyInput.placeholder = "Qty";
+    qtyInput.style.textAlign = "right";
+
+    const priceInput = document.createElement("input");
+    priceInput.type = "text";
+    priceInput.inputMode = "numeric";
+    priceInput.name = "line_price";
+    priceInput.value = preset ? String(preset.unit_price) : "0";
+    priceInput.placeholder = "Price";
+    priceInput.style.textAlign = "right";
+
+    selectValue?.addEventListener("change", () => {
+      const chosen = cachedProducts.find((p) => String(p.id) === String(selectValue.value));
+      if (chosen) priceInput.value = chosen.selling_price || 0;
+      calculateInvoiceTotals();
+    });
+    qtyInput.addEventListener("input", calculateInvoiceTotals);
+    priceInput.addEventListener("input", calculateInvoiceTotals);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "icon-button";
+    removeBtn.style.cssText = "padding:4px;color:var(--color-danger);";
+    removeBtn.innerHTML = `<svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;stroke:currentColor;stroke-width:48;"><path d="M112 112l288 288M400 112L112 400" /></svg>`;
+    removeBtn.addEventListener("click", () => { row.remove(); calculateInvoiceTotals(); });
+
+    row.append(select, qtyInput, priceInput, removeBtn);
+    invoiceLinesContainer.append(row);
+    if (preset && preset.item_id) setSSValue(select, String(preset.item_id));
+    calculateInvoiceTotals();
+  };
+  addInvoiceLineBtn?.addEventListener("click", () => addInvoiceLineItem());
+
+  // ---- Invoice form: open/close/submit ----
+  const openCreateInvoiceModal = () => {
+    if (invoiceFormError) invoiceFormError.hidden = true;
+    if (invoiceFormTitle) invoiceFormTitle.textContent = "New Invoice";
+    if (invoiceFormId) invoiceFormId.value = "";
+    invoiceForm?.reset();
+    if (invoiceForm) invoiceForm.elements["issue_date"].value = new Date().toISOString().split("T")[0];
+    setSSValue(invoiceCustomerSelect, "");
+    if (invoiceLinesContainer) invoiceLinesContainer.replaceChildren();
+    addInvoiceLineItem();
+    calculateInvoiceTotals();
+    if (invoiceFormModal) invoiceFormModal.hidden = false;
+  };
+
+  const openEditInvoiceModal = (inv) => {
+    if (!inv) return;
+    if (invoiceFormError) invoiceFormError.hidden = true;
+    if (invoiceFormTitle) invoiceFormTitle.textContent = `Edit ${inv.invoice_number}`;
+    if (invoiceFormId) invoiceFormId.value = String(inv.id);
+    invoiceForm?.reset();
+    if (invoiceForm) {
+      invoiceForm.elements["issue_date"].value = inv.issue_date || new Date().toISOString().split("T")[0];
+      invoiceForm.elements["due_date"].value = inv.due_date || "";
+      invoiceForm.elements["discount"].value = inv.discount || 0;
+      invoiceForm.elements["tax_rate"].value = inv.tax_rate || 0;
+      invoiceForm.elements["notes"].value = inv.notes || "";
+    }
+    setSSValue(invoiceCustomerSelect, inv.customer_id ? String(inv.customer_id) : "");
+    if (invoiceLinesContainer) invoiceLinesContainer.replaceChildren();
+    (inv.items || []).forEach((it) => addInvoiceLineItem(it));
+    if (!(inv.items || []).length) addInvoiceLineItem();
+    calculateInvoiceTotals();
+    if (invoiceDetailModal) invoiceDetailModal.hidden = true;
+    if (invoiceFormModal) invoiceFormModal.hidden = false;
+  };
+
+  const closeInvoiceFormModal = () => { if (invoiceFormModal) invoiceFormModal.hidden = true; };
+  openCreateInvoiceBtns.forEach((btn) => btn.addEventListener("click", openCreateInvoiceModal));
+  invoiceFormCloseBtn?.addEventListener("click", closeInvoiceFormModal);
+
+  invoiceForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (invoiceFormError) invoiceFormError.hidden = true;
+    if (invoiceFormSubmit) invoiceFormSubmit.disabled = true;
+    try {
+      const isEditing = Boolean(invoiceFormId?.value);
+      const items = [];
+      invoiceLinesContainer?.querySelectorAll(".po-line-item-row").forEach((row) => {
+        const itemId = parseInt(row.querySelector('[name="line_item_id"]')?.value || "0", 10);
+        const qty = num(row.querySelector('input[name="line_qty"]')?.value);
+        const price = num(row.querySelector('input[name="line_price"]')?.value);
+        if (itemId > 0 && qty > 0) items.push({ item_id: itemId, quantity: qty, unit_price: price });
+      });
+      if (!items.length) throw new Error("Please add at least one product with a quantity.");
+
+      const formData = new FormData(invoiceForm);
+      formData.set("action", isEditing ? "update_invoice" : "create_invoice");
+      formData.set("items", JSON.stringify(items));
+
+      const res = await fetch(`${getBasePath()}api/sales.php`, { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Failed to save invoice.");
+
+      closeInvoiceFormModal();
+      await loadInvoices(invoicesSearch?.value.trim() || "");
+      if (data.invoice_id) await loadSingleInvoiceAndOpen(data.invoice_id);
+      await showAppModal("Invoice Saved", data.message || "Invoice saved successfully.");
+    } catch (err) {
+      if (invoiceFormError) {
+        invoiceFormError.textContent = err.message || "Failed to save invoice.";
+        invoiceFormError.hidden = false;
+      }
+    } finally {
+      if (invoiceFormSubmit) invoiceFormSubmit.disabled = false;
+    }
+  });
+
+  // ---- Invoice detail ----
+  const renderInvoiceDetail = (inv) => {
+    currentInvoice = inv;
+    const eff = inv.effective_status || inv.status;
+    if (invoiceDetailNum) invoiceDetailNum.textContent = inv.invoice_number;
+    if (invoiceDetailCustomer) invoiceDetailCustomer.textContent = inv.customer_name || "Walk-in Customer";
+    if (invoiceDetailStatusBadge) {
+      invoiceDetailStatusBadge.className = `badge-status ${statusClass(eff)}`;
+      invoiceDetailStatusBadge.textContent = (eff || "draft").toUpperCase();
+    }
+    if (invoiceDetailIssue) invoiceDetailIssue.textContent = formatDate(inv.issue_date);
+    if (invoiceDetailDue) invoiceDetailDue.textContent = inv.due_date ? formatDate(inv.due_date) : "-";
+    if (invoiceDetailPhone) invoiceDetailPhone.textContent = inv.customer?.phone || "-";
+    if (invoiceDetailEmail) invoiceDetailEmail.textContent = inv.customer?.email || "-";
+    if (invoiceDetailSubtotal) invoiceDetailSubtotal.textContent = formatCurrency(inv.subtotal);
+    if (invoiceDetailDiscount) invoiceDetailDiscount.textContent = formatCurrency(inv.discount);
+    if (invoiceDetailTax) invoiceDetailTax.textContent = `${formatCurrency(inv.tax_amount)} (${inv.tax_rate || 0}%)`;
+    if (invoiceDetailTotal) invoiceDetailTotal.textContent = formatCurrency(inv.total_amount);
+
+    if (invoiceDetailItemsList) {
+      invoiceDetailItemsList.innerHTML = (inv.items || []).map((it, idx) => `
+        <div style="padding:10px 14px;border-bottom:1px solid var(--color-line);display:flex;justify-content:space-between;align-items:center;">
+          <div><strong style="color:var(--color-navy);font-size:0.9rem;">${idx + 1}. ${it.item_name}</strong>
+            <div style="font-size:0.78rem;color:var(--color-muted);margin-top:2px;">${it.quantity} @ ${formatCurrency(it.unit_price)}</div></div>
+          <strong style="font-size:0.9rem;color:var(--color-navy);">${formatCurrency(it.line_total)}</strong>
+        </div>`).join("");
+    }
+
+    if (invoiceDetailNotesWrap && invoiceDetailNotes) {
+      if (inv.notes) { invoiceDetailNotes.textContent = inv.notes; invoiceDetailNotesWrap.hidden = false; }
+      else { invoiceDetailNotesWrap.hidden = true; }
+    }
+
+    const isCancelled = inv.status === "cancelled";
+    const isPaid = inv.status === "paid";
+    if (invoiceMarkSentBtn) invoiceMarkSentBtn.hidden = isCancelled || isPaid || inv.status === "sent";
+    if (invoiceMarkPaidBtn) invoiceMarkPaidBtn.hidden = isCancelled || isPaid;
+    if (invoiceEditBtn) invoiceEditBtn.hidden = isCancelled || isPaid;
+    if (invoiceCancelBtn) invoiceCancelBtn.hidden = isCancelled || isPaid;
+    if (invoiceUncancelBtn) invoiceUncancelBtn.hidden = !isCancelled;
+
+    if (invoiceDetailModal) invoiceDetailModal.hidden = false;
+  };
+
+  const loadSingleInvoiceAndOpen = async (id) => {
+    try {
+      const res = await fetch(`${getBasePath()}api/sales.php?id=${encodeURIComponent(id)}`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Failed to load invoice.");
+      renderInvoiceDetail(data.invoice);
+    } catch (err) {
+      await showAppModal("Error", err.message || "Could not load invoice.");
+    }
+  };
+
+  invoiceDetailCloseBtn?.addEventListener("click", () => { if (invoiceDetailModal) invoiceDetailModal.hidden = true; currentInvoice = null; });
+  invoiceEditBtn?.addEventListener("click", () => openEditInvoiceModal(currentInvoice));
+
+  const postInvoiceAction = async (body, successTitle, successMsg, reopen = true) => {
+    try {
+      const formData = new FormData();
+      Object.entries(body).forEach(([k, v]) => formData.set(k, String(v)));
+      const res = await fetch(`${getBasePath()}api/sales.php`, { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Action failed.");
+      await loadInvoices(invoicesSearch?.value.trim() || "");
+      if (reopen && currentInvoice) await loadSingleInvoiceAndOpen(currentInvoice.id);
+      await showAppModal(successTitle, successMsg || data.message);
+    } catch (err) {
+      await showAppModal("Error", err.message || "Action failed.");
+    }
+  };
+
+  invoiceMarkSentBtn?.addEventListener("click", () => {
+    if (!currentInvoice) return;
+    postInvoiceAction({ action: "update_status", invoice_id: currentInvoice.id, status: "sent" }, "Invoice Sent", "Invoice marked as sent.");
+  });
+  invoiceMarkPaidBtn?.addEventListener("click", async () => {
+    if (!currentInvoice) return;
+    const ok = await showConfirmModal({ title: "Mark as Paid", message: `Mark ${currentInvoice.invoice_number} as fully paid?`, confirmLabel: "Mark Paid", cancelLabel: "Cancel" });
+    if (!ok) return;
+    postInvoiceAction({ action: "update_status", invoice_id: currentInvoice.id, status: "paid" }, "Invoice Paid", "Invoice marked as paid.");
+  });
+  invoiceCancelBtn?.addEventListener("click", async () => {
+    if (!currentInvoice) return;
+    const ok = await showConfirmModal({ title: "Cancel Invoice", message: `Cancel invoice ${currentInvoice.invoice_number}?`, confirmLabel: "Cancel Invoice", cancelLabel: "Keep", danger: true });
+    if (!ok) return;
+    postInvoiceAction({ action: "cancel_invoice", invoice_id: currentInvoice.id }, "Invoice Cancelled", "Invoice has been cancelled.");
+  });
+  invoiceUncancelBtn?.addEventListener("click", async () => {
+    if (!currentInvoice) return;
+    const ok = await showConfirmModal({ title: "Reactivate Invoice", message: `Reactivate ${currentInvoice.invoice_number}? It returns to Draft.`, confirmLabel: "Reactivate", cancelLabel: "Keep Cancelled" });
+    if (!ok) return;
+    postInvoiceAction({ action: "uncancel_invoice", invoice_id: currentInvoice.id }, "Invoice Reactivated", "Invoice is back to Draft.");
+  });
+  invoiceDeleteBtn?.addEventListener("click", async () => {
+    if (!currentInvoice) return;
+    const ok = await showConfirmModal({ title: "Delete Invoice", message: `Permanently delete ${currentInvoice.invoice_number}? This cannot be undone.`, confirmLabel: "Delete", cancelLabel: "Cancel", danger: true });
+    if (!ok) return;
+    const id = currentInvoice.id;
+    try {
+      const formData = new FormData();
+      formData.set("action", "delete_invoice");
+      formData.set("invoice_id", String(id));
+      const res = await fetch(`${getBasePath()}api/sales.php`, { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Failed to delete invoice.");
+      if (invoiceDetailModal) invoiceDetailModal.hidden = true;
+      currentInvoice = null;
+      await loadInvoices(invoicesSearch?.value.trim() || "");
+      await showAppModal("Invoice Deleted", "The invoice was removed.");
+    } catch (err) {
+      await showAppModal("Error", err.message || "Could not delete invoice.");
+    }
+  });
+
+  // ---- Filters & search ----
+  invoiceStatusFilters.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      invoiceStatusFilters.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      activeInvoiceStatus = btn.dataset.filterInvoice || "all";
+      loadInvoices(invoicesSearch?.value.trim() || "");
+    });
+  });
+  let invoiceSearchTimeout;
+  invoicesSearch?.addEventListener("input", (e) => {
+    clearTimeout(invoiceSearchTimeout);
+    invoiceSearchTimeout = setTimeout(() => loadInvoices(e.target.value.trim()), 250);
+  });
+
+  // ---- Init ----
+  loadProducts();
+  loadCustomers();
+  loadInvoices();
 };
 
 document.addEventListener("DOMContentLoaded", () => {
