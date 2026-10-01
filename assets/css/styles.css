@@ -3366,5 +3366,50 @@ button.settings-list-row:focus-visible {
   margin-bottom: 8px;
 }
 
+/* Stock page layout — aligns with the settings/customers accordion pattern */
+.stock-page-shell {
+  grid-template-rows: auto 1fr;
+  overflow: auto;
+}
+
+.stock-page {
+  padding-bottom: 40px;
+}
+
+.stock-page .stock-kpi-grid {
+  margin-bottom: 0;
+}
+
+/* Summaries carry a count badge + chevron, so give column 2 room to size itself */
+.stock-page .settings-accordion summary {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.stock-summary-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stock-count-badge {
+  font-size: 0.84rem;
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.stock-page .settings-accordion[open] summary .stock-summary-meta svg {
+  transform: rotate(90deg);
+}
+
+.stock-accordion-body {
+  padding: 14px;
+  border-top: 1px solid var(--color-line);
+}
+
+.stock-list {
+  display: grid;
+  gap: 8px;
+}
+
 
 

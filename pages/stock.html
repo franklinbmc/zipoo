@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=56">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=57">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -27,7 +27,7 @@
       </button>
     </header>
 
-    <main class="customers-page" data-stock-page style="padding-bottom: 40px;">
+    <main class="settings-page stock-page" data-stock-page>
       <!-- KPI Overview Cards -->
       <section class="stock-kpi-grid">
         <div class="stock-kpi-card">
@@ -49,15 +49,15 @@
       </section>
 
       <!-- 1. Products & Services Accordion -->
-      <details class="settings-accordion" data-accordion="items" open style="margin-bottom: 12px;">
+      <details class="settings-accordion" data-accordion="items" open>
         <summary>
           <span>Products & Services</span>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <strong data-items-count-badge style="font-size: 0.84rem; color: var(--color-muted); font-weight: 800;">0 items</strong>
+          <div class="stock-summary-meta">
+            <strong class="stock-count-badge" data-items-count-badge>0 items</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </div>
         </summary>
-        <div class="settings-list flush-list" style="padding: 14px;">
+        <div class="stock-accordion-body">
           <div class="stock-action-header">
             <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Catalog & Inventory</span>
             <button class="btn btn-primary btn-sm btn-with-icon" type="button" data-open-create-item>
@@ -83,7 +83,7 @@
           </div>
 
           <!-- Items List Container -->
-          <div class="settings-list flush-list" data-stock-items-list style="display: grid; gap: 8px;"></div>
+          <div class="stock-list" data-stock-items-list></div>
 
           <!-- Empty State -->
           <div class="company-users-empty" hidden data-stock-items-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
@@ -96,15 +96,15 @@
       </details>
 
       <!-- 2. Purchasing Accordion (PO & Goods Receiving) -->
-      <details class="settings-accordion" data-accordion="purchasing" style="margin-bottom: 12px;">
+      <details class="settings-accordion" data-accordion="purchasing">
         <summary>
           <span>Purchasing (PO & Receiving)</span>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <strong data-po-count-badge style="font-size: 0.84rem; color: var(--color-muted); font-weight: 800;">0 orders</strong>
+          <div class="stock-summary-meta">
+            <strong class="stock-count-badge" data-po-count-badge>0 orders</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </div>
         </summary>
-        <div class="settings-list flush-list" style="padding: 14px;">
+        <div class="stock-accordion-body">
           <div class="stock-action-header">
             <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Purchase Orders & GRN</span>
             <button class="btn btn-primary btn-sm btn-with-icon" type="button" data-open-create-po>
@@ -131,7 +131,7 @@
           </div>
 
           <!-- PO List Container -->
-          <div class="settings-list flush-list" data-po-list style="display: grid; gap: 8px;"></div>
+          <div class="stock-list" data-po-list></div>
 
           <!-- Empty State -->
           <div class="company-users-empty" hidden data-po-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
@@ -147,12 +147,12 @@
       <details class="settings-accordion" data-accordion="movements">
         <summary>
           <span>Stock Movement</span>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <strong data-movements-count-badge style="font-size: 0.84rem; color: var(--color-muted); font-weight: 800;">Ledger</strong>
+          <div class="stock-summary-meta">
+            <strong class="stock-count-badge" data-movements-count-badge>Ledger</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </div>
         </summary>
-        <div class="settings-list flush-list" style="padding: 14px;">
+        <div class="stock-accordion-body">
           <div class="stock-action-header">
             <span style="font-size: 0.85rem; color: var(--color-muted); font-weight: 700;">Inventory Ledger & Audit</span>
             <button class="btn btn-outline btn-sm btn-with-icon" type="button" data-open-stock-adjust>
@@ -179,7 +179,7 @@
           </div>
 
           <!-- Movements List Container -->
-          <div class="settings-list flush-list" data-stock-movements-list style="display: grid; gap: 8px;"></div>
+          <div class="stock-list" data-stock-movements-list></div>
 
           <!-- Empty State -->
           <div class="company-users-empty" hidden data-stock-movements-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
@@ -595,6 +595,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=60" defer></script>
+  <script src="/assets/js/app.js?v=61" defer></script>
 </body>
 </html>

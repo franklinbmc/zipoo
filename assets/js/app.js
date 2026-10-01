@@ -3707,7 +3707,6 @@ const setupStockPage = () => {
       row.style.border = "1px solid var(--color-line)";
       row.style.borderRadius = "10px";
       row.style.cursor = "pointer";
-      row.style.marginBottom = "8px";
 
       const left = document.createElement("div");
       left.style.display = "flex";
@@ -4291,7 +4290,6 @@ const setupStockPage = () => {
       row.style.border = "1px solid var(--color-line)";
       row.style.borderRadius = "10px";
       row.style.cursor = "pointer";
-      row.style.marginBottom = "8px";
 
       const left = document.createElement("div");
       left.style.display = "flex";
@@ -4710,7 +4708,6 @@ const setupStockPage = () => {
       row.style.background = "#fff";
       row.style.border = "1px solid var(--color-line)";
       row.style.borderRadius = "10px";
-      row.style.marginBottom = "8px";
 
       const qty = parseFloat(m.quantity || "0");
       const isPositive = qty > 0;
