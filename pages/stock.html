@@ -248,13 +248,26 @@
           <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create warehouses to organise where your stock is held.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-warehouse>Add Warehouse</button>
         </div>
+      </div>
+    </section>
+  </div>
 
-        <!-- Products & stock held across the business -->
-        <div style="margin-top: 22px; display:flex; align-items:center; justify-content:space-between;">
+  <!-- Workspace: Warehouse stock (products under one warehouse) -->
+  <div class="fullscreen-modal" hidden data-warehouse-stock-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="warehouse-stock-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-warehouse-stock-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="warehouse-stock-title" data-warehouse-stock-title>Warehouse Stock</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
           <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--color-muted); font-weight: 800;">Products &amp; Stock</div>
           <strong class="stock-count-badge" data-warehouse-products-badge>0 products</strong>
         </div>
-        <div class="customers-search-wrap" style="margin: 10px 0 12px;">
+        <div class="customers-search-wrap" style="margin: 0 0 12px;">
           <svg viewBox="0 0 512 512" aria-hidden="true">
             <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
           </svg>
@@ -768,6 +781,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=76" defer></script>
+  <script src="/assets/js/app.js?v=77" defer></script>
 </body>
 </html>

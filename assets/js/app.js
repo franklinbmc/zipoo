@@ -5134,6 +5134,7 @@ const setupStockPage = () => {
               <div style="font-size:0.78rem;color:var(--color-muted);">${meta}</div>
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto;">
+              <button type="button" class="btn btn-primary btn-sm" data-wh-stock="${w.id}">Stock</button>
               ${setDefaultBtn}
               <button type="button" class="btn btn-outline btn-sm" data-wh-edit="${w.id}">Edit</button>
               <button type="button" class="btn btn-danger-outline btn-sm" data-wh-delete="${w.id}">Delete</button>
@@ -5170,7 +5171,9 @@ const setupStockPage = () => {
     if (warehouseFormModal) warehouseFormModal.hidden = false;
   };
 
-  // Products & stock shown inside the Warehouses workspace (stock is global in this MVP).
+  // Per-warehouse stock view (products listed under one warehouse; stock is global in this MVP).
+  const warehouseStockWorkspace = document.querySelector("[data-warehouse-stock-workspace]");
+  const warehouseStockTitle = document.querySelector("[data-warehouse-stock-title]");
   const warehouseProductsList = document.querySelector("[data-warehouse-products-list]");
   const warehouseProductsEmpty = document.querySelector("[data-warehouse-products-empty]");
   const warehouseProductsBadge = document.querySelector("[data-warehouse-products-badge]");
@@ -5218,6 +5221,13 @@ const setupStockPage = () => {
     }
   };
 
+  const openWarehouseStock = (warehouse) => {
+    if (!warehouse) return;
+    if (warehouseStockTitle) warehouseStockTitle.textContent = `${warehouse.name} — Stock`;
+    if (warehouseProductsSearch) warehouseProductsSearch.value = "";
+    openWorkspace(warehouseStockWorkspace, () => loadWarehouseProducts(""));
+  };
+
   let whProductsSearchTimeout;
   warehouseProductsSearch?.addEventListener("input", (e) => {
     clearTimeout(whProductsSearchTimeout);
@@ -5232,12 +5242,10 @@ const setupStockPage = () => {
   });
 
   document.querySelectorAll("[data-open-warehouses-workspace]").forEach((btn) => {
-    btn.addEventListener("click", () => openWorkspace(warehousesWorkspace, () => {
-      loadWarehouses();
-      loadWarehouseProducts(warehouseProductsSearch?.value.trim() || "");
-    }));
+    btn.addEventListener("click", () => openWorkspace(warehousesWorkspace, loadWarehouses));
   });
   document.querySelector("[data-warehouses-workspace-close]")?.addEventListener("click", () => closeWorkspace(warehousesWorkspace));
+  document.querySelector("[data-warehouse-stock-close]")?.addEventListener("click", () => closeWorkspace(warehouseStockWorkspace));
   document.querySelectorAll("[data-open-create-warehouse]").forEach((btn) => btn.addEventListener("click", () => openWarehouseForm(null)));
   document.querySelector("[data-warehouse-form-close]")?.addEventListener("click", () => { if (warehouseFormModal) warehouseFormModal.hidden = true; });
 
@@ -5245,6 +5253,12 @@ const setupStockPage = () => {
     const editId = e.target.closest("[data-wh-edit]")?.dataset.whEdit;
     const delId = e.target.closest("[data-wh-delete]")?.dataset.whDelete;
     const defId = e.target.closest("[data-wh-set-default]")?.dataset.whSetDefault;
+    const stockId = e.target.closest("[data-wh-stock]")?.dataset.whStock;
+    if (stockId) {
+      const w = warehouseCache.find((x) => String(x.id) === String(stockId));
+      if (w) openWarehouseStock(w);
+      return;
+    }
     if (editId) {
       const w = warehouseCache.find((x) => String(x.id) === String(editId));
       if (w) openWarehouseForm(w);
