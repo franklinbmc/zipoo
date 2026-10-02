@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/warehouses_lib.php';
+require_once __DIR__ . '/accounts_lib.php';
 
 session_start();
 
@@ -238,6 +240,10 @@ try {
 
         $businessId = (int) $pdo->lastInsertId();
         $_SESSION['zipoo_business_id'] = $businessId;
+
+        // Every new business starts with a Main Warehouse and a default Cash account.
+        ensure_default_warehouse($pdo, $businessId);
+        ensure_default_account($pdo, $businessId);
         $pdo->prepare(
             'UPDATE tbl_users
              SET business_id = :business_id,

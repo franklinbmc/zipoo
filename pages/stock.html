@@ -82,6 +82,17 @@
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </span>
         </button>
+
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-warehouses-workspace>
+          <span class="stock-hub-label">
+            <strong>Warehouses</strong>
+            <small>Stock locations &amp; allocations</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-warehouses-count-badge>0 locations</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
       </nav>
     </main>
   </div>
@@ -667,6 +678,71 @@
     </section>
   </div>
 
+  <!-- Workspace: Warehouses -->
+  <div class="fullscreen-modal" hidden data-warehouses-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="warehouses-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-warehouses-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="warehouses-workspace-title">Warehouses</h2>
+        <button class="icon-button" type="button" data-open-create-warehouse aria-label="Add warehouse">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-list" data-warehouses-list></div>
+
+        <div class="company-users-empty" hidden data-warehouses-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">🏬</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No warehouses yet</strong>
+          <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create warehouses to organise where your stock is held.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-warehouse>Add Warehouse</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal: Warehouse Create & Edit -->
+  <div class="fullscreen-modal" hidden data-warehouse-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="warehouse-form-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-warehouse-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="warehouse-form-title" data-warehouse-form-title>Add Warehouse</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-warehouse-form novalidate>
+        <input type="hidden" name="warehouse_id" data-warehouse-form-id>
+
+        <label class="form-field">
+          <span>Warehouse Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="name" placeholder="e.g. Main Warehouse, Shop Front, Godown B" required>
+        </label>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <label class="form-field">
+            <span>Code</span>
+            <input type="text" name="code" placeholder="e.g. MAIN, WH-02">
+          </label>
+          <label class="form-field">
+            <span>Location</span>
+            <input type="text" name="location" placeholder="e.g. Kariakoo, Dar">
+          </label>
+        </div>
+
+        <label class="checkbox-label" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:4px;">
+          <input type="checkbox" name="is_default" value="1" data-warehouse-form-default style="width:18px;height:18px;min-height:0;flex:0 0 auto;">
+          <span style="font-weight:700;">Set as default warehouse</span>
+        </label>
+
+        <p class="inline-error" hidden data-warehouse-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-warehouse-form-submit>Save Warehouse</button>
+      </form>
+    </section>
+  </div>
+
   <!-- App Notice / Confirm Modal -->
   <div class="modal-backdrop" hidden data-app-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
@@ -676,6 +752,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=71" defer></script>
+  <script src="/assets/js/app.js?v=72" defer></script>
 </body>
 </html>

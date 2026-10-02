@@ -5095,10 +5095,156 @@ const setupStockPage = () => {
   });
   document.querySelector("[data-movements-workspace-close]")?.addEventListener("click", () => closeWorkspace(movementsWorkspace));
 
+  // ----------------------------------------
+  // Warehouses (registry + default)
+  // ----------------------------------------
+  const warehousesWorkspace = document.querySelector("[data-warehouses-workspace]");
+  const warehousesList = document.querySelector("[data-warehouses-list]");
+  const warehousesEmpty = document.querySelector("[data-warehouses-empty]");
+  const warehousesCountBadge = document.querySelector("[data-warehouses-count-badge]");
+  const warehouseFormModal = document.querySelector("[data-warehouse-form-modal]");
+  const warehouseForm = document.querySelector("[data-warehouse-form]");
+  const warehouseFormTitle = document.querySelector("[data-warehouse-form-title]");
+  const warehouseFormId = document.querySelector("[data-warehouse-form-id]");
+  const warehouseFormDefault = document.querySelector("[data-warehouse-form-default]");
+  const warehouseFormError = document.querySelector("[data-warehouse-form-error]");
+  const warehouseFormSubmit = document.querySelector("[data-warehouse-form-submit]");
+
+  const escWh = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  let warehouseCache = [];
+
+  const renderWarehouses = (list = []) => {
+    warehouseCache = list;
+    if (warehousesCountBadge) warehousesCountBadge.textContent = `${list.length} location${list.length === 1 ? "" : "s"}`;
+    if (!list.length) {
+      warehousesList?.replaceChildren();
+      if (warehousesEmpty) warehousesEmpty.hidden = false;
+      return;
+    }
+    if (warehousesEmpty) warehousesEmpty.hidden = true;
+    if (warehousesList) {
+      warehousesList.innerHTML = list.map((w) => {
+        const meta = [w.code, w.location].filter(Boolean).map(escWh).join(" • ") || "No code or location";
+        const defBadge = w.is_default ? ` <span class="badge-stock in-stock">Default</span>` : "";
+        const setDefaultBtn = w.is_default ? "" : `<button type="button" class="btn btn-outline btn-sm" data-wh-set-default="${w.id}">Set default</button>`;
+        return `
+          <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+            <div style="text-align:left;min-width:0;">
+              <div style="font-weight:800;color:var(--color-navy);font-size:0.94rem;">${escWh(w.name)}${defBadge}</div>
+              <div style="font-size:0.78rem;color:var(--color-muted);">${meta}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto;">
+              ${setDefaultBtn}
+              <button type="button" class="btn btn-outline btn-sm" data-wh-edit="${w.id}">Edit</button>
+              <button type="button" class="btn btn-danger-outline btn-sm" data-wh-delete="${w.id}">Delete</button>
+            </div>
+          </div>`;
+      }).join("");
+    }
+  };
+
+  const loadWarehouses = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/warehouses.php`);
+      const data = await res.json();
+      if (res.ok && data.ok) renderWarehouses(data.warehouses || []);
+    } catch {
+      /* offline: keep whatever is rendered */
+    }
+  };
+
+  const openWarehouseForm = (warehouse = null) => {
+    if (!warehouseForm) return;
+    warehouseForm.reset();
+    if (warehouseFormError) warehouseFormError.hidden = true;
+    if (warehouseFormId) warehouseFormId.value = warehouse ? String(warehouse.id) : "";
+    if (warehouseFormTitle) warehouseFormTitle.textContent = warehouse ? "Edit Warehouse" : "Add Warehouse";
+    if (warehouse) {
+      warehouseForm.elements.name.value = warehouse.name || "";
+      warehouseForm.elements.code.value = warehouse.code || "";
+      warehouseForm.elements.location.value = warehouse.location || "";
+      if (warehouseFormDefault) { warehouseFormDefault.checked = !!warehouse.is_default; warehouseFormDefault.disabled = !!warehouse.is_default; }
+    } else if (warehouseFormDefault) {
+      warehouseFormDefault.disabled = false;
+    }
+    if (warehouseFormModal) warehouseFormModal.hidden = false;
+  };
+
+  document.querySelectorAll("[data-open-warehouses-workspace]").forEach((btn) => {
+    btn.addEventListener("click", () => openWorkspace(warehousesWorkspace, loadWarehouses));
+  });
+  document.querySelector("[data-warehouses-workspace-close]")?.addEventListener("click", () => closeWorkspace(warehousesWorkspace));
+  document.querySelectorAll("[data-open-create-warehouse]").forEach((btn) => btn.addEventListener("click", () => openWarehouseForm(null)));
+  document.querySelector("[data-warehouse-form-close]")?.addEventListener("click", () => { if (warehouseFormModal) warehouseFormModal.hidden = true; });
+
+  warehousesList?.addEventListener("click", async (e) => {
+    const editId = e.target.closest("[data-wh-edit]")?.dataset.whEdit;
+    const delId = e.target.closest("[data-wh-delete]")?.dataset.whDelete;
+    const defId = e.target.closest("[data-wh-set-default]")?.dataset.whSetDefault;
+    if (editId) {
+      const w = warehouseCache.find((x) => String(x.id) === String(editId));
+      if (w) openWarehouseForm(w);
+      return;
+    }
+    if (defId) {
+      const body = new FormData(); body.set("action", "set_default"); body.set("warehouse_id", defId);
+      try {
+        const res = await fetch(`${getBasePath()}api/warehouses.php`, { method: "POST", body });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || "Could not update.");
+        renderWarehouses(data.warehouses || []);
+      } catch (err) { await showAppModal("Warehouses", err.message || "Please try again."); }
+      return;
+    }
+    if (delId) {
+      const w = warehouseCache.find((x) => String(x.id) === String(delId));
+      const confirmed = await showConfirmModal({ title: "Delete warehouse", message: `Delete "${w?.name || "this warehouse"}"? This cannot be undone.`, confirmLabel: "Delete", danger: true });
+      if (!confirmed) return;
+      const body = new FormData(); body.set("action", "delete"); body.set("warehouse_id", delId);
+      try {
+        const res = await fetch(`${getBasePath()}api/warehouses.php`, { method: "POST", body });
+        const data = await res.json();
+        if (!res.ok || !data.ok) throw new Error(data.message || "Could not delete.");
+        renderWarehouses(data.warehouses || []);
+      } catch (err) { await showAppModal("Warehouses", err.message || "Please try again."); }
+    }
+  });
+
+  warehouseForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (warehouseFormError) warehouseFormError.hidden = true;
+    const name = warehouseForm.elements.name.value.trim();
+    if (!name) {
+      if (warehouseFormError) { warehouseFormError.textContent = "Warehouse name is required."; warehouseFormError.hidden = false; }
+      return;
+    }
+    if (warehouseFormSubmit) warehouseFormSubmit.disabled = true;
+    try {
+      const id = warehouseFormId?.value || "";
+      const body = new FormData();
+      body.set("action", id ? "update" : "create");
+      if (id) body.set("warehouse_id", id);
+      body.set("name", name);
+      body.set("code", warehouseForm.elements.code.value.trim());
+      body.set("location", warehouseForm.elements.location.value.trim());
+      if (warehouseFormDefault?.checked) body.set("is_default", "1");
+      const res = await fetch(`${getBasePath()}api/warehouses.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not save warehouse.");
+      renderWarehouses(data.warehouses || []);
+      if (warehouseFormModal) warehouseFormModal.hidden = true;
+    } catch (err) {
+      if (warehouseFormError) { warehouseFormError.textContent = err.message || "Could not save warehouse."; warehouseFormError.hidden = false; }
+    } finally {
+      if (warehouseFormSubmit) warehouseFormSubmit.disabled = false;
+    }
+  });
+
   // Initial Data Loads (populate KPIs + hub counters)
   loadItems();
   loadPurchaseOrders();
   loadStockMovements();
+  loadWarehouses();
 };
 
 const setupSalesPage = () => {
@@ -5959,6 +6105,405 @@ const setupSalesPage = () => {
   loadInvoices();
 };
 
+const setupBankPage = () => {
+  const page = document.querySelector("[data-bank-page]");
+  if (!page) return;
+
+  const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
+  const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const typeIcon = (t) => (t === "bank" ? "🏦" : t === "mobile" ? "📱" : "💵");
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    try {
+      const d = new Date(String(dateStr).replace(" ", "T"));
+      return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch { return dateStr; }
+  };
+
+  // KPI refs
+  const kpiCash = document.querySelector("[data-kpi-cash]");
+  const kpiBank = document.querySelector("[data-kpi-bank]");
+  const kpiMobile = document.querySelector("[data-kpi-mobile]");
+  const kpiNet = document.querySelector("[data-kpi-net]");
+  const accountsCountBadge = document.querySelector("[data-accounts-count-badge]");
+
+  // Workspaces
+  const accountsWorkspace = document.querySelector("[data-accounts-workspace]");
+  const activityWorkspace = document.querySelector("[data-activity-workspace]");
+  const detailWorkspace = document.querySelector("[data-account-detail-workspace]");
+  const openWorkspace = (el, refresh) => { if (el) { el.hidden = false; if (typeof refresh === "function") refresh(); } };
+  const closeWorkspace = (el) => { if (el) el.hidden = true; };
+
+  // Lists
+  const accountsList = document.querySelector("[data-accounts-list]");
+  const accountsEmpty = document.querySelector("[data-accounts-empty]");
+  const activityList = document.querySelector("[data-activity-list]");
+  const activityEmpty = document.querySelector("[data-activity-empty]");
+
+  // Detail refs
+  const detailName = document.querySelector("[data-account-detail-name]");
+  const detailMeta = document.querySelector("[data-account-detail-meta]");
+  const detailBalance = document.querySelector("[data-account-detail-balance]");
+  const detailTxns = document.querySelector("[data-account-txns]");
+  const detailTxnsEmpty = document.querySelector("[data-account-txns-empty]");
+
+  // Account form
+  const accountFormModal = document.querySelector("[data-account-form-modal]");
+  const accountForm = document.querySelector("[data-account-form]");
+  const accountFormTitle = document.querySelector("[data-account-form-title]");
+  const accountFormId = document.querySelector("[data-account-form-id]");
+  const accountFormType = document.querySelector("[data-account-form-type]");
+  const accountBankFields = document.querySelector("[data-account-bank-fields]");
+  const accountOpeningField = document.querySelector("[data-account-opening-field]");
+  const accountFormDefault = document.querySelector("[data-account-form-default]");
+  const accountFormError = document.querySelector("[data-account-form-error]");
+  const accountFormSubmit = document.querySelector("[data-account-form-submit]");
+
+  // Money modal
+  const moneyModal = document.querySelector("[data-money-modal]");
+  const moneyForm = document.querySelector("[data-money-form]");
+  const moneyTitle = document.querySelector("[data-money-title]");
+  const moneyAction = document.querySelector("[data-money-action]");
+  const moneyAccountId = document.querySelector("[data-money-account-id]");
+  const moneyAccountName = document.querySelector("[data-money-account-name]");
+  const moneyError = document.querySelector("[data-money-error]");
+  const moneySubmit = document.querySelector("[data-money-submit]");
+
+  // Transfer modal
+  const transferModal = document.querySelector("[data-transfer-modal]");
+  const transferForm = document.querySelector("[data-transfer-form]");
+  const transferFromId = document.querySelector("[data-transfer-from-id]");
+  const transferFromName = document.querySelector("[data-transfer-from-name]");
+  const transferTo = document.querySelector("[data-transfer-to]");
+  const transferError = document.querySelector("[data-transfer-error]");
+  const transferSubmit = document.querySelector("[data-transfer-submit]");
+
+  let accountsCache = [];
+  let currentAccount = null;
+
+  const renderAccounts = (accounts = [], summary = null) => {
+    accountsCache = accounts;
+    if (summary) {
+      if (kpiCash) kpiCash.textContent = fmt(summary.cash);
+      if (kpiBank) kpiBank.textContent = fmt(summary.bank);
+      if (kpiMobile) kpiMobile.textContent = fmt(summary.mobile);
+      if (kpiNet) kpiNet.textContent = fmt(summary.net);
+    }
+    if (accountsCountBadge) accountsCountBadge.textContent = `${accounts.length} account${accounts.length === 1 ? "" : "s"}`;
+
+    if (!accounts.length) {
+      accountsList?.replaceChildren();
+      if (accountsEmpty) accountsEmpty.hidden = false;
+      return;
+    }
+    if (accountsEmpty) accountsEmpty.hidden = true;
+    if (accountsList) {
+      accountsList.innerHTML = accounts.map((a) => {
+        const defBadge = a.is_default ? ` <span class="badge-stock in-stock">Default</span>` : "";
+        return `
+          <button type="button" class="settings-list-row" data-acc-open="${a.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
+            <span style="display:flex;align-items:center;gap:10px;min-width:0;">
+              <span class="customer-avatar" style="width:38px;height:38px;font-size:1.1rem;">${typeIcon(a.type)}</span>
+              <span style="min-width:0;">
+                <span style="display:block;font-weight:800;color:var(--color-navy);font-size:0.94rem;">${esc(a.name)}${defBadge}</span>
+                <span style="display:block;font-size:0.78rem;color:var(--color-muted);">${esc(a.type_label)}</span>
+              </span>
+            </span>
+            <strong style="color:var(--color-blue);font-size:0.95rem;white-space:nowrap;">${fmt(a.balance)}</strong>
+          </button>`;
+      }).join("");
+    }
+  };
+
+  const loadAccounts = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/accounts.php`);
+      const data = await res.json();
+      if (res.ok && data.ok) renderAccounts(data.accounts || [], data.summary || null);
+    } catch { /* offline */ }
+  };
+
+  const renderDetail = (account) => {
+    currentAccount = account;
+    if (detailName) detailName.textContent = account.name;
+    if (detailMeta) {
+      const extra = [account.type_label, account.bank_name, account.account_number].filter(Boolean).map(esc).join(" • ");
+      detailMeta.textContent = extra;
+    }
+    if (detailBalance) detailBalance.textContent = fmt(account.balance);
+
+    const txns = account.transactions || [];
+    if (!txns.length) {
+      detailTxns?.replaceChildren();
+      if (detailTxnsEmpty) detailTxnsEmpty.hidden = false;
+    } else {
+      if (detailTxnsEmpty) detailTxnsEmpty.hidden = true;
+      if (detailTxns) {
+        detailTxns.innerHTML = txns.map((t) => {
+          const inbound = t.direction === "in";
+          const sign = inbound ? "+" : "−";
+          const color = inbound ? "#16a34a" : "#dc2626";
+          const sub = [t.type_label, t.notes].filter(Boolean).map(esc).join(" • ");
+          return `
+            <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:10px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+              <div style="min-width:0;text-align:left;">
+                <div style="font-weight:700;color:var(--color-navy);font-size:0.88rem;">${esc(t.type_label)}</div>
+                <div style="font-size:0.75rem;color:var(--color-muted);">${esc(sub)}${sub ? " • " : ""}${formatDate(t.created_at)}</div>
+              </div>
+              <strong style="color:${color};white-space:nowrap;">${sign}${fmt(t.amount)}</strong>
+            </div>`;
+        }).join("");
+      }
+    }
+  };
+
+  const openAccountDetail = async (id) => {
+    try {
+      const res = await fetch(`${getBasePath()}api/accounts.php?id=${encodeURIComponent(id)}`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Account not found.");
+      renderDetail(data.account);
+      if (detailWorkspace) detailWorkspace.hidden = false;
+    } catch (err) {
+      await showAppModal("Bank & Cash", err.message || "Please try again.");
+    }
+  };
+
+  const openAccountForm = (account = null) => {
+    if (!accountForm) return;
+    accountForm.reset();
+    if (accountFormError) accountFormError.hidden = true;
+    if (accountFormId) accountFormId.value = account ? String(account.id) : "";
+    if (accountFormTitle) accountFormTitle.textContent = account ? "Edit Account" : "Add Account";
+    if (account) {
+      accountForm.elements.name.value = account.name || "";
+      if (accountFormType) accountFormType.value = account.type || "cash";
+      accountForm.elements.bank_name.value = account.bank_name || "";
+      accountForm.elements.account_number.value = account.account_number || "";
+      if (accountOpeningField) accountOpeningField.hidden = true; // opening balance immutable after creation
+      if (accountFormDefault) { accountFormDefault.checked = !!account.is_default; accountFormDefault.disabled = !!account.is_default; }
+    } else {
+      if (accountOpeningField) accountOpeningField.hidden = false;
+      if (accountFormDefault) accountFormDefault.disabled = false;
+    }
+    toggleBankFields();
+    if (accountFormModal) accountFormModal.hidden = false;
+  };
+
+  const toggleBankFields = () => {
+    const t = accountFormType?.value || "cash";
+    if (accountBankFields) accountBankFields.hidden = (t === "cash");
+  };
+  accountFormType?.addEventListener("change", toggleBankFields);
+
+  const openMoney = (action, account) => {
+    if (!moneyForm || !account) return;
+    moneyForm.reset();
+    if (moneyError) moneyError.hidden = true;
+    if (moneyAction) moneyAction.value = action;
+    if (moneyAccountId) moneyAccountId.value = String(account.id);
+    if (moneyAccountName) moneyAccountName.textContent = account.name;
+    const titles = { deposit: "Deposit", withdraw: "Withdraw", expense: "Record Expense" };
+    if (moneyTitle) moneyTitle.textContent = titles[action] || "Transaction";
+    if (moneySubmit) moneySubmit.textContent = titles[action] || "Confirm";
+    if (moneyModal) moneyModal.hidden = false;
+  };
+
+  const openTransfer = (account) => {
+    if (!transferForm || !account) return;
+    transferForm.reset();
+    if (transferError) transferError.hidden = true;
+    if (transferFromId) transferFromId.value = String(account.id);
+    if (transferFromName) transferFromName.textContent = account.name;
+    if (transferTo) {
+      transferTo.innerHTML = accountsCache
+        .filter((a) => String(a.id) !== String(account.id))
+        .map((a) => `<option value="${a.id}">${esc(a.name)} (${esc(a.type_label)})</option>`)
+        .join("");
+    }
+    if (transferModal) transferModal.hidden = false;
+  };
+
+  const loadActivity = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/accounts.php?action=activity`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) return;
+      const rows = data.activity || [];
+      if (!rows.length) {
+        activityList?.replaceChildren();
+        if (activityEmpty) activityEmpty.hidden = false;
+        return;
+      }
+      if (activityEmpty) activityEmpty.hidden = true;
+      if (activityList) {
+        activityList.innerHTML = rows.map((t) => {
+          const inbound = t.direction === "in";
+          const sign = inbound ? "+" : "−";
+          const color = inbound ? "#16a34a" : "#dc2626";
+          const sub = [t.account_name, t.type_label].filter(Boolean).map(esc).join(" • ");
+          return `
+            <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:10px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+              <div style="min-width:0;text-align:left;">
+                <div style="font-weight:700;color:var(--color-navy);font-size:0.88rem;">${esc(sub)}</div>
+                <div style="font-size:0.75rem;color:var(--color-muted);">${esc(t.notes || "")}${t.notes ? " • " : ""}${formatDate(t.created_at)}</div>
+              </div>
+              <strong style="color:${color};white-space:nowrap;">${sign}${fmt(t.amount)}</strong>
+            </div>`;
+        }).join("");
+      }
+    } catch { /* offline */ }
+  };
+
+  // ---- Wiring ----
+  document.querySelectorAll("[data-open-accounts-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(accountsWorkspace, loadAccounts)));
+  document.querySelector("[data-accounts-workspace-close]")?.addEventListener("click", () => closeWorkspace(accountsWorkspace));
+  document.querySelectorAll("[data-open-activity-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(activityWorkspace, loadActivity)));
+  document.querySelector("[data-activity-workspace-close]")?.addEventListener("click", () => closeWorkspace(activityWorkspace));
+  document.querySelector("[data-account-detail-close]")?.addEventListener("click", () => closeWorkspace(detailWorkspace));
+  document.querySelectorAll("[data-open-create-account]").forEach((btn) => btn.addEventListener("click", () => openAccountForm(null)));
+  document.querySelector("[data-account-form-close]")?.addEventListener("click", () => { if (accountFormModal) accountFormModal.hidden = true; });
+  document.querySelector("[data-money-close]")?.addEventListener("click", () => { if (moneyModal) moneyModal.hidden = true; });
+  document.querySelector("[data-transfer-close]")?.addEventListener("click", () => { if (transferModal) transferModal.hidden = true; });
+
+  accountsList?.addEventListener("click", (e) => {
+    const id = e.target.closest("[data-acc-open]")?.dataset.accOpen;
+    if (id) openAccountDetail(id);
+  });
+
+  // Detail action buttons operate on currentAccount.
+  document.querySelector("[data-acc-deposit]")?.addEventListener("click", () => currentAccount && openMoney("deposit", currentAccount));
+  document.querySelector("[data-acc-withdraw]")?.addEventListener("click", () => currentAccount && openMoney("withdraw", currentAccount));
+  document.querySelector("[data-acc-expense]")?.addEventListener("click", () => currentAccount && openMoney("expense", currentAccount));
+  document.querySelector("[data-acc-transfer]")?.addEventListener("click", () => currentAccount && openTransfer(currentAccount));
+  document.querySelector("[data-acc-edit]")?.addEventListener("click", () => currentAccount && openAccountForm(currentAccount));
+  document.querySelector("[data-acc-setdefault]")?.addEventListener("click", async () => {
+    if (!currentAccount) return;
+    const body = new FormData(); body.set("action", "set_default"); body.set("account_id", String(currentAccount.id));
+    try {
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not update.");
+      renderAccounts(data.accounts || [], data.summary || null);
+      await openAccountDetail(currentAccount.id);
+    } catch (err) { await showAppModal("Bank & Cash", err.message || "Please try again."); }
+  });
+  document.querySelector("[data-acc-delete]")?.addEventListener("click", async () => {
+    if (!currentAccount) return;
+    const confirmed = await showConfirmModal({ title: "Delete account", message: `Delete "${currentAccount.name}"? Its transaction history will be removed. This cannot be undone.`, confirmLabel: "Delete", danger: true });
+    if (!confirmed) return;
+    const body = new FormData(); body.set("action", "delete"); body.set("account_id", String(currentAccount.id));
+    try {
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not delete.");
+      renderAccounts(data.accounts || [], data.summary || null);
+      closeWorkspace(detailWorkspace);
+    } catch (err) { await showAppModal("Bank & Cash", err.message || "Please try again."); }
+  });
+
+  accountForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (accountFormError) accountFormError.hidden = true;
+    const name = accountForm.elements.name.value.trim();
+    if (!name) {
+      if (accountFormError) { accountFormError.textContent = "Account name is required."; accountFormError.hidden = false; }
+      return;
+    }
+    if (accountFormSubmit) accountFormSubmit.disabled = true;
+    try {
+      const id = accountFormId?.value || "";
+      const body = new FormData();
+      body.set("action", id ? "update" : "create");
+      if (id) body.set("account_id", id);
+      body.set("name", name);
+      body.set("type", accountFormType?.value || "cash");
+      body.set("bank_name", accountForm.elements.bank_name.value.trim());
+      body.set("account_number", accountForm.elements.account_number.value.trim());
+      if (!id) body.set("opening_balance", String(parseFloat(String(accountForm.elements.opening_balance.value).replace(/[^0-9.\-]/g, "")) || 0));
+      if (accountFormDefault?.checked) body.set("is_default", "1");
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not save account.");
+      renderAccounts(data.accounts || [], data.summary || null);
+      if (accountFormModal) accountFormModal.hidden = true;
+      if (id && currentAccount && String(currentAccount.id) === String(id) && detailWorkspace && !detailWorkspace.hidden) {
+        await openAccountDetail(id);
+      }
+    } catch (err) {
+      if (accountFormError) { accountFormError.textContent = err.message || "Could not save account."; accountFormError.hidden = false; }
+    } finally {
+      if (accountFormSubmit) accountFormSubmit.disabled = false;
+    }
+  });
+
+  moneyForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (moneyError) moneyError.hidden = true;
+    const amount = parseFloat(String(moneyForm.elements.amount.value).replace(/[^0-9.\-]/g, "")) || 0;
+    if (amount <= 0) {
+      if (moneyError) { moneyError.textContent = "Enter an amount greater than zero."; moneyError.hidden = false; }
+      return;
+    }
+    if (moneySubmit) moneySubmit.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", moneyAction?.value || "deposit");
+      body.set("account_id", moneyAccountId?.value || "");
+      body.set("amount", String(amount));
+      body.set("notes", moneyForm.elements.notes.value.trim());
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not record transaction.");
+      renderAccounts(data.accounts || [], data.summary || null);
+      if (moneyModal) moneyModal.hidden = true;
+      if (currentAccount) await openAccountDetail(currentAccount.id);
+    } catch (err) {
+      if (moneyError) { moneyError.textContent = err.message || "Could not record transaction."; moneyError.hidden = false; }
+    } finally {
+      if (moneySubmit) moneySubmit.disabled = false;
+    }
+  });
+
+  transferForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (transferError) transferError.hidden = true;
+    const toId = transferTo?.value || "";
+    const amount = parseFloat(String(transferForm.elements.amount.value).replace(/[^0-9.\-]/g, "")) || 0;
+    if (!toId) {
+      if (transferError) { transferError.textContent = "Choose an account to transfer to."; transferError.hidden = false; }
+      return;
+    }
+    if (amount <= 0) {
+      if (transferError) { transferError.textContent = "Enter an amount greater than zero."; transferError.hidden = false; }
+      return;
+    }
+    if (transferSubmit) transferSubmit.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", "transfer");
+      body.set("account_id", transferFromId?.value || "");
+      body.set("to_account_id", toId);
+      body.set("amount", String(amount));
+      body.set("notes", transferForm.elements.notes.value.trim());
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not complete transfer.");
+      renderAccounts(data.accounts || [], data.summary || null);
+      if (transferModal) transferModal.hidden = true;
+      if (currentAccount) await openAccountDetail(currentAccount.id);
+    } catch (err) {
+      if (transferError) { transferError.textContent = err.message || "Could not complete transfer."; transferError.hidden = false; }
+    } finally {
+      if (transferSubmit) transferSubmit.disabled = false;
+    }
+  });
+
+  // ---- Init ----
+  loadAccounts();
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.lang));
@@ -5977,6 +6522,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCompanyUsersPage();
   setupStockPage();
   setupSalesPage();
+  setupBankPage();
   updateConnectionStatus();
   registerServiceWorker();
 });

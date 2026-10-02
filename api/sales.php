@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/accounts_lib.php';
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dompdf\Dompdf;
@@ -343,6 +344,7 @@ try {
     }
 
     ensure_sales_tables($pdo);
+    ensure_accounts_tables($pdo);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Single invoice detail
@@ -827,6 +829,24 @@ try {
                     }
                 }
 
+                // Auto-post the settled amount into a Bank & Cash account.
+                $settled = min($amountPaid, $totalAmount);
+                if ($settled > 0) {
+                    $requestedAccountId = (int) ($_POST['account_id'] ?? 0);
+                    $postAccountId = 0;
+                    if ($requestedAccountId > 0) {
+                        $accChk = $pdo->prepare('SELECT id FROM tbl_accounts WHERE id = :id AND business_id = :bid AND status = "active" LIMIT 1');
+                        $accChk->execute([':id' => $requestedAccountId, ':bid' => $businessId]);
+                        $postAccountId = (int) ($accChk->fetchColumn() ?: 0);
+                    }
+                    if ($postAccountId <= 0) {
+                        $postAccountId = resolve_account_for_type($pdo, $businessId, account_type_for_payment_method($paymentMethod));
+                    }
+                    if ($postAccountId > 0) {
+                        post_account_txn($pdo, $businessId, $postAccountId, 'in', 'sale', $settled, 'POS', $receiptNumber, 'POS sale ' . $receiptNumber . ' (' . $paymentMethod . ')', $userId);
+                    }
+                }
+
                 $pdo->commit();
             } catch (Throwable $e) {
                 $pdo->rollBack();
@@ -868,6 +888,26 @@ try {
             if ($newStatus === 'paid') {
                 $pdo->prepare('UPDATE tbl_sales SET status = "paid", amount_paid = total_amount WHERE id = :id')
                     ->execute([':id' => $saleId]);
+
+                // Auto-post the invoice payment into the default account (once).
+                if ($sale['status'] !== 'paid'
+                    && !account_txn_exists($pdo, $businessId, 'INVOICE', (string) $saleId, 'invoice_payment')) {
+                    $postAccountId = ensure_default_account($pdo, $businessId);
+                    if ($postAccountId > 0) {
+                        post_account_txn(
+                            $pdo,
+                            $businessId,
+                            $postAccountId,
+                            'in',
+                            'invoice_payment',
+                            (float) $sale['total_amount'],
+                            'INVOICE',
+                            (string) $saleId,
+                            'Invoice payment (#' . $saleId . ')',
+                            $userId
+                        );
+                    }
+                }
             } else {
                 $pdo->prepare('UPDATE tbl_sales SET status = :st WHERE id = :id')
                     ->execute([':st' => $newStatus, ':id' => $saleId]);

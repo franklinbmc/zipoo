@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#F6F8FC">
+  <meta name="description" content="Zipoo Bank & Cash: accounts, balances and money flow.">
+  <title>Bank &amp; Cash - Zipoo</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
+</head>
+<body>
+  <div class="app-shell stock-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
+      </a>
+      <h1>Bank &amp; Cash</h1>
+      <button class="icon-button" type="button" data-open-create-account aria-label="Add account">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M256 112v288M112 256h288" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="settings-page stock-page" data-bank-page>
+      <!-- KPI Overview Cards -->
+      <section class="stock-kpi-grid">
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Cash on Hand</span>
+          <strong class="kpi-val" data-kpi-cash>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Bank</span>
+          <strong class="kpi-val" data-kpi-bank>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Lipa kwa simu</span>
+          <strong class="kpi-val" data-kpi-mobile>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Net Balance</span>
+          <strong class="kpi-val" data-kpi-net>0</strong>
+        </div>
+      </section>
+
+      <!-- Bank hub: each row opens its own fullscreen workspace -->
+      <nav class="stock-hub">
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-accounts-workspace>
+          <span class="stock-hub-label">
+            <strong>Accounts</strong>
+            <small>Cash, bank &amp; Lipa kwa simu accounts</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-accounts-count-badge>0 accounts</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-activity-workspace>
+          <span class="stock-hub-label">
+            <strong>Recent Activity</strong>
+            <small>Money in &amp; out across all accounts</small>
+          </span>
+          <span class="stock-summary-meta">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+      </nav>
+    </main>
+  </div>
+
+  <!-- Workspace: Accounts -->
+  <div class="fullscreen-modal" hidden data-accounts-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="accounts-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-accounts-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="accounts-workspace-title">Accounts</h2>
+        <button class="icon-button" type="button" data-open-create-account aria-label="Add account">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-list" data-accounts-list></div>
+        <div class="company-users-empty" hidden data-accounts-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">🏦</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No accounts yet</strong>
+          <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Add a cash, bank or Lipa kwa simu account to track money flow.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-account>Add Account</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Recent Activity -->
+  <div class="fullscreen-modal" hidden data-activity-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="activity-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-activity-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="activity-workspace-title">Recent Activity</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-list" data-activity-list></div>
+        <div class="company-users-empty" hidden data-activity-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">📈</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No activity yet</strong>
+          <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Sales, deposits, withdrawals and transfers will appear here.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Account detail -->
+  <div class="fullscreen-modal" hidden data-account-detail-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="account-detail-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-account-detail-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="account-detail-title" data-account-detail-name>Account</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body" style="padding: 16px;">
+        <div style="background:#fff;border:1px solid var(--color-line);border-radius:12px;padding:16px;margin-bottom:14px;text-align:center;">
+          <div style="font-size:0.8rem;color:var(--color-muted);" data-account-detail-meta>-</div>
+          <strong data-account-detail-balance style="font-size:1.6rem;color:var(--color-blue);display:block;margin-top:4px;">0</strong>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+          <button class="btn btn-primary full" type="button" data-acc-deposit>Deposit</button>
+          <button class="btn btn-outline full" type="button" data-acc-withdraw>Withdraw</button>
+          <button class="btn btn-outline full" type="button" data-acc-transfer>Transfer</button>
+          <button class="btn btn-outline full" type="button" data-acc-expense>Expense</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px;">
+          <button class="btn btn-outline btn-sm" type="button" data-acc-edit>Edit</button>
+          <button class="btn btn-outline btn-sm" type="button" data-acc-setdefault>Set default</button>
+          <button class="btn btn-danger-outline btn-sm" type="button" data-acc-delete>Delete</button>
+        </div>
+
+        <div style="font-size:0.78rem;text-transform:uppercase;color:var(--color-muted);font-weight:800;margin-bottom:8px;">Transactions</div>
+        <div class="stock-list" data-account-txns></div>
+        <div class="company-users-empty" hidden data-account-txns-empty style="text-align:center;padding:24px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;">
+          <p style="margin:0;font-size:0.84rem;color:var(--color-muted);">No transactions on this account yet.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal: Account Create & Edit -->
+  <div class="fullscreen-modal" hidden data-account-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="account-form-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-account-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="account-form-title" data-account-form-title>Add Account</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-account-form novalidate>
+        <input type="hidden" name="account_id" data-account-form-id>
+
+        <label class="form-field">
+          <span>Account Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" name="name" placeholder="e.g. Cash Drawer, NMB Current, Mpesa Till" required>
+        </label>
+
+        <label class="form-field">
+          <span>Account Type <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="type" data-account-form-type>
+            <option value="cash" selected>Cash Account</option>
+            <option value="bank">Bank Account</option>
+            <option value="mobile">Lipa kwa simu Account</option>
+          </select>
+        </label>
+
+        <div data-account-bank-fields>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <label class="form-field">
+              <span>Bank / Provider</span>
+              <input type="text" name="bank_name" placeholder="e.g. NMB, CRDB, Vodacom">
+            </label>
+            <label class="form-field">
+              <span>Account / Till Number</span>
+              <input type="text" name="account_number" placeholder="e.g. 20110001234">
+            </label>
+          </div>
+        </div>
+
+        <label class="form-field" data-account-opening-field>
+          <span>Opening Balance</span>
+          <input type="text" inputmode="numeric" name="opening_balance" step="0.01" min="0" placeholder="0.00">
+          <small style="color:var(--color-muted);font-size:0.75rem;">Set once at creation. It cannot be edited later.</small>
+        </label>
+
+        <label class="checkbox-label" style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:4px;">
+          <input type="checkbox" name="is_default" value="1" data-account-form-default style="width:18px;height:18px;min-height:0;flex:0 0 auto;">
+          <span style="font-weight:700;">Set as default account</span>
+        </label>
+
+        <p class="inline-error" hidden data-account-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-account-form-submit>Save Account</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal: Money action (deposit / withdraw / expense) -->
+  <div class="fullscreen-modal" hidden data-money-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="money-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-money-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="money-title" data-money-title>Deposit</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-money-form novalidate>
+        <input type="hidden" name="action" data-money-action>
+        <input type="hidden" name="account_id" data-money-account-id>
+        <div style="background:#f8fafc;border:1px solid var(--color-line);border-radius:12px;padding:12px;margin-bottom:12px;">
+          <div style="font-size:0.8rem;color:var(--color-muted);">Account</div>
+          <strong data-money-account-name style="color:var(--color-navy);">-</strong>
+        </div>
+        <label class="form-field">
+          <span>Amount <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" inputmode="numeric" name="amount" step="0.01" min="0.01" placeholder="0.00" required>
+        </label>
+        <label class="form-field">
+          <span>Notes / Reason</span>
+          <input type="text" name="notes" placeholder="Optional description">
+        </label>
+        <p class="inline-error" hidden data-money-error></p>
+        <button class="btn btn-primary full" type="submit" data-money-submit>Confirm</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal: Transfer between accounts -->
+  <div class="fullscreen-modal" hidden data-transfer-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="transfer-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-transfer-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="transfer-title">Transfer Money</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-transfer-form novalidate>
+        <input type="hidden" name="account_id" data-transfer-from-id>
+        <div style="background:#f8fafc;border:1px solid var(--color-line);border-radius:12px;padding:12px;margin-bottom:12px;">
+          <div style="font-size:0.8rem;color:var(--color-muted);">From</div>
+          <strong data-transfer-from-name style="color:var(--color-navy);">-</strong>
+        </div>
+        <label class="form-field">
+          <span>To Account <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="to_account_id" data-transfer-to required></select>
+        </label>
+        <label class="form-field">
+          <span>Amount <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" inputmode="numeric" name="amount" step="0.01" min="0.01" placeholder="0.00" required>
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <input type="text" name="notes" placeholder="Optional description">
+        </label>
+        <p class="inline-error" hidden data-transfer-error></p>
+        <button class="btn btn-primary full" type="submit" data-transfer-submit>Transfer</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- App Notice / Confirm Modal -->
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-close>OK</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=72" defer></script>
+</body>
+</html>
