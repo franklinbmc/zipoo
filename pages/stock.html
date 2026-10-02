@@ -227,6 +227,47 @@
     </section>
   </div>
 
+  <!-- Workspace: Warehouses (placed before the item-detail modal so "View product" stacks above it) -->
+  <div class="fullscreen-modal" hidden data-warehouses-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="warehouses-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-warehouses-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="warehouses-workspace-title">Warehouses</h2>
+        <button class="icon-button" type="button" data-open-create-warehouse aria-label="Add warehouse">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-list" data-warehouses-list></div>
+
+        <div class="company-users-empty" hidden data-warehouses-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
+          <div style="font-size: 2rem; margin-bottom: 6px;">🏬</div>
+          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No warehouses yet</strong>
+          <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create warehouses to organise where your stock is held.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-warehouse>Add Warehouse</button>
+        </div>
+
+        <!-- Products & stock held across the business -->
+        <div style="margin-top: 22px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--color-muted); font-weight: 800;">Products &amp; Stock</div>
+          <strong class="stock-count-badge" data-warehouse-products-badge>0 products</strong>
+        </div>
+        <div class="customers-search-wrap" style="margin: 10px 0 12px;">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
+          </svg>
+          <input type="search" class="customers-search-input" data-warehouse-products-search placeholder="Search products by name, SKU, category...">
+        </div>
+        <div class="stock-list" data-warehouse-products-list></div>
+        <div class="company-users-empty" hidden data-warehouse-products-empty style="text-align: center; padding: 24px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px;">
+          <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">No products found. Add products under Products &amp; Services.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <!-- Modal 1: Item Details Modal -->
   <div class="fullscreen-modal" hidden data-item-detail-modal>
     <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="item-detail-title">
@@ -675,47 +716,6 @@
         <p class="inline-error" hidden data-grn-error></p>
         <button class="btn btn-primary full" type="submit" data-grn-submit>Confirm Goods Receipt & Update Stock</button>
       </form>
-    </section>
-  </div>
-
-  <!-- Workspace: Warehouses -->
-  <div class="fullscreen-modal" hidden data-warehouses-workspace>
-    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="warehouses-workspace-title">
-      <header class="fullscreen-header">
-        <button class="icon-button" type="button" data-warehouses-workspace-close aria-label="Back">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
-        </button>
-        <h2 id="warehouses-workspace-title">Warehouses</h2>
-        <button class="icon-button" type="button" data-open-create-warehouse aria-label="Add warehouse">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
-        </button>
-      </header>
-      <div class="fullscreen-body stock-workspace-body">
-        <div class="stock-list" data-warehouses-list></div>
-
-        <div class="company-users-empty" hidden data-warehouses-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">🏬</div>
-          <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No warehouses yet</strong>
-          <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create warehouses to organise where your stock is held.</p>
-          <button class="btn btn-primary btn-sm" type="button" data-open-create-warehouse>Add Warehouse</button>
-        </div>
-
-        <!-- Products & stock held across the business -->
-        <div style="margin-top: 22px; display:flex; align-items:center; justify-content:space-between;">
-          <div style="font-size: 0.78rem; text-transform: uppercase; color: var(--color-muted); font-weight: 800;">Products &amp; Stock</div>
-          <strong class="stock-count-badge" data-warehouse-products-badge>0 products</strong>
-        </div>
-        <div class="customers-search-wrap" style="margin: 10px 0 12px;">
-          <svg viewBox="0 0 512 512" aria-hidden="true">
-            <path d="M221.09 64a157.09 157.09 0 10157.09 157.09A157.1 157.1 0 00221.09 64zM338.29 338.29L448 448" />
-          </svg>
-          <input type="search" class="customers-search-input" data-warehouse-products-search placeholder="Search products by name, SKU, category...">
-        </div>
-        <div class="stock-list" data-warehouse-products-list></div>
-        <div class="company-users-empty" hidden data-warehouse-products-empty style="text-align: center; padding: 24px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px;">
-          <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">No products found. Add products under Products &amp; Services.</p>
-        </div>
-      </div>
     </section>
   </div>
 
