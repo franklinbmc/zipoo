@@ -51,6 +51,17 @@ function ensure_business_preference_columns(PDO $pdo): void
     if (empty($cols)) {
         $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN vat_enabled TINYINT(1) NOT NULL DEFAULT 0 AFTER tax_rate");
     }
+
+    // TIN = Taxpayer Identification Number, VRN = VAT Registration Number (see migration 014).
+    $cols = $pdo->query("SHOW COLUMNS FROM tbl_businesses LIKE 'tin'")->fetchAll();
+    if (empty($cols)) {
+        $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN tin VARCHAR(50) NULL AFTER vat_enabled");
+    }
+
+    $cols = $pdo->query("SHOW COLUMNS FROM tbl_businesses LIKE 'vrn'")->fetchAll();
+    if (empty($cols)) {
+        $pdo->exec("ALTER TABLE tbl_businesses ADD COLUMN vrn VARCHAR(50) NULL AFTER tin");
+    }
 }
 
 function business_payload(array $business): array
