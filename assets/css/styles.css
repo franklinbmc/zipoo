@@ -3325,9 +3325,18 @@ button.settings-list-row:focus-visible {
   letter-spacing: 0.04em;
 }
 .stock-kpi-card .kpi-val {
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--amount-scale, 1));
   font-weight: 900;
   color: var(--color-navy);
+  display: block;
+  white-space: nowrap;
+  line-height: 1.15;
+}
+
+/* Amounts that shrink their font as the number gets longer (set via --amount-scale). */
+.amount-fit {
+  font-size: calc(var(--amount-fit-base, 1.6rem) * var(--amount-scale, 1));
+  white-space: nowrap;
 }
 .stock-kpi-card.alert .kpi-val {
   color: var(--color-danger);

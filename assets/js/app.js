@@ -72,6 +72,40 @@ const attachThousandsFormatting = (input) => {
   });
 };
 
+// Dynamic amount sizing: shrink the font of prominent amounts as the number grows,
+// so long TZS values still fit. Driven by the --amount-scale CSS variable.
+const AMOUNT_FIT_SELECTOR = ".kpi-val, .amount-fit, [data-amount-fit]";
+const fitAmountEl = (el) => {
+  const len = (el.textContent || "").trim().length;
+  let scale = 1;
+  if (len >= 17) scale = 0.58;
+  else if (len >= 15) scale = 0.66;
+  else if (len >= 13) scale = 0.74;
+  else if (len >= 11) scale = 0.82;
+  else if (len >= 9) scale = 0.9;
+  el.style.setProperty("--amount-scale", String(scale));
+};
+const fitAmounts = (root) => {
+  try { (root || document).querySelectorAll(AMOUNT_FIT_SELECTOR).forEach(fitAmountEl); } catch { /* ignore */ }
+};
+const initAmountAutosize = () => {
+  fitAmounts(document);
+  try {
+    const obs = new MutationObserver((muts) => {
+      for (const m of muts) {
+        const node = m.target;
+        const el = node && node.nodeType === 3 ? node.parentElement : node;
+        const match = el && el.closest ? el.closest(AMOUNT_FIT_SELECTOR) : null;
+        if (match) fitAmountEl(match);
+        if (m.addedNodes && m.addedNodes.length) {
+          m.addedNodes.forEach((n) => { if (n.nodeType === 1) fitAmounts(n); });
+        }
+      }
+    });
+    obs.observe(document.body, { subtree: true, childList: true, characterData: true });
+  } catch { /* observer unsupported */ }
+};
+
 const getSavedLanguage = () => {
   const saved = localStorage.getItem("zipoo.language");
   return SUPPORTED_LANGUAGES.includes(saved) ? saved : DEFAULT_LANGUAGE;
@@ -7461,6 +7495,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSalesPage();
   setupBankPage();
   setupRealEstatePage();
+  initAmountAutosize();
   updateConnectionStatus();
   registerServiceWorker();
 });
