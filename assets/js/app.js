@@ -5170,8 +5170,72 @@ const setupStockPage = () => {
     if (warehouseFormModal) warehouseFormModal.hidden = false;
   };
 
+  // Products & stock shown inside the Warehouses workspace (stock is global in this MVP).
+  const warehouseProductsList = document.querySelector("[data-warehouse-products-list]");
+  const warehouseProductsEmpty = document.querySelector("[data-warehouse-products-empty]");
+  const warehouseProductsBadge = document.querySelector("[data-warehouse-products-badge]");
+  const warehouseProductsSearch = document.querySelector("[data-warehouse-products-search]");
+  let warehouseProductsCache = [];
+
+  const renderWarehouseProducts = (list = []) => {
+    warehouseProductsCache = list;
+    if (warehouseProductsBadge) warehouseProductsBadge.textContent = `${list.length} product${list.length === 1 ? "" : "s"}`;
+    if (!list.length) {
+      warehouseProductsList?.replaceChildren();
+      if (warehouseProductsEmpty) warehouseProductsEmpty.hidden = false;
+      return;
+    }
+    if (warehouseProductsEmpty) warehouseProductsEmpty.hidden = true;
+    warehouseProductsList.innerHTML = list.map((p) => {
+      const stock = Number(p.current_stock) || 0;
+      const stockCls = stock <= 0 ? "out-of-stock" : (p.is_low_stock ? "low-stock" : "in-stock");
+      const stockTxt = `${stock} ${escWh(p.unit || "")}`.trim();
+      const sub = [p.sku ? `SKU: ${escWh(p.sku)}` : "", escWh(p.category || "General")].filter(Boolean).join(" • ");
+      return `
+        <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+          <div style="min-width:0;text-align:left;">
+            <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${escWh(p.name)}</div>
+            <div style="font-size:0.78rem;color:var(--color-muted);">${sub}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto;">
+            <span class="badge-stock ${stockCls}">${stockTxt}</span>
+            <button type="button" class="btn btn-outline btn-sm" data-wh-view-product="${p.id}">View</button>
+          </div>
+        </div>`;
+    }).join("");
+  };
+
+  const loadWarehouseProducts = async (query = "") => {
+    try {
+      const params = new URLSearchParams({ type: "product" });
+      if (query) params.set("q", query);
+      const res = await fetch(`${getBasePath()}api/items.php?${params.toString()}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data && data.ok) renderWarehouseProducts(Array.isArray(data.items) ? data.items : []);
+    } catch {
+      /* offline: keep current */
+    }
+  };
+
+  let whProductsSearchTimeout;
+  warehouseProductsSearch?.addEventListener("input", (e) => {
+    clearTimeout(whProductsSearchTimeout);
+    whProductsSearchTimeout = setTimeout(() => loadWarehouseProducts(e.target.value.trim()), 250);
+  });
+
+  warehouseProductsList?.addEventListener("click", (e) => {
+    const id = e.target.closest("[data-wh-view-product]")?.dataset.whViewProduct;
+    if (!id) return;
+    const product = warehouseProductsCache.find((x) => String(x.id) === String(id));
+    if (product) openItemDetail(product);
+  });
+
   document.querySelectorAll("[data-open-warehouses-workspace]").forEach((btn) => {
-    btn.addEventListener("click", () => openWorkspace(warehousesWorkspace, loadWarehouses));
+    btn.addEventListener("click", () => openWorkspace(warehousesWorkspace, () => {
+      loadWarehouses();
+      loadWarehouseProducts(warehouseProductsSearch?.value.trim() || "");
+    }));
   });
   document.querySelector("[data-warehouses-workspace-close]")?.addEventListener("click", () => closeWorkspace(warehousesWorkspace));
   document.querySelectorAll("[data-open-create-warehouse]").forEach((btn) => btn.addEventListener("click", () => openWarehouseForm(null)));
@@ -6278,7 +6342,6 @@ const setupBankPage = () => {
     if (accountFormTitle) accountFormTitle.textContent = account ? "Edit Account" : "Add Account";
     if (account) {
       accountForm.elements.name.value = account.name || "";
-      if (accountFormType) accountFormType.value = account.type || "cash";
       accountForm.elements.bank_name.value = account.bank_name || "";
       accountForm.elements.account_number.value = account.account_number || "";
       if (accountOpeningField) accountOpeningField.hidden = true; // opening balance immutable after creation
@@ -6286,6 +6349,13 @@ const setupBankPage = () => {
     } else {
       if (accountOpeningField) accountOpeningField.hidden = false;
       if (accountFormDefault) accountFormDefault.disabled = false;
+    }
+    // Sync the styled account-type select (dispatch updates its label, active state and bank fields).
+    if (accountFormType) {
+      const desiredType = account ? (account.type || "cash") : "cash";
+      accountFormType.value = desiredType;
+      accountFormType.setAttribute("value", desiredType);
+      accountFormType.dispatchEvent(new Event("change", { bubbles: true }));
     }
     toggleBankFields();
     if (accountFormModal) accountFormModal.hidden = false;

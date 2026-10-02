@@ -176,11 +176,21 @@
 
         <label class="form-field">
           <span>Account Type <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select name="type" data-account-form-type>
-            <option value="cash" selected>Cash Account</option>
-            <option value="bank">Bank Account</option>
-            <option value="mobile">Lipa kwa simu Account</option>
-          </select>
+          <div class="search-select" data-search-select data-account-type-select>
+            <input type="hidden" name="type" value="cash" data-search-select-value data-account-form-type>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Cash Account</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search account types...">
+              <div class="search-select-options" data-search-select-options>
+                <button type="button" data-search-select-option data-value="cash" class="active">Cash Account</button>
+                <button type="button" data-search-select-option data-value="bank">Bank Account</button>
+                <button type="button" data-search-select-option data-value="mobile">Lipa kwa simu Account</button>
+              </div>
+            </div>
+          </div>
         </label>
 
         <div data-account-bank-fields>
@@ -287,6 +297,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=73" defer></script>
+  <script src="/assets/js/app.js?v=75" defer></script>
 </body>
 </html>
