@@ -6198,11 +6198,40 @@ const setupSalesPage = () => {
   });
 
   // Checkout flow
+  // Format a typed amount with thousand separators, keeping an optional decimal part.
+  const groupAmount = (raw) => {
+    let s = String(raw).replace(/[^0-9.]/g, "");
+    const dot = s.indexOf(".");
+    if (dot !== -1) {
+      s = s.slice(0, dot + 1) + s.slice(dot + 1).replace(/\./g, "");
+    }
+    let [intPart = "", decPart] = s.split(".");
+    intPart = intPart.replace(/^0+(?=\d)/, "");
+    const grouped = intPart === "" ? "" : Number(intPart).toLocaleString("en-US");
+    if (s.includes(".")) return `${grouped || "0"}.${(decPart || "").slice(0, 2)}`;
+    return grouped;
+  };
+
   const updatePosChange = () => {
     const { total } = posTotals();
     const paid = num(posAmountPaid?.value);
     const change = paid > total ? paid - total : 0;
     if (posChangeDue) posChangeDue.textContent = formatCurrency(change);
+  };
+
+  // Mobile Money / Card are exact electronic payments: auto-fill the total and lock
+  // the field. Cash stays editable with live thousand-separator formatting.
+  const applyAmountForMethod = ({ clearCash = false } = {}) => {
+    if (!posAmountPaid) return;
+    if (posPayment === "cash") {
+      posAmountPaid.disabled = false;
+      if (clearCash) posAmountPaid.value = "";
+    } else {
+      const { total } = posTotals();
+      posAmountPaid.value = total.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      posAmountPaid.disabled = true;
+    }
+    updatePosChange();
   };
 
   const openPosCheckout = () => {
@@ -6216,19 +6245,23 @@ const setupSalesPage = () => {
     if (posCheckoutTotal) posCheckoutTotal.textContent = formatCurrency(total);
     if (posCheckoutError) posCheckoutError.hidden = true;
     if (posAmountPaid) posAmountPaid.value = "";
-    updatePosChange();
+    applyAmountForMethod();
     if (posCheckoutModal) posCheckoutModal.hidden = false;
   };
 
   posCheckoutBtn?.addEventListener("click", openPosCheckout);
   posCheckoutCloseBtn?.addEventListener("click", () => { if (posCheckoutModal) posCheckoutModal.hidden = true; });
-  posAmountPaid?.addEventListener("input", updatePosChange);
+  posAmountPaid?.addEventListener("input", () => {
+    posAmountPaid.value = groupAmount(posAmountPaid.value);
+    updatePosChange();
+  });
 
   posPaymentMethods?.querySelectorAll(".filter-pill").forEach((btn) => {
     btn.addEventListener("click", () => {
       posPaymentMethods.querySelectorAll(".filter-pill").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       posPayment = btn.dataset.posPayment || "cash";
+      applyAmountForMethod({ clearCash: true });
     });
   });
 
