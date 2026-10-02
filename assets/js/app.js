@@ -7150,8 +7150,17 @@ const setupRealEstatePage = () => {
   const paymentsEmpty = document.querySelector("[data-payments-empty]");
   const rentFormModal = document.querySelector("[data-rent-form-modal]");
   const rentForm = document.querySelector("[data-rent-form]");
-  const rentTenancySel = document.querySelector("[data-rent-tenancy]");
-  const rentAccountSel = document.querySelector("[data-rent-account]");
+  const rentTenancyWrap = document.querySelector("[data-rent-tenancy-select]");
+  const rentTenancySel = document.querySelector("[data-rent-tenancy]"); // hidden value input
+  const rentAccountWrap = document.querySelector("[data-rent-account-select]");
+  const rentAccountSel = document.querySelector("[data-rent-account]"); // hidden value input
+  const rentPeriodWrap = document.querySelector("[data-rent-period-wrap]");
+  const rentPeriodDisplay = document.querySelector("[data-rent-period-display]");
+  const rentPeriodPop = document.querySelector("[data-rent-period-pop]");
+  const rentPeriodFrom = document.querySelector("[data-rent-period-from]");
+  const rentPeriodTo = document.querySelector("[data-rent-period-to]");
+  const rentPeriodHint = document.querySelector("[data-rent-period-hint]");
+  const rentAmountInput = document.querySelector("[data-rent-amount]");
   const rentFormError = document.querySelector("[data-rent-form-error]");
   const rentFormSubmit = document.querySelector("[data-rent-form-submit]");
   let activeTenanciesCache = [];
@@ -7173,34 +7182,118 @@ const setupRealEstatePage = () => {
   };
   const loadPayments = async () => { try { const d = await api({ query: "?resource=payments" }); renderPayments(d.payments || []); } catch {} };
 
+  // --- Period (contract) date-range + amount two-way helpers ---
+  const parseDate = (s) => { if (!s) return null; const d = new Date(`${s}T00:00:00`); return isNaN(d.getTime()) ? null : d; };
+  const isoDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const addMonths = (d, n) => { const r = new Date(d); const day = r.getDate(); r.setMonth(r.getMonth() + n); if (r.getDate() < day) r.setDate(0); return r; };
+  const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
+  const periodsBetween = (from, to, ct) => {
+    if (!from || !to || to <= from) return 0;
+    if (ct === "daily") return Math.max(1, Math.round((to - from) / 86400000));
+    return Math.max(1, (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth()));
+  };
+  const endFromPeriods = (from, n, ct) => (ct === "daily" ? addDays(from, n) : addMonths(from, n));
+  const currentRentTenancy = () => activeTenanciesCache.find((x) => String(x.id) === String(rentTenancySel?.value));
+  const periodUnit = (ct, n) => `${n} ${ct === "daily" ? "day" : "month"}${n > 1 ? "s" : ""}`;
+  let rentSyncing = false;
+
+  const updatePeriodDisplay = () => {
+    if (!rentPeriodDisplay) return;
+    const f = rentPeriodFrom?.value;
+    const t = rentPeriodTo?.value;
+    rentPeriodDisplay.value = f && t ? `${f}  →  ${t}` : (f ? `${f}  →  …` : "");
+  };
+  const setPeriodHint = (ten, n, amt) => {
+    if (rentPeriodHint) rentPeriodHint.textContent = (ten && n > 0) ? `${periodUnit(ten.charge_type, n)} × ${fmt(ten.rate)} = ${fmt(amt)}` : "";
+  };
+  // Date range changed -> adjust the amount.
+  const recalcFromRange = () => {
+    if (rentSyncing) return;
+    const ten = currentRentTenancy();
+    updatePeriodDisplay();
+    if (!ten) return;
+    const n = periodsBetween(parseDate(rentPeriodFrom.value), parseDate(rentPeriodTo.value), ten.charge_type);
+    if (n > 0) {
+      const amt = Math.round(ten.rate * n * 100) / 100;
+      rentSyncing = true;
+      if (rentAmountInput) rentAmountInput.value = groupThousands(String(amt));
+      rentSyncing = false;
+      setPeriodHint(ten, n, amt);
+    } else {
+      setPeriodHint(null, 0, 0);
+    }
+  };
+  // Amount changed -> adjust the contract end date.
+  const recalcFromAmount = () => {
+    if (rentSyncing) return;
+    const ten = currentRentTenancy();
+    if (!ten || !(ten.rate > 0)) return;
+    const amt = num(rentAmountInput.value);
+    const n = Math.max(1, Math.round(amt / ten.rate));
+    let from = parseDate(rentPeriodFrom.value);
+    if (!from) { from = new Date(); rentPeriodFrom.value = isoDate(from); }
+    rentSyncing = true;
+    rentPeriodTo.value = isoDate(endFromPeriods(from, n, ten.charge_type));
+    rentSyncing = false;
+    updatePeriodDisplay();
+    setPeriodHint(ten, n, amt);
+  };
+  const onRentTenancyChange = () => {
+    const ten = currentRentTenancy();
+    const from = new Date();
+    if (rentPeriodFrom) rentPeriodFrom.value = isoDate(from);
+    if (!ten) { if (rentPeriodTo) rentPeriodTo.value = ""; updatePeriodDisplay(); setPeriodHint(null, 0, 0); return; }
+    rentSyncing = true;
+    if (rentPeriodTo) rentPeriodTo.value = isoDate(endFromPeriods(from, 1, ten.charge_type));
+    if (rentAmountInput) rentAmountInput.value = groupThousands(String(ten.rate));
+    rentSyncing = false;
+    updatePeriodDisplay();
+    setPeriodHint(ten, 1, ten.rate);
+  };
+
   const openRentForm = async () => {
     rentForm.reset();
     if (rentFormError) rentFormError.hidden = true;
     rentForm.elements.paid_date.value = todayStr();
+    if (rentPeriodFrom) rentPeriodFrom.value = "";
+    if (rentPeriodTo) rentPeriodTo.value = "";
+    if (rentPeriodPop) rentPeriodPop.hidden = true;
+    updatePeriodDisplay();
+    if (rentPeriodHint) rentPeriodHint.textContent = "";
     try {
       const [tenD, accRes] = await Promise.all([
         api({ query: "?resource=tenancies" }),
         fetch(`${getBasePath()}api/accounts.php`).then((r) => r.json()).catch(() => ({ accounts: [] })),
       ]);
       activeTenanciesCache = (tenD.tenancies || []).filter((t) => t.status === "active");
-      if (rentTenancySel) {
-        rentTenancySel.innerHTML = activeTenanciesCache.length
-          ? activeTenanciesCache.map((t) => `<option value="${t.id}" data-rate="${t.rate}">${esc(t.tenant_name)} — ${esc(t.property_name)}/${esc(t.unit_name)} (${fmt(t.rate)}${chargeLabel(t.charge_type)})</option>`).join("")
-          : `<option value="">No active tenancies</option>`;
-        prefillRentAmount();
-      }
+      const tenancyOptions = activeTenanciesCache.map((t) => ({
+        value: String(t.id),
+        label: `${t.tenant_name} — ${t.property_name}/${t.unit_name} (${fmt(t.rate)}${chargeLabel(t.charge_type)})`,
+      }));
+      const firstTenancy = activeTenanciesCache[0] ? String(activeTenanciesCache[0].id) : "";
+      setSearchSelectOptions(rentTenancyWrap, tenancyOptions, activeTenanciesCache.length ? "Choose a tenancy..." : "No active tenancies", firstTenancy);
+
       const accounts = accRes.accounts || [];
-      if (rentAccountSel) {
-        rentAccountSel.innerHTML = accounts.map((a) => `<option value="${a.id}"${a.is_default ? " selected" : ""}>${esc(a.name)} (${esc(a.type_label)})</option>`).join("");
-      }
+      const accountOptions = accounts.map((a) => ({ value: String(a.id), label: `${a.name} (${a.type_label})` }));
+      const defaultAcc = accounts.find((a) => a.is_default);
+      setSearchSelectOptions(rentAccountWrap, accountOptions, "Default account", defaultAcc ? String(defaultAcc.id) : "");
+
+      onRentTenancyChange(); // prefill period + amount for the first tenancy
     } catch { /* ignore */ }
     if (rentFormModal) rentFormModal.hidden = false;
   };
-  const prefillRentAmount = () => {
-    const t = activeTenanciesCache.find((x) => String(x.id) === String(rentTenancySel?.value));
-    if (t && rentForm) rentForm.elements.amount.value = t.rate;
-  };
-  rentTenancySel?.addEventListener("change", prefillRentAmount);
+
+  rentTenancySel?.addEventListener("change", onRentTenancyChange);
+  rentPeriodFrom?.addEventListener("change", recalcFromRange);
+  rentPeriodTo?.addEventListener("change", recalcFromRange);
+  rentAmountInput?.addEventListener("input", () => {
+    rentAmountInput.value = groupThousands(rentAmountInput.value);
+    recalcFromAmount();
+  });
+  rentPeriodDisplay?.addEventListener("click", () => { if (rentPeriodPop) rentPeriodPop.hidden = !rentPeriodPop.hidden; });
+  document.addEventListener("click", (e) => {
+    if (rentPeriodWrap && rentPeriodPop && !rentPeriodPop.hidden && !rentPeriodWrap.contains(e.target)) rentPeriodPop.hidden = true;
+  });
 
   document.querySelectorAll("[data-open-rent-workspace]").forEach((b) => b.addEventListener("click", () => openWorkspace(rentWorkspace, loadPayments)));
   document.querySelector("[data-rent-workspace-close]")?.addEventListener("click", () => closeWorkspace(rentWorkspace));
@@ -7220,16 +7313,19 @@ const setupRealEstatePage = () => {
     e.preventDefault();
     if (rentFormError) rentFormError.hidden = true;
     const tenancyId = rentTenancySel?.value;
-    const amount = num(rentForm.elements.amount.value);
+    const amount = num(rentAmountInput ? rentAmountInput.value : rentForm.elements.amount.value);
     if (!tenancyId) { if (rentFormError) { rentFormError.textContent = "Select a tenancy."; rentFormError.hidden = false; } return; }
     if (amount <= 0) { if (rentFormError) { rentFormError.textContent = "Enter an amount greater than zero."; rentFormError.hidden = false; } return; }
+    const periodFrom = rentPeriodFrom?.value || "";
+    const periodTo = rentPeriodTo?.value || "";
+    const periodLabel = (periodFrom && periodTo) ? `${periodFrom} → ${periodTo}` : periodFrom;
     if (rentFormSubmit) rentFormSubmit.disabled = true;
     try {
       const b = new FormData();
       b.set("action", "rent_payment_create");
       b.set("tenancy_id", tenancyId);
       b.set("amount", String(amount));
-      b.set("period_label", rentForm.elements.period_label.value.trim());
+      b.set("period_label", periodLabel);
       b.set("paid_date", rentForm.elements.paid_date.value || todayStr());
       if (rentAccountSel?.value) b.set("account_id", rentAccountSel.value);
       b.set("notes", rentForm.elements.notes.value.trim());

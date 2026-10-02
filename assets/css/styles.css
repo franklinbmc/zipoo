@@ -3852,3 +3852,39 @@ button.settings-list-row:focus-visible {
   outline: 2px solid var(--color-blue);
   outline-offset: 2px;
 }
+
+/* Date-range "one input" control (period/contract) */
+.daterange {
+  position: relative;
+}
+.daterange-display {
+  cursor: pointer;
+}
+.daterange-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 36;
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 12px;
+  box-shadow: 0 16px 34px rgba(13, 43, 91, 0.16);
+  display: grid;
+  gap: 10px;
+}
+.daterange-pop .dr-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.daterange-pop .dr-row label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+.daterange-pop .dr-row input[type="date"] {
+  width: 62%;
+}

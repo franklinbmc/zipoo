@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=65">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=66">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -386,28 +386,57 @@
       <form class="fullscreen-body" data-rent-form novalidate>
         <label class="form-field">
           <span>Tenancy <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
-          <select name="tenancy_id" data-rent-tenancy required></select>
+          <div class="search-select" data-search-select data-rent-tenancy-select>
+            <input type="hidden" name="tenancy_id" data-search-select-value data-rent-tenancy>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Choose a tenancy...</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search tenancies...">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
         </label>
+
+        <label class="form-field">
+          <span>Period / contract</span>
+          <div class="daterange" data-rent-period-wrap>
+            <input type="text" class="daterange-display" data-rent-period-display readonly placeholder="Select start → end (contract period)">
+            <div class="daterange-pop" hidden data-rent-period-pop>
+              <div class="dr-row"><label>From</label><input type="date" data-rent-period-from></div>
+              <div class="dr-row"><label>To (contract end)</label><input type="date" data-rent-period-to></div>
+            </div>
+          </div>
+          <small data-rent-period-hint style="color:var(--color-muted);font-size:0.75rem;"></small>
+        </label>
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <label class="form-field">
             <span>Amount <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
-            <input type="text" inputmode="numeric" name="amount" step="0.01" min="0" placeholder="0.00" required>
+            <input type="text" inputmode="numeric" name="amount" step="0.01" min="0" placeholder="0.00" data-rent-amount required>
           </label>
-          <label class="form-field">
-            <span>Period</span>
-            <input type="text" name="period_label" placeholder="e.g. 2026-10 or Oct 2026">
-          </label>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <label class="form-field">
             <span>Paid Date <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
             <input type="date" name="paid_date" required>
           </label>
-          <label class="form-field">
-            <span>Into Account</span>
-            <select name="account_id" data-rent-account></select>
-          </label>
         </div>
+
+        <label class="form-field">
+          <span>Into Account</span>
+          <div class="search-select" data-search-select data-rent-account-select>
+            <input type="hidden" name="account_id" data-search-select-value data-rent-account>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Default account</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search accounts...">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
+        </label>
+
         <label class="form-field">
           <span>Notes</span>
           <textarea name="notes" rows="2" placeholder="Optional details..."></textarea>
@@ -475,6 +504,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=85" defer></script>
+  <script src="/assets/js/app.js?v=86" defer></script>
 </body>
 </html>
