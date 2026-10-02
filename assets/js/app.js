@@ -6709,9 +6709,16 @@ const setupRealEstatePage = () => {
     if (propertyFormTitle) propertyFormTitle.textContent = p ? "Edit Property" : "Add Property";
     if (p) {
       propertyForm.elements.name.value = p.name || "";
-      propertyForm.elements.type.value = p.type || "residential";
       propertyForm.elements.location.value = p.location || "";
       propertyForm.elements.notes.value = p.notes || "";
+    }
+    // Sync the styled Type select (dispatch updates its label + active state).
+    const typeInput = propertyForm.elements.type;
+    if (typeInput) {
+      const desiredType = p ? (p.type || "residential") : "residential";
+      typeInput.value = desiredType;
+      typeInput.setAttribute("value", desiredType);
+      typeInput.dispatchEvent(new Event("change", { bubbles: true }));
     }
     if (propertyFormModal) propertyFormModal.hidden = false;
   };

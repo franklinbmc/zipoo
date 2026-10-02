@@ -230,14 +230,24 @@
         </label>
         <label class="form-field">
           <span>Type</span>
-          <select name="type">
-            <option value="residential">Residential</option>
-            <option value="apartment">Apartment block</option>
-            <option value="house">House</option>
-            <option value="commercial">Commercial</option>
-            <option value="land">Land / Plot</option>
-            <option value="other">Other</option>
-          </select>
+          <div class="search-select" data-search-select data-property-type-select>
+            <input type="hidden" name="type" value="residential" data-search-select-value>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Residential</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search types...">
+              <div class="search-select-options" data-search-select-options>
+                <button type="button" data-search-select-option data-value="residential" class="active">Residential</button>
+                <button type="button" data-search-select-option data-value="apartment">Apartment block</button>
+                <button type="button" data-search-select-option data-value="house">House</button>
+                <button type="button" data-search-select-option data-value="commercial">Commercial</button>
+                <button type="button" data-search-select-option data-value="land">Land / Plot</button>
+                <button type="button" data-search-select-option data-value="other">Other</button>
+              </div>
+            </div>
+          </div>
         </label>
         <label class="form-field">
           <span>Location</span>
@@ -445,6 +455,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=75" defer></script>
+  <script src="/assets/js/app.js?v=76" defer></script>
 </body>
 </html>
