@@ -5179,6 +5179,7 @@ const setupStockPage = () => {
   const warehouseProductsBadge = document.querySelector("[data-warehouse-products-badge]");
   const warehouseProductsSearch = document.querySelector("[data-warehouse-products-search]");
   let warehouseProductsCache = [];
+  let currentStockWarehouse = null;
 
   const renderWarehouseProducts = (list = []) => {
     warehouseProductsCache = list;
@@ -5190,7 +5191,7 @@ const setupStockPage = () => {
     }
     if (warehouseProductsEmpty) warehouseProductsEmpty.hidden = true;
     warehouseProductsList.innerHTML = list.map((p) => {
-      const stock = Number(p.current_stock) || 0;
+      const stock = Number(p.warehouse_qty) || 0;
       const stockCls = stock <= 0 ? "out-of-stock" : (p.is_low_stock ? "low-stock" : "in-stock");
       const stockTxt = `${stock} ${escWh(p.unit || "")}`.trim();
       const sub = [p.sku ? `SKU: ${escWh(p.sku)}` : "", escWh(p.category || "General")].filter(Boolean).join(" • ");
@@ -5202,6 +5203,7 @@ const setupStockPage = () => {
           </div>
           <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto;">
             <span class="badge-stock ${stockCls}">${stockTxt}</span>
+            <button type="button" class="btn btn-outline btn-sm" data-wh-transfer="${p.id}">Transfer</button>
             <button type="button" class="btn btn-outline btn-sm" data-wh-view-product="${p.id}">View</button>
           </div>
         </div>`;
@@ -5209,13 +5211,14 @@ const setupStockPage = () => {
   };
 
   const loadWarehouseProducts = async (query = "") => {
+    if (!currentStockWarehouse) return;
     try {
-      const params = new URLSearchParams({ type: "product" });
+      const params = new URLSearchParams({ stock_warehouse_id: String(currentStockWarehouse.id) });
       if (query) params.set("q", query);
-      const res = await fetch(`${getBasePath()}api/items.php?${params.toString()}`);
+      const res = await fetch(`${getBasePath()}api/warehouses.php?${params.toString()}`);
       if (!res.ok) return;
       const data = await res.json();
-      if (data && data.ok) renderWarehouseProducts(Array.isArray(data.items) ? data.items : []);
+      if (data && data.ok) renderWarehouseProducts(Array.isArray(data.products) ? data.products : []);
     } catch {
       /* offline: keep current */
     }
@@ -5223,6 +5226,7 @@ const setupStockPage = () => {
 
   const openWarehouseStock = (warehouse) => {
     if (!warehouse) return;
+    currentStockWarehouse = warehouse;
     if (warehouseStockTitle) warehouseStockTitle.textContent = `${warehouse.name} — Stock`;
     if (warehouseProductsSearch) warehouseProductsSearch.value = "";
     openWorkspace(warehouseStockWorkspace, () => loadWarehouseProducts(""));
@@ -5234,11 +5238,80 @@ const setupStockPage = () => {
     whProductsSearchTimeout = setTimeout(() => loadWarehouseProducts(e.target.value.trim()), 250);
   });
 
-  warehouseProductsList?.addEventListener("click", (e) => {
-    const id = e.target.closest("[data-wh-view-product]")?.dataset.whViewProduct;
-    if (!id) return;
-    const product = warehouseProductsCache.find((x) => String(x.id) === String(id));
-    if (product) openItemDetail(product);
+  warehouseProductsList?.addEventListener("click", async (e) => {
+    const transferId = e.target.closest("[data-wh-transfer]")?.dataset.whTransfer;
+    if (transferId) {
+      const product = warehouseProductsCache.find((x) => String(x.id) === String(transferId));
+      if (product) openStockTransfer(product);
+      return;
+    }
+    const viewId = e.target.closest("[data-wh-view-product]")?.dataset.whViewProduct;
+    if (!viewId) return;
+    try {
+      const res = await fetch(`${getBasePath()}api/items.php?id=${encodeURIComponent(viewId)}`);
+      const data = await res.json();
+      if (res.ok && data.ok && data.item) openItemDetail(data.item);
+    } catch { /* offline */ }
+  });
+
+  // ---- Stock transfer between warehouses ----
+  const stockTransferModal = document.querySelector("[data-stock-transfer-modal]");
+  const stockTransferForm = document.querySelector("[data-stock-transfer-form]");
+  const stockTransferItemName = document.querySelector("[data-stock-transfer-item]");
+  const stockTransferItemId = document.querySelector("[data-stock-transfer-item-id]");
+  const stockTransferFromId = document.querySelector("[data-stock-transfer-from-id]");
+  const stockTransferFromName = document.querySelector("[data-stock-transfer-from-name]");
+  const stockTransferTo = document.querySelector("[data-stock-transfer-to]");
+  const stockTransferAvail = document.querySelector("[data-stock-transfer-avail]");
+  const stockTransferError = document.querySelector("[data-stock-transfer-error]");
+  const stockTransferSubmit = document.querySelector("[data-stock-transfer-submit]");
+
+  const openStockTransfer = (product) => {
+    if (!stockTransferForm || !currentStockWarehouse) return;
+    stockTransferForm.reset();
+    if (stockTransferError) stockTransferError.hidden = true;
+    if (stockTransferItemName) stockTransferItemName.textContent = product.name;
+    if (stockTransferItemId) stockTransferItemId.value = String(product.id);
+    if (stockTransferFromId) stockTransferFromId.value = String(currentStockWarehouse.id);
+    if (stockTransferFromName) stockTransferFromName.textContent = currentStockWarehouse.name;
+    if (stockTransferAvail) stockTransferAvail.textContent = `Available here: ${Number(product.warehouse_qty) || 0} ${product.unit || ""}`.trim();
+    if (stockTransferTo) {
+      const others = warehouseCache.filter((w) => String(w.id) !== String(currentStockWarehouse.id));
+      stockTransferTo.innerHTML = others.length
+        ? others.map((w) => `<option value="${w.id}">${escWh(w.name)}${w.is_default ? " (default)" : ""}</option>`).join("")
+        : `<option value="">No other warehouse</option>`;
+    }
+    if (stockTransferModal) stockTransferModal.hidden = false;
+  };
+
+  document.querySelector("[data-stock-transfer-close]")?.addEventListener("click", () => { if (stockTransferModal) stockTransferModal.hidden = true; });
+
+  stockTransferForm?.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    if (stockTransferError) stockTransferError.hidden = true;
+    const toId = stockTransferTo?.value || "";
+    const qty = parseFloat(String(stockTransferForm.elements.quantity.value).replace(/[^0-9.\-]/g, "")) || 0;
+    if (!toId) { if (stockTransferError) { stockTransferError.textContent = "Choose a destination warehouse."; stockTransferError.hidden = false; } return; }
+    if (qty <= 0) { if (stockTransferError) { stockTransferError.textContent = "Enter a quantity greater than zero."; stockTransferError.hidden = false; } return; }
+    if (stockTransferSubmit) stockTransferSubmit.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", "transfer_stock");
+      body.set("from_warehouse_id", stockTransferFromId.value);
+      body.set("to_warehouse_id", toId);
+      body.set("item_id", stockTransferItemId.value);
+      body.set("quantity", String(qty));
+      body.set("notes", stockTransferForm.elements.notes.value.trim());
+      const res = await fetch(`${getBasePath()}api/warehouses.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not transfer stock.");
+      if (stockTransferModal) stockTransferModal.hidden = true;
+      await loadWarehouseProducts(warehouseProductsSearch?.value.trim() || "");
+    } catch (err) {
+      if (stockTransferError) { stockTransferError.textContent = err.message || "Could not transfer stock."; stockTransferError.hidden = false; }
+    } finally {
+      if (stockTransferSubmit) stockTransferSubmit.disabled = false;
+    }
   });
 
   document.querySelectorAll("[data-open-warehouses-workspace]").forEach((btn) => {

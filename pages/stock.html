@@ -772,6 +772,43 @@
     </section>
   </div>
 
+  <!-- Modal: Stock Transfer -->
+  <div class="fullscreen-modal" hidden data-stock-transfer-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="stock-transfer-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-stock-transfer-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="stock-transfer-title">Transfer Stock</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-stock-transfer-form novalidate>
+        <input type="hidden" data-stock-transfer-item-id>
+        <input type="hidden" data-stock-transfer-from-id>
+        <div style="background:#f8fafc;border:1px solid var(--color-line);border-radius:12px;padding:12px;margin-bottom:12px;">
+          <div style="font-size:0.8rem;color:var(--color-muted);">Product</div>
+          <strong data-stock-transfer-item style="color:var(--color-navy);">-</strong>
+          <div style="font-size:0.8rem;color:var(--color-muted);margin-top:6px;">From: <strong data-stock-transfer-from-name style="color:var(--color-navy);">-</strong></div>
+          <div style="font-size:0.78rem;color:var(--color-blue);font-weight:700;margin-top:2px;" data-stock-transfer-avail></div>
+        </div>
+        <label class="form-field">
+          <span>To Warehouse <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <select data-stock-transfer-to required></select>
+        </label>
+        <label class="form-field">
+          <span>Quantity <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <input type="text" inputmode="numeric" name="quantity" step="0.01" min="0.01" placeholder="0" required>
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <input type="text" name="notes" placeholder="Optional reason / reference">
+        </label>
+        <p class="inline-error" hidden data-stock-transfer-error></p>
+        <button class="btn btn-primary full" type="submit" data-stock-transfer-submit>Transfer Stock</button>
+      </form>
+    </section>
+  </div>
+
   <!-- App Notice / Confirm Modal -->
   <div class="modal-backdrop" hidden data-app-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
@@ -781,6 +818,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=77" defer></script>
+  <script src="/assets/js/app.js?v=78" defer></script>
 </body>
 </html>

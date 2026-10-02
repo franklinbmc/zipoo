@@ -26,6 +26,63 @@ function ensure_warehouses_table(PDO $pdo): void
 }
 
 /**
+ * Per-warehouse stock allocations and a transfer audit log.
+ *
+ * Model: tbl_warehouse_stock holds an explicit quantity only for NON-default
+ * warehouses. The default warehouse holds the residual
+ * (tbl_items.current_stock minus the sum of all explicit allocations), so the
+ * per-warehouse quantities always reconcile to each item's total stock without
+ * touching the existing POS / purchasing / adjustment flows.
+ */
+function ensure_warehouse_stock_tables(PDO $pdo): void
+{
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS tbl_warehouse_stock (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            business_id INT UNSIGNED NOT NULL,
+            warehouse_id INT UNSIGNED NOT NULL,
+            item_id INT UNSIGNED NOT NULL,
+            quantity DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_ws (business_id, warehouse_id, item_id),
+            KEY idx_ws_item (business_id, item_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS tbl_stock_transfers (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            business_id INT UNSIGNED NOT NULL,
+            item_id INT UNSIGNED NOT NULL,
+            from_warehouse_id INT UNSIGNED NOT NULL,
+            to_warehouse_id INT UNSIGNED NOT NULL,
+            quantity DECIMAL(12, 2) NOT NULL,
+            notes TEXT NULL,
+            created_by INT UNSIGNED NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            KEY idx_st_biz (business_id),
+            KEY idx_st_item (business_id, item_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+}
+
+/** Sets a non-default warehouse's allocation for an item, deleting the row when it reaches zero. */
+function set_warehouse_allocation(PDO $pdo, int $businessId, int $warehouseId, int $itemId, float $quantity): void
+{
+    if ($quantity <= 0) {
+        $pdo->prepare('DELETE FROM tbl_warehouse_stock WHERE business_id = :bid AND warehouse_id = :wid AND item_id = :iid')
+            ->execute([':bid' => $businessId, ':wid' => $warehouseId, ':iid' => $itemId]);
+        return;
+    }
+    $pdo->prepare(
+        'INSERT INTO tbl_warehouse_stock (business_id, warehouse_id, item_id, quantity)
+         VALUES (:bid, :wid, :iid, :qty)
+         ON DUPLICATE KEY UPDATE quantity = VALUES(quantity)'
+    )->execute([':bid' => $businessId, ':wid' => $warehouseId, ':iid' => $itemId, ':qty' => round($quantity, 2)]);
+}
+
+/**
  * Guarantees the business has at least one warehouse, creating a default
  * "Main Warehouse" when none exist. Returns the default warehouse id.
  */
