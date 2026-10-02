@@ -470,20 +470,38 @@
           </label>
           <label class="form-field">
             <span>Role</span>
-            <select name="role">
-              <option value="caretaker">Caretaker</option>
-              <option value="manager">Manager</option>
-              <option value="security">Security</option>
-              <option value="cleaner">Cleaner</option>
-              <option value="other">Other</option>
-            </select>
+            <div class="search-select" data-search-select data-staff-role-select>
+              <input type="hidden" name="role" value="caretaker" data-search-select-value data-staff-role>
+              <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+                <span data-search-select-label>Caretaker</span>
+                <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+              </button>
+              <div class="search-select-panel" hidden data-search-select-panel>
+                <input type="search" data-search-select-search placeholder="Search roles...">
+                <div class="search-select-options" data-search-select-options>
+                  <button type="button" data-search-select-option data-value="caretaker" class="active">Caretaker</button>
+                  <button type="button" data-search-select-option data-value="manager">Manager</button>
+                  <button type="button" data-search-select-option data-value="security">Security</button>
+                  <button type="button" data-search-select-option data-value="cleaner">Cleaner</button>
+                  <button type="button" data-search-select-option data-value="other">Other</button>
+                </div>
+              </div>
+            </div>
           </label>
         </div>
         <label class="form-field">
           <span>Assigned Property</span>
-          <select name="property_id" data-staff-property>
-            <option value="">— None —</option>
-          </select>
+          <div class="search-select" data-search-select data-staff-property-select>
+            <input type="hidden" name="property_id" data-search-select-value data-staff-property>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>— None —</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search properties...">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
         </label>
         <label class="form-field">
           <span>Notes</span>
@@ -504,6 +522,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=86" defer></script>
+  <script src="/assets/js/app.js?v=87" defer></script>
 </body>
 </html>

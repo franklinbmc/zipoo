@@ -7344,7 +7344,10 @@ const setupRealEstatePage = () => {
   const staffForm = document.querySelector("[data-staff-form]");
   const staffFormTitle = document.querySelector("[data-staff-form-title]");
   const staffFormId = document.querySelector("[data-staff-form-id]");
-  const staffPropertySel = document.querySelector("[data-staff-property]");
+  const staffRoleWrap = document.querySelector("[data-staff-role-select]");
+  const staffRoleSel = document.querySelector("[data-staff-role]"); // hidden value input
+  const staffPropertyWrap = document.querySelector("[data-staff-property-select]");
+  const staffPropertySel = document.querySelector("[data-staff-property]"); // hidden value input
   const staffFormError = document.querySelector("[data-staff-form-error]");
   const staffFormSubmit = document.querySelector("[data-staff-form-submit]");
   let staffCache = [];
@@ -7372,20 +7375,24 @@ const setupRealEstatePage = () => {
     if (staffFormError) staffFormError.hidden = true;
     if (staffFormId) staffFormId.value = s ? String(s.id) : "";
     if (staffFormTitle) staffFormTitle.textContent = s ? "Edit Staff" : "Add Staff";
-    // Populate property options.
-    try {
-      const d = await api({ query: "?resource=properties" });
-      if (staffPropertySel) {
-        staffPropertySel.innerHTML = `<option value="">— None —</option>` + (d.properties || []).map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
-      }
-    } catch {}
     if (s) {
       staffForm.elements.name.value = s.name || "";
       staffForm.elements.phone.value = s.phone || "";
-      staffForm.elements.role.value = s.role || "caretaker";
-      if (staffPropertySel) staffPropertySel.value = s.property_id ? String(s.property_id) : "";
       staffForm.elements.notes.value = s.notes || "";
     }
+    // Role select (static options) — sync the styled widget to the current value.
+    const roleVal = s ? (s.role || "caretaker") : "caretaker";
+    if (staffRoleSel) {
+      staffRoleSel.value = roleVal;
+      staffRoleSel.setAttribute("value", roleVal);
+      staffRoleSel.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    // Property select — populate from the live property list.
+    try {
+      const d = await api({ query: "?resource=properties" });
+      const propOptions = [{ value: "", label: "— None —" }].concat((d.properties || []).map((p) => ({ value: String(p.id), label: p.name })));
+      setSearchSelectOptions(staffPropertyWrap, propOptions, "— None —", s && s.property_id ? String(s.property_id) : "");
+    } catch { /* ignore */ }
     if (staffFormModal) staffFormModal.hidden = false;
   };
 
