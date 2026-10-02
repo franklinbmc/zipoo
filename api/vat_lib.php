@@ -23,6 +23,10 @@ function ensure_vat_columns(PDO $pdo): void
     $addColumn('tbl_items', 'vat_applicable', 'TINYINT(1) NOT NULL DEFAULT 1 AFTER selling_price');
     $addColumn('tbl_purchase_order_items', 'vat_applicable', 'TINYINT(1) NOT NULL DEFAULT 1 AFTER line_total');
     $addColumn('tbl_sale_items', 'vat_applicable', 'TINYINT(1) NOT NULL DEFAULT 1 AFTER line_total');
+
+    // Whether an item's price already includes VAT (1 = tax-inclusive, 0 = exclusive).
+    $addColumn('tbl_items', 'tax_inclusive', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER vat_applicable');
+    $addColumn('tbl_sale_items', 'tax_inclusive', 'TINYINT(1) NOT NULL DEFAULT 0 AFTER vat_applicable');
 }
 
 /**

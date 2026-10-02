@@ -3726,6 +3726,13 @@ const setupStockPage = () => {
   const itemVatField = document.querySelector("[data-item-vat-field]");
   const itemVatCheckbox = document.querySelector("[data-item-vat-checkbox]");
   const itemVatHint = document.querySelector("[data-item-vat-hint]");
+  const itemTaxModeField = document.querySelector("[data-item-taxmode-field]");
+  const itemTaxModeSelect = document.querySelector("[data-item-taxmode]");
+  const syncItemTaxMode = () => {
+    // The inclusive/exclusive choice only applies to taxable items.
+    if (itemTaxModeField) itemTaxModeField.hidden = !(itemVatCheckbox && itemVatCheckbox.checked);
+  };
+  itemVatCheckbox?.addEventListener("change", syncItemTaxMode);
 
   // Stock Adjust Modal
   const adjustModal = document.querySelector("[data-stock-adjust-modal]");
@@ -4085,6 +4092,8 @@ const setupStockPage = () => {
     if (itemVatField) itemVatField.hidden = false;
     if (itemVatCheckbox) itemVatCheckbox.checked = true; // new items default to taxable
     if (itemVatHint) itemVatHint.textContent = vatConfig.enabled ? "" : "(VAT is off — no tax applied yet)";
+    if (itemTaxModeSelect) itemTaxModeSelect.value = "0"; // default tax exclusive
+    syncItemTaxMode();
     if (itemFormModal) itemFormModal.hidden = false;
     itemForm?.querySelector('input[name="name"]')?.focus();
   };
@@ -4116,6 +4125,8 @@ const setupStockPage = () => {
     if (itemVatField) itemVatField.hidden = false;
     if (itemVatCheckbox) itemVatCheckbox.checked = Number(item.vat_applicable ?? 1) === 1;
     if (itemVatHint) itemVatHint.textContent = vatConfig.enabled ? "" : "(VAT is off — no tax applied yet)";
+    if (itemTaxModeSelect) itemTaxModeSelect.value = Number(item.tax_inclusive ?? 0) === 1 ? "1" : "0";
+    syncItemTaxMode();
 
     if (itemDetailModal) itemDetailModal.hidden = true;
     if (itemFormModal) itemFormModal.hidden = false;
@@ -4213,7 +4224,9 @@ const setupStockPage = () => {
       }
       // Honour the Taxable checkbox. The flag is stored regardless of whether VAT is
       // currently enabled, so turning VAT on later applies tax to the right items.
-      formData.set("vat_applicable", (itemVatCheckbox && itemVatCheckbox.checked) ? "1" : "0");
+      const isTaxable = itemVatCheckbox && itemVatCheckbox.checked;
+      formData.set("vat_applicable", isTaxable ? "1" : "0");
+      formData.set("tax_inclusive", (isTaxable && itemTaxModeSelect && itemTaxModeSelect.value === "1") ? "1" : "0");
 
       const res = await fetch(`${getBasePath()}api/items.php`, {
         method: "POST",
@@ -5649,28 +5662,31 @@ const setupSalesPage = () => {
 
   // ---- Invoice form: line items ----
   const calculateInvoiceTotals = () => {
-    let subtotal = 0;
-    let vatBase = 0;
+    let subtotal = 0; // net subtotal
+    let taxableNet = 0;
+    const taxRate = invVatConfig.enabled ? invVatConfig.rate : 0;
     invoiceLinesContainer?.querySelectorAll(".po-line-item-row").forEach((row) => {
       const qty = num(row.querySelector('input[name="line_qty"]')?.value);
       const price = num(row.querySelector('input[name="line_price"]')?.value);
       const selectValue = row.querySelector('[name="line_item_id"]');
-      const lineTot = qty * price;
-      subtotal += lineTot;
+      const gross = qty * price;
+      let taxable = false;
+      let inclusive = false;
       if (invVatConfig.enabled) {
         const chosen = cachedProducts.find((p) => String(p.id) === String(selectValue?.value || ""));
-        // Known items follow their flag; free-text lines default to VAT-applicable.
-        if (!chosen || Number(chosen.vat_applicable ?? 1) === 1) {
-          vatBase += lineTot;
-        }
+        // Known items follow their flags; free-text lines default to taxable, exclusive.
+        taxable = !chosen || Number(chosen.vat_applicable ?? 1) === 1;
+        inclusive = !!chosen && Number(chosen.tax_inclusive ?? 0) === 1;
       }
+      const net = (taxable && inclusive && taxRate > 0) ? gross / (1 + taxRate / 100) : gross;
+      subtotal += net;
+      if (taxable) taxableNet += net;
       const totSpan = row.querySelector("[data-line-total]");
-      if (totSpan) totSpan.textContent = formatCurrency(lineTot);
+      if (totSpan) totSpan.textContent = formatCurrency(gross);
     });
     const discount = Math.min(Math.max(0, num(invoiceDiscountInput?.value)), subtotal);
-    const taxRate = invVatConfig.enabled ? invVatConfig.rate : 0;
     const discountRatio = subtotal > 0 ? discount / subtotal : 0;
-    const taxAmt = (vatBase * (1 - discountRatio) * taxRate) / 100;
+    const taxAmt = (taxableNet * (1 - discountRatio) * taxRate) / 100;
     const total = (subtotal - discount) + taxAmt;
     if (invoiceVatRow) invoiceVatRow.hidden = !invVatConfig.enabled;
     if (invoiceVatRateLabel) invoiceVatRateLabel.textContent = String(taxRate);
@@ -5996,15 +6012,17 @@ const setupSalesPage = () => {
   let lastSale = null;
 
   const posTotals = () => {
-    let subtotal = 0;
-    let vatBase = 0;
-    posCart.forEach((l) => {
-      const lineTot = l.price * l.qty;
-      subtotal += lineTot;
-      if (invVatConfig.enabled && Number(l.vat_applicable) === 1) vatBase += lineTot;
-    });
+    let subtotal = 0; // net subtotal
+    let taxableNet = 0;
     const rate = invVatConfig.enabled ? invVatConfig.rate : 0;
-    const tax = (vatBase * rate) / 100;
+    posCart.forEach((l) => {
+      const gross = l.price * l.qty;
+      const taxable = invVatConfig.enabled && Number(l.vat_applicable) === 1;
+      const net = (taxable && Number(l.tax_inclusive) === 1 && rate > 0) ? gross / (1 + rate / 100) : gross;
+      subtotal += net;
+      if (taxable) taxableNet += net;
+    });
+    const tax = (taxableNet * rate) / 100;
     return { subtotal, tax, rate, total: subtotal + tax };
   };
 
@@ -6080,6 +6098,7 @@ const setupSalesPage = () => {
       price: Number(product.selling_price) || 0,
       qty: 1,
       vat_applicable: Number(product.vat_applicable ?? 1),
+      tax_inclusive: Number(product.tax_inclusive ?? 0),
       type: product.type,
       stock,
     });

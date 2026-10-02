@@ -392,6 +392,7 @@ try {
                     'unit_price' => (float) $it['unit_price'],
                     'line_total' => (float) $it['line_total'],
                     'vat_applicable' => (int) ($it['vat_applicable'] ?? 1),
+                    'tax_inclusive' => (int) ($it['tax_inclusive'] ?? 0),
                 ];
             }, $items);
             $out['customer'] = $customer ? [
@@ -513,9 +514,10 @@ try {
                 }
             }
 
-            // Validate line items
-            $subtotal = 0.0;
-            $vatBase = 0.0;
+            // Validate line items. Prices may be tax-inclusive per item; convert each
+            // taxable line to its net amount so VAT = net * rate for both pricing modes.
+            $subtotal = 0.0;   // net subtotal
+            $taxableNet = 0.0; // net of taxable lines
             $validatedItems = [];
             foreach ($items as $item) {
                 $itemId = (int) ($item['item_id'] ?? 0);
@@ -530,14 +532,16 @@ try {
                 $itemName = $nameFallback;
                 $resolvedItemId = null;
                 $itemVat = 1; // free-text lines default to VAT-applicable when VAT is on
+                $itemIncl = 0; // free-text lines are treated as tax-exclusive
                 if ($itemId > 0) {
-                    $iStmt = $pdo->prepare('SELECT id, name, vat_applicable FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
+                    $iStmt = $pdo->prepare('SELECT id, name, vat_applicable, tax_inclusive FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
                     $iStmt->execute([':id' => $itemId, ':bid' => $businessId]);
                     $iRow = $iStmt->fetch();
                     if ($iRow) {
                         $resolvedItemId = (int) $iRow['id'];
                         $itemName = (string) $iRow['name'];
                         $itemVat = (int) ($iRow['vat_applicable'] ?? 1);
+                        $itemIncl = (int) ($iRow['tax_inclusive'] ?? 0);
                     }
                 }
 
@@ -545,19 +549,22 @@ try {
                     continue;
                 }
 
-                $lineTotal = round($qty * $price, 2);
-                $subtotal += $lineTotal;
+                $gross = round($qty * $price, 2);
                 $lineVat = ($vatEnabled && $itemVat === 1) ? 1 : 0;
+                $lineIncl = ($lineVat === 1 && $itemIncl === 1) ? 1 : 0;
+                $net = ($lineIncl === 1 && $taxRate > 0) ? ($gross / (1 + $taxRate / 100)) : $gross;
+                $subtotal += $net;
                 if ($lineVat === 1) {
-                    $vatBase += $lineTotal;
+                    $taxableNet += $net;
                 }
                 $validatedItems[] = [
                     'item_id' => $resolvedItemId,
                     'item_name' => $itemName,
                     'quantity' => $qty,
                     'unit_price' => $price,
-                    'line_total' => $lineTotal,
+                    'line_total' => $gross, // the price as entered (inclusive price when inclusive)
                     'vat_applicable' => $lineVat,
+                    'tax_inclusive' => $lineIncl,
                 ];
             }
 
@@ -565,16 +572,18 @@ try {
                 respond(422, ['ok' => false, 'message' => 'No valid line items provided.']);
             }
 
+            $subtotal = round($subtotal, 2);
+            $taxableNet = round($taxableNet, 2);
             if ($discount < 0) {
                 $discount = 0.0;
             }
             if ($discount > $subtotal) {
                 $discount = $subtotal;
             }
-            // Discount reduces the VAT base proportionally so tax stays consistent with the net amount.
+            // Discount reduces the taxable net proportionally so tax stays consistent.
             $discountRatio = $subtotal > 0 ? ($discount / $subtotal) : 0.0;
-            $effectiveVatBase = $vatBase * (1 - $discountRatio);
-            $taxAmount = round(($effectiveVatBase * $taxRate) / 100, 2);
+            $effectiveTaxableNet = $taxableNet * (1 - $discountRatio);
+            $taxAmount = round(($effectiveTaxableNet * $taxRate) / 100, 2);
             $totalAmount = round(($subtotal - $discount) + $taxAmount, 2);
 
             $pdo->beginTransaction();
@@ -645,8 +654,8 @@ try {
                 }
 
                 $liStmt = $pdo->prepare(
-                    'INSERT INTO tbl_sale_items (sale_id, item_id, item_name, quantity, unit_price, line_total, vat_applicable)
-                     VALUES (:sid, :iid, :iname, :qty, :price, :ltot, :vat)'
+                    'INSERT INTO tbl_sale_items (sale_id, item_id, item_name, quantity, unit_price, line_total, vat_applicable, tax_inclusive)
+                     VALUES (:sid, :iid, :iname, :qty, :price, :ltot, :vat, :taxincl)'
                 );
                 foreach ($validatedItems as $v) {
                     $liStmt->execute([
@@ -657,6 +666,7 @@ try {
                         ':price' => $v['unit_price'],
                         ':ltot' => $v['line_total'],
                         ':vat' => $v['vat_applicable'],
+                        ':taxincl' => $v['tax_inclusive'],
                     ]);
                 }
 
@@ -706,9 +716,10 @@ try {
                 }
             }
 
-            // Validate items, compute totals, and check stock for products.
-            $subtotal = 0.0;
-            $vatBase = 0.0;
+            // Validate items, compute totals (net-based, honouring tax-inclusive prices),
+            // and check stock for products.
+            $subtotal = 0.0;   // net subtotal
+            $taxableNet = 0.0; // net of taxable lines
             $validatedItems = [];
             foreach ($items as $item) {
                 $itemId = (int) ($item['item_id'] ?? 0);
@@ -718,7 +729,7 @@ try {
                     continue;
                 }
 
-                $iStmt = $pdo->prepare('SELECT id, name, type, current_stock, cost_price, vat_applicable FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
+                $iStmt = $pdo->prepare('SELECT id, name, type, current_stock, cost_price, vat_applicable, tax_inclusive FROM tbl_items WHERE id = :id AND business_id = :bid LIMIT 1');
                 $iStmt->execute([':id' => $itemId, ':bid' => $businessId]);
                 $iRow = $iStmt->fetch();
                 if (!$iRow) {
@@ -729,11 +740,13 @@ try {
                     respond(422, ['ok' => false, 'message' => 'Not enough stock for "' . $iRow['name'] . '". Available: ' . rtrim(rtrim(number_format((float) $iRow['current_stock'], 2), '0'), '.') . '.']);
                 }
 
-                $lineTotal = round($qty * $price, 2);
-                $subtotal += $lineTotal;
+                $gross = round($qty * $price, 2);
                 $lineVat = ($vatEnabled && (int) ($iRow['vat_applicable'] ?? 1) === 1) ? 1 : 0;
+                $lineIncl = ($lineVat === 1 && (int) ($iRow['tax_inclusive'] ?? 0) === 1) ? 1 : 0;
+                $net = ($lineIncl === 1 && $taxRate > 0) ? ($gross / (1 + $taxRate / 100)) : $gross;
+                $subtotal += $net;
                 if ($lineVat === 1) {
-                    $vatBase += $lineTotal;
+                    $taxableNet += $net;
                 }
 
                 $validatedItems[] = [
@@ -743,8 +756,9 @@ try {
                     'cost_price' => (float) $iRow['cost_price'],
                     'quantity' => $qty,
                     'unit_price' => $price,
-                    'line_total' => $lineTotal,
+                    'line_total' => $gross,
                     'vat_applicable' => $lineVat,
+                    'tax_inclusive' => $lineIncl,
                 ];
             }
 
@@ -752,7 +766,8 @@ try {
                 respond(422, ['ok' => false, 'message' => 'No valid products in the cart.']);
             }
 
-            $taxAmount = round(($vatBase * $taxRate) / 100, 2);
+            $subtotal = round($subtotal, 2);
+            $taxAmount = round(($taxableNet * $taxRate) / 100, 2);
             $totalAmount = round($subtotal + $taxAmount, 2);
             // POS sales are settled immediately; default paid = total.
             $amountPaid = ($amountPaidInput !== null && $amountPaidInput >= $totalAmount) ? $amountPaidInput : $totalAmount;
@@ -815,8 +830,8 @@ try {
                 $saleId = (int) $pdo->lastInsertId();
 
                 $liStmt = $pdo->prepare(
-                    'INSERT INTO tbl_sale_items (sale_id, item_id, item_name, quantity, unit_price, line_total, vat_applicable)
-                     VALUES (:sid, :iid, :iname, :qty, :price, :ltot, :vat)'
+                    'INSERT INTO tbl_sale_items (sale_id, item_id, item_name, quantity, unit_price, line_total, vat_applicable, tax_inclusive)
+                     VALUES (:sid, :iid, :iname, :qty, :price, :ltot, :vat, :taxincl)'
                 );
                 $updStock = $pdo->prepare('UPDATE tbl_items SET current_stock = current_stock - :qty WHERE id = :id AND business_id = :bid');
                 $moveStmt = $pdo->prepare(
@@ -834,6 +849,7 @@ try {
                         ':price' => $v['unit_price'],
                         ':ltot' => $v['line_total'],
                         ':vat' => $v['vat_applicable'],
+                        ':taxincl' => $v['tax_inclusive'],
                     ]);
 
                     if ($v['type'] !== 'service') {

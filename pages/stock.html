@@ -385,6 +385,14 @@
           <small data-item-vat-hint style="color:var(--color-muted);font-weight:500;"></small>
         </label>
 
+        <label class="form-field" data-item-taxmode-field hidden style="margin-bottom:4px;">
+          <span>Price &amp; cost are</span>
+          <select name="tax_inclusive" data-item-taxmode>
+            <option value="0">Tax exclusive — VAT added on top</option>
+            <option value="1">Tax inclusive — VAT already in the price</option>
+          </select>
+        </label>
+
         <label class="form-field">
           <span>Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
           <input type="text" name="name" placeholder="e.g. Wireless Mouse or Consulting" required>
@@ -819,6 +827,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=81" defer></script>
+  <script src="/assets/js/app.js?v=82" defer></script>
 </body>
 </html>

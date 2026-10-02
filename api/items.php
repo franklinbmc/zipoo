@@ -77,6 +77,7 @@ function item_payload(array $row): array
         'cost_price' => $costPrice,
         'selling_price' => $sellingPrice,
         'vat_applicable' => (int) ($row['vat_applicable'] ?? 1),
+        'tax_inclusive' => (int) ($row['tax_inclusive'] ?? 0),
         'margin_percent' => $margin,
         'current_stock' => $type === 'service' ? 0.0 : $currentStock,
         'min_stock_alert' => $minStockAlert,
@@ -217,6 +218,7 @@ try {
             $costPrice = (float) ($_POST['cost_price'] ?? 0);
             $sellingPrice = (float) ($_POST['selling_price'] ?? 0);
             $vatApplicable = (!isset($_POST['vat_applicable']) || $_POST['vat_applicable'] === '0') ? 0 : 1;
+            $taxInclusive = ($vatApplicable === 1 && ($_POST['tax_inclusive'] ?? '0') === '1') ? 1 : 0;
             $initialStock = (float) ($_POST['initial_stock'] ?? 0);
             $minStockAlert = (float) ($_POST['min_stock_alert'] ?? 5);
             $description = trim((string) ($_POST['description'] ?? ''));
@@ -233,8 +235,8 @@ try {
 
             $stmt = $pdo->prepare(
                 'INSERT INTO tbl_items
-                 (business_id, type, name, sku, barcode, category, unit, cost_price, selling_price, vat_applicable, current_stock, min_stock_alert, description, status)
-                 VALUES (:bid, :type, :name, :sku, :barcode, :category, :unit, :cost, :selling, :vat, :stock, :min_alert, :desc, :status)'
+                 (business_id, type, name, sku, barcode, category, unit, cost_price, selling_price, vat_applicable, tax_inclusive, current_stock, min_stock_alert, description, status)
+                 VALUES (:bid, :type, :name, :sku, :barcode, :category, :unit, :cost, :selling, :vat, :taxincl, :stock, :min_alert, :desc, :status)'
             );
             $stmt->execute([
                 ':bid' => $businessId,
@@ -247,6 +249,7 @@ try {
                 ':cost' => $costPrice,
                 ':selling' => $sellingPrice,
                 ':vat' => $vatApplicable,
+                ':taxincl' => $taxInclusive,
                 ':stock' => $currentStock,
                 ':min_alert' => $minStockAlert,
                 ':desc' => $description !== '' ? $description : null,
@@ -297,6 +300,7 @@ try {
             $costPrice = (float) ($_POST['cost_price'] ?? 0);
             $sellingPrice = (float) ($_POST['selling_price'] ?? 0);
             $vatApplicable = (!isset($_POST['vat_applicable']) || $_POST['vat_applicable'] === '0') ? 0 : 1;
+            $taxInclusive = ($vatApplicable === 1 && ($_POST['tax_inclusive'] ?? '0') === '1') ? 1 : 0;
             $minStockAlert = (float) ($_POST['min_stock_alert'] ?? 5);
             $description = trim((string) ($_POST['description'] ?? ''));
             $status = trim((string) ($_POST['status'] ?? 'active'));
@@ -318,7 +322,7 @@ try {
             $stmt = $pdo->prepare(
                 'UPDATE tbl_items
                  SET name = :name, sku = :sku, barcode = :barcode, category = :category, unit = :unit,
-                     cost_price = :cost, selling_price = :selling, vat_applicable = :vat, min_stock_alert = :min_alert,
+                     cost_price = :cost, selling_price = :selling, vat_applicable = :vat, tax_inclusive = :taxincl, min_stock_alert = :min_alert,
                      description = :desc, status = :status
                  WHERE id = :id AND business_id = :bid'
             );
@@ -331,6 +335,7 @@ try {
                 ':cost' => $costPrice,
                 ':selling' => $sellingPrice,
                 ':vat' => $vatApplicable,
+                ':taxincl' => $taxInclusive,
                 ':min_alert' => $minStockAlert,
                 ':desc' => $description !== '' ? $description : null,
                 ':status' => $status,
