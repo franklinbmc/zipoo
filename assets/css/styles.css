@@ -3791,3 +3791,64 @@ button.settings-list-row:focus-visible {
 [data-pos-customer-modal] .app-modal {
   overflow: visible;
 }
+
+/* Toggle switch (used for Taxable / Tax-inclusive in the item form) */
+.tax-settings {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  background: #f8fafc;
+  margin-bottom: 4px;
+}
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  margin: 0;
+}
+.switch-row .switch-label {
+  font-weight: 700;
+  color: var(--color-navy);
+}
+.switch {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+.switch input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.switch-track {
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--color-line);
+  transition: background 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+}
+.switch-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transform: translateX(0);
+  transition: transform 0.18s ease;
+}
+.switch input:checked + .switch-track {
+  background: var(--color-blue);
+}
+.switch input:checked + .switch-track .switch-thumb {
+  transform: translateX(20px);
+}
+.switch input:focus-visible + .switch-track {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}

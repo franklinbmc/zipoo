@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=64">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=65">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -379,20 +379,6 @@
           <input type="hidden" name="type" value="product" data-item-form-type>
         </label>
 
-        <label class="checkbox-label" data-item-vat-field style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:4px;">
-          <input type="checkbox" name="vat_applicable" value="1" data-item-vat-checkbox style="width:18px;height:18px;min-height:0;flex:0 0 auto;">
-          <span style="font-weight:700;">Taxable</span>
-          <small data-item-vat-hint style="color:var(--color-muted);font-weight:500;"></small>
-        </label>
-
-        <label class="form-field" data-item-taxmode-field hidden style="margin-bottom:4px;">
-          <span>Price &amp; cost are</span>
-          <select name="tax_inclusive" data-item-taxmode>
-            <option value="0">Tax exclusive — VAT added on top</option>
-            <option value="1">Tax inclusive — VAT already in the price</option>
-          </select>
-        </label>
-
         <label class="form-field">
           <span>Name <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
           <input type="text" name="name" placeholder="e.g. Wireless Mouse or Consulting" required>
@@ -488,6 +474,24 @@
             <option value="inactive">Inactive</option>
           </select>
         </label>
+
+        <div class="tax-settings">
+          <label class="switch-row" data-item-vat-field>
+            <span class="switch-label">Taxable <small data-item-vat-hint style="color:var(--color-muted);font-weight:500;"></small></span>
+            <span class="switch">
+              <input type="checkbox" name="vat_applicable" value="1" data-item-vat-checkbox>
+              <span class="switch-track"><span class="switch-thumb"></span></span>
+            </span>
+          </label>
+
+          <label class="switch-row" data-item-taxmode-field hidden style="margin-top:8px;">
+            <span class="switch-label">Tax inclusive price <small data-item-taxmode-hint style="color:var(--color-muted);font-weight:500;"></small></span>
+            <span class="switch">
+              <input type="checkbox" name="tax_inclusive" value="1" data-item-taxmode>
+              <span class="switch-track"><span class="switch-thumb"></span></span>
+            </span>
+          </label>
+        </div>
 
         <p class="inline-error" hidden data-item-form-error></p>
         <button class="btn btn-primary full" type="submit" data-item-form-submit>Save Item</button>
@@ -827,6 +831,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=82" defer></script>
+  <script src="/assets/js/app.js?v=83" defer></script>
 </body>
 </html>

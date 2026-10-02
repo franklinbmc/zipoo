@@ -3727,12 +3727,17 @@ const setupStockPage = () => {
   const itemVatCheckbox = document.querySelector("[data-item-vat-checkbox]");
   const itemVatHint = document.querySelector("[data-item-vat-hint]");
   const itemTaxModeField = document.querySelector("[data-item-taxmode-field]");
-  const itemTaxModeSelect = document.querySelector("[data-item-taxmode]");
+  const itemTaxModeToggle = document.querySelector("[data-item-taxmode]");
+  const itemTaxModeHint = document.querySelector("[data-item-taxmode-hint]");
   const syncItemTaxMode = () => {
-    // The inclusive/exclusive choice only applies to taxable items.
+    // The inclusive/exclusive switch only applies to taxable items.
     if (itemTaxModeField) itemTaxModeField.hidden = !(itemVatCheckbox && itemVatCheckbox.checked);
+    if (itemTaxModeHint) itemTaxModeHint.textContent = (itemTaxModeToggle && itemTaxModeToggle.checked)
+      ? "(VAT already in the price)"
+      : "(VAT added on top)";
   };
   itemVatCheckbox?.addEventListener("change", syncItemTaxMode);
+  itemTaxModeToggle?.addEventListener("change", syncItemTaxMode);
 
   // Stock Adjust Modal
   const adjustModal = document.querySelector("[data-stock-adjust-modal]");
@@ -4092,7 +4097,7 @@ const setupStockPage = () => {
     if (itemVatField) itemVatField.hidden = false;
     if (itemVatCheckbox) itemVatCheckbox.checked = true; // new items default to taxable
     if (itemVatHint) itemVatHint.textContent = vatConfig.enabled ? "" : "(VAT is off — no tax applied yet)";
-    if (itemTaxModeSelect) itemTaxModeSelect.value = "0"; // default tax exclusive
+    if (itemTaxModeToggle) itemTaxModeToggle.checked = false; // default tax exclusive
     syncItemTaxMode();
     if (itemFormModal) itemFormModal.hidden = false;
     itemForm?.querySelector('input[name="name"]')?.focus();
@@ -4125,7 +4130,7 @@ const setupStockPage = () => {
     if (itemVatField) itemVatField.hidden = false;
     if (itemVatCheckbox) itemVatCheckbox.checked = Number(item.vat_applicable ?? 1) === 1;
     if (itemVatHint) itemVatHint.textContent = vatConfig.enabled ? "" : "(VAT is off — no tax applied yet)";
-    if (itemTaxModeSelect) itemTaxModeSelect.value = Number(item.tax_inclusive ?? 0) === 1 ? "1" : "0";
+    if (itemTaxModeToggle) itemTaxModeToggle.checked = Number(item.tax_inclusive ?? 0) === 1;
     syncItemTaxMode();
 
     if (itemDetailModal) itemDetailModal.hidden = true;
@@ -4226,7 +4231,7 @@ const setupStockPage = () => {
       // currently enabled, so turning VAT on later applies tax to the right items.
       const isTaxable = itemVatCheckbox && itemVatCheckbox.checked;
       formData.set("vat_applicable", isTaxable ? "1" : "0");
-      formData.set("tax_inclusive", (isTaxable && itemTaxModeSelect && itemTaxModeSelect.value === "1") ? "1" : "0");
+      formData.set("tax_inclusive", (isTaxable && itemTaxModeToggle && itemTaxModeToggle.checked) ? "1" : "0");
 
       const res = await fetch(`${getBasePath()}api/items.php`, {
         method: "POST",
