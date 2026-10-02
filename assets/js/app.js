@@ -7029,9 +7029,11 @@ const setupRealEstatePage = () => {
   const tenanciesEmpty = document.querySelector("[data-tenancies-empty]");
   const tenancyFormModal = document.querySelector("[data-tenancy-form-modal]");
   const tenancyForm = document.querySelector("[data-tenancy-form]");
-  const tenancyUnitSel = document.querySelector("[data-tenancy-unit]");
+  const tenancyUnitWrap = document.querySelector("[data-tenancy-unit-select]");
+  const tenancyUnitSel = document.querySelector("[data-tenancy-unit]"); // hidden value input
   const tenancyUnitHint = document.querySelector("[data-tenancy-unit-hint]");
-  const tenancyTenantSel = document.querySelector("[data-tenancy-tenant]");
+  const tenancyTenantWrap = document.querySelector("[data-tenancy-tenant-select]");
+  const tenancyTenantSel = document.querySelector("[data-tenancy-tenant]"); // hidden value input
   const newTenantFields = document.querySelector("[data-new-tenant-fields]");
   const newTenantName = document.querySelector("[data-new-tenant-name]");
   const newTenantPhone = document.querySelector("[data-new-tenant-phone]");
@@ -7074,18 +7076,19 @@ const setupRealEstatePage = () => {
         fetch(`${getBasePath()}api/customers.php`).then((r) => r.json()).catch(() => ({ customers: [] })),
       ]);
       vacantUnitsCache = (unitsD.units || []).filter((u) => u.status === "vacant");
-      if (tenancyUnitSel) {
-        tenancyUnitSel.innerHTML = vacantUnitsCache.length
-          ? vacantUnitsCache.map((u) => `<option value="${u.id}">${esc(u.property_name)} — ${esc(u.name)} (${fmt(u.rate)}${chargeLabel(u.charge_type)})</option>`).join("")
-          : `<option value="">No vacant units</option>`;
-      }
+      const unitOptions = vacantUnitsCache.map((u) => ({
+        value: String(u.id),
+        label: `${u.property_name} — ${u.name} (${fmt(u.rate)}${chargeLabel(u.charge_type)})`,
+      }));
+      setSearchSelectOptions(tenancyUnitWrap, unitOptions, vacantUnitsCache.length ? "Choose a vacant unit..." : "No vacant units", "");
       updateUnitHint();
+
       const customers = custD.customers || [];
-      if (tenancyTenantSel) {
-        tenancyTenantSel.innerHTML = `<option value="">Select tenant…</option>` +
-          customers.map((c) => `<option value="${c.id}">${esc(c.full_name)}${c.phone ? " (" + esc(c.phone) + ")" : ""}</option>`).join("") +
-          `<option value="__new__">+ New tenant…</option>`;
-      }
+      const tenantOptions = customers
+        .map((c) => ({ value: String(c.id), label: `${c.full_name}${c.phone ? ` (${c.phone})` : ""}` }))
+        .concat([{ value: "__new__", label: "➕ New tenant…" }]);
+      setSearchSelectOptions(tenancyTenantWrap, tenantOptions, "Choose a tenant...", "");
+      if (newTenantFields) newTenantFields.hidden = true;
     } catch { /* ignore */ }
     if (tenancyFormModal) tenancyFormModal.hidden = false;
   };
@@ -7095,6 +7098,7 @@ const setupRealEstatePage = () => {
   };
   tenancyUnitSel?.addEventListener("change", updateUnitHint);
   tenancyTenantSel?.addEventListener("change", () => { if (newTenantFields) newTenantFields.hidden = tenancyTenantSel.value !== "__new__"; });
+  attachThousandsFormatting(tenancyForm?.elements.deposit);
 
   document.querySelectorAll("[data-open-tenancies-workspace]").forEach((b) => b.addEventListener("click", () => openWorkspace(tenanciesWorkspace, loadTenancies)));
   document.querySelector("[data-tenancies-workspace-close]")?.addEventListener("click", () => closeWorkspace(tenanciesWorkspace));

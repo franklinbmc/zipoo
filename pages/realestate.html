@@ -316,12 +316,32 @@
       <form class="fullscreen-body" data-tenancy-form novalidate>
         <label class="form-field">
           <span>Vacant Unit <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
-          <select name="unit_id" data-tenancy-unit required></select>
+          <div class="search-select" data-search-select data-tenancy-unit-select>
+            <input type="hidden" name="unit_id" data-search-select-value data-tenancy-unit>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Choose a vacant unit...</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search units...">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
           <small style="color:var(--color-muted);font-size:0.75rem;" data-tenancy-unit-hint></small>
         </label>
         <label class="form-field">
           <span>Tenant <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
-          <select name="customer_id" data-tenancy-tenant required></select>
+          <div class="search-select" data-search-select data-tenancy-tenant-select>
+            <input type="hidden" name="customer_id" data-search-select-value data-tenancy-tenant>
+            <button class="search-select-trigger" type="button" data-search-select-trigger aria-expanded="false">
+              <span data-search-select-label>Choose a tenant...</span>
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 184l144 144 144-144" /></svg>
+            </button>
+            <div class="search-select-panel" hidden data-search-select-panel>
+              <input type="search" data-search-select-search placeholder="Search tenants...">
+              <div class="search-select-options" data-search-select-options></div>
+            </div>
+          </div>
         </label>
         <div data-new-tenant-fields hidden style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
           <label class="form-field">
@@ -455,6 +475,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=84" defer></script>
+  <script src="/assets/js/app.js?v=85" defer></script>
 </body>
 </html>
