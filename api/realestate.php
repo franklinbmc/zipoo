@@ -138,6 +138,7 @@ try {
     $pdo = db();
     $userId = require_user();
     ensure_realestate_tables($pdo);
+    ensure_rent_period_columns($pdo);
     ensure_accounts_tables($pdo);
     ensure_rent_txn_type($pdo);
 
@@ -149,8 +150,8 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $resource = trim((string) ($_GET['resource'] ?? ''));
 
-        // Property detail (property + its units).
-        if (isset($_GET['id'])) {
+        // Property detail (property + its units). The `tenancy` resource also uses `id`.
+        if (isset($_GET['id']) && $resource !== 'tenancy') {
             $propertyId = (int) $_GET['id'];
             $property = fetch_or_404($pdo, 'tbl_properties', $businessId, $propertyId, 'Property');
             $units = load_units($pdo, $businessId, $propertyId);
@@ -248,6 +249,111 @@ try {
                 ];
             }, $stmt->fetchAll());
             respond(200, ['ok' => true, 'payments' => $payments]);
+        }
+
+        // Who rented + rent-status summary per tenancy.
+        if ($resource === 'rent_overview') {
+            $stmt = $pdo->prepare(
+                'SELECT t.id, t.status, t.rate, t.charge_type, t.start_date, t.end_date, t.deposit,
+                        u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, c.phone AS tenant_phone,
+                        (SELECT COUNT(*) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS payments_count,
+                        (SELECT COALESCE(SUM(amount), 0) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS total_paid,
+                        (SELECT MAX(paid_date) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS last_paid_date,
+                        (SELECT amount FROM tbl_rent_payments r WHERE r.tenancy_id = t.id ORDER BY r.id DESC LIMIT 1) AS last_amount,
+                        (SELECT MAX(period_end) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id AND r.period_end IS NOT NULL) AS paid_until
+                 FROM tbl_tenancies t
+                 JOIN tbl_property_units u ON u.id = t.unit_id
+                 JOIN tbl_properties p ON p.id = t.property_id
+                 JOIN tbl_customers c ON c.id = t.customer_id
+                 WHERE t.business_id = :bid
+                 ORDER BY (t.status = "active") DESC, t.id DESC'
+            );
+            $stmt->execute([':bid' => $businessId]);
+            $rows = array_map(static function ($r) {
+                return [
+                    'tenancy_id' => (int) $r['id'],
+                    'status' => (string) $r['status'],
+                    'rate' => (float) $r['rate'],
+                    'charge_type' => (string) $r['charge_type'],
+                    'start_date' => (string) $r['start_date'],
+                    'end_date' => $r['end_date'] !== null ? (string) $r['end_date'] : null,
+                    'deposit' => (float) $r['deposit'],
+                    'property_name' => (string) $r['property_name'],
+                    'unit_name' => (string) $r['unit_name'],
+                    'tenant_name' => (string) $r['tenant_name'],
+                    'tenant_phone' => (string) ($r['tenant_phone'] ?? ''),
+                    'payments_count' => (int) $r['payments_count'],
+                    'total_paid' => (float) $r['total_paid'],
+                    'last_paid_date' => $r['last_paid_date'] !== null ? (string) $r['last_paid_date'] : null,
+                    'last_amount' => $r['last_amount'] !== null ? (float) $r['last_amount'] : null,
+                    'paid_until' => $r['paid_until'] !== null ? (string) $r['paid_until'] : null,
+                ];
+            }, $stmt->fetchAll());
+            respond(200, ['ok' => true, 'tenants' => $rows]);
+        }
+
+        // Full detail for one tenancy, including payment history.
+        if ($resource === 'tenancy') {
+            $tenancyId = (int) ($_GET['id'] ?? 0);
+            $stmt = $pdo->prepare(
+                'SELECT t.*, u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, c.phone AS tenant_phone, c.email AS tenant_email
+                 FROM tbl_tenancies t
+                 JOIN tbl_property_units u ON u.id = t.unit_id
+                 JOIN tbl_properties p ON p.id = t.property_id
+                 JOIN tbl_customers c ON c.id = t.customer_id
+                 WHERE t.id = :id AND t.business_id = :bid LIMIT 1'
+            );
+            $stmt->execute([':id' => $tenancyId, ':bid' => $businessId]);
+            $t = $stmt->fetch();
+            if (!$t) {
+                respond(404, ['ok' => false, 'message' => 'Tenancy not found.']);
+            }
+
+            $pStmt = $pdo->prepare(
+                'SELECT r.*, a.name AS account_name FROM tbl_rent_payments r
+                 LEFT JOIN tbl_accounts a ON a.id = r.account_id
+                 WHERE r.tenancy_id = :id AND r.business_id = :bid ORDER BY r.id DESC'
+            );
+            $pStmt->execute([':id' => $tenancyId, ':bid' => $businessId]);
+            $history = array_map(static function ($r) {
+                return [
+                    'id' => (int) $r['id'],
+                    'amount' => (float) $r['amount'],
+                    'period_label' => (string) ($r['period_label'] ?? ''),
+                    'period_start' => $r['period_start'] !== null ? (string) $r['period_start'] : null,
+                    'period_end' => $r['period_end'] !== null ? (string) $r['period_end'] : null,
+                    'paid_date' => (string) $r['paid_date'],
+                    'account_name' => (string) ($r['account_name'] ?? ''),
+                    'notes' => (string) ($r['notes'] ?? ''),
+                ];
+            }, $pStmt->fetchAll());
+            $totalPaid = 0.0;
+            $paidUntil = null;
+            foreach ($history as $h) {
+                $totalPaid += $h['amount'];
+                if ($h['period_end'] !== null && ($paidUntil === null || $h['period_end'] > $paidUntil)) {
+                    $paidUntil = $h['period_end'];
+                }
+            }
+
+            respond(200, ['ok' => true, 'tenancy' => [
+                'id' => (int) $t['id'],
+                'status' => (string) $t['status'],
+                'property_name' => (string) $t['property_name'],
+                'unit_name' => (string) $t['unit_name'],
+                'tenant_name' => (string) $t['tenant_name'],
+                'tenant_phone' => (string) ($t['tenant_phone'] ?? ''),
+                'tenant_email' => (string) ($t['tenant_email'] ?? ''),
+                'charge_type' => (string) $t['charge_type'],
+                'rate' => (float) $t['rate'],
+                'start_date' => (string) $t['start_date'],
+                'end_date' => $t['end_date'] !== null ? (string) $t['end_date'] : null,
+                'deposit' => (float) $t['deposit'],
+                'notes' => (string) ($t['notes'] ?? ''),
+                'total_paid' => round($totalPaid, 2),
+                'paid_until' => $paidUntil,
+                'payments' => $history,
+            ]]);
         }
 
         if ($resource === 'staff') {
@@ -424,6 +530,11 @@ try {
         $tenancyId = (int) ($_POST['tenancy_id'] ?? 0);
         $amount = round((float) ($_POST['amount'] ?? 0), 2);
         $periodLabel = trim((string) ($_POST['period_label'] ?? ''));
+        $periodStart = trim((string) ($_POST['period_start'] ?? ''));
+        $periodEnd = trim((string) ($_POST['period_end'] ?? ''));
+        $isDate = static fn ($s) => (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $s);
+        $periodStart = $isDate($periodStart) ? $periodStart : null;
+        $periodEnd = $isDate($periodEnd) ? $periodEnd : null;
         $paidDate = trim((string) ($_POST['paid_date'] ?? date('Y-m-d')));
         $notes = trim((string) ($_POST['notes'] ?? ''));
         $requestedAccountId = (int) ($_POST['account_id'] ?? 0);
@@ -451,12 +562,13 @@ try {
                 ('Rent' . ($periodLabel !== '' ? ' ' . $periodLabel : '') . ($notes !== '' ? ' — ' . $notes : '')), $userId
             );
             $ins = $pdo->prepare(
-                'INSERT INTO tbl_rent_payments (business_id, tenancy_id, unit_id, property_id, customer_id, amount, period_label, paid_date, account_id, account_txn_id, notes, created_by)
-                 VALUES (:bid, :ten, :uid, :pid, :cid, :amt, :period, :paid, :acc, :txn, :notes, :by)'
+                'INSERT INTO tbl_rent_payments (business_id, tenancy_id, unit_id, property_id, customer_id, amount, period_label, period_start, period_end, paid_date, account_id, account_txn_id, notes, created_by)
+                 VALUES (:bid, :ten, :uid, :pid, :cid, :amt, :period, :pstart, :pend, :paid, :acc, :txn, :notes, :by)'
             );
             $ins->execute([
                 ':bid' => $businessId, ':ten' => $tenancyId, ':uid' => (int) $tenancy['unit_id'], ':pid' => (int) $tenancy['property_id'],
                 ':cid' => (int) $tenancy['customer_id'], ':amt' => $amount, ':period' => $periodLabel !== '' ? $periodLabel : null,
+                ':pstart' => $periodStart, ':pend' => $periodEnd,
                 ':paid' => $paidDate, ':acc' => $accountId, ':txn' => $txnId, ':notes' => $notes !== '' ? $notes : null, ':by' => $userId,
             ]);
             $pdo->commit();

@@ -513,6 +513,46 @@
     </section>
   </div>
 
+  <!-- Workspace: Tenancy detail (info + payment history) -->
+  <div class="fullscreen-modal" hidden data-tenancy-detail-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-tenancy-detail-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 data-tenancy-detail-title>Tenancy</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body" style="padding:16px;">
+        <div style="background:#fff;border:1px solid var(--color-line);border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+            <strong data-td-tenant style="font-size:1.05rem;color:var(--color-navy);">-</strong>
+            <span class="badge-stock" data-td-status>Active</span>
+          </div>
+          <div style="font-size:0.82rem;color:var(--color-muted);margin-top:4px;" data-td-meta>-</div>
+        </div>
+
+        <section class="stock-kpi-grid" style="margin-bottom:14px;">
+          <div class="stock-kpi-card"><span class="kpi-label">Rent</span><strong class="kpi-val" data-td-rate>-</strong></div>
+          <div class="stock-kpi-card"><span class="kpi-label">Total Paid</span><strong class="kpi-val" data-td-total>-</strong></div>
+          <div class="stock-kpi-card"><span class="kpi-label">Paid Until</span><strong class="kpi-val" data-td-paiduntil>-</strong></div>
+          <div class="stock-kpi-card"><span class="kpi-label">Remaining</span><strong class="kpi-val" data-td-remaining>-</strong></div>
+        </section>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+          <button class="btn btn-primary full" type="button" data-td-record>Record Rent</button>
+          <button class="btn btn-danger-outline full" type="button" data-td-end hidden>End Tenancy</button>
+        </div>
+
+        <div style="font-size:0.78rem;text-transform:uppercase;color:var(--color-muted);font-weight:800;margin-bottom:8px;">Payment History</div>
+        <div class="stock-list" data-td-payments></div>
+        <div class="company-users-empty" hidden data-td-payments-empty style="text-align:center;padding:24px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;">
+          <p style="margin:0;font-size:0.84rem;color:var(--color-muted);">No rent recorded for this tenancy yet.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <!-- App Notice / Confirm Modal -->
   <div class="modal-backdrop" hidden data-app-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
@@ -522,6 +562,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=89" defer></script>
+  <script src="/assets/js/app.js?v=90" defer></script>
 </body>
 </html>

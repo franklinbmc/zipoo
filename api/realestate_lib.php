@@ -75,6 +75,8 @@ function ensure_realestate_tables(PDO $pdo): void
             customer_id BIGINT UNSIGNED NOT NULL,
             amount DECIMAL(14, 2) NOT NULL DEFAULT 0.00,
             period_label VARCHAR(50) NULL,
+            period_start DATE NULL,
+            period_end DATE NULL,
             paid_date DATE NOT NULL,
             account_id INT UNSIGNED NULL,
             account_txn_id BIGINT UNSIGNED NULL,
@@ -101,4 +103,22 @@ function ensure_realestate_tables(PDO $pdo): void
             KEY idx_restaff_biz (business_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
+}
+
+/** Self-heals the structured period columns on tbl_rent_payments for pre-existing databases. */
+function ensure_rent_period_columns(PDO $pdo): void
+{
+    $addColumn = static function (string $table, string $column, string $definition) use ($pdo): void {
+        try {
+            $cols = $pdo->query("SHOW COLUMNS FROM {$table} LIKE '{$column}'")->fetchAll();
+        } catch (Throwable) {
+            return;
+        }
+        if (empty($cols)) {
+            $pdo->exec("ALTER TABLE {$table} ADD COLUMN {$column} {$definition}");
+        }
+    };
+
+    $addColumn('tbl_rent_payments', 'period_start', 'DATE NULL AFTER period_label');
+    $addColumn('tbl_rent_payments', 'period_end', 'DATE NULL AFTER period_start');
 }
