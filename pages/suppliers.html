@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=64">
 </head>
 <body>
   <div class="app-shell customers-page-shell">
@@ -38,7 +38,7 @@
       <div class="settings-list flush-list customers-list" data-suppliers-list></div>
 
       <div class="customers-empty-state" hidden data-suppliers-empty style="text-align: center; padding: 48px 16px; background: #fff; border: 1px solid var(--color-line); border-radius: 12px;">
-        <div style="font-size: 2.2rem; margin-bottom: 8px;">🚚</div>
+        <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M48 160h256v160H48zM304 208h80l48 48v64h-128zM160 384a32 32 0 100 64 32 32 0 000-64m192 0a32 32 0 100 64 32 32 0 000-64" /></svg>
         <h3 style="margin: 0 0 6px; color: var(--color-navy); font-size: 1.15rem; font-weight: 800;">No suppliers found</h3>
         <p style="margin: 0 0 16px; color: var(--color-muted); font-size: 0.9rem;">Add your first supplier to start tracking their details and purchases.</p>
         <button class="btn btn-primary btn-sm" type="button" data-open-create-supplier>Add Supplier</button>
@@ -209,6 +209,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=78" defer></script>
+  <script src="/assets/js/app.js?v=79" defer></script>
 </body>
 </html>

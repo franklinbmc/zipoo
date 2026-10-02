@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=64">
 </head>
 <body>
   <div class="app-shell customers-page-shell">
@@ -38,7 +38,7 @@
       <div class="settings-list flush-list customers-list" data-customers-list></div>
 
       <div class="customers-empty-state" hidden data-customers-empty style="text-align: center; padding: 48px 16px; background: #fff; border: 1px solid var(--color-line); border-radius: 12px;">
-        <div style="font-size: 2.2rem; margin-bottom: 8px;">👥</div>
+        <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M176 232a68 68 0 100-136 68 68 0 000 136M56 440c14-76 64-128 120-128s106 52 120 128M344 216a52 52 0 100-104M328 312c44 8 80 48 92 120" /></svg>
         <h3 style="margin: 0 0 6px; color: var(--color-navy); font-size: 1.15rem; font-weight: 800;">No customers found</h3>
         <p style="margin: 0 0 16px; color: var(--color-muted); font-size: 0.9rem;">Add your first customer to start tracking their details and sales.</p>
         <button class="btn btn-primary btn-sm" type="button" data-open-create-customer>Add Customer</button>
@@ -209,6 +209,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=78" defer></script>
+  <script src="/assets/js/app.js?v=79" defer></script>
 </body>
 </html>

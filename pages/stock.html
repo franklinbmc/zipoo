@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=64">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -115,7 +115,7 @@
           <button type="button" class="filter-pill active" data-filter-type="all">All Items</button>
           <button type="button" class="filter-pill" data-filter-type="product">Products</button>
           <button type="button" class="filter-pill" data-filter-type="service">Services</button>
-          <button type="button" class="filter-pill" data-filter-type="low_stock">⚠️ Low Stock</button>
+          <button type="button" class="filter-pill" data-filter-type="low_stock">Low Stock</button>
         </div>
 
         <!-- Search Input -->
@@ -131,7 +131,7 @@
 
         <!-- Empty State -->
         <div class="company-users-empty" hidden data-stock-items-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">📦</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M64 160l192-96 192 96-192 96zM64 160v192l192 96 192-96V160M256 256v192" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No items found</strong>
           <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Add physical products to track stock, or services to bill clients.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-item>Add Item</button>
@@ -175,7 +175,7 @@
 
         <!-- Empty State -->
         <div class="company-users-empty" hidden data-po-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">📋</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M192 72h128v56H192zM320 100h56v340H136V100h56M184 240h144M184 312h144" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No purchase orders yet</strong>
           <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create purchase orders to procure items, generate PDFs, and receive goods.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-po>New Purchase Order</button>
@@ -219,7 +219,7 @@
 
         <!-- Empty State -->
         <div class="company-users-empty" hidden data-stock-movements-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">📊</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M96 416V272M224 416V160M352 416V224M448 416H64" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No movements recorded</strong>
           <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Inventory movements will automatically appear here when receiving goods or making adjustments.</p>
         </div>
@@ -243,7 +243,7 @@
         <div class="stock-list" data-warehouses-list></div>
 
         <div class="company-users-empty" hidden data-warehouses-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">🏬</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M64 448V224l192-96 192 96v224M160 448V312h192v136" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No warehouses yet</strong>
           <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create warehouses to organise where your stock is held.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-warehouse>Add Warehouse</button>
@@ -293,7 +293,7 @@
       </header>
       <div class="fullscreen-body customer-detail-body">
         <div class="customer-detail-hero">
-          <div class="customer-avatar" data-item-detail-avatar>📦</div>
+          <div class="customer-avatar" data-item-detail-avatar><svg class="svg-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M64 160l192-96 192 96-192 96zM64 160v192l192 96 192-96V160M256 256v192" /></svg></div>
           <h3 data-item-detail-name>-</h3>
           <span class="customer-meta" data-item-detail-meta>-</span>
         </div>
@@ -818,6 +818,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=78" defer></script>
+  <script src="/assets/js/app.js?v=79" defer></script>
 </body>
 </html>

@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=64">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -101,7 +101,7 @@
       <div class="fullscreen-body stock-workspace-body">
         <div class="stock-list" data-properties-list></div>
         <div class="company-users-empty" hidden data-properties-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
-          <div style="font-size:2rem;margin-bottom:6px;">🏢</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M128 448V80h256v368M192 160h40M280 160h40M192 240h40M280 240h40M192 320h40M280 320h40" /></svg>
           <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No properties yet</strong>
           <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Add a building, plot or house, then create its rentable units.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-property>Add Property</button>
@@ -155,7 +155,7 @@
       <div class="fullscreen-body stock-workspace-body">
         <div class="stock-list" data-tenancies-list></div>
         <div class="company-users-empty" hidden data-tenancies-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
-          <div style="font-size:2rem;margin-bottom:6px;">🧾</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M144 48v416l40-28 40 28 40-28 40 28 40-28 40 28V48zM200 176h112M200 256h112" /></svg>
           <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No tenancies yet</strong>
           <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Assign a tenant to a vacant unit to start a tenancy.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-tenancy>New Tenancy</button>
@@ -179,7 +179,7 @@
       <div class="fullscreen-body stock-workspace-body">
         <div class="stock-list" data-payments-list></div>
         <div class="company-users-empty" hidden data-payments-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
-          <div style="font-size:2rem;margin-bottom:6px;">💰</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M48 144h416v224H48zM256 200a56 56 0 100 112 56 56 0 000-112M120 176v160M392 176v160" /></svg>
           <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No rent recorded yet</strong>
           <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Record a rent payment — it posts into your Bank &amp; Cash accounts.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-record-rent>Record Rent</button>
@@ -203,7 +203,7 @@
       <div class="fullscreen-body stock-workspace-body">
         <div class="stock-list" data-staff-list></div>
         <div class="company-users-empty" hidden data-staff-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
-          <div style="font-size:2rem;margin-bottom:6px;">👷</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 96a56 56 0 100 112 56 56 0 000-112M120 424c0-75 61-120 136-120s136 45 136 120" /></svg>
           <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No staff yet</strong>
           <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Add caretakers or managers for your properties.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-staff>Add Staff</button>
@@ -455,6 +455,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=78" defer></script>
+  <script src="/assets/js/app.js?v=79" defer></script>
 </body>
 </html>

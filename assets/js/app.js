@@ -13,6 +13,35 @@ const getBasePath = () => {
   return new URL("../../", script.src).pathname;
 };
 
+// Inline monochrome SVG icons (used in place of emoji throughout the app).
+const ICONS = {
+  box: "M64 160l192-96 192 96-192 96zM64 160v192l192 96 192-96V160M256 256v192",
+  bolt: "M288 48L112 304h112l-32 160 176-256H256z",
+  clipboard: "M192 72h128v56H192zM320 100h56v340H136V100h56M184 240h144M184 312h144",
+  chartColumn: "M96 416V272M224 416V160M352 416V224M448 416H64",
+  chartLine: "M64 96v320h384M96 352l112-112 80 80 160-176",
+  warehouse: "M64 448V224l192-96 192 96v224M160 448V312h192v136",
+  building: "M128 448V80h256v368M192 160h40M280 160h40M192 240h40M280 240h40M192 320h40M280 320h40",
+  receipt: "M144 48v416l40-28 40 28 40-28 40 28 40-28 40 28V48zM200 176h112M200 256h112",
+  moneyBill: "M48 144h416v224H48zM256 200a56 56 0 100 112 56 56 0 000-112M120 176v160M392 176v160",
+  worker: "M256 96a56 56 0 100 112 56 56 0 000-112M120 424c0-75 61-120 136-120s136 45 136 120",
+  cart: "M80 112h336l-44 192H160L112 80H48M184 416a28 28 0 100 56 28 28 0 000-56m176 0a28 28 0 100 56 28 28 0 000-56",
+  truck: "M48 160h256v160H48zM304 208h80l48 48v64h-128zM160 384a32 32 0 100 64 32 32 0 000-64m192 0a32 32 0 100 64 32 32 0 000-64",
+  people: "M176 232a68 68 0 100-136 68 68 0 000 136M56 440c14-76 64-128 120-128s106 52 120 128M344 216a52 52 0 100-104M328 312c44 8 80 48 92 120",
+  bank: "M64 192L256 80l192 112M96 192v160M416 192v160M176 192v160M336 192v160M56 416h400",
+  mobile: "M160 48h192v416H160zM232 416h48",
+  cash: "M48 144h416v224H48zM256 200a56 56 0 100 112 56 56 0 000-112",
+  user: "M256 96a64 64 0 100 128 64 64 0 000-128M96 432c0-82 72-128 160-128s160 46 160 128",
+  check: "M112 268l96 96 192-224",
+  close: "M112 112l288 288M400 112L112 400",
+};
+
+const svgMarkup = (name, { size = 0, cls = "", style = "" } = {}) => {
+  const d = ICONS[name] || ICONS.box;
+  const dim = size ? `width:${size}px;height:${size}px;` : "";
+  return `<svg class="svg-ico ${cls}" viewBox="0 0 512 512" aria-hidden="true" style="${dim}${style}"><path d="${d}" /></svg>`;
+};
+
 const getSavedLanguage = () => {
   const saved = localStorage.getItem("zipoo.language");
   return SUPPORTED_LANGUAGES.includes(saved) ? saved : DEFAULT_LANGUAGE;
@@ -3893,7 +3922,7 @@ const setupStockPage = () => {
       avatar.style.width = "38px";
       avatar.style.height = "38px";
       avatar.style.fontSize = "1.1rem";
-      avatar.textContent = item.type === "service" ? "⚡" : "📦";
+      avatar.innerHTML = svgMarkup(item.type === "service" ? "bolt" : "box");
 
       const info = document.createElement("div");
       const name = document.createElement("div");
@@ -3925,7 +3954,7 @@ const setupStockPage = () => {
         stockBadge.textContent = `0 ${item.unit}`;
       } else if (item.is_low_stock) {
         stockBadge.className = "badge-stock low-stock";
-        stockBadge.textContent = `⚠️ ${item.current_stock} ${item.unit}`;
+        stockBadge.textContent = `${item.current_stock} ${item.unit}`;
       } else {
         stockBadge.className = "badge-stock in-stock";
         stockBadge.textContent = `${item.current_stock} ${item.unit}`;
@@ -4008,7 +4037,7 @@ const setupStockPage = () => {
   const openItemDetail = (item) => {
     currentItem = item;
     if (itemDetailAvatar) {
-      itemDetailAvatar.textContent = item.type === "service" ? "⚡" : "📦";
+      itemDetailAvatar.innerHTML = svgMarkup(item.type === "service" ? "bolt" : "box");
     }
     if (itemDetailName) itemDetailName.textContent = item.name;
     if (itemDetailMeta) {
@@ -4517,7 +4546,7 @@ const setupStockPage = () => {
       avatar.style.width = "38px";
       avatar.style.height = "38px";
       avatar.style.fontSize = "1.1rem";
-      avatar.textContent = "📋";
+      avatar.innerHTML = svgMarkup("clipboard");
 
       const info = document.createElement("div");
       const name = document.createElement("div");
@@ -4840,7 +4869,7 @@ const setupStockPage = () => {
               <span style="font-size: 0.8rem; color: var(--color-muted);">Ordered: ${ordered} | Remaining: <strong style="color: ${isDone ? 'var(--color-muted)' : 'var(--color-blue)'};">${remaining}</strong></span>
             </div>
             ${isDone ? `
-              <div style="font-size: 0.82rem; color: #047857; font-weight: 700;">✓ Fully received</div>
+              <div style="font-size: 0.82rem; color: #047857; font-weight: 700;">${svgMarkup("check", { size: 13, style: "vertical-align:-2px;" })} Fully received</div>
             ` : `
               <div style="display: flex; align-items: center; gap: 8px;">
                 <label style="font-size: 0.8rem; color: var(--color-muted); white-space: nowrap;">Receiving now:</label>
@@ -5569,7 +5598,7 @@ const setupSalesPage = () => {
       const avatar = document.createElement("div");
       avatar.className = "customer-avatar";
       avatar.style.cssText = "width:38px;height:38px;font-size:1.1rem;";
-      avatar.textContent = "🧾";
+      avatar.innerHTML = svgMarkup("receipt");
       const info = document.createElement("div");
       info.style.minWidth = "0";
       const name = document.createElement("div");
@@ -6263,7 +6292,7 @@ const setupBankPage = () => {
   const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
   const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const typeIcon = (t) => (t === "bank" ? "🏦" : t === "mobile" ? "📱" : "💵");
+  const typeIcon = (t) => svgMarkup(t === "bank" ? "bank" : t === "mobile" ? "mobile" : "cash");
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     try {
@@ -6741,7 +6770,7 @@ const setupRealEstatePage = () => {
     propertiesList.innerHTML = list.map((p) => `
       <button type="button" class="settings-list-row" data-prop-open="${p.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
         <span style="display:flex;align-items:center;gap:10px;min-width:0;">
-          <span class="customer-avatar" style="width:38px;height:38px;font-size:1.1rem;">🏢</span>
+          <span class="customer-avatar" style="width:38px;height:38px;">${svgMarkup("building")}</span>
           <span style="min-width:0;">
             <span style="display:block;font-weight:800;color:var(--color-navy);font-size:0.94rem;">${esc(p.name)}</span>
             <span style="display:block;font-size:0.78rem;color:var(--color-muted);">${esc(p.type)}${p.location ? " • " + esc(p.location) : ""}</span>
@@ -6964,7 +6993,7 @@ const setupRealEstatePage = () => {
       if (tenancyTenantSel) {
         tenancyTenantSel.innerHTML = `<option value="">Select tenant…</option>` +
           customers.map((c) => `<option value="${c.id}">${esc(c.full_name)}${c.phone ? " (" + esc(c.phone) + ")" : ""}</option>`).join("") +
-          `<option value="__new__">➕ New tenant…</option>`;
+          `<option value="__new__">+ New tenant…</option>`;
       }
     } catch { /* ignore */ }
     if (tenancyFormModal) tenancyFormModal.hidden = false;
@@ -7043,7 +7072,7 @@ const setupRealEstatePage = () => {
         </div>
         <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto;">
           <strong style="color:#16a34a;white-space:nowrap;">+${fmt(r.amount)}</strong>
-          <button type="button" class="btn btn-danger-outline btn-sm" data-payment-delete="${r.id}" aria-label="Delete">✕</button>
+          <button type="button" class="btn btn-danger-outline btn-sm" data-payment-delete="${r.id}" aria-label="Delete">${svgMarkup("close", { size: 14 })}</button>
         </div>
       </div>`).join("");
   };

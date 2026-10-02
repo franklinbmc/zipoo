@@ -3762,3 +3762,32 @@ button.settings-list-row:focus-visible {
 
 
 
+
+/* Inline monochrome SVG icons (replace emoji globally) */
+.svg-ico {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 32px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.empty-ico {
+  width: 46px;
+  height: 46px;
+  color: var(--color-muted);
+  margin: 0 auto 10px;
+  display: block;
+}
+
+.customer-avatar .svg-ico {
+  width: 56%;
+  height: 56%;
+  stroke-width: 34px;
+}
+
+/* Let the searchable customer dropdown inside the compact POS modal overflow
+   instead of being clipped by .app-modal's overflow:hidden. */
+[data-pos-customer-modal] .app-modal {
+  overflow: visible;
+}

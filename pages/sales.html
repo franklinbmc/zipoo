@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=64">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -98,7 +98,7 @@
         <!-- Customer bar -->
         <div class="pos-customer-bar">
           <div class="pos-customer-current">
-            <span aria-hidden="true">👤</span>
+            <svg class="svg-ico" viewBox="0 0 512 512" aria-hidden="true" style="width:18px;height:18px;"><path d="M256 96a64 64 0 100 128 64 64 0 000-128M96 432c0-82 72-128 160-128s160 46 160 128" /></svg>
             <strong data-pos-customer-name>Walk-in Customer</strong>
           </div>
           <button class="btn btn-outline btn-sm" type="button" data-pos-change-customer>Change</button>
@@ -127,7 +127,7 @@
           </table>
         </div>
         <div class="company-users-empty" data-pos-cart-empty style="text-align: center; padding: 28px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">🛒</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M80 112h336l-44 192H160L112 80H48M184 416a28 28 0 100 56 28 28 0 000-56m176 0a28 28 0 100 56 28 28 0 000-56" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">Cart is empty</strong>
           <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Tap products below to add them to this sale.</p>
         </div>
@@ -225,7 +225,7 @@
   <div class="modal-backdrop" hidden data-pos-receipt-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="pos-receipt-title">
       <div style="text-align:center;margin-bottom:10px;">
-        <div style="font-size:2.4rem;line-height:1;">✅</div>
+        <svg class="svg-ico" viewBox="0 0 512 512" aria-hidden="true" style="width:52px;height:52px;color:#16a34a;"><path d="M112 268l96 96 192-224" /></svg>
         <h2 id="pos-receipt-title" style="margin:8px 0 2px;">Sale Completed</h2>
         <p style="margin:0;color:var(--color-muted);font-size:0.85rem;" data-pos-receipt-number>POS-000</p>
       </div>
@@ -276,7 +276,7 @@
 
         <!-- Empty State -->
         <div class="company-users-empty" data-invoices-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">🧾</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M144 48v416l40-28 40 28 40-28 40 28 40-28 40 28V48zM200 176h112M200 256h112" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No invoices yet</strong>
           <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Create an invoice to bill a customer and track payment.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-invoice>New Invoice</button>
@@ -326,7 +326,7 @@
 
         <!-- Placeholder -->
         <div class="company-users-empty" style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 14px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">📈</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M64 96v320h384M96 352l112-112 80 80 160-176" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No sales data yet</strong>
           <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Reports will populate here once you start recording sales.</p>
         </div>
@@ -481,6 +481,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=78" defer></script>
+  <script src="/assets/js/app.js?v=79" defer></script>
 </body>
 </html>

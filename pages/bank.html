@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=62">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=64">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -89,7 +89,7 @@
       <div class="fullscreen-body stock-workspace-body">
         <div class="stock-list" data-accounts-list></div>
         <div class="company-users-empty" hidden data-accounts-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">🏦</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M64 192L256 80l192 112M96 192v160M416 192v160M176 192v160M336 192v160M56 416h400" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No accounts yet</strong>
           <p style="margin: 0 0 14px; font-size: 0.84rem; color: var(--color-muted);">Add a cash, bank or Lipa kwa simu account to track money flow.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-account>Add Account</button>
@@ -111,7 +111,7 @@
       <div class="fullscreen-body stock-workspace-body">
         <div class="stock-list" data-activity-list></div>
         <div class="company-users-empty" hidden data-activity-empty style="text-align: center; padding: 36px 16px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 12px; margin-top: 8px;">
-          <div style="font-size: 2rem; margin-bottom: 6px;">📈</div>
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M64 96v320h384M96 352l112-112 80 80 160-176" /></svg>
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No activity yet</strong>
           <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Sales, deposits, withdrawals and transfers will appear here.</p>
         </div>
@@ -297,6 +297,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=78" defer></script>
+  <script src="/assets/js/app.js?v=79" defer></script>
 </body>
 </html>
