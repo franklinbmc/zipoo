@@ -347,6 +347,7 @@ try {
     ensure_sales_tables($pdo);
     ensure_accounts_tables($pdo);
     ensure_vat_columns($pdo);
+    ensure_party_tax_ids($pdo);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Single invoice detail
@@ -757,6 +758,31 @@ try {
             $amountPaid = ($amountPaidInput !== null && $amountPaidInput >= $totalAmount) ? $amountPaidInput : $totalAmount;
             $changeDue = round($amountPaid - $totalAmount, 2);
 
+            // Resolve which Bank & Cash account this payment lands in, before touching
+            // the database. Cash uses/creates the default; Card and Lipa kwa simu require
+            // an account of their own type so the money is tracked correctly.
+            $payType = account_type_for_payment_method($paymentMethod);
+            $requestedAccountId = (int) ($_POST['account_id'] ?? 0);
+            $postAccountId = 0;
+            if ($requestedAccountId > 0) {
+                $accChk = $pdo->prepare('SELECT id FROM tbl_accounts WHERE id = :id AND business_id = :bid AND status = "active" LIMIT 1');
+                $accChk->execute([':id' => $requestedAccountId, ':bid' => $businessId]);
+                $postAccountId = (int) ($accChk->fetchColumn() ?: 0);
+            }
+            if ($postAccountId <= 0) {
+                if ($payType === 'cash') {
+                    $postAccountId = ensure_default_account($pdo, $businessId);
+                } else {
+                    $accStmt = $pdo->prepare('SELECT id FROM tbl_accounts WHERE business_id = :bid AND type = :type AND status = "active" ORDER BY is_default DESC, id ASC LIMIT 1');
+                    $accStmt->execute([':bid' => $businessId, ':type' => $payType]);
+                    $postAccountId = (int) ($accStmt->fetchColumn() ?: 0);
+                    if ($postAccountId <= 0) {
+                        $label = $payType === 'bank' ? 'Bank' : 'Lipa kwa simu';
+                        respond(422, ['ok' => false, 'message' => "No {$label} account is set up yet. Open Bank & Cash, add a {$label} account, then complete this sale."]);
+                    }
+                }
+            }
+
             $pdo->beginTransaction();
             try {
                 $countStmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_sales WHERE business_id = :bid AND sale_type = "pos"');
@@ -831,22 +857,10 @@ try {
                     }
                 }
 
-                // Auto-post the settled amount into a Bank & Cash account.
+                // Auto-post the settled amount into the resolved Bank & Cash account.
                 $settled = min($amountPaid, $totalAmount);
-                if ($settled > 0) {
-                    $requestedAccountId = (int) ($_POST['account_id'] ?? 0);
-                    $postAccountId = 0;
-                    if ($requestedAccountId > 0) {
-                        $accChk = $pdo->prepare('SELECT id FROM tbl_accounts WHERE id = :id AND business_id = :bid AND status = "active" LIMIT 1');
-                        $accChk->execute([':id' => $requestedAccountId, ':bid' => $businessId]);
-                        $postAccountId = (int) ($accChk->fetchColumn() ?: 0);
-                    }
-                    if ($postAccountId <= 0) {
-                        $postAccountId = resolve_account_for_type($pdo, $businessId, account_type_for_payment_method($paymentMethod));
-                    }
-                    if ($postAccountId > 0) {
-                        post_account_txn($pdo, $businessId, $postAccountId, 'in', 'sale', $settled, 'POS', $receiptNumber, 'POS sale ' . $receiptNumber . ' (' . $paymentMethod . ')', $userId);
-                    }
+                if ($settled > 0 && $postAccountId > 0) {
+                    post_account_txn($pdo, $businessId, $postAccountId, 'in', 'sale', $settled, 'POS', $receiptNumber, 'POS sale ' . $receiptNumber . ' (' . $paymentMethod . ')', $userId);
                 }
 
                 $pdo->commit();

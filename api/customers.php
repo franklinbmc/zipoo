@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/vat_lib.php';
 
 session_start();
 
@@ -100,6 +101,7 @@ try {
     $userId = require_user();
     $pdo = db();
     ensure_customers_table($pdo);
+    ensure_party_tax_ids($pdo);
     $businessId = get_active_business_id($pdo, $userId);
 
     if ($businessId <= 0) {
