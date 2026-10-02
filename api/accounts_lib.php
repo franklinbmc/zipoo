@@ -36,7 +36,7 @@ function ensure_accounts_tables(PDO $pdo): void
             business_id INT UNSIGNED NOT NULL,
             account_id INT UNSIGNED NOT NULL,
             direction ENUM("in", "out") NOT NULL,
-            type ENUM("sale", "invoice_payment", "deposit", "withdrawal", "transfer_in", "transfer_out", "expense", "opening", "adjustment") NOT NULL,
+            type ENUM("sale", "invoice_payment", "rent", "deposit", "withdrawal", "transfer_in", "transfer_out", "expense", "opening", "adjustment") NOT NULL,
             amount DECIMAL(14, 2) NOT NULL DEFAULT 0.00,
             reference_type VARCHAR(50) NULL,
             reference_id VARCHAR(100) NULL,
@@ -48,6 +48,27 @@ function ensure_accounts_tables(PDO $pdo): void
             KEY idx_at_date (created_at),
             KEY idx_at_ref (business_id, reference_type, reference_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+}
+
+/**
+ * Self-heals the account-transaction `type` ENUM on databases created before
+ * the `rent` value existed. Cheap: one SHOW COLUMNS, ALTER only when missing.
+ */
+function ensure_rent_txn_type(PDO $pdo): void
+{
+    ensure_accounts_tables($pdo);
+    $col = $pdo->query("SHOW COLUMNS FROM tbl_account_transactions LIKE 'type'")->fetch();
+    if (!$col) {
+        return;
+    }
+    $definition = (string) ($col['Type'] ?? '');
+    if (stripos($definition, "'rent'") !== false) {
+        return;
+    }
+    $pdo->exec(
+        'ALTER TABLE tbl_account_transactions MODIFY COLUMN type
+         ENUM("sale", "invoice_payment", "rent", "deposit", "withdrawal", "transfer_in", "transfer_out", "expense", "opening", "adjustment") NOT NULL'
     );
 }
 

@@ -62,6 +62,7 @@ const ACCOUNT_TYPE_LABELS = [
 const TXN_TYPE_LABELS = [
     'sale' => 'POS sale',
     'invoice_payment' => 'Invoice payment',
+    'rent' => 'Rent payment',
     'deposit' => 'Deposit',
     'withdrawal' => 'Withdrawal',
     'transfer_in' => 'Transfer in',

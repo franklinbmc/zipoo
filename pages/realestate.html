@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#F6F8FC">
-  <meta name="description" content="Zipoo Real Estate - coming soon.">
+  <meta name="description" content="Zipoo Real Estate: properties, units, tenants and rent collection.">
   <title>Real Estate - Zipoo</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
@@ -15,26 +15,436 @@
   <div class="app-shell stock-page-shell">
     <header class="topbar app-topbar inner-topbar">
       <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
-        <svg viewBox="0 0 512 512" aria-hidden="true">
-          <path d="M328 112L184 256l144 144" />
-        </svg>
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
       </a>
       <h1>Real Estate</h1>
-      <span class="topbar-spacer" aria-hidden="true"></span>
+      <button class="icon-button" type="button" data-open-create-property aria-label="Add property">
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+      </button>
     </header>
 
-    <main class="settings-page stock-page">
-      <div class="company-users-empty" style="text-align: center; padding: 48px 20px; background: #f8fafc; border: 1px dashed var(--color-line); border-radius: 16px; margin-top: 12px;">
-        <div style="font-size: 3rem; margin-bottom: 10px;">🏠</div>
-        <strong style="display: block; color: var(--color-navy); font-size: 1.15rem; margin-bottom: 6px;">Real Estate is coming soon</strong>
-        <p style="margin: 0 auto; max-width: 420px; font-size: 0.9rem; color: var(--color-muted);">
-          Manage properties, tenants, leases and rent collection right inside Zipoo. We're building it now — check back soon.
-        </p>
-        <a class="btn btn-primary btn-sm" href="/dashboard" style="margin-top: 18px; display: inline-block;">Back to Dashboard</a>
-      </div>
+    <main class="settings-page stock-page" data-realestate-page>
+      <section class="stock-kpi-grid">
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Properties</span>
+          <strong class="kpi-val" data-kpi-properties>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Units (occupied)</span>
+          <strong class="kpi-val" data-kpi-units>0 / 0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Active Tenancies</span>
+          <strong class="kpi-val" data-kpi-tenancies>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Rent This Month</span>
+          <strong class="kpi-val" data-kpi-rent>0</strong>
+        </div>
+      </section>
+
+      <nav class="stock-hub">
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-properties-workspace>
+          <span class="stock-hub-label">
+            <strong>Properties</strong>
+            <small>Buildings, plots &amp; their units</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-properties-count-badge>0 properties</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-tenancies-workspace>
+          <span class="stock-hub-label">
+            <strong>Tenancies</strong>
+            <small>Assign tenants to units</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-tenancies-count-badge>0 active</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-rent-workspace>
+          <span class="stock-hub-label">
+            <strong>Rent</strong>
+            <small>Collect rent &amp; track payments</small>
+          </span>
+          <span class="stock-summary-meta">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-staff-workspace>
+          <span class="stock-hub-label">
+            <strong>Staff</strong>
+            <small>Caretakers &amp; managers</small>
+          </span>
+          <span class="stock-summary-meta">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+      </nav>
     </main>
   </div>
 
-  <script src="/assets/js/app.js?v=72" defer></script>
+  <!-- Workspace: Properties -->
+  <div class="fullscreen-modal" hidden data-properties-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-properties-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2>Properties</h2>
+        <button class="icon-button" type="button" data-open-create-property aria-label="Add property">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-list" data-properties-list></div>
+        <div class="company-users-empty" hidden data-properties-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <div style="font-size:2rem;margin-bottom:6px;">🏢</div>
+          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No properties yet</strong>
+          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Add a building, plot or house, then create its rentable units.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-property>Add Property</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Property detail (units) -->
+  <div class="fullscreen-modal" hidden data-property-detail-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-property-detail-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 data-property-detail-name>Property</h2>
+        <button class="icon-button" type="button" data-open-create-unit aria-label="Add unit">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body" style="padding:16px;">
+        <div style="background:#fff;border:1px solid var(--color-line);border-radius:12px;padding:14px;margin-bottom:14px;">
+          <div style="font-size:0.82rem;color:var(--color-muted);" data-property-detail-meta>-</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+            <button class="btn btn-outline btn-sm" type="button" data-prop-edit>Edit Property</button>
+            <button class="btn btn-danger-outline btn-sm" type="button" data-prop-delete>Delete Property</button>
+          </div>
+        </div>
+        <div style="font-size:0.78rem;text-transform:uppercase;color:var(--color-muted);font-weight:800;margin-bottom:8px;">Units</div>
+        <div class="stock-list" data-units-list></div>
+        <div class="company-users-empty" hidden data-units-empty style="text-align:center;padding:24px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;">
+          <p style="margin:0 0 12px;font-size:0.84rem;color:var(--color-muted);">No units yet. Add rooms, apartments or shops.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-unit>Add Unit</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Tenancies -->
+  <div class="fullscreen-modal" hidden data-tenancies-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-tenancies-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2>Tenancies</h2>
+        <button class="icon-button" type="button" data-open-create-tenancy aria-label="New tenancy">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-list" data-tenancies-list></div>
+        <div class="company-users-empty" hidden data-tenancies-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <div style="font-size:2rem;margin-bottom:6px;">🧾</div>
+          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No tenancies yet</strong>
+          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Assign a tenant to a vacant unit to start a tenancy.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-tenancy>New Tenancy</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Rent -->
+  <div class="fullscreen-modal" hidden data-rent-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-rent-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2>Rent</h2>
+        <button class="icon-button" type="button" data-open-record-rent aria-label="Record rent">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-list" data-payments-list></div>
+        <div class="company-users-empty" hidden data-payments-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <div style="font-size:2rem;margin-bottom:6px;">💰</div>
+          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No rent recorded yet</strong>
+          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Record a rent payment — it posts into your Bank &amp; Cash accounts.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-record-rent>Record Rent</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Staff -->
+  <div class="fullscreen-modal" hidden data-staff-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-staff-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2>Staff</h2>
+        <button class="icon-button" type="button" data-open-create-staff aria-label="Add staff">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-list" data-staff-list></div>
+        <div class="company-users-empty" hidden data-staff-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <div style="font-size:2rem;margin-bottom:6px;">👷</div>
+          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No staff yet</strong>
+          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Add caretakers or managers for your properties.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-staff>Add Staff</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal: Property form -->
+  <div class="fullscreen-modal" hidden data-property-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-property-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 data-property-form-title>Add Property</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-property-form novalidate>
+        <input type="hidden" name="property_id" data-property-form-id>
+        <label class="form-field">
+          <span>Property Name <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <input type="text" name="name" placeholder="e.g. Mikocheni Flats, Plot 221" required>
+        </label>
+        <label class="form-field">
+          <span>Type</span>
+          <select name="type">
+            <option value="residential">Residential</option>
+            <option value="apartment">Apartment block</option>
+            <option value="house">House</option>
+            <option value="commercial">Commercial</option>
+            <option value="land">Land / Plot</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Location</span>
+          <input type="text" name="location" placeholder="e.g. Mikocheni, Dar es Salaam">
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="2" placeholder="Optional details..."></textarea>
+        </label>
+        <p class="inline-error" hidden data-property-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-property-form-submit>Save Property</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal: Unit form -->
+  <div class="fullscreen-modal" hidden data-unit-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-unit-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 data-unit-form-title>Add Unit</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-unit-form novalidate>
+        <input type="hidden" name="unit_id" data-unit-form-id>
+        <input type="hidden" name="property_id" data-unit-form-property-id>
+        <label class="form-field">
+          <span>Unit Name <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <input type="text" name="name" placeholder="e.g. Room A, Apartment 2, Shop 1" required>
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label class="form-field">
+            <span>Charge Frequency</span>
+            <select name="charge_type">
+              <option value="monthly">Monthly</option>
+              <option value="daily">Daily</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span>Rate <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+            <input type="text" inputmode="numeric" name="rate" step="0.01" min="0" placeholder="0.00" required>
+          </label>
+        </div>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="2" placeholder="Optional details..."></textarea>
+        </label>
+        <p class="inline-error" hidden data-unit-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-unit-form-submit>Save Unit</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal: Tenancy form -->
+  <div class="fullscreen-modal" hidden data-tenancy-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-tenancy-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2>New Tenancy</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-tenancy-form novalidate>
+        <label class="form-field">
+          <span>Vacant Unit <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <select name="unit_id" data-tenancy-unit required></select>
+          <small style="color:var(--color-muted);font-size:0.75rem;" data-tenancy-unit-hint></small>
+        </label>
+        <label class="form-field">
+          <span>Tenant <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <select name="customer_id" data-tenancy-tenant required></select>
+        </label>
+        <div data-new-tenant-fields hidden style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label class="form-field">
+            <span>New Tenant Name</span>
+            <input type="text" data-new-tenant-name placeholder="Full name">
+          </label>
+          <label class="form-field">
+            <span>Phone</span>
+            <input type="text" data-new-tenant-phone placeholder="07...">
+          </label>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label class="form-field">
+            <span>Start Date <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+            <input type="date" name="start_date" required>
+          </label>
+          <label class="form-field">
+            <span>Deposit</span>
+            <input type="text" inputmode="numeric" name="deposit" step="0.01" min="0" placeholder="0.00">
+          </label>
+        </div>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="2" placeholder="Optional details..."></textarea>
+        </label>
+        <p class="inline-error" hidden data-tenancy-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-tenancy-form-submit>Start Tenancy</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal: Rent payment form -->
+  <div class="fullscreen-modal" hidden data-rent-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-rent-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2>Record Rent</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-rent-form novalidate>
+        <label class="form-field">
+          <span>Tenancy <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <select name="tenancy_id" data-rent-tenancy required></select>
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label class="form-field">
+            <span>Amount <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+            <input type="text" inputmode="numeric" name="amount" step="0.01" min="0" placeholder="0.00" required>
+          </label>
+          <label class="form-field">
+            <span>Period</span>
+            <input type="text" name="period_label" placeholder="e.g. 2026-10 or Oct 2026">
+          </label>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label class="form-field">
+            <span>Paid Date <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+            <input type="date" name="paid_date" required>
+          </label>
+          <label class="form-field">
+            <span>Into Account</span>
+            <select name="account_id" data-rent-account></select>
+          </label>
+        </div>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="2" placeholder="Optional details..."></textarea>
+        </label>
+        <p class="inline-error" hidden data-rent-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-rent-form-submit>Record Payment</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Modal: Staff form -->
+  <div class="fullscreen-modal" hidden data-staff-form-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-staff-form-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 data-staff-form-title>Add Staff</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-staff-form novalidate>
+        <input type="hidden" name="staff_id" data-staff-form-id>
+        <label class="form-field">
+          <span>Name <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <input type="text" name="name" placeholder="Full name" required>
+        </label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <label class="form-field">
+            <span>Phone</span>
+            <input type="text" name="phone" placeholder="07...">
+          </label>
+          <label class="form-field">
+            <span>Role</span>
+            <select name="role">
+              <option value="caretaker">Caretaker</option>
+              <option value="manager">Manager</option>
+              <option value="security">Security</option>
+              <option value="cleaner">Cleaner</option>
+              <option value="other">Other</option>
+            </select>
+          </label>
+        </div>
+        <label class="form-field">
+          <span>Assigned Property</span>
+          <select name="property_id" data-staff-property>
+            <option value="">— None —</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <textarea name="notes" rows="2" placeholder="Optional details..."></textarea>
+        </label>
+        <p class="inline-error" hidden data-staff-form-error></p>
+        <button class="btn btn-primary full" type="submit" data-staff-form-submit>Save Staff</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- App Notice / Confirm Modal -->
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-close>OK</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=73" defer></script>
 </body>
 </html>

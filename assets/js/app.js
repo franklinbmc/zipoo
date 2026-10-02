@@ -6504,6 +6504,552 @@ const setupBankPage = () => {
   loadAccounts();
 };
 
+const setupRealEstatePage = () => {
+  const page = document.querySelector("[data-realestate-page]");
+  if (!page) return;
+
+  const RE = `${getBasePath()}api/realestate.php`;
+  const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
+  const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const num = (v) => parseFloat(String(v ?? "").replace(/[^0-9.\-]/g, "")) || 0;
+  const todayStr = () => new Date().toISOString().slice(0, 10);
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    try { const d = new Date(String(dateStr).replace(" ", "T")); return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); } catch { return dateStr; }
+  };
+  const chargeLabel = (t) => (t === "daily" ? "/day" : "/month");
+
+  const openWorkspace = (el, refresh) => { if (el) { el.hidden = false; if (typeof refresh === "function") refresh(); } };
+  const closeWorkspace = (el) => { if (el) el.hidden = true; };
+  const api = async (opts) => {
+    const res = await fetch(RE + (opts.query || ""), opts.body ? { method: "POST", body: opts.body } : {});
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.message || "Request failed.");
+    return data;
+  };
+
+  // ---- Summary / KPIs ----
+  const kpiProperties = document.querySelector("[data-kpi-properties]");
+  const kpiUnits = document.querySelector("[data-kpi-units]");
+  const kpiTenancies = document.querySelector("[data-kpi-tenancies]");
+  const kpiRent = document.querySelector("[data-kpi-rent]");
+  const propertiesCountBadge = document.querySelector("[data-properties-count-badge]");
+  const tenanciesCountBadge = document.querySelector("[data-tenancies-count-badge]");
+  const loadSummary = async () => {
+    try {
+      const { summary: s } = await api({ query: "?resource=summary" });
+      if (kpiProperties) kpiProperties.textContent = s.properties;
+      if (kpiUnits) kpiUnits.textContent = `${s.units_occupied} / ${s.units_total}`;
+      if (kpiTenancies) kpiTenancies.textContent = s.active_tenancies;
+      if (kpiRent) kpiRent.textContent = fmt(s.rent_collected_month);
+      if (propertiesCountBadge) propertiesCountBadge.textContent = `${s.properties} propert${s.properties === 1 ? "y" : "ies"}`;
+      if (tenanciesCountBadge) tenanciesCountBadge.textContent = `${s.active_tenancies} active`;
+    } catch { /* offline */ }
+  };
+
+  // ======================= PROPERTIES =======================
+  const propertiesWorkspace = document.querySelector("[data-properties-workspace]");
+  const propertiesList = document.querySelector("[data-properties-list]");
+  const propertiesEmpty = document.querySelector("[data-properties-empty]");
+  const propertyDetailWorkspace = document.querySelector("[data-property-detail-workspace]");
+  const propertyDetailName = document.querySelector("[data-property-detail-name]");
+  const propertyDetailMeta = document.querySelector("[data-property-detail-meta]");
+  const unitsList = document.querySelector("[data-units-list]");
+  const unitsEmpty = document.querySelector("[data-units-empty]");
+
+  const propertyFormModal = document.querySelector("[data-property-form-modal]");
+  const propertyForm = document.querySelector("[data-property-form]");
+  const propertyFormTitle = document.querySelector("[data-property-form-title]");
+  const propertyFormId = document.querySelector("[data-property-form-id]");
+  const propertyFormError = document.querySelector("[data-property-form-error]");
+  const propertyFormSubmit = document.querySelector("[data-property-form-submit]");
+
+  const unitFormModal = document.querySelector("[data-unit-form-modal]");
+  const unitForm = document.querySelector("[data-unit-form]");
+  const unitFormTitle = document.querySelector("[data-unit-form-title]");
+  const unitFormId = document.querySelector("[data-unit-form-id]");
+  const unitFormPropertyId = document.querySelector("[data-unit-form-property-id]");
+  const unitFormError = document.querySelector("[data-unit-form-error]");
+  const unitFormSubmit = document.querySelector("[data-unit-form-submit]");
+
+  let propertyCache = [];
+  let unitCache = [];
+  let currentProperty = null;
+
+  const renderProperties = (list) => {
+    propertyCache = list;
+    if (!list.length) { propertiesList?.replaceChildren(); if (propertiesEmpty) propertiesEmpty.hidden = false; return; }
+    if (propertiesEmpty) propertiesEmpty.hidden = true;
+    propertiesList.innerHTML = list.map((p) => `
+      <button type="button" class="settings-list-row" data-prop-open="${p.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
+        <span style="display:flex;align-items:center;gap:10px;min-width:0;">
+          <span class="customer-avatar" style="width:38px;height:38px;font-size:1.1rem;">🏢</span>
+          <span style="min-width:0;">
+            <span style="display:block;font-weight:800;color:var(--color-navy);font-size:0.94rem;">${esc(p.name)}</span>
+            <span style="display:block;font-size:0.78rem;color:var(--color-muted);">${esc(p.type)}${p.location ? " • " + esc(p.location) : ""}</span>
+          </span>
+        </span>
+        <span style="font-size:0.8rem;color:var(--color-muted);white-space:nowrap;">${p.occupied_count}/${p.units_count} units</span>
+      </button>`).join("");
+  };
+  const loadProperties = async () => { try { const d = await api({ query: "?resource=properties" }); renderProperties(d.properties || []); } catch {} };
+
+  const renderUnits = (list) => {
+    unitCache = list;
+    if (!list.length) { unitsList?.replaceChildren(); if (unitsEmpty) unitsEmpty.hidden = false; return; }
+    if (unitsEmpty) unitsEmpty.hidden = true;
+    unitsList.innerHTML = list.map((u) => {
+      const occupied = u.status === "occupied";
+      const badge = occupied
+        ? `<span class="badge-stock in-stock">Occupied</span>`
+        : `<span class="badge-stock low-stock">Vacant</span>`;
+      const tenant = occupied && u.tenant_name ? `<div style="font-size:0.75rem;color:var(--color-muted);">Tenant: ${esc(u.tenant_name)}</div>` : "";
+      return `
+        <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+          <div style="min-width:0;text-align:left;">
+            <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(u.name)} ${badge}</div>
+            <div style="font-size:0.8rem;color:var(--color-blue);font-weight:700;">${fmt(u.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(u.charge_type)}</span></div>
+            ${tenant}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto;">
+            <button type="button" class="btn btn-outline btn-sm" data-unit-edit="${u.id}">Edit</button>
+            <button type="button" class="btn btn-danger-outline btn-sm" data-unit-delete="${u.id}">Delete</button>
+          </div>
+        </div>`;
+    }).join("");
+  };
+  const loadUnits = async (propertyId) => { try { const d = await api({ query: `?resource=units&property_id=${propertyId}` }); renderUnits(d.units || []); } catch {} };
+
+  const openPropertyDetail = async (id) => {
+    try {
+      const d = await api({ query: `?id=${id}` });
+      currentProperty = d.property;
+      if (propertyDetailName) propertyDetailName.textContent = d.property.name;
+      if (propertyDetailMeta) propertyDetailMeta.textContent = [d.property.type, d.property.location].filter(Boolean).join(" • ") || "No location set";
+      renderUnits(d.property.units || []);
+      if (propertyDetailWorkspace) propertyDetailWorkspace.hidden = false;
+    } catch (err) { await showAppModal("Real Estate", err.message); }
+  };
+
+  const openPropertyForm = (p = null) => {
+    propertyForm.reset();
+    if (propertyFormError) propertyFormError.hidden = true;
+    if (propertyFormId) propertyFormId.value = p ? String(p.id) : "";
+    if (propertyFormTitle) propertyFormTitle.textContent = p ? "Edit Property" : "Add Property";
+    if (p) {
+      propertyForm.elements.name.value = p.name || "";
+      propertyForm.elements.type.value = p.type || "residential";
+      propertyForm.elements.location.value = p.location || "";
+      propertyForm.elements.notes.value = p.notes || "";
+    }
+    if (propertyFormModal) propertyFormModal.hidden = false;
+  };
+  const openUnitForm = (u = null) => {
+    unitForm.reset();
+    if (unitFormError) unitFormError.hidden = true;
+    if (unitFormId) unitFormId.value = u ? String(u.id) : "";
+    if (unitFormPropertyId) unitFormPropertyId.value = String(currentProperty?.id || "");
+    if (unitFormTitle) unitFormTitle.textContent = u ? "Edit Unit" : "Add Unit";
+    if (u) {
+      unitForm.elements.name.value = u.name || "";
+      unitForm.elements.charge_type.value = u.charge_type || "monthly";
+      unitForm.elements.rate.value = u.rate || "";
+      unitForm.elements.notes.value = u.notes || "";
+    }
+    if (unitFormModal) unitFormModal.hidden = false;
+  };
+
+  document.querySelectorAll("[data-open-properties-workspace]").forEach((b) => b.addEventListener("click", () => openWorkspace(propertiesWorkspace, loadProperties)));
+  document.querySelector("[data-properties-workspace-close]")?.addEventListener("click", () => closeWorkspace(propertiesWorkspace));
+  document.querySelector("[data-property-detail-close]")?.addEventListener("click", () => { closeWorkspace(propertyDetailWorkspace); loadProperties(); loadSummary(); });
+  document.querySelectorAll("[data-open-create-property]").forEach((b) => b.addEventListener("click", () => openPropertyForm(null)));
+  document.querySelector("[data-property-form-close]")?.addEventListener("click", () => { if (propertyFormModal) propertyFormModal.hidden = true; });
+  document.querySelectorAll("[data-open-create-unit]").forEach((b) => b.addEventListener("click", () => { if (currentProperty) openUnitForm(null); }));
+  document.querySelector("[data-unit-form-close]")?.addEventListener("click", () => { if (unitFormModal) unitFormModal.hidden = true; });
+
+  propertiesList?.addEventListener("click", (e) => { const id = e.target.closest("[data-prop-open]")?.dataset.propOpen; if (id) openPropertyDetail(id); });
+  document.querySelector("[data-prop-edit]")?.addEventListener("click", () => currentProperty && openPropertyForm(currentProperty));
+  document.querySelector("[data-prop-delete]")?.addEventListener("click", async () => {
+    if (!currentProperty) return;
+    const ok = await showConfirmModal({ title: "Delete property", message: `Delete "${currentProperty.name}" and its units? This cannot be undone.`, confirmLabel: "Delete", danger: true });
+    if (!ok) return;
+    try { const b = new FormData(); b.set("action", "property_delete"); b.set("property_id", String(currentProperty.id)); await api({ body: b }); closeWorkspace(propertyDetailWorkspace); await loadProperties(); await loadSummary(); }
+    catch (err) { await showAppModal("Real Estate", err.message); }
+  });
+
+  unitsList?.addEventListener("click", async (e) => {
+    const editId = e.target.closest("[data-unit-edit]")?.dataset.unitEdit;
+    const delId = e.target.closest("[data-unit-delete]")?.dataset.unitDelete;
+    if (editId) { const u = unitCache.find((x) => String(x.id) === String(editId)); if (u) openUnitForm(u); return; }
+    if (delId) {
+      const u = unitCache.find((x) => String(x.id) === String(delId));
+      const ok = await showConfirmModal({ title: "Delete unit", message: `Delete "${u?.name || "this unit"}"?`, confirmLabel: "Delete", danger: true });
+      if (!ok) return;
+      try { const b = new FormData(); b.set("action", "unit_delete"); b.set("unit_id", delId); const d = await api({ body: b }); renderUnits(d.units || []); await loadSummary(); }
+      catch (err) { await showAppModal("Real Estate", err.message); }
+    }
+  });
+
+  propertyForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (propertyFormError) propertyFormError.hidden = true;
+    const name = propertyForm.elements.name.value.trim();
+    if (!name) { if (propertyFormError) { propertyFormError.textContent = "Property name is required."; propertyFormError.hidden = false; } return; }
+    if (propertyFormSubmit) propertyFormSubmit.disabled = true;
+    try {
+      const id = propertyFormId.value;
+      const b = new FormData();
+      b.set("action", id ? "property_update" : "property_create");
+      if (id) b.set("property_id", id);
+      b.set("name", name);
+      b.set("type", propertyForm.elements.type.value);
+      b.set("location", propertyForm.elements.location.value.trim());
+      b.set("notes", propertyForm.elements.notes.value.trim());
+      const d = await api({ body: b });
+      renderProperties(d.properties || []);
+      if (propertyFormModal) propertyFormModal.hidden = true;
+      if (id && currentProperty && String(currentProperty.id) === String(id) && propertyDetailWorkspace && !propertyDetailWorkspace.hidden) await openPropertyDetail(id);
+      await loadSummary();
+    } catch (err) { if (propertyFormError) { propertyFormError.textContent = err.message; propertyFormError.hidden = false; } }
+    finally { if (propertyFormSubmit) propertyFormSubmit.disabled = false; }
+  });
+
+  unitForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (unitFormError) unitFormError.hidden = true;
+    const name = unitForm.elements.name.value.trim();
+    if (!name) { if (unitFormError) { unitFormError.textContent = "Unit name is required."; unitFormError.hidden = false; } return; }
+    if (unitFormSubmit) unitFormSubmit.disabled = true;
+    try {
+      const id = unitFormId.value;
+      const b = new FormData();
+      b.set("action", id ? "unit_update" : "unit_create");
+      if (id) b.set("unit_id", id);
+      b.set("property_id", unitFormPropertyId.value);
+      b.set("name", name);
+      b.set("charge_type", unitForm.elements.charge_type.value);
+      b.set("rate", String(num(unitForm.elements.rate.value)));
+      b.set("notes", unitForm.elements.notes.value.trim());
+      const d = await api({ body: b });
+      renderUnits(d.units || []);
+      if (unitFormModal) unitFormModal.hidden = true;
+      await loadSummary();
+    } catch (err) { if (unitFormError) { unitFormError.textContent = err.message; unitFormError.hidden = false; } }
+    finally { if (unitFormSubmit) unitFormSubmit.disabled = false; }
+  });
+
+  // ======================= TENANCIES =======================
+  const tenanciesWorkspace = document.querySelector("[data-tenancies-workspace]");
+  const tenanciesListEl = document.querySelector("[data-tenancies-list]");
+  const tenanciesEmpty = document.querySelector("[data-tenancies-empty]");
+  const tenancyFormModal = document.querySelector("[data-tenancy-form-modal]");
+  const tenancyForm = document.querySelector("[data-tenancy-form]");
+  const tenancyUnitSel = document.querySelector("[data-tenancy-unit]");
+  const tenancyUnitHint = document.querySelector("[data-tenancy-unit-hint]");
+  const tenancyTenantSel = document.querySelector("[data-tenancy-tenant]");
+  const newTenantFields = document.querySelector("[data-new-tenant-fields]");
+  const newTenantName = document.querySelector("[data-new-tenant-name]");
+  const newTenantPhone = document.querySelector("[data-new-tenant-phone]");
+  const tenancyFormError = document.querySelector("[data-tenancy-form-error]");
+  const tenancyFormSubmit = document.querySelector("[data-tenancy-form-submit]");
+  let tenancyCache = [];
+  let vacantUnitsCache = [];
+
+  const renderTenancies = (list) => {
+    tenancyCache = list;
+    const active = list.filter((t) => t.status === "active");
+    if (tenanciesCountBadge) tenanciesCountBadge.textContent = `${active.length} active`;
+    if (!list.length) { tenanciesListEl?.replaceChildren(); if (tenanciesEmpty) tenanciesEmpty.hidden = false; return; }
+    if (tenanciesEmpty) tenanciesEmpty.hidden = true;
+    tenanciesListEl.innerHTML = list.map((t) => {
+      const isActive = t.status === "active";
+      const badge = isActive ? `<span class="badge-stock in-stock">Active</span>` : `<span class="badge-stock out-of-stock">Ended</span>`;
+      const endBtn = isActive ? `<button type="button" class="btn btn-danger-outline btn-sm" data-tenancy-end="${t.id}">End</button>` : "";
+      return `
+        <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+          <div style="min-width:0;text-align:left;">
+            <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(t.tenant_name)} ${badge}</div>
+            <div style="font-size:0.78rem;color:var(--color-muted);">${esc(t.property_name)} • ${esc(t.unit_name)}</div>
+            <div style="font-size:0.78rem;color:var(--color-blue);font-weight:700;">${fmt(t.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(t.charge_type)}</span> • from ${formatDate(t.start_date)}</div>
+          </div>
+          <div style="flex:0 0 auto;">${endBtn}</div>
+        </div>`;
+    }).join("");
+  };
+  const loadTenancies = async () => { try { const d = await api({ query: "?resource=tenancies" }); renderTenancies(d.tenancies || []); } catch {} };
+
+  const openTenancyForm = async () => {
+    tenancyForm.reset();
+    if (tenancyFormError) tenancyFormError.hidden = true;
+    if (newTenantFields) newTenantFields.hidden = true;
+    tenancyForm.elements.start_date.value = todayStr();
+    try {
+      const [unitsD, custD] = await Promise.all([
+        api({ query: "?resource=units" }),
+        fetch(`${getBasePath()}api/customers.php`).then((r) => r.json()).catch(() => ({ customers: [] })),
+      ]);
+      vacantUnitsCache = (unitsD.units || []).filter((u) => u.status === "vacant");
+      if (tenancyUnitSel) {
+        tenancyUnitSel.innerHTML = vacantUnitsCache.length
+          ? vacantUnitsCache.map((u) => `<option value="${u.id}">${esc(u.property_name)} — ${esc(u.name)} (${fmt(u.rate)}${chargeLabel(u.charge_type)})</option>`).join("")
+          : `<option value="">No vacant units</option>`;
+      }
+      updateUnitHint();
+      const customers = custD.customers || [];
+      if (tenancyTenantSel) {
+        tenancyTenantSel.innerHTML = `<option value="">Select tenant…</option>` +
+          customers.map((c) => `<option value="${c.id}">${esc(c.full_name)}${c.phone ? " (" + esc(c.phone) + ")" : ""}</option>`).join("") +
+          `<option value="__new__">➕ New tenant…</option>`;
+      }
+    } catch { /* ignore */ }
+    if (tenancyFormModal) tenancyFormModal.hidden = false;
+  };
+  const updateUnitHint = () => {
+    const u = vacantUnitsCache.find((x) => String(x.id) === String(tenancyUnitSel?.value));
+    if (tenancyUnitHint) tenancyUnitHint.textContent = u ? `Rent: ${fmt(u.rate)}${chargeLabel(u.charge_type)}` : "";
+  };
+  tenancyUnitSel?.addEventListener("change", updateUnitHint);
+  tenancyTenantSel?.addEventListener("change", () => { if (newTenantFields) newTenantFields.hidden = tenancyTenantSel.value !== "__new__"; });
+
+  document.querySelectorAll("[data-open-tenancies-workspace]").forEach((b) => b.addEventListener("click", () => openWorkspace(tenanciesWorkspace, loadTenancies)));
+  document.querySelector("[data-tenancies-workspace-close]")?.addEventListener("click", () => closeWorkspace(tenanciesWorkspace));
+  document.querySelectorAll("[data-open-create-tenancy]").forEach((b) => b.addEventListener("click", openTenancyForm));
+  document.querySelector("[data-tenancy-form-close]")?.addEventListener("click", () => { if (tenancyFormModal) tenancyFormModal.hidden = true; });
+
+  tenanciesListEl?.addEventListener("click", async (e) => {
+    const endId = e.target.closest("[data-tenancy-end]")?.dataset.tenancyEnd;
+    if (!endId) return;
+    const ok = await showConfirmModal({ title: "End tenancy", message: "End this tenancy? The unit will be marked vacant.", confirmLabel: "End tenancy", danger: true });
+    if (!ok) return;
+    try { const b = new FormData(); b.set("action", "tenancy_end"); b.set("tenancy_id", endId); await api({ body: b }); await loadTenancies(); await loadSummary(); }
+    catch (err) { await showAppModal("Real Estate", err.message); }
+  });
+
+  tenancyForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (tenancyFormError) tenancyFormError.hidden = true;
+    const unitId = tenancyUnitSel?.value;
+    if (!unitId) { if (tenancyFormError) { tenancyFormError.textContent = "Select a vacant unit."; tenancyFormError.hidden = false; } return; }
+    if (tenancyFormSubmit) tenancyFormSubmit.disabled = true;
+    try {
+      let customerId = tenancyTenantSel.value;
+      if (customerId === "__new__") {
+        const nm = newTenantName.value.trim();
+        if (!nm) throw new Error("Enter the new tenant's name.");
+        const nb = new FormData(); nb.set("action", "tenant_quick_create"); nb.set("full_name", nm); nb.set("phone", newTenantPhone.value.trim());
+        const nd = await api({ body: nb });
+        customerId = String(nd.customer.id);
+      }
+      if (!customerId) throw new Error("Select a tenant.");
+      const b = new FormData();
+      b.set("action", "tenancy_create");
+      b.set("unit_id", unitId);
+      b.set("customer_id", customerId);
+      b.set("start_date", tenancyForm.elements.start_date.value || todayStr());
+      b.set("deposit", String(num(tenancyForm.elements.deposit.value)));
+      b.set("notes", tenancyForm.elements.notes.value.trim());
+      await api({ body: b });
+      if (tenancyFormModal) tenancyFormModal.hidden = true;
+      await loadTenancies(); await loadSummary();
+    } catch (err) { if (tenancyFormError) { tenancyFormError.textContent = err.message; tenancyFormError.hidden = false; } }
+    finally { if (tenancyFormSubmit) tenancyFormSubmit.disabled = false; }
+  });
+
+  // ======================= RENT =======================
+  const rentWorkspace = document.querySelector("[data-rent-workspace]");
+  const paymentsList = document.querySelector("[data-payments-list]");
+  const paymentsEmpty = document.querySelector("[data-payments-empty]");
+  const rentFormModal = document.querySelector("[data-rent-form-modal]");
+  const rentForm = document.querySelector("[data-rent-form]");
+  const rentTenancySel = document.querySelector("[data-rent-tenancy]");
+  const rentAccountSel = document.querySelector("[data-rent-account]");
+  const rentFormError = document.querySelector("[data-rent-form-error]");
+  const rentFormSubmit = document.querySelector("[data-rent-form-submit]");
+  let activeTenanciesCache = [];
+
+  const renderPayments = (list) => {
+    if (!list.length) { paymentsList?.replaceChildren(); if (paymentsEmpty) paymentsEmpty.hidden = false; return; }
+    if (paymentsEmpty) paymentsEmpty.hidden = true;
+    paymentsList.innerHTML = list.map((r) => `
+      <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+        <div style="min-width:0;text-align:left;">
+          <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(r.tenant_name)}</div>
+          <div style="font-size:0.78rem;color:var(--color-muted);">${esc(r.property_name)} • ${esc(r.unit_name)}${r.period_label ? " • " + esc(r.period_label) : ""} • ${formatDate(r.paid_date)}${r.account_name ? " → " + esc(r.account_name) : ""}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto;">
+          <strong style="color:#16a34a;white-space:nowrap;">+${fmt(r.amount)}</strong>
+          <button type="button" class="btn btn-danger-outline btn-sm" data-payment-delete="${r.id}" aria-label="Delete">✕</button>
+        </div>
+      </div>`).join("");
+  };
+  const loadPayments = async () => { try { const d = await api({ query: "?resource=payments" }); renderPayments(d.payments || []); } catch {} };
+
+  const openRentForm = async () => {
+    rentForm.reset();
+    if (rentFormError) rentFormError.hidden = true;
+    rentForm.elements.paid_date.value = todayStr();
+    try {
+      const [tenD, accRes] = await Promise.all([
+        api({ query: "?resource=tenancies" }),
+        fetch(`${getBasePath()}api/accounts.php`).then((r) => r.json()).catch(() => ({ accounts: [] })),
+      ]);
+      activeTenanciesCache = (tenD.tenancies || []).filter((t) => t.status === "active");
+      if (rentTenancySel) {
+        rentTenancySel.innerHTML = activeTenanciesCache.length
+          ? activeTenanciesCache.map((t) => `<option value="${t.id}" data-rate="${t.rate}">${esc(t.tenant_name)} — ${esc(t.property_name)}/${esc(t.unit_name)} (${fmt(t.rate)}${chargeLabel(t.charge_type)})</option>`).join("")
+          : `<option value="">No active tenancies</option>`;
+        prefillRentAmount();
+      }
+      const accounts = accRes.accounts || [];
+      if (rentAccountSel) {
+        rentAccountSel.innerHTML = accounts.map((a) => `<option value="${a.id}"${a.is_default ? " selected" : ""}>${esc(a.name)} (${esc(a.type_label)})</option>`).join("");
+      }
+    } catch { /* ignore */ }
+    if (rentFormModal) rentFormModal.hidden = false;
+  };
+  const prefillRentAmount = () => {
+    const t = activeTenanciesCache.find((x) => String(x.id) === String(rentTenancySel?.value));
+    if (t && rentForm) rentForm.elements.amount.value = t.rate;
+  };
+  rentTenancySel?.addEventListener("change", prefillRentAmount);
+
+  document.querySelectorAll("[data-open-rent-workspace]").forEach((b) => b.addEventListener("click", () => openWorkspace(rentWorkspace, loadPayments)));
+  document.querySelector("[data-rent-workspace-close]")?.addEventListener("click", () => closeWorkspace(rentWorkspace));
+  document.querySelectorAll("[data-open-record-rent]").forEach((b) => b.addEventListener("click", openRentForm));
+  document.querySelector("[data-rent-form-close]")?.addEventListener("click", () => { if (rentFormModal) rentFormModal.hidden = true; });
+
+  paymentsList?.addEventListener("click", async (e) => {
+    const delId = e.target.closest("[data-payment-delete]")?.dataset.paymentDelete;
+    if (!delId) return;
+    const ok = await showConfirmModal({ title: "Delete rent payment", message: "Delete this payment? It will be removed from the account balance too.", confirmLabel: "Delete", danger: true });
+    if (!ok) return;
+    try { const b = new FormData(); b.set("action", "rent_payment_delete"); b.set("payment_id", delId); await api({ body: b }); await loadPayments(); await loadSummary(); }
+    catch (err) { await showAppModal("Real Estate", err.message); }
+  });
+
+  rentForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (rentFormError) rentFormError.hidden = true;
+    const tenancyId = rentTenancySel?.value;
+    const amount = num(rentForm.elements.amount.value);
+    if (!tenancyId) { if (rentFormError) { rentFormError.textContent = "Select a tenancy."; rentFormError.hidden = false; } return; }
+    if (amount <= 0) { if (rentFormError) { rentFormError.textContent = "Enter an amount greater than zero."; rentFormError.hidden = false; } return; }
+    if (rentFormSubmit) rentFormSubmit.disabled = true;
+    try {
+      const b = new FormData();
+      b.set("action", "rent_payment_create");
+      b.set("tenancy_id", tenancyId);
+      b.set("amount", String(amount));
+      b.set("period_label", rentForm.elements.period_label.value.trim());
+      b.set("paid_date", rentForm.elements.paid_date.value || todayStr());
+      if (rentAccountSel?.value) b.set("account_id", rentAccountSel.value);
+      b.set("notes", rentForm.elements.notes.value.trim());
+      await api({ body: b });
+      if (rentFormModal) rentFormModal.hidden = true;
+      await loadPayments(); await loadSummary();
+    } catch (err) { if (rentFormError) { rentFormError.textContent = err.message; rentFormError.hidden = false; } }
+    finally { if (rentFormSubmit) rentFormSubmit.disabled = false; }
+  });
+
+  // ======================= STAFF =======================
+  const staffWorkspace = document.querySelector("[data-staff-workspace]");
+  const staffListEl = document.querySelector("[data-staff-list]");
+  const staffEmpty = document.querySelector("[data-staff-empty]");
+  const staffFormModal = document.querySelector("[data-staff-form-modal]");
+  const staffForm = document.querySelector("[data-staff-form]");
+  const staffFormTitle = document.querySelector("[data-staff-form-title]");
+  const staffFormId = document.querySelector("[data-staff-form-id]");
+  const staffPropertySel = document.querySelector("[data-staff-property]");
+  const staffFormError = document.querySelector("[data-staff-form-error]");
+  const staffFormSubmit = document.querySelector("[data-staff-form-submit]");
+  let staffCache = [];
+
+  const renderStaff = (list) => {
+    staffCache = list;
+    if (!list.length) { staffListEl?.replaceChildren(); if (staffEmpty) staffEmpty.hidden = false; return; }
+    if (staffEmpty) staffEmpty.hidden = true;
+    staffListEl.innerHTML = list.map((s) => `
+      <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+        <div style="min-width:0;text-align:left;">
+          <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;text-transform:capitalize;">${esc(s.name)}</div>
+          <div style="font-size:0.78rem;color:var(--color-muted);text-transform:capitalize;">${esc(s.role)}${s.phone ? " • " + esc(s.phone) : ""}${s.property_name ? " • " + esc(s.property_name) : ""}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex:0 0 auto;">
+          <button type="button" class="btn btn-outline btn-sm" data-staff-edit="${s.id}">Edit</button>
+          <button type="button" class="btn btn-danger-outline btn-sm" data-staff-delete="${s.id}">Delete</button>
+        </div>
+      </div>`).join("");
+  };
+  const loadStaff = async () => { try { const d = await api({ query: "?resource=staff" }); renderStaff(d.staff || []); } catch {} };
+
+  const openStaffForm = async (s = null) => {
+    staffForm.reset();
+    if (staffFormError) staffFormError.hidden = true;
+    if (staffFormId) staffFormId.value = s ? String(s.id) : "";
+    if (staffFormTitle) staffFormTitle.textContent = s ? "Edit Staff" : "Add Staff";
+    // Populate property options.
+    try {
+      const d = await api({ query: "?resource=properties" });
+      if (staffPropertySel) {
+        staffPropertySel.innerHTML = `<option value="">— None —</option>` + (d.properties || []).map((p) => `<option value="${p.id}">${esc(p.name)}</option>`).join("");
+      }
+    } catch {}
+    if (s) {
+      staffForm.elements.name.value = s.name || "";
+      staffForm.elements.phone.value = s.phone || "";
+      staffForm.elements.role.value = s.role || "caretaker";
+      if (staffPropertySel) staffPropertySel.value = s.property_id ? String(s.property_id) : "";
+      staffForm.elements.notes.value = s.notes || "";
+    }
+    if (staffFormModal) staffFormModal.hidden = false;
+  };
+
+  document.querySelectorAll("[data-open-staff-workspace]").forEach((b) => b.addEventListener("click", () => openWorkspace(staffWorkspace, loadStaff)));
+  document.querySelector("[data-staff-workspace-close]")?.addEventListener("click", () => closeWorkspace(staffWorkspace));
+  document.querySelectorAll("[data-open-create-staff]").forEach((b) => b.addEventListener("click", () => openStaffForm(null)));
+  document.querySelector("[data-staff-form-close]")?.addEventListener("click", () => { if (staffFormModal) staffFormModal.hidden = true; });
+
+  staffListEl?.addEventListener("click", async (e) => {
+    const editId = e.target.closest("[data-staff-edit]")?.dataset.staffEdit;
+    const delId = e.target.closest("[data-staff-delete]")?.dataset.staffDelete;
+    if (editId) { const s = staffCache.find((x) => String(x.id) === String(editId)); if (s) openStaffForm(s); return; }
+    if (delId) {
+      const s = staffCache.find((x) => String(x.id) === String(delId));
+      const ok = await showConfirmModal({ title: "Remove staff", message: `Remove "${s?.name || "this staff member"}"?`, confirmLabel: "Remove", danger: true });
+      if (!ok) return;
+      try { const b = new FormData(); b.set("action", "staff_delete"); b.set("staff_id", delId); await api({ body: b }); await loadStaff(); }
+      catch (err) { await showAppModal("Real Estate", err.message); }
+    }
+  });
+
+  staffForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (staffFormError) staffFormError.hidden = true;
+    const name = staffForm.elements.name.value.trim();
+    if (!name) { if (staffFormError) { staffFormError.textContent = "Staff name is required."; staffFormError.hidden = false; } return; }
+    if (staffFormSubmit) staffFormSubmit.disabled = true;
+    try {
+      const id = staffFormId.value;
+      const b = new FormData();
+      b.set("action", id ? "staff_update" : "staff_create");
+      if (id) b.set("staff_id", id);
+      b.set("name", name);
+      b.set("phone", staffForm.elements.phone.value.trim());
+      b.set("role", staffForm.elements.role.value);
+      b.set("property_id", staffPropertySel?.value || "0");
+      b.set("notes", staffForm.elements.notes.value.trim());
+      await api({ body: b });
+      if (staffFormModal) staffFormModal.hidden = true;
+      await loadStaff();
+    } catch (err) { if (staffFormError) { staffFormError.textContent = err.message; staffFormError.hidden = false; } }
+    finally { if (staffFormSubmit) staffFormSubmit.disabled = false; }
+  });
+
+  // ---- Init ----
+  loadSummary();
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.lang));
@@ -6523,6 +7069,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupStockPage();
   setupSalesPage();
   setupBankPage();
+  setupRealEstatePage();
   updateConnectionStatus();
   registerServiceWorker();
 });
