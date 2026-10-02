@@ -42,6 +42,36 @@ const svgMarkup = (name, { size = 0, cls = "", style = "" } = {}) => {
   return `<svg class="svg-ico ${cls}" viewBox="0 0 512 512" aria-hidden="true" style="${dim}${style}"><path d="${d}" /></svg>`;
 };
 
+// Format a typed numeric amount with thousand separators, keeping an optional decimal part.
+const groupThousands = (raw) => {
+  let s = String(raw).replace(/[^0-9.]/g, "");
+  const dot = s.indexOf(".");
+  if (dot !== -1) {
+    s = s.slice(0, dot + 1) + s.slice(dot + 1).replace(/\./g, "");
+  }
+  let [intPart = "", decPart] = s.split(".");
+  intPart = intPart.replace(/^0+(?=\d)/, "");
+  const grouped = intPart === "" ? "" : Number(intPart).toLocaleString("en-US");
+  if (s.includes(".")) return `${grouped || "0"}.${(decPart || "").slice(0, 2)}`;
+  return grouped;
+};
+
+// Attach live thousand-separator formatting to a numeric <input>.
+const attachThousandsFormatting = (input) => {
+  if (!input || input.dataset.thousandsBound === "true") return;
+  input.dataset.thousandsBound = "true";
+  input.addEventListener("input", () => {
+    const start = input.selectionStart;
+    const before = input.value;
+    input.value = groupThousands(before);
+    // Best-effort caret keep when formatting didn't shift length much.
+    if (typeof start === "number") {
+      const delta = input.value.length - before.length;
+      try { input.setSelectionRange(start + delta, start + delta); } catch { /* ignore */ }
+    }
+  });
+};
+
 const getSavedLanguage = () => {
   const saved = localStorage.getItem("zipoo.language");
   return SUPPORTED_LANGUAGES.includes(saved) ? saved : DEFAULT_LANGUAGE;
@@ -6907,11 +6937,12 @@ const setupRealEstatePage = () => {
     if (u) {
       unitForm.elements.name.value = u.name || "";
       unitForm.elements.charge_type.value = u.charge_type || "monthly";
-      unitForm.elements.rate.value = u.rate || "";
+      unitForm.elements.rate.value = u.rate ? groupThousands(String(u.rate)) : "";
       unitForm.elements.notes.value = u.notes || "";
     }
     if (unitFormModal) unitFormModal.hidden = false;
   };
+  attachThousandsFormatting(unitForm?.elements.rate);
 
   document.querySelectorAll("[data-open-properties-workspace]").forEach((b) => b.addEventListener("click", () => openWorkspace(propertiesWorkspace, loadProperties)));
   document.querySelector("[data-properties-workspace-close]")?.addEventListener("click", () => closeWorkspace(propertiesWorkspace));
