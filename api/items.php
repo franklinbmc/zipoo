@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/vat_lib.php';
 
 session_start();
 
@@ -95,6 +96,8 @@ try {
     if ($businessId <= 0) {
         respond(400, ['ok' => false, 'message' => 'No active business selected.']);
     }
+
+    ensure_vat_columns($pdo);
 
     // VAT config for the active business (toggle + rate reuse tbl_businesses).
     $vatStmt = $pdo->prepare('SELECT vat_enabled, tax_rate FROM tbl_businesses WHERE id = :bid LIMIT 1');

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/vat_lib.php';
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dompdf\Dompdf;
@@ -271,6 +272,8 @@ try {
     }
 
     $businessId = (int) $biz['id'];
+
+    ensure_vat_columns($pdo);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $poId = isset($_GET['id']) ? (int) $_GET['id'] : 0;

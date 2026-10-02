@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/accounts_lib.php';
+require_once __DIR__ . '/vat_lib.php';
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dompdf\Dompdf;
@@ -345,6 +346,7 @@ try {
 
     ensure_sales_tables($pdo);
     ensure_accounts_tables($pdo);
+    ensure_vat_columns($pdo);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Single invoice detail
