@@ -3725,6 +3725,7 @@ const setupStockPage = () => {
   const statusField = document.querySelector("[data-status-field]");
   const itemVatField = document.querySelector("[data-item-vat-field]");
   const itemVatCheckbox = document.querySelector("[data-item-vat-checkbox]");
+  const itemVatHint = document.querySelector("[data-item-vat-hint]");
 
   // Stock Adjust Modal
   const adjustModal = document.querySelector("[data-stock-adjust-modal]");
@@ -4081,8 +4082,9 @@ const setupStockPage = () => {
     populateCategorySelect(cachedCategories, "General");
     if (statusField) statusField.hidden = true;
     if (initialStockWrap) initialStockWrap.hidden = false;
-    if (itemVatField) itemVatField.hidden = !vatConfig.enabled;
-    if (itemVatCheckbox) itemVatCheckbox.checked = vatConfig.enabled; // default VAT-applicable when VAT is on
+    if (itemVatField) itemVatField.hidden = false;
+    if (itemVatCheckbox) itemVatCheckbox.checked = true; // new items default to taxable
+    if (itemVatHint) itemVatHint.textContent = vatConfig.enabled ? "" : "(VAT is off — no tax applied yet)";
     if (itemFormModal) itemFormModal.hidden = false;
     itemForm?.querySelector('input[name="name"]')?.focus();
   };
@@ -4111,8 +4113,9 @@ const setupStockPage = () => {
       itemForm.elements["status"].value = item.status || "active";
     }
 
-    if (itemVatField) itemVatField.hidden = !vatConfig.enabled;
+    if (itemVatField) itemVatField.hidden = false;
     if (itemVatCheckbox) itemVatCheckbox.checked = Number(item.vat_applicable ?? 1) === 1;
+    if (itemVatHint) itemVatHint.textContent = vatConfig.enabled ? "" : "(VAT is off — no tax applied yet)";
 
     if (itemDetailModal) itemDetailModal.hidden = true;
     if (itemFormModal) itemFormModal.hidden = false;
@@ -4208,9 +4211,9 @@ const setupStockPage = () => {
       if (usingNewCategory) {
         formData.set("category", newCat);
       }
-      // When VAT is enabled, honour the checkbox; when it's off, keep items VAT-applicable by default
-      // so enabling VAT later works without re-editing every item.
-      formData.set("vat_applicable", vatConfig.enabled ? (itemVatCheckbox && itemVatCheckbox.checked ? "1" : "0") : "1");
+      // Honour the Taxable checkbox. The flag is stored regardless of whether VAT is
+      // currently enabled, so turning VAT on later applies tax to the right items.
+      formData.set("vat_applicable", (itemVatCheckbox && itemVatCheckbox.checked) ? "1" : "0");
 
       const res = await fetch(`${getBasePath()}api/items.php`, {
         method: "POST",
