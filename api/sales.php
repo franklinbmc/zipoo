@@ -180,8 +180,8 @@ function generate_invoice_pdf_html(array $sale, array $items, array $customer, a
     foreach ($items as $item) {
         $name = htmlspecialchars((string) ($item['item_name'] ?? ''));
         $qty = number_format((float) ($item['quantity'] ?? 0), 2);
-        $price = number_format((float) ($item['unit_price'] ?? 0), 2);
-        $total = number_format((float) ($item['line_total'] ?? 0), 2);
+        $price = number_format((float) ($item['unit_price'] ?? 0), 0);
+        $total = number_format((float) ($item['line_total'] ?? 0), 0);
         $vatTag = ((int) ($item['vat_applicable'] ?? 0) === 1) ? " <span style='color:#64748b;font-size:10px;'>(VAT)</span>" : '';
 
         $itemsHtml .= "
@@ -289,21 +289,21 @@ function generate_invoice_pdf_html(array $sale, array $items, array $customer, a
                     <table class='totals'>
                         <tr>
                             <td>Subtotal:</td>
-                            <td style='text-align: right;'>" . number_format($subtotal, 2) . " {$currency}</td>
+                            <td style='text-align: right;'>" . number_format($subtotal, 0) . " {$currency}</td>
                         </tr>
                         " . ($discount > 0 ? "
                         <tr>
                             <td>Discount:</td>
-                            <td style='text-align: right;'>-" . number_format($discount, 2) . " {$currency}</td>
+                            <td style='text-align: right;'>-" . number_format($discount, 0) . " {$currency}</td>
                         </tr>" : "") . "
                         " . ($taxRate > 0 ? "
                         <tr>
                             <td>VAT ({$taxRate}%):</td>
-                            <td style='text-align: right;'>" . number_format($taxAmount, 2) . " {$currency}</td>
+                            <td style='text-align: right;'>" . number_format($taxAmount, 0) . " {$currency}</td>
                         </tr>" : "") . "
                         <tr class='grand-total'>
                             <td>Total:</td>
-                            <td style='text-align: right;'>" . number_format($totalAmount, 2) . " {$currency}</td>
+                            <td style='text-align: right;'>" . number_format($totalAmount, 0) . " {$currency}</td>
                         </tr>
                     </table>
                 </td>

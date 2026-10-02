@@ -362,7 +362,7 @@ try {
         if ($direction === 'out') {
             $balance = account_balance($pdo, $businessId, $accountId);
             if ($amount > $balance) {
-                respond(422, ['ok' => false, 'message' => 'Insufficient balance. Available: ' . number_format($balance, 2) . '.']);
+                respond(422, ['ok' => false, 'message' => 'Insufficient balance. Available: ' . number_format($balance, 0) . '.']);
             }
         }
 
@@ -389,7 +389,7 @@ try {
 
         $balance = account_balance($pdo, $businessId, $fromId);
         if ($amount > $balance) {
-            respond(422, ['ok' => false, 'message' => 'Insufficient balance in "' . $from['name'] . '". Available: ' . number_format($balance, 2) . '.']);
+            respond(422, ['ok' => false, 'message' => 'Insufficient balance in "' . $from['name'] . '". Available: ' . number_format($balance, 0) . '.']);
         }
 
         $pdo->beginTransaction();

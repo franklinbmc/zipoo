@@ -114,8 +114,8 @@ function generate_po_pdf_html(array $po, array $supplier, array $items, array $b
     foreach ($items as $item) {
         $name = htmlspecialchars((string) ($item['item_name'] ?? ''));
         $qty = number_format((float) ($item['quantity'] ?? 0), 2);
-        $cost = number_format((float) ($item['unit_cost'] ?? 0), 2);
-        $total = number_format((float) ($item['line_total'] ?? 0), 2);
+        $cost = number_format((float) ($item['unit_cost'] ?? 0), 0);
+        $total = number_format((float) ($item['line_total'] ?? 0), 0);
 
         $itemsHtml .= "
         <tr>
@@ -221,16 +221,16 @@ function generate_po_pdf_html(array $po, array $supplier, array $items, array $b
                     <table class='totals'>
                         <tr>
                             <td>Subtotal:</td>
-                            <td style='text-align: right;'>" . number_format($subtotal, 2) . " {$currency}</td>
+                            <td style='text-align: right;'>" . number_format($subtotal, 0) . " {$currency}</td>
                         </tr>
                         " . ($taxRate > 0 ? "
                         <tr>
                             <td>Tax ({$taxRate}%):</td>
-                            <td style='text-align: right;'>" . number_format($taxAmount, 2) . " {$currency}</td>
+                            <td style='text-align: right;'>" . number_format($taxAmount, 0) . " {$currency}</td>
                         </tr>" : "") . "
                         <tr class='grand-total'>
                             <td>Total Amount:</td>
-                            <td style='text-align: right;'>" . number_format($totalAmount, 2) . " {$currency}</td>
+                            <td style='text-align: right;'>" . number_format($totalAmount, 0) . " {$currency}</td>
                         </tr>
                     </table>
                 </td>
@@ -611,7 +611,7 @@ try {
                 $mail->addStringAttachment($pdfBytes, $pdfFilename, 'base64', 'application/pdf');
 
                 $mail->Subject = "Purchase Order {$po['po_number']} from {$bizName}";
-                $mail->Body = "Dear " . ($supplier['supplier_name'] ?: 'Vendor') . ",\n\nPlease find attached Purchase Order {$po['po_number']} from {$bizName}.\n\nTotal Order Amount: " . number_format((float)$po['total_amount'], 2) . " " . ($biz['currency'] ?? 'TZS') . "\nOrder Date: " . $po['order_date'] . "\n\nPlease review and confirm receipt.\n\nBest regards,\n{$bizName}";
+                $mail->Body = "Dear " . ($supplier['supplier_name'] ?: 'Vendor') . ",\n\nPlease find attached Purchase Order {$po['po_number']} from {$bizName}.\n\nTotal Order Amount: " . number_format((float)$po['total_amount'], 0) . " " . ($biz['currency'] ?? 'TZS') . "\nOrder Date: " . $po['order_date'] . "\n\nPlease review and confirm receipt.\n\nBest regards,\n{$bizName}";
 
                 $mail->send();
 

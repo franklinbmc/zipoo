@@ -3132,7 +3132,7 @@ const setupCustomersPage = () => {
 
   const formatTzs = (amount) => {
     const val = Number(amount) || 0;
-    return "TZS " + val.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    return "TZS " + val.toLocaleString("en-US", { maximumFractionDigits: 0 });
   };
 
   const formatDate = (dateStr) => {
@@ -3439,7 +3439,7 @@ const setupSuppliersPage = () => {
 
   const formatTzs = (amount) => {
     const val = Number(amount) || 0;
-    return "TZS " + val.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    return "TZS " + val.toLocaleString("en-US", { maximumFractionDigits: 0 });
   };
 
   const formatDate = (dateStr) => {
@@ -3858,7 +3858,7 @@ const setupStockPage = () => {
 
   const formatCurrency = (amount, cur = "TZS") => {
     const val = Number(amount) || 0;
-    return `${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${cur}`;
+    return `${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${cur}`;
   };
 
   const formatDate = (dateStr) => {
@@ -5485,7 +5485,7 @@ const setupSalesPage = () => {
   // ---- Local helpers ----
   const formatCurrency = (amount, cur = "TZS") => {
     const val = Number(amount) || 0;
-    return `${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${cur}`;
+    return `${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${cur}`;
   };
   const formatDate = (dateStr) => {
     if (!dateStr) return "-";
@@ -6380,7 +6380,7 @@ const setupBankPage = () => {
   if (!page) return;
 
   const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
-  const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
+  const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${currency}`;
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const typeIcon = (t) => svgMarkup(t === "bank" ? "bank" : t === "mobile" ? "mobile" : "cash");
   const formatDate = (dateStr) => {
@@ -6786,7 +6786,7 @@ const setupRealEstatePage = () => {
 
   const RE = `${getBasePath()}api/realestate.php`;
   const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
-  const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
+  const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${currency}`;
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const num = (v) => parseFloat(String(v ?? "").replace(/[^0-9.\-]/g, "")) || 0;
   const todayStr = () => new Date().toISOString().slice(0, 10);
