@@ -6229,8 +6229,9 @@ const setupSalesPage = () => {
       const row = document.createElement("button");
       row.type = "button";
       row.className = "pos-product-row" + (out ? " is-out" : "");
-      const meta = isProduct ? `${stock} ${p.unit || "pcs"}` : "Service";
-      row.innerHTML = `<span><span class="pos-product-name">${p.name}</span><span class="pos-product-meta">${meta}${out ? " — Out of stock" : ""}</span></span><span class="pos-product-price">${formatCurrency(p.selling_price)}</span>`;
+      const meta = isProduct ? `${stock} ${p.unit || "pcs"}` : "";
+      const metaHtml = meta ? `<span class="pos-product-meta">${meta}${out ? " — Out of stock" : ""}</span>` : "";
+      row.innerHTML = `<span><span class="pos-product-name">${p.name}</span>${metaHtml}</span><span class="pos-product-price">${formatCurrency(p.selling_price)}</span>`;
       if (!out) row.addEventListener("click", () => addToPosCart(p));
       return row;
     }));

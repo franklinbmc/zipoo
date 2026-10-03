@@ -3708,15 +3708,18 @@ button.settings-list-row:focus-visible {
 }
 
 .pos-product-row .pos-product-name {
+  display: block;
   font-weight: 800;
   color: var(--color-navy);
   font-size: 0.92rem;
+  line-height: 1.35;
 }
 
 .pos-product-row .pos-product-meta {
+  display: block;
   font-size: 0.76rem;
   color: var(--color-muted);
-  margin-top: 2px;
+  margin-top: 5px;
 }
 
 .pos-product-row .pos-product-price {
