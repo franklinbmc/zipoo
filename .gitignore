@@ -1,0 +1,6 @@
+.DS_Store
+Thumbs.db
+.composer/
+composer.phar
+composer-setup.php
+*.log

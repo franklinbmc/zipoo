@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="theme-color" content="#0D2B5B">
+  <meta name="description" content="Zipoo - Run your business. Know your numbers. Modern all-in-one software for retail and wholesale businesses in Tanzania and East Africa. Manage sales, stock, customer debts, expenses, and profits.">
+  <title>Zipoo — Run your business. Know your numbers.</title>
+  
+  <link rel="icon" href="./assets/images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+<body>
+
+  <!-- =====================================================================
+       1. NAVIGATION
+       ===================================================================== -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <!-- Brand Logo -->
+      <a href="./" class="brand-wrap" aria-label="Zipoo Home">
+        <img src="./assets/images/logo.svg" alt="Zipoo Logo" class="brand-logo-img">
+        <span class="brand-title">Zipoo<span>.</span></span>
+      </a>
+
+      <!-- Desktop Nav Menu -->
+      <nav class="nav-menu" aria-label="Main Navigation">
+        <a href="#features" class="nav-link" data-i18n="nav.features">Features</a>
+        <a href="#how-it-works" class="nav-link" data-i18n="nav.howItWorks">How It Works</a>
+        <a href="#devices" class="nav-link" data-i18n="nav.devices">Mobile &amp; PC</a>
+        <a href="#pricing" class="nav-link" data-i18n="nav.pricing">Pricing</a>
+        <a href="#faq" class="nav-link" data-i18n="nav.faq">FAQ</a>
+      </nav>
+
+      <!-- Nav Actions (Lang switch + Login + Start Free) -->
+      <div class="nav-actions">
+        <!-- Language Switcher -->
+        <div class="lang-switch" role="group" aria-label="Language Switcher">
+          <button type="button" class="lang-btn active" data-lang-btn="en" aria-label="Switch to English">EN</button>
+          <button type="button" class="lang-btn" data-lang-btn="sw" aria-label="Switch to Kiswahili">SW</button>
+        </div>
+
+        <a href="https://app.zipoo.co.tz/login" class="login-link" data-i18n="nav.login">Login</a>
+        <a href="https://app.zipoo.co.tz/register" class="btn btn-primary btn-sm" data-i18n="nav.startFree">Start Free</a>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button type="button" class="mobile-toggle" data-mobile-toggle aria-label="Open Navigation Menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+            <path d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Drawer Navigation -->
+    <div class="mobile-drawer" data-mobile-drawer aria-label="Mobile Navigation">
+      <ul class="mobile-nav-list">
+        <li><a href="#features" class="mobile-nav-link" data-i18n="nav.features">Features</a></li>
+        <li><a href="#how-it-works" class="mobile-nav-link" data-i18n="nav.howItWorks">How It Works</a></li>
+        <li><a href="#devices" class="mobile-nav-link" data-i18n="nav.devices">Mobile &amp; PC</a></li>
+        <li><a href="#pricing" class="mobile-nav-link" data-i18n="nav.pricing">Pricing</a></li>
+        <li><a href="#faq" class="mobile-nav-link" data-i18n="nav.faq">FAQ</a></li>
+      </ul>
+      <div class="mobile-actions">
+        <a href="https://app.zipoo.co.tz/register" class="btn btn-primary btn-lg" data-i18n="nav.startFree">Start Free</a>
+        <a href="https://app.zipoo.co.tz/login" class="btn btn-outline btn-lg" data-i18n="nav.login">Login</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- =====================================================================
+         2. HERO SECTION
+         ===================================================================== -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-badge-wrap">
+            <span class="badge badge-teal">
+              <span class="badge-pulse"></span>
+              <span data-i18n="hero.badge">Modern Business System • East Africa</span>
+            </span>
+          </div>
+
+          <h1 class="hero-title" data-i18n="hero.title">
+            Run your business.<br><span class="highlight">Know your numbers.</span>
+          </h1>
+
+          <p class="hero-subtitle" data-i18n="hero.subtitle">
+            All-in-one software for retail, wholesale, and service businesses. Effortlessly track sales, inventory, customer debts, expenses, and real-time profits from your phone or PC.
+          </p>
+
+          <div class="hero-ctas">
+            <a href="https://app.zipoo.co.tz/register" class="btn btn-primary btn-lg" data-i18n="hero.startFree">
+              Start Free Today
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="https://app.zipoo.co.tz/login" class="btn btn-outline btn-lg" data-i18n="hero.login">
+              Sign In to Account
+            </a>
+          </div>
+
+          <div class="hero-trust">
+            <span class="hero-trust-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="hero.trustCard">No credit card required</span>
+            </span>
+            <span class="hero-trust-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="hero.trustOffline">Works offline &amp; online</span>
+            </span>
+            <span class="hero-trust-item">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <span data-i18n="hero.trustTrial">Instant access</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Hero Graphic Showcase (Interactive Preview Mockup) -->
+        <div class="hero-mockup-wrapper">
+          <div class="mockup-main-card">
+            <div class="mockup-topbar">
+              <div class="mockup-dots">
+                <span class="mockup-dot red"></span>
+                <span class="mockup-dot yellow"></span>
+                <span class="mockup-dot green"></span>
+              </div>
+              <div class="mockup-header-title">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                <span>Zipoo Workspace &bull; Kariakoo Main Branch</span>
+              </div>
+              <span class="table-pill" style="background: #e6faf5; color: #078c71; font-weight: 800;">LIVE</span>
+            </div>
+
+            <!-- Metric Cards -->
+            <div class="mockup-grid">
+              <div class="mockup-metric">
+                <div class="mockup-metric-label" data-i18n="mockup.todaySales">Today's Total Sales</div>
+                <div class="mockup-metric-val">TZS 2,367,080</div>
+                <div class="mockup-metric-trend">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                  <span>+18.4% vs yesterday</span>
+                </div>
+              </div>
+
+              <div class="mockup-metric">
+                <div class="mockup-metric-label" data-i18n="mockup.profit">Estimated Net Profit</div>
+                <div class="mockup-metric-val" style="color: #0bbf9a;">TZS 684,200</div>
+                <div class="mockup-metric-trend" style="color: var(--teal-dark);">
+                  <span>28.9% Net Margin</span>
+                </div>
+              </div>
+
+              <div class="mockup-metric">
+                <div class="mockup-metric-label" data-i18n="mockup.lowStock">Low Stock Alert</div>
+                <div class="mockup-metric-val" style="color: #e11438;">3 Items</div>
+                <div class="mockup-metric-trend" style="color: #e11438;">
+                  <span>Re-order recommended</span>
+                </div>
+              </div>
+
+              <!-- POS Live Feed Preview -->
+              <div class="mockup-preview-table">
+                <div class="table-header-row">
+                  <span class="table-header-title" data-i18n="mockup.recentTx">Live POS Sales Stream</span>
+                  <span class="table-pill">Shift #4 &bull; Open</span>
+                </div>
+
+                <div class="preview-row">
+                  <div class="preview-row-item">
+                    <div class="preview-item-icon">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+                    </div>
+                    <div>
+                      <strong style="color: var(--navy); display: block;">Azam Energy Drink 330ml (x24)</strong>
+                      <small style="color: var(--text-muted);"><span data-i18n="mockup.cash">Cash</span> &bull; 10:42 AM</small>
+                    </div>
+                  </div>
+                  <span class="preview-row-amount">TZS 26,000</span>
+                </div>
+
+                <div class="preview-row">
+                  <div class="preview-row-item">
+                    <div class="preview-item-icon" style="background: #e6faf5; color: #0bbf9a;">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                    </div>
+                    <div>
+                      <strong style="color: var(--navy); display: block;">Kilimanjaro Water 1.5L (x12)</strong>
+                      <small style="color: var(--text-muted);"><span data-i18n="mockup.mpesa">Lipa kwa Simu</span> &bull; 10:38 AM</small>
+                    </div>
+                  </div>
+                  <span class="preview-row-amount">TZS 18,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         3. BUSINESS PROBLEMS ZIPOO SOLVES
+         ===================================================================== -->
+    <section class="problem-section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker" data-i18n="prob.kicker">Why Zipoo?</div>
+          <h2 class="section-title" data-i18n="prob.title">Stop Losing Money to Paperwork and Guesswork</h2>
+          <p class="section-subtitle" data-i18n="prob.subtitle">Traditional book recording causes unnoticed stock loss, forgotten customer debts, and inaccurate profit estimates.</p>
+        </div>
+
+        <div class="problems-grid">
+          <!-- Problem 1 -->
+          <div class="problem-card">
+            <span class="problem-tag" data-i18n="prob.1.tag">Common Problem</span>
+            <h3 data-i18n="prob.1.title">Missing Stock &amp; Cash Mismatches</h3>
+            <p data-i18n="prob.1.desc">Handwritten notebooks make it easy for stock to vanish and cash drawers to mismatch without anyone noticing.</p>
+            <div style="border-top: 1px dashed var(--border); padding-top: 12px; margin-top: auto;">
+              <span class="solution-tag" style="margin-bottom: 6px;">Zipoo Fix</span>
+              <p style="font-weight: 600; color: var(--navy); font-size: 0.92rem;" data-i18n="prob.1.sol">
+                Zipoo shift till reconciliation records every coin, barcode scan, and cash movement automatically.
+              </p>
+            </div>
+          </div>
+
+          <!-- Problem 2 -->
+          <div class="problem-card">
+            <span class="problem-tag" data-i18n="prob.2.tag">Common Problem</span>
+            <h3 data-i18n="prob.2.title">Forgotten Customer Debts (Madeni)</h3>
+            <p data-i18n="prob.2.desc">Customer debts scattered across multiple books get forgotten, disputed, or never collected.</p>
+            <div style="border-top: 1px dashed var(--border); padding-top: 12px; margin-top: auto;">
+              <span class="solution-tag" style="margin-bottom: 6px;">Zipoo Fix</span>
+              <p style="font-weight: 600; color: var(--navy); font-size: 0.92rem;" data-i18n="prob.2.sol">
+                Automated customer debt ledgers with single-click WhatsApp payment reminders and clear balances.
+              </p>
+            </div>
+          </div>
+
+          <!-- Problem 3 -->
+          <div class="problem-card">
+            <span class="problem-tag" data-i18n="prob.3.tag">Common Problem</span>
+            <h3 data-i18n="prob.3.title">Stockouts on Fast-Selling Goods</h3>
+            <p data-i18n="prob.3.desc">Running out of popular items unexpectedly means turning away paying customers and losing revenue.</p>
+            <div style="border-top: 1px dashed var(--border); padding-top: 12px; margin-top: auto;">
+              <span class="solution-tag" style="margin-bottom: 6px;">Zipoo Fix</span>
+              <p style="font-weight: 600; color: var(--navy); font-size: 0.92rem;" data-i18n="prob.3.sol">
+                Smart low-stock warning indicators notify you in advance before critical products run out.
+              </p>
+            </div>
+          </div>
+
+          <!-- Problem 4 -->
+          <div class="problem-card">
+            <span class="problem-tag" data-i18n="prob.4.tag">Common Problem</span>
+            <h3 data-i18n="prob.4.title">Unknown Real Profit at End of Day</h3>
+            <p data-i18n="prob.4.desc">High sales volume often tricks owners into thinking they made money when expenses ate up the margin.</p>
+            <div style="border-top: 1px dashed var(--border); padding-top: 12px; margin-top: auto;">
+              <span class="solution-tag" style="margin-bottom: 6px;">Zipoo Fix</span>
+              <p style="font-weight: 600; color: var(--navy); font-size: 0.92rem;" data-i18n="prob.4.sol">
+                Real-time profit deduction that subtracts item cost and overhead expenses instantly.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         4. MAIN FEATURES (THE 6 PILLARS)
+         ===================================================================== -->
+    <section class="features-section" id="features">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker" data-i18n="feat.kicker">Core Capabilities</div>
+          <h2 class="section-title" data-i18n="feat.title">Everything You Need to Run Your Business</h2>
+          <p class="section-subtitle" data-i18n="feat.subtitle">6 powerful pillars engineered specifically for retail shops, wholesalers, and growing enterprises.</p>
+        </div>
+
+        <div class="features-grid">
+          <!-- Pillar 1: POS -->
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M6 8h12M6 12h4M14 12h4M6 16h8"/></svg>
+            </div>
+            <h3 data-i18n="feat.1.title">POS &amp; Quick Invoicing</h3>
+            <p data-i18n="feat.1.desc">Fast touch checkout, thermal Bluetooth receipt printing, and professional PDF invoices sent directly via WhatsApp.</p>
+            <ul class="feature-bullet-list">
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.1.b1">Thermal receipt printing (58mm/80mm)</span>
+              </li>
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.1.b2">Fast barcode camera scanner</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Pillar 2: Inventory -->
+          <div class="feature-card">
+            <div class="feature-icon-box" style="background: #e6faf5; color: #0bbf9a;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <h3 data-i18n="feat.2.title">Smart Inventory &amp; Stock</h3>
+            <p data-i18n="feat.2.desc">Track quantities, unit costs, supplier purchase orders, and stock movements across multiple warehouses with ease.</p>
+            <ul class="feature-bullet-list">
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.2.b1">Multi-store and warehouse support</span>
+              </li>
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.2.b2">Automatic low-stock threshold alerts</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Pillar 3: Customers & Debts -->
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <h3 data-i18n="feat.3.title">Customer &amp; Debt Ledgers</h3>
+            <p data-i18n="feat.3.desc">Never lose track of credit sales again. Keep detailed customer profiles, credit limits, and historical debt payments.</p>
+            <ul class="feature-bullet-list">
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.3.b1">Instant WhatsApp payment reminders</span>
+              </li>
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.3.b2">Customer statement &amp; balance tracking</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Pillar 4: Expenses & Shifts -->
+          <div class="feature-card">
+            <div class="feature-icon-box" style="background: #e6faf5; color: #0bbf9a;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01M18 12h.01"/></svg>
+            </div>
+            <h3 data-i18n="feat.4.title">Expenses &amp; Till Reconciliation</h3>
+            <p data-i18n="feat.4.desc">Record daily shop expenses, rent, utilities, and reconcile cashier cash drawers with shift opening/closing balances.</p>
+            <ul class="feature-bullet-list">
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.4.b1">Cashier shift till variance tracking</span>
+              </li>
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.4.b2">Expense categorization and cash accounts</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Pillar 5: Reports -->
+          <div class="feature-card">
+            <div class="feature-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <h3 data-i18n="feat.5.title">Real-Time Financial Reports</h3>
+            <p data-i18n="feat.5.desc">Clear daily, weekly, and monthly reports showing total sales, gross profit, net profit, and best-selling products.</p>
+            <ul class="feature-bullet-list">
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.5.b1">Downloadable PDF &amp; Excel reports</span>
+              </li>
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.5.b2">Top product performance metrics</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Pillar 6: Security & Staff Roles -->
+          <div class="feature-card">
+            <div class="feature-icon-box" style="background: #e6faf5; color: #0bbf9a;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h3 data-i18n="feat.6.title">Staff Roles &amp; Security</h3>
+            <p data-i18n="feat.6.desc">Assign your cashiers sales-only access while keeping profit margins, supplier costs, and financial summaries private.</p>
+            <ul class="feature-bullet-list">
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.6.b1">Owner vs. Cashier permission control</span>
+              </li>
+              <li class="feature-bullet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="feat.6.b2">Audit trail of every transaction</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         5. CROSS-PLATFORM (MOBILE + PC)
+         ===================================================================== -->
+    <section class="platform-section" id="devices">
+      <div class="container">
+        <div class="platform-split">
+          <div>
+            <div class="section-kicker" data-i18n="plat.kicker">Cross-Platform Flexibility</div>
+            <h2 class="section-title" data-i18n="plat.title">Your Business in Your Pocket or On Your Counter</h2>
+            <p class="section-subtitle" style="margin-bottom: 24px;" data-i18n="plat.subtitle">
+              Work smoothly across all your devices without purchasing expensive proprietary hardware.
+            </p>
+
+            <div class="platform-card-wrap">
+              <div class="platform-card">
+                <div class="platform-icon">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                </div>
+                <div class="platform-info">
+                  <h4 data-i18n="plat.phone.title">On Your Smartphone</h4>
+                  <p data-i18n="plat.phone.desc">Check sales numbers from home, record orders while visiting clients, or ring up sales from anywhere.</p>
+                </div>
+              </div>
+
+              <div class="platform-card">
+                <div class="platform-icon">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                </div>
+                <div class="platform-info">
+                  <h4 data-i18n="plat.pc.title">On Your PC &amp; Laptop</h4>
+                  <p data-i18n="plat.pc.desc">Enjoy an expansive counter POS experience with keyboard shortcuts, barcode scanners, and printer connectivity.</p>
+                </div>
+              </div>
+
+              <div class="platform-card">
+                <div class="platform-icon" style="background: var(--teal);">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+                </div>
+                <div class="platform-info">
+                  <h4 data-i18n="plat.offline.title">Works When Internet Fails</h4>
+                  <p data-i18n="plat.offline.desc">Keep recording sales and printing receipts offline. Zipoo automatically synchronizes once your connection restores.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Showcase Card -->
+          <div class="device-composition">
+            <div class="device-badge-row">
+              <span class="badge badge-teal">Offline-First PWA</span>
+              <span class="badge badge-blue">Zero Installation</span>
+            </div>
+
+            <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 12px;" data-i18n="plat.box.title">
+              Zero Expensive Hardware Required
+            </h3>
+            <p style="color: #cbd5e1; font-size: 0.94rem; margin-bottom: 24px;" data-i18n="plat.box.sub">
+              Runs on any device you already own:
+            </p>
+
+            <div class="device-feature-row">
+              <div class="device-row-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="plat.box.1">Android smartphones &amp; tablets</span>
+              </div>
+              <div class="device-row-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="plat.box.2">iPhones &amp; iPads</span>
+              </div>
+              <div class="device-row-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="plat.box.3">Windows laptops &amp; desktops</span>
+              </div>
+              <div class="device-row-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="plat.box.4">Standard Bluetooth &amp; USB thermal printers</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.15);">
+              <a href="https://app.zipoo.co.tz/register" class="btn btn-white btn-lg" style="width: 100%;" data-i18n="hero.startFree">
+                Start Free Today
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         6. HOW IT WORKS (3 SIMPLE STEPS)
+         ===================================================================== -->
+    <section class="steps-section" id="how-it-works">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker" data-i18n="steps.kicker">Simple Setup</div>
+          <h2 class="section-title" data-i18n="steps.title">Get Started in 3 Minutes</h2>
+          <p class="section-subtitle" data-i18n="steps.subtitle">No technical IT knowledge required. Simple, fast, and ready to use immediately.</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">01</div>
+            <h3 data-i18n="step.1.title">1. Create Free Account</h3>
+            <p data-i18n="step.1.desc">Sign up with your phone number and business name in under 60 seconds. No credit card needed.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">02</div>
+            <h3 data-i18n="step.2.title">2. Add Stock &amp; Start Selling</h3>
+            <p data-i18n="step.2.desc">Add products easily or upload via Excel. Ring up sales on POS and print receipts right away.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">03</div>
+            <h3 data-i18n="step.3.title">3. Know Your Real Numbers</h3>
+            <p data-i18n="step.3.desc">Watch your profits, stock levels, and customer debts update in real-time from anywhere in the world.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         7. AUDIENCE / WHO IT'S FOR
+         ===================================================================== -->
+    <section class="audience-section">
+      <div class="container" style="text-align: center;">
+        <div class="section-head" style="margin-bottom: 32px;">
+          <div class="section-kicker" data-i18n="aud.kicker">Built For You</div>
+          <h2 class="section-title" data-i18n="aud.title">Designed for Modern Businesses in Tanzania</h2>
+          <p class="section-subtitle" data-i18n="aud.subtitle">Trusted by ambitious shop owners, retailers, and wholesalers across East Africa.</p>
+        </div>
+
+        <div class="audience-tags-wrap">
+          <span class="audience-pill">🛒 <span data-i18n="aud.retail">Retail Shops &amp; Mini-Markets</span></span>
+          <span class="audience-pill">💊 <span data-i18n="aud.pharmacy">Pharmacies &amp; Duka la Dawa</span></span>
+          <span class="audience-pill">🧱 <span data-i18n="aud.hardware">Hardware &amp; Building Materials</span></span>
+          <span class="audience-pill">📦 <span data-i18n="aud.wholesale">Wholesalers &amp; Distributors</span></span>
+          <span class="audience-pill">👗 <span data-i18n="aud.clothing">Fashion, Boutiques &amp; Cosmetics</span></span>
+          <span class="audience-pill">📱 <span data-i18n="aud.electronics">Electronics &amp; Mobile Shops</span></span>
+          <span class="audience-pill">🔧 <span data-i18n="aud.autoparts">Auto Spare Parts &amp; Garages</span></span>
+          <span class="audience-pill">💼 <span data-i18n="aud.services">Services &amp; Consultancies</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         8. PRICING PREVIEW
+         ===================================================================== -->
+    <section class="pricing-section" id="pricing">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker" data-i18n="price.kicker">Simple Pricing</div>
+          <h2 class="section-title" data-i18n="price.title">Transparent Plans for Every Business Stage</h2>
+          <p class="section-subtitle" data-i18n="price.subtitle">Start free and upgrade as your business expands. No hidden charges.</p>
+        </div>
+
+        <div class="pricing-grid">
+          <!-- Tier 1: Free Trial -->
+          <div class="pricing-card">
+            <h3 class="pricing-tier-name" data-i18n="price.free.title">Starter Trial</h3>
+            <p class="pricing-tier-desc" data-i18n="price.free.desc">Ideal for new shops testing modern digital business management.</p>
+            
+            <div class="pricing-price-wrap">
+              <span class="pricing-price" data-i18n="price.free.price">Free</span>
+              <span class="pricing-period" data-i18n="price.free.period">14-day full access</span>
+            </div>
+
+            <ul class="pricing-features-list">
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.free.b1">Full POS &amp; sales tracking</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.free.b2">Stock &amp; inventory management</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.free.b3">Customer debts &amp; ledgers</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.free.b4">Receipt printing &amp; PDF invoices</span>
+              </li>
+            </ul>
+
+            <a href="https://app.zipoo.co.tz/register" class="btn btn-outline" style="width: 100%;" data-i18n="price.free.cta">Start Free Trial</a>
+          </div>
+
+          <!-- Tier 2: Pro (Featured) -->
+          <div class="pricing-card featured">
+            <span class="pricing-popular-badge" data-i18n="price.pro.popular">Most Popular</span>
+            <h3 class="pricing-tier-name" data-i18n="price.pro.title">Business Pro</h3>
+            <p class="pricing-tier-desc" data-i18n="price.pro.desc">Everything you need to run a fast-paced retail or wholesale store.</p>
+            
+            <div class="pricing-price-wrap">
+              <span class="pricing-price" data-i18n="price.pro.price">TZS 25,000</span>
+              <span class="pricing-period" data-i18n="price.pro.period">/ month</span>
+            </div>
+
+            <ul class="pricing-features-list">
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.pro.b1">Everything in Starter</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.pro.b2">Multiple staff &amp; cashier accounts</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.pro.b3">WhatsApp debt reminder alerts</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.pro.b4">Advanced profit &amp; loss reports</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.pro.b5">Shift till cash reconciliation</span>
+              </li>
+            </ul>
+
+            <a href="https://app.zipoo.co.tz/register" class="btn btn-primary" style="width: 100%;" data-i18n="price.pro.cta">Get Started Pro</a>
+          </div>
+
+          <!-- Tier 3: Enterprise -->
+          <div class="pricing-card">
+            <h3 class="pricing-tier-name" data-i18n="price.ent.title">Multi-Branch</h3>
+            <p class="pricing-tier-desc" data-i18n="price.ent.desc">For businesses with multiple shops, warehouses, and branches.</p>
+            
+            <div class="pricing-price-wrap">
+              <span class="pricing-price" data-i18n="price.ent.price">Custom</span>
+              <span class="pricing-period" data-i18n="price.ent.period">tailored solution</span>
+            </div>
+
+            <ul class="pricing-features-list">
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.ent.b1">Multiple business branches</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.ent.b2">Inter-branch stock transfers</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.ent.b3">Consolidated owner dashboard</span>
+              </li>
+              <li class="pricing-feature-item">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <span data-i18n="price.ent.b4">Dedicated priority support</span>
+              </li>
+            </ul>
+
+            <a href="mailto:support@zipoo.co.tz" class="btn btn-outline" style="width: 100%;" data-i18n="price.ent.cta">Contact Sales</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         9. FREQUENTLY ASKED QUESTIONS (FAQ)
+         ===================================================================== -->
+    <section class="faq-section" id="faq">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-kicker" data-i18n="faq.kicker">Got Questions?</div>
+          <h2 class="section-title" data-i18n="faq.title">Frequently Asked Questions</h2>
+          <p class="section-subtitle" data-i18n="faq.subtitle">Everything you need to know about Zipoo and how it helps your business.</p>
+        </div>
+
+        <div class="faq-wrapper">
+          <!-- Q1 -->
+          <div class="faq-item" data-faq-item>
+            <button type="button" class="faq-question">
+              <span data-i18n="faq.q1">Can I use Zipoo on my mobile phone?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p data-i18n="faq.a1">
+                Yes! Zipoo is designed mobile-first. You can use it on any Android phone, iPhone, tablet, laptop, or desktop computer through your browser or by installing it as an app.
+              </p>
+            </div>
+          </div>
+
+          <!-- Q2 -->
+          <div class="faq-item" data-faq-item>
+            <button type="button" class="faq-question">
+              <span data-i18n="faq.q2">What happens if the internet goes down?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p data-i18n="faq.a2">
+                Zipoo has built-in offline support. You can continue ringing up POS sales and issuing receipts without interruption. Once your internet reconnects, all transactions sync automatically.
+              </p>
+            </div>
+          </div>
+
+          <!-- Q3 -->
+          <div class="faq-item" data-faq-item>
+            <button type="button" class="faq-question">
+              <span data-i18n="faq.q3">Can I print receipts for my customers?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p data-i18n="faq.a3">
+                Yes! Zipoo works with standard Bluetooth and USB thermal receipt printers (both 58mm and 80mm). You can also share professional PDF invoices directly via WhatsApp or email.
+              </p>
+            </div>
+          </div>
+
+          <!-- Q4 -->
+          <div class="faq-item" data-faq-item>
+            <button type="button" class="faq-question">
+              <span data-i18n="faq.q4">How does Zipoo help me track customer debts (madeni)?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p data-i18n="faq.a4">
+                Every time you make a credit sale, Zipoo links it to the customer profile. You can see total unpaid debts at a glance, record partial repayments, and send polite payment reminders on WhatsApp.
+              </p>
+            </div>
+          </div>
+
+          <!-- Q5 -->
+          <div class="faq-item" data-faq-item>
+            <button type="button" class="faq-question">
+              <span data-i18n="faq.q5">Is my business information safe and private?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="faq-answer">
+              <p data-i18n="faq.a5">
+                Absolutely. Your data is encrypted and backed up securely in modern cloud infrastructure. Your cashiers only see sales screens, while sensitive profit margins and reports remain strictly private to the business owner.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         10. FINAL CALL TO ACTION (CTA)
+         ===================================================================== -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-banner">
+          <h2 class="cta-title" data-i18n="cta.title">Ready to take full control of your business?</h2>
+          <p class="cta-subtitle" data-i18n="cta.subtitle">
+            Join forward-thinking business owners in Tanzania who manage sales, stock, and profits with complete clarity.
+          </p>
+
+          <div class="cta-buttons">
+            <a href="https://app.zipoo.co.tz/register" class="btn btn-primary btn-lg" data-i18n="cta.start">
+              Start Free Today
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="https://app.zipoo.co.tz/login" class="btn btn-outline btn-lg" style="color: #ffffff; border-color: rgba(255,255,255,0.3);" data-i18n="cta.login">
+              Sign In to Account
+            </a>
+          </div>
+
+          <div class="cta-footnote" data-i18n="cta.footnote">
+            Instant setup in 60 seconds • No credit card required
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       11. FOOTER
+       ===================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="./" class="brand-wrap">
+            <img src="./assets/images/logo.svg" alt="Zipoo Logo" class="brand-logo-img">
+            <span class="brand-title">Zipoo<span>.</span></span>
+          </a>
+          <p class="footer-tagline" data-i18n="footer.tagline">
+            The modern business operating system for sales, stock, customer debts, and financial reports.
+          </p>
+          <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+            📍 <span data-i18n="footer.location">Dar es Salaam, Tanzania</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title" data-i18n="footer.prod">Product</h4>
+          <ul class="footer-nav">
+            <li><a href="#features" class="footer-link" data-i18n="footer.pos">Point of Sale (POS)</a></li>
+            <li><a href="#features" class="footer-link" data-i18n="footer.inventory">Stock &amp; Inventory</a></li>
+            <li><a href="#features" class="footer-link" data-i18n="footer.debts">Customer Debts</a></li>
+            <li><a href="#features" class="footer-link" data-i18n="footer.reports">Profit Reports</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title" data-i18n="footer.co">Company</h4>
+          <ul class="footer-nav">
+            <li><a href="#how-it-works" class="footer-link" data-i18n="footer.about">About Zipoo</a></li>
+            <li><a href="#pricing" class="footer-link" data-i18n="footer.pricing">Pricing Plans</a></li>
+            <li><a href="https://app.zipoo.co.tz/login" class="footer-link" data-i18n="footer.login">Sign In</a></li>
+            <li><a href="https://app.zipoo.co.tz/register" class="footer-link" data-i18n="footer.register">Create Account</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title" data-i18n="footer.contact">Contact &amp; Support</h4>
+          <ul class="footer-nav">
+            <li><a href="mailto:support@zipoo.co.tz" class="footer-link">support@zipoo.co.tz</a></li>
+            <li><a href="https://wa.me/255700000000" target="_blank" rel="noopener noreferrer" class="footer-link">WhatsApp Support</a></li>
+            <li><a href="https://app.zipoo.co.tz/login" class="footer-link">Customer Portal</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 Zipoo Technologies. <span data-i18n="footer.rights">All rights reserved. Run your business. Know your numbers.</span>
+        </div>
+        <div style="display: flex; gap: 16px;">
+          <a href="#features" class="footer-link">Privacy</a>
+          <a href="#features" class="footer-link">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./assets/js/main.js"></script>
+</body>
+</html>

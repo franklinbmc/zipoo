@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Zipoo">
+  <rect width="192" height="192" rx="42" fill="#0D2B5B"/>
+  <path d="M47 54h98v25l-57 58h59v28H45v-26l57-57H47V54z" fill="#FFFFFF"/>
+  <rect x="132" y="33" width="27" height="27" rx="6" fill="#0BBF9A"/>
+</svg>
