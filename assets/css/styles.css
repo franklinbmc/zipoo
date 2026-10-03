@@ -3897,3 +3897,32 @@ button.settings-list-row:focus-visible {
 .daterange-pop .dr-row input[type="date"] {
   width: 62%;
 }
+
+/* ======================= Desktop / big-screen layout (>= 1024px) ======================= */
+@media (min-width: 1024px) {
+  /* Wider, centered content */
+  .app-topbar { width: min(1100px, 94%); }
+  .settings-page { width: min(1100px, 94%); max-width: 94%; }
+
+  /* Hub rows in two columns (KPI tiles are already 4-up above 600px) */
+  .stock-hub { grid-template-columns: repeat(2, 1fr); align-items: start; }
+
+  /* Fullscreen workspaces & forms become centered dialog cards with a dimmed backdrop */
+  .fullscreen-modal {
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    background: rgba(18, 35, 63, 0.45);
+    backdrop-filter: blur(4px);
+  }
+  .fullscreen-panel {
+    width: min(980px, 100%);
+    max-height: calc(100vh - 56px);
+    min-height: 0;
+    border: 1px solid var(--color-line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .fullscreen-body { overflow: auto; }
+}
