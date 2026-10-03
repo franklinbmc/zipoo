@@ -6333,23 +6333,24 @@ const setupSalesPage = () => {
   attachThousandsFormatting(startShiftAmount);
   attachThousandsFormatting(closeShiftAmount);
 
-  const shiftStripHtml = () => {
+  const shiftStripHtml = (isPos = false) => {
     if (currentShift) {
       const opened = new Date(String(currentShift.opened_at).replace(" ", "T"));
       const t = isNaN(opened.getTime()) ? "" : opened.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+      const salesInfo = isPos ? "" : ` · cash sales ${formatCurrency(currentShift.cash_sales || 0)}`;
       return `<div class="pos-shift-open">
-        <span><strong>Shift open</strong>${t ? " · since " + t : ""} · cash sales ${formatCurrency(currentShift.cash_sales || 0)}</span>
+        <span><strong>Shift open</strong>${t ? " · since " + t : ""}${salesInfo}</span>
         <button type="button" class="btn btn-danger-outline btn-sm" data-close-shift-open>Close Shift</button>
       </div>`;
     }
     return `<div class="pos-shift-closed">
-      <span>No open shift — start one to begin selling.</span>
+      <span>No open shift — start one to begin.</span>
       <button type="button" class="btn btn-primary btn-sm" data-start-shift-open>Start Shift</button>
     </div>`;
   };
   const renderShiftUI = () => {
-    if (posShiftStrip) posShiftStrip.innerHTML = shiftStripHtml();
-    if (shiftWsStatus) shiftWsStatus.innerHTML = shiftStripHtml();
+    if (posShiftStrip) posShiftStrip.innerHTML = shiftStripHtml(true);
+    if (shiftWsStatus) shiftWsStatus.innerHTML = shiftStripHtml(false);
     if (shiftStatusBadge) shiftStatusBadge.textContent = currentShift ? "Open" : "Closed";
     renderPosCart();
   };
@@ -6702,7 +6703,9 @@ const setupSalesPage = () => {
     });
     applyAmountForMethod({ clearCash: true });
     if (posCheckoutModal) posCheckoutModal.hidden = false;
-    setTimeout(() => { posAmountPaid?.focus(); }, 60);
+    if (window.innerWidth >= 768) {
+      setTimeout(() => { posAmountPaid?.focus(); }, 60);
+    }
   };
 
   posCheckoutBtn?.addEventListener("click", openPosCheckout);
