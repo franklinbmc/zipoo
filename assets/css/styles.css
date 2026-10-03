@@ -2484,6 +2484,7 @@ button.settings-list-row:focus-visible {
 }
 
 .fullscreen-panel {
+  position: relative;
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 100svh;
@@ -3910,4 +3911,61 @@ button.settings-list-row:focus-visible {
   /* Fullscreen workspaces stay full-height; just centre and cap their width at 1100 */
   .fullscreen-modal { grid-template-columns: minmax(0, 1fr); }
   .fullscreen-panel { width: 100%; max-width: 1100px; margin-inline: auto; }
+}
+
+/* ======================= Desktop Point of Sale (supermarket layout, >= 1024px) ======================= */
+@media (min-width: 1024px) {
+  .pos-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "search    customer"
+      "filters   cart"
+      "products  cart";
+    gap: 12px 16px;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    padding: 16px;
+    padding-bottom: 96px; /* room for the docked register bar */
+    overflow: hidden;
+  }
+  .pos-body > .pos-customer-bar { grid-area: customer; margin: 0; }
+  .pos-body > .pos-search-wrap { grid-area: search; margin: 0; }
+  .pos-body > .pos-category-filters { grid-area: filters; margin: 0; }
+  .pos-body > .pos-product-list { grid-area: products; overflow: auto; min-height: 0; align-content: start; }
+  .pos-body > [data-pos-product-empty] { grid-area: products; align-self: start; }
+  .pos-body > .pos-cart-wrap { grid-area: cart; overflow: auto; min-height: 0; margin: 0; align-self: stretch; }
+  .pos-body > [data-pos-cart-empty] { grid-area: cart; align-self: start; }
+
+  /* Product tiles grid */
+  .pos-product-list {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    border: 0;
+    background: transparent;
+    padding: 2px;
+  }
+  .pos-product-row {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 6px;
+    min-height: 94px;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+  }
+  .pos-product-row:first-child { border-top: 1px solid var(--color-line); }
+  .pos-product-row .pos-product-price { align-self: flex-end; font-size: 1rem; }
+
+  /* Register action bar docked to the cart (right) column */
+  .pos-footer {
+    left: auto;
+    right: 16px;
+    bottom: 16px;
+    width: 380px;
+    border: 1px solid var(--color-line);
+    border-radius: 14px;
+  }
 }
