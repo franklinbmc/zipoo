@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=83">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=85">
 </head>
 <body>
   <div class="app-shell login-entry">
@@ -32,46 +32,51 @@
     <footer class="app-bottom-bar">
       <nav class="app-bottom-nav" aria-label="Main Navigation">
         <a class="bottom-nav-item active" href="/dashboard" aria-label="Home">
-          <svg viewBox="0 0 512 512" aria-hidden="true">
-            <path d="M80 220l176-140 176 140v212H304V304h-96v128H80z" />
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-4a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z" />
           </svg>
-          <span>HOME</span>
+          <span>Home</span>
         </a>
         <a class="bottom-nav-item" href="/sales?workspace=invoices" aria-label="Invoice">
-          <svg viewBox="0 0 512 512" aria-hidden="true">
-            <path d="M128 48h256v416l-32-24-32 24-32-24-32 24-32-24-32 24-32-24-32 24V48z" />
-            <path d="M192 144h128M192 224h128M192 304h80" />
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+            <path d="M14 2v6h6" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <line x1="10" y1="9" x2="8" y2="9" />
           </svg>
-          <span>INVOICE</span>
+          <span>Invoice</span>
         </a>
         <a class="bottom-nav-item pos-nav-item" href="/sales?workspace=pos" aria-label="POS">
-          <span class="pos-icon-circle">
-            <svg viewBox="0 0 512 512" aria-hidden="true">
-              <rect x="64" y="96" width="384" height="320" rx="32" />
-              <path d="M112 144h288v72H112z" />
-              <circle cx="160" cy="280" r="14" />
-              <circle cx="256" cy="280" r="14" />
-              <circle cx="352" cy="280" r="14" />
-              <circle cx="160" cy="344" r="14" />
-              <circle cx="256" cy="344" r="14" />
-              <circle cx="352" cy="344" r="14" />
+          <div class="pos-icon-circle">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 8V5a1 1 0 0 1 1-1h3" />
+              <path d="M16 4h3a1 1 0 0 1 1 1v3" />
+              <path d="M4 16v3a1 1 0 0 0 1 1h3" />
+              <path d="M16 20h3a1 1 0 0 0 1-1v-3" />
+              <rect x="8" y="8" width="2.5" height="2.5" rx="0.5" fill="#ffffff" stroke="none" />
+              <rect x="13.5" y="8" width="2.5" height="2.5" rx="0.5" fill="#ffffff" stroke="none" />
+              <rect x="8" y="13.5" width="2.5" height="2.5" rx="0.5" fill="#ffffff" stroke="none" />
+              <rect x="13.5" y="13.5" width="2.5" height="2.5" rx="0.5" fill="#ffffff" stroke="none" />
             </svg>
-          </span>
-          <span>POS</span>
+          </div>
+          <span class="pos-label">POS</span>
         </a>
         <button class="bottom-nav-item" type="button" data-quick-open aria-label="Services" aria-controls="quick-panel" aria-expanded="false">
-          <svg viewBox="0 0 512 512" aria-hidden="true">
-            <rect x="64" y="144" width="384" height="288" rx="32" />
-            <path d="M176 144V96a32 32 0 0132-32h96a32 32 0 0132 32v48M64 240h384M232 240v32h48v-32" />
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 9l1-5h16l1 5" />
+            <path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0" />
+            <path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9" />
+            <path d="M9 21v-7a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v7" />
           </svg>
-          <span>SERVICES</span>
+          <span>Services</span>
         </button>
         <button class="bottom-nav-item" type="button" data-open-support aria-label="Support">
-          <svg viewBox="0 0 512 512" aria-hidden="true">
-            <path d="M80 256a176 176 0 01352 0v96a48 48 0 01-48 48h-48v-112h64v-32a144 144 0 00-288 0v32h64v112H96a48 48 0 01-48-48v-96z" />
-            <path d="M208 440h96" />
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
           </svg>
-          <span>SUPPORT</span>
+          <span>Support</span>
         </button>
       </nav>
     </footer>
@@ -235,6 +240,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=102" defer></script>
+  <script src="/assets/js/app.js?v=103" defer></script>
 </body>
 </html>
