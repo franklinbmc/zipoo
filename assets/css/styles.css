@@ -1447,16 +1447,27 @@ body.offline .status-dot {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: 20000 !important;
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgba(18, 35, 63, 0.45);
+  background: rgba(18, 35, 63, 0.55);
   backdrop-filter: blur(4px);
 }
 
 .modal-backdrop[hidden] {
-  display: none;
+  display: none !important;
+}
+
+[data-close-shift-modal],
+[data-start-shift-modal],
+[data-pos-customer-modal],
+[data-pos-receipt-modal] {
+  z-index: 20020 !important;
+}
+
+[data-app-modal] {
+  z-index: 20050 !important;
 }
 
 .settings-modal,
@@ -3877,7 +3888,7 @@ button.settings-list-row:focus-visible {
 
 /* ======================= POS Checkout Workplace Modal ======================= */
 .pos-checkout-backdrop {
-  z-index: 120;
+  z-index: 20020 !important;
   padding: 16px;
   background: rgba(15, 23, 42, 0.65);
   backdrop-filter: blur(6px);
