@@ -666,21 +666,22 @@ const setupQuickPanel = () => {
   refreshStoredAccount().then(syncQuickBusinessUi);
   refreshStoredBusinesses().then(syncQuickBusinessUi);
 
-  if (!panel || !openButton || !closeButton) {
+  const openButtons = document.querySelectorAll("[data-quick-open]");
+
+  if (!panel || !closeButton) {
     return;
   }
 
   const openPanel = () => {
     panel.hidden = false;
-    openButton.setAttribute("aria-expanded", "true");
+    openButtons.forEach((b) => b.setAttribute("aria-expanded", "true"));
     closeButton.focus();
   };
 
   const closePanel = () => {
     panel.hidden = true;
-    openButton.setAttribute("aria-expanded", "false");
+    openButtons.forEach((b) => b.setAttribute("aria-expanded", "false"));
     closeCompanyMenu();
-    openButton.focus();
   };
 
   const toggleCompanyMenu = () => {
@@ -692,7 +693,7 @@ const setupQuickPanel = () => {
     companyCurrent?.setAttribute("aria-expanded", willOpen ? "true" : "false");
   };
 
-  openButton.addEventListener("click", openPanel);
+  openButtons.forEach((btn) => btn.addEventListener("click", openPanel));
   closeButton.addEventListener("click", closePanel);
   panel.addEventListener("click", (event) => {
     if (event.target === panel) {
@@ -5579,14 +5580,38 @@ const setupSalesPage = () => {
   };
   const syncPosFs = () => {
     const fs = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    posWorkspace?.classList.toggle("pos-fs", fs && !posWorkspace.hidden);
+    if (fs && !posWorkspace?.hidden) {
+      posWorkspace?.classList.add("pos-fs");
+    }
   };
   document.addEventListener("fullscreenchange", syncPosFs);
   document.addEventListener("webkitfullscreenchange", syncPosFs);
-  const closePos = () => { exitFullscreen(); posWorkspace?.classList.remove("pos-fs"); closeWorkspace(posWorkspace); };
+  const openPos = () => {
+    openWorkspace(posWorkspace);
+    posWorkspace?.classList.add("pos-fs");
+    enterPosFullscreen();
+    refreshPosCatalogue();
+    loadPosTickets();
+    refreshShift();
+  };
+  const closePos = () => {
+    exitFullscreen();
+    posWorkspace?.classList.remove("pos-fs");
+    closeWorkspace(posWorkspace);
+    if (new URLSearchParams(window.location.search).get("workspace") === "pos") {
+      window.location.href = `${getBasePath()}dashboard`;
+    }
+  };
 
   document.querySelector("[data-pos-workspace-close]")?.addEventListener("click", closePos);
   document.querySelector("[data-pos-fs-exit]")?.addEventListener("click", closePos);
+  posWorkspace?.addEventListener("click", () => {
+    if (!posWorkspace.hidden && posWorkspace.classList.contains("pos-fs")) {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+        enterPosFullscreen();
+      }
+    }
+  }, { passive: true });
   document.querySelectorAll("[data-open-invoices-workspace]").forEach((btn) => btn.addEventListener("click", () => { openWorkspace(invoicesWorkspace); loadInvoices(invoicesSearch?.value.trim() || ""); }));
   document.querySelector("[data-invoices-workspace-close]")?.addEventListener("click", () => closeWorkspace(invoicesWorkspace));
   document.querySelectorAll("[data-open-reports-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(reportsWorkspace)));
@@ -6575,7 +6600,7 @@ const setupSalesPage = () => {
 
   // Open / close POS
   document.querySelectorAll("[data-open-pos-workspace]").forEach((btn) => {
-    btn.addEventListener("click", () => { openWorkspace(posWorkspace); enterPosFullscreen(); refreshPosCatalogue(); loadPosTickets(); refreshShift(); });
+    btn.addEventListener("click", openPos);
   });
 
   let posSearchTimer;
@@ -6799,11 +6824,7 @@ const setupSalesPage = () => {
   const salesParams = new URLSearchParams(window.location.search);
   const targetWorkspace = salesParams.get("workspace") || salesParams.get("view");
   if (targetWorkspace === "pos") {
-    openWorkspace(posWorkspace);
-    enterPosFullscreen();
-    refreshPosCatalogue();
-    loadPosTickets();
-    refreshShift();
+    openPos();
   } else if (targetWorkspace === "invoices") {
     openWorkspace(invoicesWorkspace);
     loadInvoices(invoicesSearch?.value.trim() || "");
