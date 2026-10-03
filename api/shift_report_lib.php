@@ -33,15 +33,16 @@ function get_shift_report_data(PDO $pdo, int $businessId, int $shiftId): ?array
         return null;
     }
 
-    $bStmt = $pdo->prepare('SELECT id, name, phone, email, tin_number, vrn_number, address FROM tbl_businesses WHERE id = :bid LIMIT 1');
+    $bStmt = $pdo->prepare('SELECT * FROM tbl_businesses WHERE id = :bid LIMIT 1');
     $bStmt->execute([':bid' => $businessId]);
-    $business = $bStmt->fetch() ?: [
-        'name' => 'Zipoo Business',
-        'phone' => '',
-        'email' => '',
-        'tin_number' => '',
-        'vrn_number' => '',
-        'address' => '',
+    $bRow = $bStmt->fetch() ?: [];
+    $business = [
+        'name' => (string) ($bRow['business_name'] ?? $bRow['name'] ?? 'Zipoo Business'),
+        'phone' => (string) ($bRow['phone'] ?? ''),
+        'email' => (string) ($bRow['email'] ?? ''),
+        'tin_number' => (string) ($bRow['tin'] ?? $bRow['tin_number'] ?? ''),
+        'vrn_number' => (string) ($bRow['vrn'] ?? $bRow['vrn_number'] ?? ''),
+        'address' => (string) ($bRow['address'] ?? ''),
     ];
 
     // Totals by payment method
@@ -78,7 +79,7 @@ function get_shift_report_data(PDO $pdo, int $businessId, int $shiftId): ?array
     // Individual sales transactions
     $tStmt = $pdo->prepare(
         'SELECT 
-            s.id, s.invoice_number, s.sale_date, s.created_at, s.payment_method, s.total_amount,
+            s.id, s.invoice_number, s.issue_date, s.created_at, s.payment_method, s.total_amount,
             COALESCE(c.full_name, "Walk-in Customer") AS customer_name
          FROM tbl_sales s
          LEFT JOIN tbl_customers c ON c.id = s.customer_id
