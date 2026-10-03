@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/accounts_lib.php';
 require_once __DIR__ . '/vat_lib.php';
+require_once __DIR__ . '/pos_lib.php';
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dompdf\Dompdf;
@@ -348,6 +349,7 @@ try {
     ensure_accounts_tables($pdo);
     ensure_vat_columns($pdo);
     ensure_party_tax_ids($pdo);
+    ensure_sales_pos_columns($pdo);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Single invoice detail
@@ -406,6 +408,43 @@ try {
             ] : null;
 
             respond(200, ['ok' => true, 'invoice' => $out]);
+        }
+
+        // POS sales history (dated list of counter sales).
+        if (($_GET['history'] ?? '') === 'pos') {
+            $from = trim((string) ($_GET['from'] ?? ''));
+            $to = trim((string) ($_GET['to'] ?? ''));
+            $hq = trim((string) ($_GET['q'] ?? ''));
+            $conds = ['s.business_id = :bid', 's.sale_type = "pos"'];
+            $hp = [':bid' => $businessId];
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $conds[] = 'DATE(s.created_at) >= :from'; $hp[':from'] = $from; }
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) { $conds[] = 'DATE(s.created_at) <= :to'; $hp[':to'] = $to; }
+            if ($hq !== '') { $conds[] = '(s.invoice_number LIKE :q OR s.customer_name LIKE :q)'; $hp[':q'] = '%' . $hq . '%'; }
+            $hwhere = implode(' AND ', $conds);
+            $stmt = $pdo->prepare(
+                "SELECT s.id, s.invoice_number, s.customer_name, s.total_amount, s.amount_paid, s.payment_method, s.status, s.created_at,
+                        u.full_name AS cashier
+                 FROM tbl_sales s LEFT JOIN tbl_users u ON u.id = s.created_by
+                 WHERE {$hwhere} ORDER BY s.id DESC LIMIT 300"
+            );
+            $stmt->execute($hp);
+            $rows = $stmt->fetchAll();
+            $total = 0.0;
+            $sales = array_map(static function ($r) use (&$total) {
+                if ($r['status'] !== 'cancelled') { $total += (float) $r['total_amount']; }
+                return [
+                    'id' => (int) $r['id'],
+                    'receipt_number' => (string) $r['invoice_number'],
+                    'customer_name' => (string) ($r['customer_name'] ?? ''),
+                    'total_amount' => (float) $r['total_amount'],
+                    'amount_paid' => (float) $r['amount_paid'],
+                    'payment_method' => (string) ($r['payment_method'] ?? ''),
+                    'status' => (string) $r['status'],
+                    'cashier' => (string) ($r['cashier'] ?? ''),
+                    'created_at' => (string) $r['created_at'],
+                ];
+            }, $rows);
+            respond(200, ['ok' => true, 'sales' => $sales, 'stats' => ['count' => count($sales), 'total' => round($total, 2)]]);
         }
 
         // List invoices
@@ -773,6 +812,13 @@ try {
             $amountPaid = ($amountPaidInput !== null && $amountPaidInput >= $totalAmount) ? $amountPaidInput : $totalAmount;
             $changeDue = round($amountPaid - $totalAmount, 2);
 
+            // A shift (till) must be open before any counter sale can be made.
+            $openShift = current_open_shift($pdo, $businessId, $userId);
+            if (!$openShift) {
+                respond(422, ['ok' => false, 'message' => 'Start a shift before making sales.']);
+            }
+            $shiftId = (int) $openShift['id'];
+
             // Resolve which Bank & Cash account this payment lands in, before touching
             // the database. Cash uses/creates the default; Card and Lipa kwa simu require
             // an account of their own type so the money is tracked correctly.
@@ -809,9 +855,9 @@ try {
                 $ins = $pdo->prepare(
                     'INSERT INTO tbl_sales
                         (business_id, sale_type, invoice_number, customer_id, customer_name, status, issue_date, due_date,
-                         subtotal, discount, tax_rate, tax_amount, total_amount, amount_paid, notes, created_by)
+                         subtotal, discount, tax_rate, tax_amount, total_amount, amount_paid, notes, created_by, shift_id, payment_method)
                      VALUES (:bid, "pos", :inv, :cid, :cname, "paid", :idate, NULL,
-                         :sub, 0.00, :trate, :tamt, :tot, :paid, :notes, :uid)'
+                         :sub, 0.00, :trate, :tamt, :tot, :paid, :notes, :uid, :shift, :pm)'
                 );
                 $ins->execute([
                     ':bid' => $businessId,
@@ -826,6 +872,8 @@ try {
                     ':paid' => min($amountPaid, $totalAmount), // store settled amount, not change
                     ':notes' => 'POS sale (' . $paymentMethod . ')',
                     ':uid' => $userId,
+                    ':shift' => $shiftId,
+                    ':pm' => $paymentMethod,
                 ]);
                 $saleId = (int) $pdo->lastInsertId();
 

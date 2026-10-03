@@ -6137,8 +6137,9 @@ const setupSalesPage = () => {
     if (posCartBody) posCartBody.replaceChildren(...posCart.map(buildPosCartRow));
     const { total } = posTotals();
     if (posTotalEl) posTotalEl.textContent = formatCurrency(total);
-    if (posCheckoutBtn) posCheckoutBtn.disabled = !has;
+    if (posCheckoutBtn) posCheckoutBtn.disabled = !has || !currentShift;
     if (posClearBtn) posClearBtn.disabled = !has;
+    if (typeof persistActiveTicket === "function") persistActiveTicket();
   };
 
   const addToPosCart = (product) => {
@@ -6191,6 +6192,302 @@ const setupSalesPage = () => {
     posCart = [];
     renderPosCart();
   };
+
+  // ===================== Held sales (tickets) + Shift + Sales history =====================
+  const escH = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const posTicketsBar = document.querySelector("[data-pos-tickets]");
+  const posShiftStrip = document.querySelector("[data-pos-shift-strip]");
+  const POS_TICKETS_KEY = () => `zipoo.pos.tickets.${getStoredBusinessState().selectedBusiness?.id || 0}`;
+  let posTickets = [];
+  let activeTicketId = null;
+  let posTicketSeq = 0;
+  let currentShift = null;
+  let shiftAccounts = [];
+
+  const activeTicket = () => posTickets.find((t) => t.id === activeTicketId) || null;
+  const savePosTickets = () => {
+    try { localStorage.setItem(POS_TICKETS_KEY(), JSON.stringify({ tickets: posTickets, activeId: activeTicketId, seq: posTicketSeq })); } catch { /* ignore */ }
+  };
+  const renderTicketsBar = () => {
+    if (!posTicketsBar) return;
+    const chips = posTickets.map((t) => {
+      const count = (t.cart || []).reduce((s, l) => s + (Number(l.qty) || 0), 0);
+      const active = t.id === activeTicketId;
+      return `<button type="button" class="pos-ticket${active ? " active" : ""}" data-ticket="${t.id}">
+        <span class="pos-ticket-label">${escH(t.label)}</span>
+        <span class="pos-ticket-meta">${count} item${count !== 1 ? "s" : ""}</span>
+        <span class="pos-ticket-x" data-ticket-del="${t.id}" aria-label="Remove">${svgMarkup("close", { size: 11 })}</span>
+      </button>`;
+    }).join("");
+    posTicketsBar.innerHTML = chips + `<button type="button" class="pos-ticket pos-ticket-new" data-ticket-new>+ New sale</button>`;
+  };
+  const persistActiveTicket = () => {
+    const t = activeTicket();
+    if (t) { t.cart = posCart; t.customer = { ...posCustomer }; t.payment = posPayment; }
+    savePosTickets();
+    renderTicketsBar();
+  };
+  const loadTicketIntoState = (t) => {
+    posCart = Array.isArray(t.cart) ? t.cart : [];
+    posCustomer = (t.customer && t.customer.id) ? { ...t.customer } : { id: 0, name: "Walk-in Customer" };
+    posPayment = t.payment || "cash";
+    if (posCustomerNameEl) posCustomerNameEl.textContent = posCustomer.name;
+    posPaymentMethods?.querySelectorAll(".filter-pill").forEach((b) => b.classList.toggle("active", (b.dataset.posPayment || "cash") === posPayment));
+    renderPosCart();
+  };
+  const newPosTicket = (makeActive = true) => {
+    posTicketSeq += 1;
+    const t = { id: `t${Date.now()}${Math.floor(Math.random() * 1000)}`, label: `Sale ${posTicketSeq}`, cart: [], customer: { id: 0, name: "Walk-in Customer" }, payment: "cash", createdAt: Date.now() };
+    posTickets.push(t);
+    if (makeActive) { activeTicketId = t.id; loadTicketIntoState(t); }
+    savePosTickets();
+    renderTicketsBar();
+    return t;
+  };
+  const switchPosTicket = (id) => {
+    if (id === activeTicketId) return;
+    persistActiveTicket();
+    const t = posTickets.find((x) => x.id === id);
+    if (!t) return;
+    activeTicketId = id;
+    loadTicketIntoState(t);
+    savePosTickets();
+    renderTicketsBar();
+  };
+  const deletePosTicket = async (id) => {
+    const t = posTickets.find((x) => x.id === id);
+    if (!t) return;
+    if ((t.cart || []).length) {
+      const ok = await showConfirmModal({ title: "Remove sale", message: `Discard "${t.label}" with ${t.cart.length} item(s)? This held sale will be deleted.`, confirmLabel: "Remove", danger: true });
+      if (!ok) return;
+    }
+    posTickets = posTickets.filter((x) => x.id !== id);
+    if (activeTicketId === id) {
+      if (!posTickets.length) { newPosTicket(true); return; }
+      activeTicketId = posTickets[0].id;
+      loadTicketIntoState(posTickets[0]);
+    }
+    savePosTickets();
+    renderTicketsBar();
+  };
+  const dropActiveTicketAfterSale = () => {
+    posTickets = posTickets.filter((x) => x.id !== activeTicketId);
+    if (!posTickets.length) { newPosTicket(true); return; }
+    activeTicketId = posTickets[0].id;
+    loadTicketIntoState(posTickets[0]);
+    savePosTickets();
+    renderTicketsBar();
+  };
+  const loadPosTickets = () => {
+    try {
+      const raw = localStorage.getItem(POS_TICKETS_KEY());
+      if (raw) { const d = JSON.parse(raw); posTickets = Array.isArray(d.tickets) ? d.tickets : []; activeTicketId = d.activeId || null; posTicketSeq = Number(d.seq) || posTickets.length; }
+    } catch { /* ignore */ }
+    if (!posTickets.length) { newPosTicket(true); return; }
+    if (!posTickets.find((t) => t.id === activeTicketId)) activeTicketId = posTickets[0].id;
+    loadTicketIntoState(activeTicket());
+    renderTicketsBar();
+  };
+  posTicketsBar?.addEventListener("click", (e) => {
+    const delId = e.target.closest("[data-ticket-del]")?.dataset.ticketDel;
+    if (delId) { deletePosTicket(delId); return; }
+    if (e.target.closest("[data-ticket-new]")) { newPosTicket(true); return; }
+    const id = e.target.closest("[data-ticket]")?.dataset.ticket;
+    if (id) switchPosTicket(id);
+  });
+
+  // ---- Shift (till) ----
+  const startShiftModal = document.querySelector("[data-start-shift-modal]");
+  const startShiftAmount = document.querySelector("[data-start-shift-amount]");
+  const startShiftError = document.querySelector("[data-start-shift-error]");
+  const closeShiftModal = document.querySelector("[data-close-shift-modal]");
+  const closeShiftAmount = document.querySelector("[data-close-shift-amount]");
+  const closeShiftAccounts = document.querySelector("[data-close-shift-accounts]");
+  const csOpening = document.querySelector("[data-cs-opening]");
+  const csCashSales = document.querySelector("[data-cs-cashsales]");
+  const csExpected = document.querySelector("[data-cs-expected]");
+  const csVariance = document.querySelector("[data-cs-variance]");
+  const closeShiftError = document.querySelector("[data-close-shift-error]");
+  const shiftStatusBadge = document.querySelector("[data-shift-status-badge]");
+  const shiftWsStatus = document.querySelector("[data-shift-ws-status]");
+  attachThousandsFormatting(startShiftAmount);
+  attachThousandsFormatting(closeShiftAmount);
+
+  const shiftStripHtml = () => {
+    if (currentShift) {
+      const opened = new Date(String(currentShift.opened_at).replace(" ", "T"));
+      const t = isNaN(opened.getTime()) ? "" : opened.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+      return `<div class="pos-shift-open">
+        <span><strong>Shift open</strong>${t ? " · since " + t : ""} · cash sales ${formatCurrency(currentShift.cash_sales || 0)}</span>
+        <button type="button" class="btn btn-danger-outline btn-sm" data-close-shift-open>Close Shift</button>
+      </div>`;
+    }
+    return `<div class="pos-shift-closed">
+      <span>No open shift — start one to begin selling.</span>
+      <button type="button" class="btn btn-primary btn-sm" data-start-shift-open>Start Shift</button>
+    </div>`;
+  };
+  const renderShiftUI = () => {
+    if (posShiftStrip) posShiftStrip.innerHTML = shiftStripHtml();
+    if (shiftWsStatus) shiftWsStatus.innerHTML = shiftStripHtml();
+    if (shiftStatusBadge) shiftStatusBadge.textContent = currentShift ? "Open" : "Closed";
+    renderPosCart();
+  };
+  const refreshShift = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/shifts.php?action=current`);
+      const d = await res.json();
+      if (res.ok && d.ok) { currentShift = d.shift; shiftAccounts = d.accounts || []; }
+    } catch { /* offline */ }
+    renderShiftUI();
+  };
+  const openStartShift = () => {
+    if (startShiftModal) startShiftModal.hidden = false;
+    if (startShiftError) startShiftError.hidden = true;
+    if (startShiftAmount) { startShiftAmount.value = ""; startShiftAmount.focus(); }
+  };
+  const openCloseShift = async () => {
+    await refreshShift();
+    if (!currentShift) { await showAppModal("Shift", "There is no open shift to close."); return; }
+    if (closeShiftError) closeShiftError.hidden = true;
+    if (closeShiftAccounts) closeShiftAccounts.innerHTML = shiftAccounts.map((a) => `<div style="display:flex;justify-content:space-between;font-size:0.85rem;margin-bottom:3px;"><span style="color:var(--color-muted);">${escH(a.name)}</span><strong>${formatCurrency(a.balance)}</strong></div>`).join("") || `<div style="font-size:0.82rem;color:var(--color-muted);">No accounts.</div>`;
+    if (csOpening) csOpening.textContent = formatCurrency(currentShift.opening_balance || 0);
+    if (csCashSales) csCashSales.textContent = formatCurrency(currentShift.cash_sales || 0);
+    if (csExpected) csExpected.textContent = formatCurrency(currentShift.expected_cash || 0);
+    if (closeShiftAmount) closeShiftAmount.value = "";
+    if (csVariance) csVariance.textContent = formatCurrency(0 - (currentShift.expected_cash || 0));
+    if (closeShiftModal) closeShiftModal.hidden = false;
+  };
+  closeShiftAmount?.addEventListener("input", () => {
+    const counted = num(closeShiftAmount.value);
+    const v = counted - (currentShift?.expected_cash || 0);
+    if (csVariance) { csVariance.textContent = formatCurrency(v); csVariance.style.color = v === 0 ? "var(--color-navy)" : (v < 0 ? "#dc2626" : "#16a34a"); }
+  });
+  document.querySelector("[data-start-shift-cancel]")?.addEventListener("click", () => { if (startShiftModal) startShiftModal.hidden = true; });
+  document.querySelector("[data-close-shift-cancel]")?.addEventListener("click", () => { if (closeShiftModal) closeShiftModal.hidden = true; });
+  document.querySelector("[data-start-shift-confirm]")?.addEventListener("click", async () => {
+    if (startShiftError) startShiftError.hidden = true;
+    try {
+      const b = new FormData(); b.set("action", "open"); b.set("opening_balance", String(num(startShiftAmount?.value)));
+      const res = await fetch(`${getBasePath()}api/shifts.php`, { method: "POST", body: b });
+      const d = await res.json();
+      if (!res.ok || !d.ok) throw new Error(d.message || "Could not start shift.");
+      if (startShiftModal) startShiftModal.hidden = true;
+      await refreshShift();
+      if (typeof loadShiftsList === "function") loadShiftsList();
+    } catch (err) { if (startShiftError) { startShiftError.textContent = err.message; startShiftError.hidden = false; } }
+  });
+  document.querySelector("[data-close-shift-confirm]")?.addEventListener("click", async () => {
+    if (closeShiftError) closeShiftError.hidden = true;
+    try {
+      const b = new FormData(); b.set("action", "close"); b.set("closing_balance", String(num(closeShiftAmount?.value)));
+      const res = await fetch(`${getBasePath()}api/shifts.php`, { method: "POST", body: b });
+      const d = await res.json();
+      if (!res.ok || !d.ok) throw new Error(d.message || "Could not close shift.");
+      if (closeShiftModal) closeShiftModal.hidden = true;
+      const s = d.summary || {};
+      await showAppModal("Shift closed", `Sales: ${s.sales_count || 0} (${formatCurrency(s.sales_total || 0)})\nExpected cash: ${formatCurrency(s.expected_cash || 0)}\nCounted: ${formatCurrency(s.closing_balance || 0)}\nVariance: ${formatCurrency(s.variance || 0)}`);
+      await refreshShift();
+      if (typeof loadShiftsList === "function") loadShiftsList();
+    } catch (err) { if (closeShiftError) { closeShiftError.textContent = err.message; closeShiftError.hidden = false; } }
+  });
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-start-shift-open]")) openStartShift();
+    else if (e.target.closest("[data-close-shift-open]")) openCloseShift();
+  });
+
+  // ---- Shift workspace ----
+  const shiftWorkspace = document.querySelector("[data-shift-workspace]");
+  const shiftListEl = document.querySelector("[data-shift-list]");
+  const shiftEmptyEl = document.querySelector("[data-shift-empty]");
+  const loadShiftsList = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/shifts.php?action=list`);
+      const d = await res.json();
+      if (!res.ok || !d.ok) return;
+      const list = d.shifts || [];
+      if (!list.length) { shiftListEl?.replaceChildren(); if (shiftEmptyEl) shiftEmptyEl.hidden = false; return; }
+      if (shiftEmptyEl) shiftEmptyEl.hidden = true;
+      if (shiftListEl) {
+        shiftListEl.innerHTML = list.map((s) => {
+          const open = s.status === "open";
+          const o = new Date(String(s.opened_at).replace(" ", "T"));
+          const when = isNaN(o.getTime()) ? s.opened_at : o.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+          const badge = open ? `<span class="badge-stock in-stock">Open</span>` : `<span class="badge-stock out-of-stock">Closed</span>`;
+          const extra = (!open && s.variance != null) ? ` · var ${formatCurrency(s.variance)}` : "";
+          return `<div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+            <div style="min-width:0;text-align:left;">
+              <div style="font-weight:800;color:var(--color-navy);font-size:0.88rem;">${escH(s.cashier || "Cashier")} ${badge}</div>
+              <div style="font-size:0.75rem;color:var(--color-muted);">${when} · open ${formatCurrency(s.opening_balance)}${s.sales_total != null ? " · sales " + formatCurrency(s.sales_total) : ""}${extra}</div>
+            </div>
+          </div>`;
+        }).join("");
+      }
+    } catch { /* offline */ }
+  };
+  document.querySelectorAll("[data-open-shift-workspace]").forEach((b) => b.addEventListener("click", () => { openWorkspace(shiftWorkspace); refreshShift(); loadShiftsList(); }));
+  document.querySelector("[data-shift-close]")?.addEventListener("click", () => closeWorkspace(shiftWorkspace));
+
+  // ---- Sales history workspace ----
+  const salesHistoryWorkspace = document.querySelector("[data-sales-history-workspace]");
+  const historyList = document.querySelector("[data-history-list]");
+  const historyEmpty = document.querySelector("[data-history-empty]");
+  const historyCountEl = document.querySelector("[data-history-count]");
+  const historyTotalEl = document.querySelector("[data-history-total]");
+  let historyRangeVal = "today";
+  const rangeToDates = (r) => {
+    const today = new Date();
+    const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    if (r === "all") return { from: "", to: "" };
+    if (r === "today") return { from: iso(today), to: iso(today) };
+    const days = Number(r) || 7;
+    const start = new Date(today); start.setDate(start.getDate() - (days - 1));
+    return { from: iso(start), to: iso(today) };
+  };
+  const loadSalesHistory = async () => {
+    const { from, to } = rangeToDates(historyRangeVal);
+    try {
+      const params = new URLSearchParams({ history: "pos" });
+      if (from) params.set("from", from);
+      if (to) params.set("to", to);
+      const res = await fetch(`${getBasePath()}api/sales.php?${params.toString()}`);
+      const d = await res.json();
+      if (!res.ok || !d.ok) return;
+      const list = d.sales || [];
+      if (historyCountEl) historyCountEl.textContent = `${d.stats.count} sale${d.stats.count !== 1 ? "s" : ""}`;
+      if (historyTotalEl) historyTotalEl.textContent = formatCurrency(d.stats.total);
+      if (!list.length) { historyList?.replaceChildren(); if (historyEmpty) historyEmpty.hidden = false; return; }
+      if (historyEmpty) historyEmpty.hidden = true;
+      if (historyList) {
+        historyList.innerHTML = list.map((s) => {
+          const dt = new Date(String(s.created_at).replace(" ", "T"));
+          const when = isNaN(dt.getTime()) ? s.created_at : dt.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+          const cancelled = s.status === "cancelled";
+          return `<button type="button" class="settings-list-row" data-history-open="${s.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
+            <div style="min-width:0;">
+              <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(s.receipt_number)}${cancelled ? ' <span class="badge-stock out-of-stock">Cancelled</span>' : ""}</div>
+              <div style="font-size:0.76rem;color:var(--color-muted);">${when} · ${escH(s.payment_method || "-")}${s.cashier ? " · " + escH(s.cashier) : ""}</div>
+            </div>
+            <strong style="color:var(--color-navy);white-space:nowrap;">${formatCurrency(s.total_amount)}</strong>
+          </button>`;
+        }).join("");
+      }
+    } catch { /* offline */ }
+  };
+  document.querySelectorAll("[data-open-sales-history-workspace]").forEach((b) => b.addEventListener("click", () => { openWorkspace(salesHistoryWorkspace); loadSalesHistory(); }));
+  document.querySelector("[data-sales-history-close]")?.addEventListener("click", () => closeWorkspace(salesHistoryWorkspace));
+  document.querySelectorAll("[data-history-range] .filter-pill").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-history-range] .filter-pill").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      historyRangeVal = btn.dataset.range || "today";
+      loadSalesHistory();
+    });
+  });
+  historyList?.addEventListener("click", (e) => {
+    const id = e.target.closest("[data-history-open]")?.dataset.historyOpen;
+    if (id) window.open(`${getBasePath()}api/sales.php?action=pdf&id=${id}`, "_blank");
+  });
 
   const renderPosCategories = () => {
     if (!posCategoryFilters) return;
@@ -6246,7 +6543,7 @@ const setupSalesPage = () => {
 
   // Open / close POS
   document.querySelectorAll("[data-open-pos-workspace]").forEach((btn) => {
-    btn.addEventListener("click", () => { openWorkspace(posWorkspace); refreshPosCatalogue(); });
+    btn.addEventListener("click", () => { openWorkspace(posWorkspace); refreshPosCatalogue(); loadPosTickets(); refreshShift(); });
   });
 
   let posSearchTimer;
@@ -6265,6 +6562,7 @@ const setupSalesPage = () => {
   const setPosCustomer = (id, name) => {
     posCustomer = { id: Number(id) || 0, name: name || "Walk-in Customer" };
     if (posCustomerNameEl) posCustomerNameEl.textContent = posCustomer.name;
+    if (typeof persistActiveTicket === "function") persistActiveTicket();
   };
 
   posChangeCustomerBtn?.addEventListener("click", () => {
@@ -6347,6 +6645,7 @@ const setupSalesPage = () => {
       btn.classList.add("active");
       posPayment = btn.dataset.posPayment || "cash";
       applyAmountForMethod({ clearCash: true });
+      if (typeof persistActiveTicket === "function") persistActiveTicket();
     });
   });
 
@@ -6376,10 +6675,10 @@ const setupSalesPage = () => {
       if (posReceiptChange) posReceiptChange.textContent = formatCurrency(data.change_due);
       if (posReceiptModal) posReceiptModal.hidden = false;
 
-      // Reset for next sale and refresh stock-aware catalogue.
-      clearPosCart();
-      setPosCustomer(0, "Walk-in Customer");
+      // The completed sale's ticket is done — drop it and move to the next.
+      dropActiveTicketAfterSale();
       await refreshPosCatalogue();
+      await refreshShift();
       loadInvoices(invoicesSearch?.value.trim() || "");
     } catch (err) {
       if (posCheckoutError) {

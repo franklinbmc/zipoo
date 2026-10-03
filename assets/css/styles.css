@@ -3923,8 +3923,10 @@ button.settings-list-row:focus-visible {
   .pos-body {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 380px;
-    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto minmax(0, 1fr);
     grid-template-areas:
+      "tickets   tickets"
+      "shift     shift"
       "search    customer"
       "filters   cart"
       "products  cart";
@@ -3936,6 +3938,8 @@ button.settings-list-row:focus-visible {
     padding-bottom: 96px; /* room for the docked register bar */
     overflow: hidden;
   }
+  .pos-body > .pos-tickets { grid-area: tickets; margin: 0; }
+  .pos-body > .pos-shift-strip { grid-area: shift; margin: 0; }
   .pos-body > .pos-customer-bar { grid-area: customer; margin: 0; }
   .pos-body > .pos-search-wrap { grid-area: search; margin: 0; }
   .pos-body > .pos-category-filters { grid-area: filters; margin: 0; }
@@ -3974,3 +3978,50 @@ button.settings-list-row:focus-visible {
     border-radius: 14px;
   }
 }
+
+/* POS held-sales tickets + shift strip */
+.pos-tickets {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+.pos-tickets:empty { display: none; }
+.pos-ticket {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  color: var(--color-navy);
+  min-height: 42px;
+}
+.pos-ticket.active {
+  border-color: var(--color-blue);
+  box-shadow: inset 0 0 0 1px var(--color-blue);
+}
+.pos-ticket .pos-ticket-label { font-weight: 800; font-size: 0.85rem; white-space: nowrap; }
+.pos-ticket .pos-ticket-meta { font-size: 0.72rem; color: var(--color-muted); white-space: nowrap; }
+.pos-ticket .pos-ticket-x { display: inline-flex; color: var(--color-muted); padding: 2px; border-radius: 6px; }
+.pos-ticket .pos-ticket-x:hover { color: #dc2626; }
+.pos-ticket.pos-ticket-new { font-weight: 800; color: var(--color-blue); border-style: dashed; }
+
+.pos-shift-strip:empty { display: none; }
+.pos-shift-strip .pos-shift-open,
+.pos-shift-strip .pos-shift-closed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+}
+.pos-shift-strip .pos-shift-open { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+.pos-shift-strip .pos-shift-closed { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+.pos-shift-strip .btn { flex: 0 0 auto; }

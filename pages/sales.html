@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=72">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=73">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -71,6 +71,27 @@
           </span>
         </button>
 
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-sales-history-workspace>
+          <span class="stock-hub-label">
+            <strong>Sales History</strong>
+            <small>Past POS sales by date</small>
+          </span>
+          <span class="stock-summary-meta">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-shift-workspace>
+          <span class="stock-hub-label">
+            <strong>Shift</strong>
+            <small>Open &amp; close the till</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-shift-status-badge>Closed</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+
         <button class="settings-accordion-link stock-hub-row" type="button" data-open-reports-workspace>
           <span class="stock-hub-label">
             <strong>Reports</strong>
@@ -95,6 +116,12 @@
         <span class="topbar-spacer" aria-hidden="true"></span>
       </header>
       <div class="fullscreen-body stock-workspace-body pos-body">
+        <!-- Held sales (tickets) -->
+        <div class="pos-tickets" data-pos-tickets></div>
+
+        <!-- Shift (till) strip -->
+        <div class="pos-shift-strip" data-pos-shift-strip></div>
+
         <!-- Customer bar -->
         <div class="pos-customer-bar">
           <div class="pos-customer-current">
@@ -237,6 +264,97 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <button class="btn btn-outline" type="button" data-pos-receipt-print>Print Receipt</button>
         <button class="btn btn-primary" type="button" data-pos-new-sale>New Sale</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Start Shift Modal -->
+  <div class="modal-backdrop" hidden data-start-shift-modal>
+    <section class="app-modal" role="dialog" aria-modal="true">
+      <h2>Start Shift</h2>
+      <p style="color:var(--color-muted);font-size:0.85rem;margin:0;">Count the cash in the drawer to open the till.</p>
+      <label class="form-field">
+        <span>Opening Cash Balance</span>
+        <input type="text" inputmode="numeric" data-start-shift-amount placeholder="0">
+      </label>
+      <p class="inline-error" hidden data-start-shift-error></p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button class="btn btn-outline" type="button" data-start-shift-cancel>Cancel</button>
+        <button class="btn btn-primary" type="button" data-start-shift-confirm>Start Shift</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Close Shift Modal -->
+  <div class="modal-backdrop" hidden data-close-shift-modal>
+    <section class="app-modal" role="dialog" aria-modal="true">
+      <h2>Close Shift</h2>
+      <div style="font-size:0.75rem;text-transform:uppercase;color:var(--color-muted);font-weight:800;margin:2px 0 4px;">Available funds</div>
+      <div class="shift-balances" data-close-shift-accounts></div>
+      <div class="shift-summary" style="background:#f8fafc;border:1px solid var(--color-line);border-radius:12px;padding:12px;margin:10px 0;">
+        <div style="display:flex;justify-content:space-between;font-size:0.88rem;margin-bottom:4px;"><span style="color:var(--color-muted);">Opening cash</span><strong data-cs-opening>0</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.88rem;margin-bottom:4px;"><span style="color:var(--color-muted);">Cash sales</span><strong data-cs-cashsales>0</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:0.95rem;font-weight:800;color:var(--color-blue);border-top:1px dashed var(--color-line);padding-top:6px;"><span>Expected cash</span><strong data-cs-expected>0</strong></div>
+      </div>
+      <label class="form-field">
+        <span>Counted Closing Cash</span>
+        <input type="text" inputmode="numeric" data-close-shift-amount placeholder="0">
+      </label>
+      <div style="display:flex;justify-content:space-between;font-weight:800;margin:2px 2px 10px;"><span style="color:var(--color-muted);">Variance</span><strong data-cs-variance>0</strong></div>
+      <p class="inline-error" hidden data-close-shift-error></p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button class="btn btn-outline" type="button" data-close-shift-cancel>Cancel</button>
+        <button class="btn btn-primary" type="button" data-close-shift-confirm>Close Shift</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Sales History -->
+  <div class="fullscreen-modal" hidden data-sales-history-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-sales-history-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2>Sales History</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="filter-bar" data-history-range>
+          <button type="button" class="filter-pill active" data-range="today">Today</button>
+          <button type="button" class="filter-pill" data-range="7">7 days</button>
+          <button type="button" class="filter-pill" data-range="30">30 days</button>
+          <button type="button" class="filter-pill" data-range="all">All</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--color-muted);margin-bottom:10px;">
+          <span data-history-count>0 sales</span>
+          <strong class="amount-fit" data-history-total style="--amount-fit-base:1.05rem;color:var(--color-navy);">TZS 0</strong>
+        </div>
+        <div class="stock-list" data-history-list></div>
+        <div class="company-users-empty" hidden data-history-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <p style="margin:0;font-size:0.84rem;color:var(--color-muted);">No sales in this period.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Shift -->
+  <div class="fullscreen-modal" hidden data-shift-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-shift-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2>Shift</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="pos-shift-strip" data-shift-ws-status style="margin-bottom:14px;"></div>
+        <div style="font-size:0.78rem;text-transform:uppercase;color:var(--color-muted);font-weight:800;margin-bottom:8px;">Recent Shifts</div>
+        <div class="stock-list" data-shift-list></div>
+        <div class="company-users-empty" hidden data-shift-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <p style="margin:0;font-size:0.84rem;color:var(--color-muted);">No shifts recorded yet.</p>
+        </div>
       </div>
     </section>
   </div>
@@ -481,6 +599,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=92" defer></script>
+  <script src="/assets/js/app.js?v=93" defer></script>
 </body>
 </html>
