@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=75">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=81">
 </head>
 <body>
   <div class="app-shell login-entry">
@@ -29,8 +29,49 @@
         <h1>Dashboard</h1>
       </section>
     </main>
-    <footer class="entry-footer">
-      <p data-i18n="app.tagline">Zipoo - Business anywhere</p>
+    <footer class="app-bottom-bar">
+      <nav class="app-bottom-nav" aria-label="Main Navigation">
+        <a class="bottom-nav-item active" href="/dashboard" aria-label="Home">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M80 220l176-140 176 140v212H304V304h-96v128H80z" />
+          </svg>
+          <span>HOME</span>
+        </a>
+        <a class="bottom-nav-item" href="/sales?workspace=invoices" aria-label="Invoice">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M128 48h256v416l-32-24-32 24-32-24-32 24-32-24-32 24-32-24-32 24V48z" />
+            <path d="M192 144h128M192 224h128M192 304h80" />
+          </svg>
+          <span>INVOICE</span>
+        </a>
+        <a class="bottom-nav-item" href="/sales?workspace=pos" aria-label="POS">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <rect x="64" y="96" width="384" height="320" rx="32" />
+            <path d="M112 144h288v72H112z" />
+            <circle cx="160" cy="280" r="14" />
+            <circle cx="256" cy="280" r="14" />
+            <circle cx="352" cy="280" r="14" />
+            <circle cx="160" cy="344" r="14" />
+            <circle cx="256" cy="344" r="14" />
+            <circle cx="352" cy="344" r="14" />
+          </svg>
+          <span>POS</span>
+        </a>
+        <a class="bottom-nav-item" href="/stock?workspace=items&filter=service" aria-label="Services">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <rect x="64" y="144" width="384" height="288" rx="32" />
+            <path d="M176 144V96a32 32 0 0132-32h96a32 32 0 0132 32v48M64 240h384M232 240v32h48v-32" />
+          </svg>
+          <span>SERVICES</span>
+        </a>
+        <button class="bottom-nav-item" type="button" data-open-support aria-label="Support">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M80 256a176 176 0 01352 0v96a48 48 0 01-48 48h-48v-112h64v-32a144 144 0 00-288 0v32h64v112H96a48 48 0 01-48-48v-96z" />
+            <path d="M208 440h96" />
+          </svg>
+          <span>SUPPORT</span>
+        </button>
+      </nav>
     </footer>
   </div>
 
@@ -135,6 +176,63 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=94" defer></script>
+  <!-- Support Modal -->
+  <div class="modal-backdrop" hidden data-support-modal>
+    <section class="app-modal support-modal" role="dialog" aria-modal="true" aria-labelledby="support-modal-title">
+      <div class="support-modal-header">
+        <div class="support-modal-icon">
+          <svg viewBox="0 0 512 512" aria-hidden="true">
+            <path d="M80 256a176 176 0 01352 0v96a48 48 0 01-48 48h-48v-112h64v-32a144 144 0 00-288 0v32h64v112H96a48 48 0 01-48-48v-96z" />
+            <path d="M208 440h96" />
+          </svg>
+        </div>
+        <h2 id="support-modal-title">Zipoo Support</h2>
+        <p class="support-modal-subtitle">We are here to help you run your business smoothly.</p>
+      </div>
+
+      <div class="support-options-grid">
+        <a class="support-option-card" href="https://wa.me/255700000000" target="_blank" rel="noopener noreferrer">
+          <span class="support-option-icon wa-icon">
+            <svg viewBox="0 0 448 512" aria-hidden="true">
+              <path d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3L72 359.2l-4.4-7c-18.5-29.4-28.2-63.3-28.2-98.2 0-101.7 82.8-184.5 184.6-184.5 49.3 0 95.6 19.2 130.4 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-3.9-10.5-6.6z"/>
+            </svg>
+          </span>
+          <div class="support-option-info">
+            <strong>Chat on WhatsApp</strong>
+            <small>Quick assistance from support</small>
+          </div>
+        </a>
+
+        <a class="support-option-card" href="tel:+255700000000">
+          <span class="support-option-icon phone-icon">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/>
+            </svg>
+          </span>
+          <div class="support-option-info">
+            <strong>Call Support</strong>
+            <small>Direct phone assistance</small>
+          </div>
+        </a>
+
+        <a class="support-option-card" href="mailto:support@zipoo.app">
+          <span class="support-option-icon mail-icon">
+            <svg viewBox="0 0 512 512" aria-hidden="true">
+              <rect x="48" y="96" width="416" height="320" rx="40" />
+              <path d="M112 160l144 112 144-112" />
+            </svg>
+          </span>
+          <div class="support-option-info">
+            <strong>Email Us</strong>
+            <small>support@zipoo.app</small>
+          </div>
+        </a>
+      </div>
+
+      <button class="btn btn-outline full" type="button" data-support-modal-close style="margin-top: 14px;">Close</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=100" defer></script>
 </body>
 </html>

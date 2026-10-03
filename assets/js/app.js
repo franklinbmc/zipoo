@@ -5510,6 +5510,17 @@ const setupStockPage = () => {
   loadPurchaseOrders();
   loadStockMovements();
   loadWarehouses();
+
+  const stockParams = new URLSearchParams(window.location.search);
+  const stockWs = stockParams.get("workspace") || stockParams.get("view");
+  if (stockWs === "items" || stockParams.get("filter") === "service") {
+    openWorkspace(itemsWorkspace, () => {
+      loadItems(itemsSearch?.value.trim() || "");
+      if (stockParams.get("filter") === "service") {
+        document.querySelector("[data-filter-type='service']")?.click();
+      }
+    });
+  }
 };
 
 const setupSalesPage = () => {
@@ -6784,6 +6795,19 @@ const setupSalesPage = () => {
   loadProducts();
   loadCustomers();
   loadInvoices();
+
+  const salesParams = new URLSearchParams(window.location.search);
+  const targetWorkspace = salesParams.get("workspace") || salesParams.get("view");
+  if (targetWorkspace === "pos") {
+    openWorkspace(posWorkspace);
+    enterPosFullscreen();
+    refreshPosCatalogue();
+    loadPosTickets();
+    refreshShift();
+  } else if (targetWorkspace === "invoices") {
+    openWorkspace(invoicesWorkspace);
+    loadInvoices(invoicesSearch?.value.trim() || "");
+  }
 };
 
 const setupBankPage = () => {
@@ -7981,6 +8005,29 @@ const setupRealEstatePage = () => {
   loadSummary();
 };
 
+const setupSupportModal = () => {
+  const modal = document.querySelector("[data-support-modal]");
+  if (!modal) return;
+  const openButtons = document.querySelectorAll("[data-open-support]");
+  const closeButtons = document.querySelectorAll("[data-support-modal-close]");
+
+  openButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      modal.hidden = false;
+    });
+  });
+
+  closeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      modal.hidden = true;
+    });
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.hidden = true;
+  });
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.lang));
@@ -7989,6 +8036,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setLanguage(getSavedLanguage()).catch(() => setLanguage(DEFAULT_LANGUAGE));
   setupBottomSheet();
   setupQuickPanel();
+  setupSupportModal();
   setupSearchSelects();
   setupPasswordTools();
   setupLoginFlow();
