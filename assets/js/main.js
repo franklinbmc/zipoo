@@ -1,6 +1,7 @@
 /**
  * Zipoo Marketing Website - Main JS
- * Bilingual (EN & SW) translation engine, mobile drawer, and FAQ accordion.
+ * Bilingual (EN & SW) translation engine, Founding 20 application form handler,
+ * mobile drawer, FAQ accordion, and smooth scroll.
  */
 
 (function () {
@@ -12,193 +13,295 @@
   const translations = {
     en: {
       // Nav
-      'nav.features': 'Features',
-      'nav.howItWorks': 'How It Works',
-      'nav.devices': 'Mobile & PC',
+      'nav.home': 'Home',
+      'nav.whyZipoo': 'Why Zipoo',
+      'nav.features': 'What It Helps With',
+      'nav.status': 'Availability',
+      'nav.founding': 'Founding 20',
       'nav.pricing': 'Pricing',
       'nav.faq': 'FAQ',
       'nav.login': 'Login',
-      'nav.startFree': 'Start Free',
+      'nav.cta': 'Join Founding 20',
 
       // Hero
-      'hero.badge': 'Modern Business System • East Africa',
+      'hero.badge': 'FOUNDING 20 — LIMITED EARLY ACCESS',
       'hero.title': 'Run your business.<br><span class="highlight">Know your numbers.</span>',
-      'hero.subtitle': 'All-in-one software for retail, wholesale, and service businesses. Effortlessly track sales, inventory, customer debts, expenses, and real-time profits from your phone or PC.',
-      'hero.startFree': 'Start Free Today',
-      'hero.login': 'Sign In to Account',
-      'hero.trustCard': 'No credit card required',
-      'hero.trustOffline': 'Works offline & online',
-      'hero.trustTrial': 'Instant access',
+      'hero.subtitle': 'Manage sales, stock, customers, expenses and debts from your phone or computer — simply and in one place.',
+      'hero.primaryCta': 'Join the Founding 20',
+      'hero.secondaryCta': 'See How Zipoo Works',
+      'hero.trust1': 'Built for Tanzania 🇹🇿',
+      'hero.trust2': 'Personal onboarding & setup',
+      'hero.trust3': 'Special founder pricing',
 
-      // Hero Mockup
-      'mockup.todaySales': "Today's Total Sales",
-      'mockup.profit': 'Estimated Net Profit',
-      'mockup.lowStock': 'Low Stock Alert',
-      'mockup.recentTx': 'Live POS Sales Stream',
+      // Demo Mockup
+      'mockup.badge': 'Sample Zipoo Dashboard',
+      'mockup.location': 'Demo Business • Retail Store',
+      'mockup.todaySales': "Today's Sales",
+      'mockup.expenses': 'Expenses',
+      'mockup.credit': 'Outstanding Credit',
+      'mockup.lowStock': 'Low Stock',
+      'mockup.lowStockVal': '8 Products',
+      'mockup.streamTitle': 'Sample POS Sales Stream',
       'mockup.cash': 'Cash',
       'mockup.mpesa': 'Lipa kwa Simu',
-      'mockup.bank': 'Bank Transfer',
 
-      // Problems & Solutions
-      'prob.kicker': 'Why Zipoo?',
-      'prob.title': 'Stop Losing Money to Paperwork and Guesswork',
-      'prob.subtitle': 'Traditional book recording causes unnoticed stock loss, forgotten customer debts, and inaccurate profit estimates.',
-      'prob.1.tag': 'Common Problem',
-      'prob.1.title': 'Missing Stock & Cash Mismatches',
-      'prob.1.desc': 'Handwritten notebooks make it easy for stock to vanish and cash drawers to mismatch without anyone noticing.',
-      'prob.1.sol': 'Zipoo shift till reconciliation records every coin, barcode scan, and cash movement automatically.',
-      'prob.2.tag': 'Common Problem',
-      'prob.2.title': 'Forgotten Customer Debts (Madeni)',
-      'prob.2.desc': 'Customer debts scattered across multiple books get forgotten, disputed, or never collected.',
-      'prob.2.sol': 'Automated customer debt ledgers with single-click WhatsApp payment reminders and clear balances.',
-      'prob.3.tag': 'Common Problem',
-      'prob.3.title': 'Stockouts on Fast-Selling Goods',
-      'prob.3.desc': 'Running out of popular items unexpectedly means turning away paying customers and losing revenue.',
-      'prob.3.sol': 'Smart low-stock warning indicators notify you in advance before critical products run out.',
-      'prob.4.tag': 'Common Problem',
-      'prob.4.title': 'Unknown Real Profit at End of Day',
-      'prob.4.desc': 'High sales volume often tricks owners into thinking they made money when expenses ate up the margin.',
-      'prob.4.sol': 'Real-time profit deduction that subtracts item cost and overhead expenses instantly.',
+      // Problem Section
+      'prob.kicker': 'The Reality of Running a Shop',
+      'prob.title': "Running a business shouldn't mean guessing.",
+      'prob.sub': "Every day, business owners face questions that shouldn't require digging through notebooks.",
+      'prob.q1': 'How much did I sell today?',
+      'prob.q2': 'Which products are running low?',
+      'prob.q3': 'Who owes me money?',
+      'prob.q4': 'How much did I spend today?',
+      'prob.q5': 'Is my business actually making money?',
+      'prob.resolution.title': 'Zipoo brings these answers together in one place.',
+      'prob.resolution.sub': 'No more scattered notebooks or evening math headaches. See your numbers clearly from your phone or computer at any time.',
 
-      // Features
+      // What Zipoo Helps With (6 Core Areas)
       'feat.kicker': 'Core Capabilities',
-      'feat.title': 'Everything You Need to Run Your Business',
-      'feat.subtitle': '6 powerful pillars engineered specifically for retail shops, wholesalers, and growing enterprises.',
-      'feat.1.title': 'POS & Quick Invoicing',
-      'feat.1.desc': 'Fast touch checkout, thermal Bluetooth receipt printing, and professional PDF invoices sent directly via WhatsApp.',
-      'feat.1.b1': 'Thermal receipt printing (58mm/80mm)',
-      'feat.1.b2': 'Fast barcode camera scanner',
-      'feat.2.title': 'Smart Inventory & Stock',
-      'feat.2.desc': 'Track quantities, unit costs, supplier purchase orders, and stock movements across multiple warehouses with ease.',
-      'feat.2.b1': 'Multi-store and warehouse support',
-      'feat.2.b2': 'Automatic low-stock threshold alerts',
-      'feat.3.title': 'Customer & Debt Ledgers',
-      'feat.3.desc': 'Never lose track of credit sales again. Keep detailed customer profiles, credit limits, and historical debt payments.',
-      'feat.3.b1': 'Instant WhatsApp payment reminders',
-      'feat.3.b2': 'Customer statement & balance tracking',
-      'feat.4.title': 'Expenses & Till Reconciliation',
-      'feat.4.desc': 'Record daily shop expenses, rent, utilities, and reconcile cashier cash drawers with shift opening/closing balances.',
-      'feat.4.b1': 'Cashier shift till variance tracking',
-      'feat.4.b2': 'Expense categorization and cash accounts',
-      'feat.5.title': 'Real-Time Financial Reports',
-      'feat.5.desc': 'Clear daily, weekly, and monthly reports showing total sales, gross profit, net profit, and best-selling products.',
-      'feat.5.b1': 'Downloadable PDF & Excel reports',
-      'feat.5.b2': 'Top product performance metrics',
-      'feat.6.title': 'Staff Roles & Security',
-      'feat.6.desc': 'Assign your cashiers sales-only access while keeping profit margins, supplier costs, and financial summaries private.',
-      'feat.6.b1': 'Owner vs. Cashier permission control',
-      'feat.6.b2': 'Audit trail of every transaction',
+      'feat.title': 'What Zipoo Helps With',
+      'feat.subtitle': 'Six simple tools to manage daily operations with clarity — without complicated ERP jargon.',
+      'feat.1.title': 'Sales',
+      'feat.1.desc': 'Record sales and understand how your business is performing each day.',
+      'feat.2.title': 'Stock',
+      'feat.2.desc': 'Know what you have, what is selling fast and what is running low.',
+      'feat.3.title': 'Customers',
+      'feat.3.desc': 'Keep customer information and purchasing activity organized in one directory.',
+      'feat.4.title': 'Credit & Debts',
+      'feat.4.desc': 'Track customers who owe you money, record repayments, and never lose credit records.',
+      'feat.5.title': 'Expenses',
+      'feat.5.desc': 'Record business expenses and understand where your hard-earned money goes.',
+      'feat.6.title': 'Reports',
+      'feat.6.desc': 'See important daily, weekly, and monthly numbers without calculating everything manually.',
 
-      // Platforms (Mobile + PC)
-      'plat.kicker': 'Cross-Platform Flexibility',
-      'plat.title': 'Your Business in Your Pocket or On Your Counter',
-      'plat.subtitle': 'Work smoothly across all your devices without purchasing expensive proprietary hardware.',
+      // Available vs Coming Soon
+      'status.kicker': 'Transparent Development',
+      'status.title': "What's Available vs. What's Coming to Zipoo",
+      'status.subtitle': 'We believe in 100% honesty: we only promise what works today, while developing future features together with our Founding 20.',
+      'status.avail.title': 'Available During Early Access',
+      'status.avail.pill': 'Functional Today',
+      'status.avail.1': 'Recording daily sales & counter checkout',
+      'status.avail.2': 'Product catalog & price management',
+      'status.avail.3': 'Customer profiles & contact records',
+      'status.avail.4': 'Basic stock quantity tracking',
+      'status.avail.5': 'Shop expenses & spending entries',
+      'status.avail.6': 'Basic dashboard & financial summaries',
+      'status.avail.7': 'Full English and Kiswahili toggle',
+      'status.coming.title': 'Coming to Zipoo',
+      'status.coming.pill': 'Being Developed During Early Access',
+      'status.coming.1': 'Advanced offline mode with background sync',
+      'status.coming.2': 'Automatic multi-device synchronization',
+      'status.coming.3': 'Multi-branch & multi-shop management',
+      'status.coming.4': 'WhatsApp debt payment reminders',
+      'status.coming.5': 'SMS receipt notifications',
+      'status.coming.6': 'Advanced downloadable reports (PDF & Excel)',
+      'status.coming.7': 'Barcode printing & custom labels',
+      'status.coming.8': 'Granular staff & cashier permissions',
+      'status.coming.9': 'Inter-branch stock transfers',
+      'status.coming.10': 'Detailed net profit margin analytics',
+
+      // Target Businesses
+      'target.kicker': 'Target Audience',
+      'target.title': 'Built for Businesses Managing Stock, Customers & Sales',
+      'target.subtitle': 'Initially focusing on businesses with inventory and counter operations in Tanzania.',
+      'target.1': 'Retail Shops & Mini-Markets',
+      'target.2': 'Hardware & Building Materials',
+      'target.3': 'Wholesalers & Distributors',
+      'target.4': 'Auto Spare-Parts & Garages',
+      'target.5': 'Electronics & Mobile Phone Shops',
+      'target.6': 'Fashion, Boutiques & Cosmetics',
+      'target.7': 'Small FMCG Distributors',
+      'target.8': 'Other Businesses Managing Stock & Sales',
+
+      // Founding 20 Campaign
+      'f20.kicker': 'Exclusive Early Programme',
+      'f20.title': 'Join the Zipoo Founding 20',
+      'f20.copy': 'We are looking for 20 Tanzanian businesses to become the first businesses using Zipoo. These businesses will help us test the system in real working environments and shape the features that matter most.',
+      'f20.b1': 'Personal onboarding & training',
+      'f20.b2': 'Hands-on help setting up your business',
+      'f20.b3': 'Help importing initial products where practical',
+      'f20.b4': 'Direct WhatsApp line to the Zipoo founding team',
+      'f20.b5': 'Priority support with rapid turnaround',
+      'f20.b6': 'Early access to test all new features',
+      'f20.b7': 'Opportunity to directly influence future roadmap',
+      'f20.b8': 'Special founder pricing locked for your first year',
+      'f20.cta': 'Apply for Founding 20',
+
+      // Founding Structure
+      'tier.1.badge': 'First 5 Businesses',
+      'tier.1.title': 'Design Partners',
+      'tier.1.desc': 'Selected businesses will use Zipoo during the pilot period and work closely with us to improve the platform.',
+      'tier.1.price': 'Free',
+      'tier.1.period': 'during initial pilot',
+      'tier.1.b1': 'Zero subscription fee during pilot',
+      'tier.1.b2': 'Direct 1-on-1 team support',
+      'tier.1.b3': 'Personal on-site / remote business setup',
+      'tier.1.b4': 'Regular feedback & feature-request sessions',
+      'tier.2.badge': 'Businesses 6–20',
+      'tier.2.title': 'Founding Customers',
+      'tier.2.desc': 'The remaining 15 early businesses get full access, onboarding support, and grandfathered founder pricing.',
+      'tier.2.price': 'TZS 15,000',
+      'tier.2.period': '/ month',
+      'tier.2.alt': 'or TZS 150,000 / year',
+      'tier.2.note': 'Special founder pricing applies during your first year.',
+      'tier.2.b1': 'Complete POS & business management',
+      'tier.2.b2': 'Full onboarding and product import assistance',
+      'tier.2.b3': 'Priority customer support',
+      'tier.2.b4': 'Direct voice in upcoming feature releases',
+
+      // Application Form
+      'form.kicker': 'Apply Now',
+      'form.title': 'Founding 20 Application Form',
+      'form.subtitle': 'Tell us about your business. We will personally review every application and contact you within 24 hours.',
+      'form.fullName': 'Full Name',
+      'form.phone': 'Phone / WhatsApp Number',
+      'form.bizName': 'Business Name',
+      'form.bizType': 'Business Type',
+      'form.bizTypeSelect': 'Select your business type',
+      'form.typeRetail': 'Retail Shop / Mini-Market',
+      'form.typeHardware': 'Hardware & Building Materials',
+      'form.typeWholesale': 'Wholesale Store',
+      'form.typeSpare': 'Auto Spare-Parts',
+      'form.typeElectronics': 'Electronics / Phone Accessories',
+      'form.typeFashion': 'Fashion / Boutique / Cosmetics',
+      'form.typeDistributor': 'Small Distributor',
+      'form.typeOther': 'Other business',
+      'form.region': 'Region (Mkoa)',
+      'form.regionPlaceholder': 'e.g. Dar es Salaam, Arusha, Mwanza...',
+      'form.district': 'District / Area (Wilaya au Eneo)',
+      'form.districtPlaceholder': 'e.g. Kariakoo, Ilala, Kinondoni...',
+      'form.salesMethod': 'How do you currently record sales?',
+      'form.salesNotebook': 'Notebook (Daftari)',
+      'form.salesExcel': 'Excel / Spreadsheet',
+      'form.salesPos': 'Another POS system',
+      'form.salesApp': 'Another mobile app',
+      'form.salesNothing': 'Nothing / Memorized',
+      'form.numProducts': 'Approximate number of products',
+      'form.prodUnder100': 'Under 100',
+      'form.prod100to500': '100 – 500',
+      'form.prod500to2k': '500 – 2,000',
+      'form.prodOver2k': 'More than 2,000',
+      'form.numStaff': 'Number of staff',
+      'form.staff1to2': '1 – 2 staff',
+      'form.staff3to5': '3 – 5 staff',
+      'form.staff6plus': '6 or more staff',
+      'form.numBranches': 'Number of shops / branches',
+      'form.branch1': '1 branch (single shop)',
+      'form.branch2to3': '2 – 3 branches',
+      'form.branch4plus': '4+ branches',
+      'form.biggestProblem': 'What is your biggest business-management problem?',
+      'form.probStock': 'Stock & missing items',
+      'form.probSales': 'Sales tracking & cash',
+      'form.probDebts': 'Customer debts (Madeni)',
+      'form.probExpenses': 'Shop expenses',
+      'form.probStaff': 'Staff & cashier management',
+      'form.probReports': 'Knowing real profits / reports',
+      'form.probOther': 'Other challenges',
+      'form.notes': 'Tell us more about your business (Optional)',
+      'form.notesPlaceholder': 'Describe your main products, daily workflow, or what you hope Zipoo helps you solve...',
+      'form.submit': 'Apply for Early Access',
+      'form.submitting': 'Submitting application...',
+      'form.successTitle': 'Thank You! Application Received',
+      'form.successText': 'Thank you. We will contact you about joining the Zipoo Founding 20. Our team personally reviews each submission and will reach out via WhatsApp or phone call.',
+      'form.whatsappChat': 'Chat Directly with Founding Team on WhatsApp',
+
+      // Device Section
+      'plat.kicker': 'Accessibility',
+      'plat.title': 'One business. Every device.',
+      'plat.subtitle': 'Use Zipoo from your phone while working in the shop and check your business from your computer when you need a bigger view.',
       'plat.phone.title': 'On Your Smartphone',
-      'plat.phone.desc': 'Check sales numbers from home, record orders while visiting clients, or ring up sales from anywhere.',
+      'plat.phone.desc': 'Record sales on the shop floor, check stock levels, and see daily numbers wherever you are.',
       'plat.pc.title': 'On Your PC & Laptop',
-      'plat.pc.desc': 'Enjoy an expansive counter POS experience with keyboard shortcuts, barcode scanners, and printer connectivity.',
-      'plat.offline.title': 'Works When Internet Fails',
-      'plat.offline.desc': 'Keep recording sales and printing receipts offline. Zipoo automatically synchronizes once your connection restores.',
+      'plat.pc.desc': 'Enjoy a wider counter experience with keyboard shortcuts, faster data entry, and full-screen tables.',
       'plat.box.title': 'Zero Expensive Hardware Required',
-      'plat.box.sub': 'Runs on any device you already own:',
+      'plat.box.sub': 'Access Zipoo seamlessly from standard devices you already have:',
       'plat.box.1': 'Android smartphones & tablets',
       'plat.box.2': 'iPhones & iPads',
-      'plat.box.3': 'Windows laptops & desktops',
-      'plat.box.4': 'Standard Bluetooth & USB thermal printers',
+      'plat.box.3': 'Windows laptops & desktop PCs',
+      'plat.box.4': 'Standard Bluetooth & USB thermal receipt printers',
 
-      // How it Works
-      'steps.kicker': 'Simple Setup',
-      'steps.title': 'Get Started in 3 Minutes',
-      'steps.subtitle': 'No technical IT knowledge required. Simple, fast, and ready to use immediately.',
-      'step.1.title': '1. Create Free Account',
-      'step.1.desc': 'Sign up with your phone number and business name in under 60 seconds. No credit card needed.',
-      'step.2.title': '2. Add Stock & Start Selling',
-      'step.2.desc': 'Add products easily or upload via Excel. Ring up sales on POS and print receipts right away.',
-      'step.3.title': '3. Know Your Real Numbers',
-      'step.3.desc': 'Watch your profits, stock levels, and customer debts update in real-time from anywhere in the world.',
+      // Tanzania Positioning
+      'tz.kicker': 'Local Context',
+      'tz.title': 'Built for businesses in Tanzania 🇹🇿',
+      'tz.subtitle': 'Tailored to the way retail and wholesale stores actually operate in our local economy.',
+      'tz.1.title': 'Native TZS Currency',
+      'tz.1.desc': 'All accounting, balances, and reports designed around Tanzanian Shillings without conversion issues.',
+      'tz.2.title': 'English & Kiswahili',
+      'tz.2.desc': 'Full bilingual support ensures you and your cashiers can work in the language you are most comfortable with.',
+      'tz.3.title': 'Tanzanian Business Workflows',
+      'tz.3.desc': 'Built around customer credit (madeni), mobile money (Lipa kwa Simu), and daily drawer handovers.',
+      'tz.4.title': 'Phone-First Simplicity',
+      'tz.4.desc': 'Optimized for mobile screens and light data consumption on standard mobile internet bundles.',
+      'tz.5.title': 'Local Dar es Salaam Support',
+      'tz.5.desc': 'Direct assistance from a team on the ground that understands your local trading environment.',
 
-      // Audience
-      'aud.kicker': 'Built For You',
-      'aud.title': 'Designed for Modern Businesses in Tanzania',
-      'aud.subtitle': 'Trusted by ambitious shop owners, retailers, and wholesalers across East Africa.',
-      'aud.retail': 'Retail Shops & Mini-Markets',
-      'aud.pharmacy': 'Pharmacies & Duka la Dawa',
-      'aud.hardware': 'Hardware & Building Materials',
-      'aud.wholesale': 'Wholesalers & Distributors',
-      'aud.clothing': 'Fashion, Boutiques & Cosmetics',
-      'aud.electronics': 'Electronics & Mobile Shops',
-      'aud.autoparts': 'Auto Spare Parts & Garages',
-      'aud.services': 'Services & Consultancies',
+      // Pricing Section
+      'price.kicker': 'Early Access Pricing',
+      'price.title': 'Transparent Founding Pricing',
+      'price.subtitle': 'Special first-year rates for the 20 businesses helping us test and build Zipoo.',
+      'price.1.badge': 'First 5 Businesses',
+      'price.1.title': 'Design Partner',
+      'price.1.price': 'Free',
+      'price.1.period': 'during pilot',
+      'price.1.desc': 'Work closely with our product team to test workflows and suggest essential improvements.',
+      'price.1.b1': 'Full access during pilot period',
+      'price.1.b2': 'Free personal onboarding & setup',
+      'price.1.b3': 'Weekly check-in & feedback sessions',
+      'price.1.cta': 'Apply as Design Partner',
+      'price.2.badge': 'Businesses 6–20',
+      'price.2.title': 'Founding Business',
+      'price.2.price': 'TZS 15,000',
+      'price.2.period': '/ month',
+      'price.2.alt': 'or TZS 150,000 / year',
+      'price.2.desc': 'Early adopter rate locked in for your entire first year of using Zipoo.',
+      'price.2.b1': 'Complete core POS & stock tools',
+      'price.2.b2': 'Help setting up & importing stock',
+      'price.2.b3': 'Priority direct team support',
+      'price.2.b4': 'Early access to all new updates',
+      'price.2.cta': 'Apply for Founding 20',
+      'price.3.badge': 'Coming After Early Access',
+      'price.3.title': 'Standard Zipoo',
+      'price.3.price': 'From TZS 25,000',
+      'price.3.period': '/ month',
+      'price.3.desc': 'Standard commercial pricing when Zipoo opens for general public registration.',
+      'price.3.b1': 'General public subscription',
+      'price.3.b2': 'Self-serve setup & guides',
+      'price.3.b3': 'Standard email/chat support',
+      'price.3.cta': 'Coming Soon',
 
-      // Pricing Preview
-      'price.kicker': 'Simple Pricing',
-      'price.title': 'Transparent Plans for Every Business Stage',
-      'price.subtitle': 'Start free and upgrade as your business expands. No hidden charges.',
-      'price.free.title': 'Starter Trial',
-      'price.free.desc': 'Ideal for new shops testing modern digital business management.',
-      'price.free.price': 'Free',
-      'price.free.period': '14-day full access',
-      'price.free.b1': 'Full POS & sales tracking',
-      'price.free.b2': 'Stock & inventory management',
-      'price.free.b3': 'Customer debts & ledgers',
-      'price.free.b4': 'Receipt printing & PDF invoices',
-      'price.free.cta': 'Start Free Trial',
-      'price.pro.popular': 'Most Popular',
-      'price.pro.title': 'Business Pro',
-      'price.pro.desc': 'Everything you need to run a fast-paced retail or wholesale store.',
-      'price.pro.price': 'TZS 25,000',
-      'price.pro.period': '/ month',
-      'price.pro.b1': 'Everything in Starter',
-      'price.pro.b2': 'Multiple staff & cashier accounts',
-      'price.pro.b3': 'WhatsApp debt reminder alerts',
-      'price.pro.b4': 'Advanced profit & loss reports',
-      'price.pro.b5': 'Shift till cash reconciliation',
-      'price.pro.cta': 'Get Started Pro',
-      'price.ent.title': 'Multi-Branch',
-      'price.ent.desc': 'For businesses with multiple shops, warehouses, and branches.',
-      'price.ent.price': 'Custom',
-      'price.ent.period': 'tailored solution',
-      'price.ent.b1': 'Multiple business branches',
-      'price.ent.b2': 'Inter-branch stock transfers',
-      'price.ent.b3': 'Consolidated owner dashboard',
-      'price.ent.b4': 'Dedicated priority support',
-      'price.ent.cta': 'Contact Sales',
+      // Social Proof
+      'proof.title': "We're starting with our first 20 businesses.",
+      'proof.sub': 'Real businesses in Kariakoo and across Tanzania testing every workflow in real shop environments.',
 
       // FAQ
-      'faq.kicker': 'Got Questions?',
+      'faq.kicker': 'Common Questions',
       'faq.title': 'Frequently Asked Questions',
-      'faq.subtitle': 'Everything you need to know about Zipoo and how it helps your business.',
-      'faq.q1': 'Can I use Zipoo on my mobile phone?',
-      'faq.a1': 'Yes! Zipoo is designed mobile-first. You can use it on any Android phone, iPhone, tablet, laptop, or desktop computer through your browser or by installing it as an app.',
-      'faq.q2': 'What happens if the internet goes down?',
-      'faq.a2': 'Zipoo has built-in offline support. You can continue ringing up POS sales and issuing receipts without interruption. Once your internet reconnects, all transactions sync automatically.',
-      'faq.q3': 'Can I print receipts for my customers?',
-      'faq.a3': 'Yes! Zipoo works with standard Bluetooth and USB thermal receipt printers (both 58mm and 80mm). You can also share professional PDF invoices directly via WhatsApp or email.',
-      'faq.q4': 'How does Zipoo help me track customer debts (madeni)?',
-      'faq.a4': 'Every time you make a credit sale, Zipoo links it to the customer profile. You can see total unpaid debts at a glance, record partial repayments, and send polite payment reminders on WhatsApp.',
-      'faq.q5': 'Is my business information safe and private?',
-      'faq.a5': 'Absolutely. Your data is encrypted and backed up securely in modern cloud infrastructure. Your cashiers only see sales screens, while sensitive profit margins and reports remain strictly private to the business owner.',
+      'faq.subtitle': 'Everything you need to know about the Zipoo Early Access and Founding 20 programme.',
+      'faq.q1': 'Is Zipoo ready to use?',
+      'faq.a1': 'Zipoo is currently in Early Access. Core features like sales recording, products, customers, expenses, and basic stock are functional today, while advanced features are being actively developed together with our first businesses.',
+      'faq.q2': 'Who can join the Founding 20?',
+      'faq.a2': 'We are initially looking for Tanzanian businesses that manage stock, counter sales, customers, or credit — such as retail shops, hardware stores, wholesalers, auto-part shops, and electronics boutiques.',
+      'faq.q3': 'Do I need a computer?',
+      'faq.a3': 'No! Zipoo works directly on supported smartphones, tablets, laptops, and desktop computers through modern web browsers. You do not need to buy expensive computer equipment.',
+      'faq.q4': 'Is Zipoo available in Kiswahili?',
+      'faq.a4': 'Yes! Zipoo is fully bilingual and supports both English and Kiswahili across all user interfaces.',
+      'faq.q5': 'Will my feedback matter?',
+      'faq.a5': 'Yes, absolutely. The entire purpose of the Founding 20 is to build Zipoo around real needs. Founding businesses have a direct communication channel to the creators to suggest features and refine workflows.',
+      'faq.q6': 'How much does it cost?',
+      'faq.a6': 'The first 5 selected design partners use Zipoo completely free during the initial pilot. Founding businesses 6–20 receive a special first-year founder rate of TZS 15,000/month or TZS 150,000/year.',
 
-      // CTA
-      'cta.title': 'Ready to take full control of your business?',
-      'cta.subtitle': 'Join forward-thinking business owners in Tanzania who manage sales, stock, and profits with complete clarity.',
-      'cta.start': 'Start Free Today',
-      'cta.login': 'Sign In to Account',
-      'cta.footnote': 'Instant setup in 60 seconds • No credit card required',
+      // Final CTA
+      'cta.title': 'Help us build Zipoo around real businesses.',
+      'cta.subtitle': 'Join the first 20 businesses using Zipoo and help shape a business platform built for Tanzania.',
+      'cta.primary': 'Apply for Founding 20',
+      'cta.secondary': 'Explore What Zipoo Helps With',
 
       // Footer
-      'footer.tagline': 'The modern business operating system for sales, stock, customer debts, and financial reports.',
-      'footer.prod': 'Product',
-      'footer.features': 'Features',
-      'footer.pos': 'Point of Sale (POS)',
-      'footer.inventory': 'Stock & Inventory',
-      'footer.debts': 'Customer Debts',
-      'footer.reports': 'Profit Reports',
+      'footer.tagline': 'A modern business management platform being built with real Tanzanian businesses.',
       'footer.co': 'Company',
       'footer.about': 'About Zipoo',
-      'footer.pricing': 'Pricing Plans',
+      'footer.pricing': 'Early Pricing',
       'footer.login': 'Sign In',
-      'footer.register': 'Create Account',
       'footer.contact': 'Contact & Support',
       'footer.location': 'Dar es Salaam, Tanzania',
       'footer.rights': 'All rights reserved. Run your business. Know your numbers.',
@@ -206,194 +309,296 @@
 
     sw: {
       // Nav
-      'nav.features': 'Vipengele',
-      'nav.howItWorks': 'Jinsi Inavyofanya Kazi',
-      'nav.devices': 'Simu & Kompyuta',
+      'nav.home': 'Mwanzo',
+      'nav.whyZipoo': 'Kwanini Zipoo',
+      'nav.features': 'Inachosaidia',
+      'nav.status': 'Upatikanaji',
+      'nav.founding': 'Biashara 20',
       'nav.pricing': 'Bei',
       'nav.faq': 'Maswali',
       'nav.login': 'Ingia',
-      'nav.startFree': 'Anza Bure',
+      'nav.cta': 'Jiunge na Biashara 20',
 
       // Hero
-      'hero.badge': 'Mfumo wa Kisasa wa Biashara • Afrika Mashariki',
+      'hero.badge': 'BIASHARA 20 ZA KWANZA — NAFASI CHACHE',
       'hero.title': 'Simamia biashara yako.<br><span class="highlight">Zijue namba zako.</span>',
-      'hero.subtitle': 'Mfumo thabiti wa kidijitali kwa maduka ya reja reja, jumla na huduma. Fuatilia mauzo, stoo ya bidhaa, madeni ya wateja, matumizi na faida halisi kupitia simu au kompyuta yako.',
-      'hero.startFree': 'Anza Bure Sasa',
-      'hero.login': 'Ingia Kwenye Akaunti',
-      'hero.trustCard': 'Hauhitaji kadi ya benki',
-      'hero.trustOffline': 'Inafanya kazi mtandaoni & bila intaneti',
-      'hero.trustTrial': 'Upatikanaji wa papo hapo',
+      'hero.subtitle': 'Simamia mauzo, stock, wateja, matumizi na madeni kupitia simu au kompyuta yako — kwa urahisi, sehemu moja.',
+      'hero.primaryCta': 'Jiunge na Biashara 20 za Kwanza',
+      'hero.secondaryCta': 'Ona Jinsi Inavyofanya Kazi',
+      'hero.trust1': 'Imetengenezwa Tanzania 🇹🇿',
+      'hero.trust2': 'Usaidizi binafsi wa kuanza',
+      'hero.trust3': 'Bei maalum ya waasisi',
 
-      // Hero Mockup
+      // Demo Mockup
+      'mockup.badge': 'Mfano wa Dashibodi ya Zipoo',
+      'mockup.location': 'Biashara ya Mfano • Duka la Reja Reja',
       'mockup.todaySales': 'Mauzo ya Leo',
-      'mockup.profit': 'Makadirio ya Faida Halisi',
-      'mockup.lowStock': 'Tahadhari ya Bidhaa Zinazoisha',
-      'mockup.recentTx': 'Mtiririko wa Mauzo ya POS',
-      'mockup.cash': 'Pesa Taslimu (Cash)',
+      'mockup.expenses': 'Matumizi',
+      'mockup.credit': 'Madeni ya Wateja',
+      'mockup.lowStock': 'Bidhaa Zinazoisha',
+      'mockup.lowStockVal': 'Bidhaa 8',
+      'mockup.streamTitle': 'Mfano wa Mauzo ya Kaunta (POS)',
+      'mockup.cash': 'Taslimu (Cash)',
       'mockup.mpesa': 'Lipa kwa Simu',
-      'mockup.bank': 'Benki',
 
-      // Problems & Solutions
-      'prob.kicker': 'Kwanini Zipoo?',
-      'prob.title': 'Acha Kupoteza Pesa kwa Vitabu na Makadirio',
-      'prob.subtitle': 'Kutumia madaftari husababisha bidhaa kupotea bila kujua, madeni kusahaulika, na kutokujua faida halisi ya biashara.',
-      'prob.1.tag': 'Tatizo Kubwa',
-      'prob.1.title': 'Bidhaa Kupotea & Pesa Kutotimia',
-      'prob.1.desc': 'Kurekodi kwa mikono kwenye madaftari kunafanya bidhaa kupotea na pesa kwenye droo kutolingana bila muhusika kujulikana.',
-      'prob.1.sol': 'Zipoo huhesabu shifti ya muuzaji na kupatanisha kila senti na stoo ya bidhaa papo hapo.',
-      'prob.2.tag': 'Tatizo Kubwa',
-      'prob.2.title': 'Madeni ya Wateja Kusahaulika',
-      'prob.2.desc': 'Madeni yaliyoandikwa kwenye madaftari mbalimbali hupotea, kusahaulika, au kusababisha mabishano na wateja.',
-      'prob.2.sol': 'Daftari la kisasa la madeni linalokupa orodha kamili na uwezo wa kutuma ukumbusho wa WhatsApp kwa mbofyo mmoja.',
-      'prob.3.tag': 'Tatizo Kubwa',
-      'prob.3.title': 'Bidhaa Zinazotoka Sana Kuisha Ghafla',
-      'prob.3.desc': 'Kuishiwa bidhaa maarufu ghafla kunakufanya uwakatishe tamaa wateja na kupoteza mapato ya kila siku.',
-      'prob.3.sol': 'Tahadhari ya kiotomatiki inakujulisha mapema kabla bidhaa zako muhimu hazijaisha stoo.',
-      'prob.4.tag': 'Tatizo Kubwa',
-      'prob.4.title': 'Kutojua Faida Halisi Mwisho wa Siku',
-      'prob.4.desc': 'Kuwa na mauzo makubwa hakumaanishi unapata faida ikiwa matumizi na gharama za bidhaa hazijakatwa kwa usahihi.',
-      'prob.4.sol': 'Hesabu ya moja kwa moja ya faida halisi baada ya kutoa gharama ya manunuzi na matumizi ya duka.',
+      // Problem Section
+      'prob.kicker': 'Uhalisia wa Kuendesha Duka',
+      'prob.title': 'Kuendesha biashara hakupaswi kuwa kubahatisha.',
+      'prob.sub': 'Kila siku, wamiliki wa biashara wanakutana na maswali ambayo hayakupaswi kuhitaji kupekuwa madaftari.',
+      'prob.q1': 'Leo nimeuza kiasi gani?',
+      'prob.q2': 'Ni bidhaa gani zinakaribia kuisha?',
+      'prob.q3': 'Ni wateja gani wanadaiwa?',
+      'prob.q4': 'Leo nimetumia kiasi gani?',
+      'prob.q5': 'Biashara yangu kweli inatengeneza faida?',
+      'prob.resolution.title': 'Zipoo inakusanya majibu haya yote sehemu moja.',
+      'prob.resolution.sub': 'Acha kuandika kwenye madaftari yaliyotawanyika au kupiga hesabu ndefu jioni. Zijue namba zako wakati wowote kupitia simu au kompyuta yako.',
 
-      // Features
+      // What Zipoo Helps With (6 Core Areas)
       'feat.kicker': 'Uwezo wa Mfumo',
-      'feat.title': 'Kila Kitu Unachohitaji Kusimamia Biashara',
-      'feat.subtitle': 'Nguzo 6 thabiti zilizotengenezwa mahsusi kwa maduka, wafanyabiashara wa jumla, na kampuni zinazokua.',
-      'feat.1.title': 'Kuuza Haraka (POS) & Ankara',
-      'feat.1.desc': 'Uza kwa urahisi, chapisha risiti za mashine ndogo za Bluetooth, na toa ankara (invoices) za PDF kutuma kwa WhatsApp.',
-      'feat.1.b1': 'Kuchapisha risiti (58mm/80mm Bluetooth & USB)',
-      'feat.1.b2': 'Kusoma barcode kwa kamera ya simu',
-      'feat.2.title': 'Stoo & Udhibiti wa Bidhaa',
-      'feat.2.desc': 'Fuatilia idadi ya bidhaa, bei ya kununulia, wauzaji wa jumla, na uhamisho wa stoo kati ya matawi kwa urahisi.',
-      'feat.2.b1': 'Usaidizi wa stoo zaidi ya moja',
-      'feat.2.b2': 'Tahadhari ya bidhaa zinazokaribia kuisha',
-      'feat.3.title': 'Wateja & Usimamizi wa Madeni',
-      'feat.3.desc': 'Usipoteze tena pesa za mauzo ya mkopo. Hifadhi rekodi kamili za wateja, kiasi cha deni, na malipo ya awamu.',
-      'feat.3.b1': 'Kutuma ujumbe wa ukumbusho wa deni WhatsApp',
-      'feat.3.b2': 'Taarifa kamili ya akaunti ya mteja',
-      'feat.4.title': 'Matumizi & Upashanaji wa Droo (Shift)',
-      'feat.4.desc': 'Rekodi matumizi ya duka kama kodi, umeme, mishahara, na linganisha hesabu ya droo ya pesa wakati wa kuanza na kufunga shifti.',
-      'feat.4.b1': 'Kujua tofauti ya pesa iliyopo na inayotarajiwa',
-      'feat.4.b2': 'Kupanga matumizi katika makundi',
-      'feat.5.title': 'Ripoti za Kifedha za Wakati Halisi',
-      'feat.5.desc': 'Pata ripoti za siku, wiki na mwezi zinazoonyesha mauzo, faida ghafi, faida halisi, na bidhaa zinazouza zaidi.',
-      'feat.5.b1': 'Pakua ripoti za PDF na Excel',
-      'feat.5.b2': 'Orodha ya bidhaa zilizouza zaidi',
-      'feat.6.title': 'Usimamizi wa Wafanyakazi & Usalama',
-      'feat.6.desc': 'Wape wauzaji uwezo wa kuuza pekee huku faida, gharama za manunuzi, na mipangilio ya siri ikibaki kwa mwenye duka.',
-      'feat.6.b1': 'Ruhusa tofauti kwa mwenye duka na muuzaji',
-      'feat.6.b2': 'Kumbukumbu ya kila muamala unaofanyika',
+      'feat.title': 'Kile Zipoo Inachokusaidia',
+      'feat.subtitle': 'Mambo 6 ya msingi ya kuendesha biashara yako kwa uwazi kila siku — bila maneno magumu ya mifumo.',
+      'feat.1.title': 'Mauzo',
+      'feat.1.desc': 'Rekodi mauzo na uelewe mwenendo wa biashara yako kila siku.',
+      'feat.2.title': 'Stock / Stoo',
+      'feat.2.desc': 'Jua bidhaa ulizonazo, zinazouza zaidi na zinazokaribia kuisha stoo.',
+      'feat.3.title': 'Wateja',
+      'feat.3.desc': 'Weka taarifa za wateja na mawasiliano yao kwa mpangilio mzuri sehemu moja.',
+      'feat.4.title': 'Madeni ya Wateja',
+      'feat.4.desc': 'Fuatilia wateja wanaokudaiwa, rekodi malipo ya awamu, na usipoteze tena kumbukumbu.',
+      'feat.5.title': 'Matumizi',
+      'feat.5.desc': 'Rekodi matumizi ya biashara na ujue wapi pesa zako zinakwenda.',
+      'feat.6.title': 'Ripoti',
+      'feat.6.desc': 'Ona namba zako muhimu bila kupiga hesabu ndefu kwa mkono.',
 
-      // Platforms (Mobile + PC)
+      // Available vs Coming Soon
+      'status.kicker': 'Uwazi Katika Ujenzi wa Mfumo',
+      'status.title': 'Kile Kilichopo Sasa vs. Kinachokuja Zipoo',
+      'status.subtitle': 'Tunaamini katika uwazi wa 100%: tunaahidi tu kile kinachofanya kazi leo, huku tukijenga vipengele vingine pamoja na biashara 20 za kwanza.',
+      'status.avail.title': 'Inapatikana Wakati wa Early Access',
+      'status.avail.pill': 'Inafanya Kazi Sasa',
+      'status.avail.1': 'Kurekodi mauzo ya kila siku na kuuza kaunta',
+      'status.avail.2': 'Orodha ya bidhaa na bei zake',
+      'status.avail.3': 'Kuhifadhi majina na namba za wateja',
+      'status.avail.4': 'Ufuatiliaji wa idadi ya bidhaa zilizobaki stoo',
+      'status.avail.5': 'Kurekodi matumizi madogo ya duka',
+      'status.avail.6': 'Dashibodi ya muhtasari wa mauzo na pesa',
+      'status.avail.7': 'Kubadili lugha ya Kiingereza na Kiswahili',
+      'status.coming.title': 'Kinachokuja Zipoo',
+      'status.coming.pill': 'Kinajengwa Wakati wa Early Access',
+      'status.coming.1': 'Kufanya kazi bila intaneti na kujisawazisha mtandao ukirudi',
+      'status.coming.2': 'Kujisawazisha kiotomatiki kati ya vifaa vingi',
+      'status.coming.3': 'Usimamizi wa matawi na maduka mengi',
+      'status.coming.4': 'Ukumbusho wa madeni kwa wateja kupitia WhatsApp',
+      'status.coming.5': 'Kutuma risiti kwa ujumbe wa SMS',
+      'status.coming.6': 'Kupakua ripoti za kina za PDF na Excel',
+      'status.coming.7': 'Kuchapisha barcode za bidhaa',
+      'status.coming.8': 'Ruhusa tofauti za wafanyakazi na wauzaji',
+      'status.coming.9': 'Uhamisho wa stoo kati ya maduka',
+      'status.coming.10': 'Uchambuzi wa kina wa faida halisi baada ya gharama zote',
+
+      // Target Businesses
+      'target.kicker': 'Biashara Lengwa',
+      'target.title': 'Imejengwa kwa Biashara Zinazosimamia Bidhaa, Wateja na Mauzo',
+      'target.subtitle': 'Hapo mwanzo inalenga maduka na biashara zinazouza bidhaa nchini Tanzania.',
+      'target.1': 'Maduka ya Reja Reja & Mini-Supermarkets',
+      'target.2': 'Maduka ya Vifaa vya Ujenzi (Hardware)',
+      'target.3': 'Wafanyabiashara wa Jumla & Wasambazaji',
+      'target.4': 'Maduka ya Spea za Magari & Pikipiki',
+      'target.5': 'Maduka ya Vifaa vya Umeme & Simu',
+      'target.6': 'Maduka ya Nguo, Viatu & Vipodozi',
+      'target.7': 'Wasambazaji Wadogo wa Bidhaa',
+      'target.8': 'Biashara Nyingine zenye Stoo na Mauzo',
+
+      // Founding 20 Campaign
+      'f20.kicker': 'Nafasi Maalum ya Waasisi',
+      'f20.title': 'Jiunge na Biashara 20 za Kwanza za Zipoo',
+      'f20.copy': 'Tunatafuta biashara 20 za Kitanzania kuwa biashara za kwanza kutumia Zipoo. Biashara hizi zitatusaidia kufanyia majaribio mfumo huu katika mazingira halisi ya kazi na kutengeneza vipengele vyenye umuhimu mkubwa zaidi.',
+      'f20.b1': 'Mafunzo na usaidizi binafsi wa ana kwa ana',
+      'f20.b2': 'Kusaidiwa kuweka mfumo kwenye biashara yako',
+      'f20.b3': 'Msaada wa kuingiza orodha ya bidhaa zako stoo',
+      'f20.b4': 'Mawasiliano ya moja kwa moja ya WhatsApp na timu ya Zipoo',
+      'f20.b5': 'Kupewa kipaumbele kwenye huduma na majibu ya haraka',
+      'f20.b6': 'Kutumia vipengele vipya kabla ya wengine wote',
+      'f20.b7': 'Uwezo wa kupendekeza vipengele unavyovihitaji',
+      'f20.b8': 'Bei maalum ya waasisi iliyopunguzwa kwa mwaka mzima',
+      'f20.cta': 'Omba Nafasi ya Biashara 20 za Kwanza',
+
+      // Founding Structure
+      'tier.1.badge': 'Biashara 5 za Kwanza',
+      'tier.1.title': 'Washirika wa Ujenzi (Design Partners)',
+      'tier.1.desc': 'Biashara 5 teule zitakazotumia Zipoo wakati wa majaribio ya kwanza na kufanya kazi nasi kwa ukaribu kuboresha mfumo.',
+      'tier.1.price': 'Bure',
+      'tier.1.period': 'wakati wa majaribio',
+      'tier.1.b1': 'Hutolipa gharama yoyote ya mwezi wakati wa majaribio',
+      'tier.1.b2': 'Usaidizi wa moja kwa moja kutoka kwa wataalamu',
+      'tier.1.b3': 'Kusaidiwa kuweka biashara yako kwenye mfumo',
+      'tier.1.b4': 'Kukutana na kutoa maoni ya vipengele unavyotaka',
+      'tier.2.badge': 'Biashara 6–20',
+      'tier.2.title': 'Wateja Waasisi (Founding Customers)',
+      'tier.2.desc': 'Biashara 15 zitakazofuata zitapata huduma kamili, usaidizi wa kuingiza bidhaa, na bei maalum iliyopunguzwa.',
+      'tier.2.price': 'TZS 15,000',
+      'tier.2.period': '/ mwezi',
+      'tier.2.alt': 'au TZS 150,000 / mwaka',
+      'tier.2.note': 'Bei hii maalum ya waasisi inatumika kwa mwaka wa kwanza mzima.',
+      'tier.2.b1': 'Kutumia mfumo kamili wa kuuza na stoo',
+      'tier.2.b2': 'Kusaidiwa kuweka na kuingiza bidhaa zako',
+      'tier.2.b3': 'Huduma ya haraka na kipaumbele cha pekee',
+      'tier.2.b4': 'Kupata vipengele vipya kabla ya wengine',
+
+      // Application Form
+      'form.kicker': 'Omba Sasa',
+      'form.title': 'Fomu ya Maombi ya Biashara 20 za Kwanza',
+      'form.subtitle': 'Tueleze machache kuhusu biashara yako. Tutapitia kila ombi binafsi na kuwasiliana nawe ndani ya saa 24.',
+      'form.fullName': 'Jina Lako Kamili',
+      'form.phone': 'Namba ya Simu / WhatsApp',
+      'form.bizName': 'Jina la Biashara',
+      'form.bizType': 'Aina ya Biashara',
+      'form.bizTypeSelect': 'Chagua aina ya biashara yako',
+      'form.typeRetail': 'Duka la Reja Reja / Mini-Market',
+      'form.typeHardware': 'Duka la Vifaa vya Ujenzi (Hardware)',
+      'form.typeWholesale': 'Duka la Jumla (Wholesale)',
+      'form.typeSpare': 'Spea za Magari / Pikipiki',
+      'form.typeElectronics': 'Vifaa vya Umeme / Simu',
+      'form.typeFashion': 'Duka la Nguo / Viatu / Vipodozi',
+      'form.typeDistributor': 'Msambazaji Mdogo',
+      'form.typeOther': 'Biashara nyingine',
+      'form.region': 'Mkoa',
+      'form.regionPlaceholder': 'mf. Dar es Salaam, Arusha, Mwanza...',
+      'form.district': 'Wilaya au Eneo la Biashara',
+      'form.districtPlaceholder': 'mf. Kariakoo, Ilala, Kinondoni...',
+      'form.salesMethod': 'Kwa sasa unarekodi vipi mauzo yako?',
+      'form.salesNotebook': 'Daftari la mkono',
+      'form.salesExcel': 'Excel / Kompyuta',
+      'form.salesPos': 'Mfumo mwingine wa POS',
+      'form.salesApp': 'App nyingine ya simu',
+      'form.salesNothing': 'Hakuna / Nakariri kichwani',
+      'form.numProducts': 'Makadirio ya idadi ya bidhaa zako',
+      'form.prodUnder100': 'Chini ya 100',
+      'form.prod100to500': 'Bidhaa 100 – 500',
+      'form.prod500to2k': 'Bidhaa 500 – 2,000',
+      'form.prodOver2k': 'Zaidi ya 2,000',
+      'form.numStaff': 'Idadi ya wafanyakazi / wauzaji',
+      'form.staff1to2': 'Wafanyakazi 1 – 2',
+      'form.staff3to5': 'Wafanyakazi 3 – 5',
+      'form.staff6plus': 'Wafanyakazi 6 au zaidi',
+      'form.numBranches': 'Idadi ya maduka / matawi',
+      'form.branch1': 'Tawi 1 (duka moja)',
+      'form.branch2to3': 'Matawi 2 – 3',
+      'form.branch4plus': 'Matawi 4 au zaidi',
+      'form.biggestProblem': 'Ni changamoto gani kubwa ya kiutawala inayokusumbua?',
+      'form.probStock': 'Stoo na bidhaa kupotea',
+      'form.probSales': 'Kufuatilia mauzo na pesa',
+      'form.probDebts': 'Madeni ya wateja (Kusahau madeni)',
+      'form.probExpenses': 'Kudhibiti matumizi ya duka',
+      'form.probStaff': 'Usimamizi wa wafanyakazi na wauzaji',
+      'form.probReports': 'Kutojua faida halisi / ripoti',
+      'form.probOther': 'Changamoto nyingine',
+      'form.notes': 'Tueleze machache zaidi kuhusu biashara yako (Hiyari)',
+      'form.notesPlaceholder': 'Eleza bidhaa unazouza au changamoto unazotaka Zipoo ikusaidie kutatua...',
+      'form.submit': 'Omba Kushiriki',
+      'form.submitting': 'Inatuma maombi yako...',
+      'form.successTitle': 'Asante! Maombi Yako Yamepokelewa',
+      'form.successText': 'Asante. Tutawasiliana nawe kuhusu nafasi ya kujiunga na biashara 20 za kwanza za Zipoo. Timu yetu itapitia taarifa zako na kukupigia au kukutumia ujumbe kwa WhatsApp.',
+      'form.whatsappChat': 'Wasiliana Moja kwa Moja na Waasisi WhatsApp',
+
+      // Device Section
       'plat.kicker': 'Urahisi wa Matumizi',
-      'plat.title': 'Biashara Yako Mkononi au Kaunta, Popote Ulipo',
-      'plat.subtitle': 'Fanya kazi kwenye vifaa vyako ulivyo navyo sasa bila kulazimika kununua vifaa vya gharama kubwa.',
+      'plat.title': 'Biashara moja. Kwenye vifaa vyako vyote.',
+      'plat.subtitle': 'Tumia Zipoo kwenye simu yako ukiwa dukani na angalia mwenendo wa biashara kwenye kompyuta unapohitaji muonekano mpana zaidi.',
       'plat.phone.title': 'Kwenye Simu Yako ya Mkononi',
-      'plat.phone.desc': 'Angalia mauzo ukiwa nyumbani, rekodi mauzo popote ulipo, au tuma ankara kwa wateja kwa urahisi.',
+      'plat.phone.desc': 'Rekodi mauzo kaunta, angalia idadi ya bidhaa stoo, na fuatilia namba zako popote ulipo.',
       'plat.pc.title': 'Kwenye Kompyuta & Laptop',
-      'plat.pc.desc': 'Pata muonekano mpana wa kaunta wenye njia za mkato za keyboard, skana ya barcode, na printa za risiti.',
-      'plat.offline.title': 'Inafanya Kazi Mtandao Ukikatika',
-      'plat.offline.desc': 'Endelea kuuza na kutoa risiti hata intaneti ikikatika. Mfumo utasawazisha taarifa zote mtandao ukirudi.',
+      'plat.pc.desc': 'Pata muonekano mpana zaidi wa kaunta wenye njia za mkato za keyboard na jedwali kubwa za bidhaa.',
       'plat.box.title': 'Hauhitaji Vifaa vya Gharama Kubwa',
-      'plat.box.sub': 'Inafanya kazi kwenye vifaa unavyomiliki tayari:',
+      'plat.box.sub': 'Inafanya kazi kwenye vifaa vya kawaida unavyomiliki tayari:',
       'plat.box.1': 'Simu na tablet za Android',
       'plat.box.2': 'iPhone na iPad za Apple',
-      'plat.box.3': 'Laptop na kompyuta za mezani (Windows & Mac)',
+      'plat.box.3': 'Laptop na kompyuta za Windows / Mac',
       'plat.box.4': 'Printa za kawaida za risiti za Bluetooth & USB',
 
-      // How it Works
-      'steps.kicker': 'Hatua Rahisi',
-      'steps.title': 'Anza Ndani ya Dakika 3 Tu',
-      'steps.subtitle': 'Hauhitaji utaalamu wa IT. Ni rahisi, ya haraka, na iko tayari kutumika mara moja.',
-      'step.1.title': '1. Fungua Akaunti Bure',
-      'step.1.desc': 'Jiandikishe kwa namba yako ya simu na jina la biashara ndani ya sekunde 60. Hakuna gharama ya kuanza.',
-      'step.2.title': '2. Weka Bidhaa & Anza Kuuza',
-      'step.2.desc': 'Ingiza bidhaa zako au pakia kutoka Excel. Anza kuuza kwenye kaunta ya POS na kutoa risiti mara moja.',
-      'step.3.title': '3. Zijue Namba Zako Halisi',
-      'step.3.desc': 'Tazama faida yako halisi, idadi ya bidhaa zilizobaki, na madeni ya wateja yakisasishwa kwa wakati halisi popote ulipo.',
+      // Tanzania Positioning
+      'tz.kicker': 'Mazingira ya Nyumbani',
+      'tz.title': 'Imetengenezwa kwa biashara za Tanzania 🇹🇿',
+      'tz.subtitle': 'Inaendana na jinsi maduka ya reja reja na ya jumla yanavyoendeshwa katika mazingira yetu ya Kitanzania.',
+      'tz.1.title': 'Sarafu Halisi ya TZS',
+      'tz.1.desc': 'Hesabu zote, salio na ripoti zimewekwa kwa Shilingi ya Kitanzania bila masuala ya kubadili sarafu.',
+      'tz.2.title': 'Kiingereza & Kiswahili',
+      'tz.2.desc': 'Uwezo kamili wa lugha zote mbili unamwezesha mmiliki na muuzaji kufanya kazi kwa lugha anayoielewa vizuri.',
+      'tz.3.title': 'Mifumo ya Biashara za Kitanzania',
+      'tz.3.desc': 'Imejengwa ikizingatia madeni ya wateja (madeni), malipo ya mitandao (Lipa kwa Simu), na upashanaji wa droo ya pesa.',
+      'tz.4.title': 'Urahisi Kwenye Simu',
+      'tz.4.desc': 'Imeboreshwa kutumia bando ndogo ya intaneti na kufanya kazi vizuri kwenye simu za kawaida.',
+      'tz.5.title': 'Usaidizi Hapa Hapa Nchini',
+      'tz.5.desc': 'Msaada wa haraka kutoka kwa timu iliyopo Dar es Salaam inayoelewa mazingira yako ya biashara.',
 
-      // Audience
-      'aud.kicker': 'Imejengwa Kwa Ajili Yako',
-      'aud.title': 'Imetengenezwa Mahsusi kwa Wafanyabiashara wa Kitanzania',
-      'aud.subtitle': 'Inaaminiwa na wamiliki wa maduka, wauzaji wa jumla, na watoa huduma kote nchini.',
-      'aud.retail': 'Maduka ya Reja Reja & Mini-Supermarkets',
-      'aud.pharmacy': 'Maduka ya Dawa (Pharmacies & DLDM)',
-      'aud.hardware': 'Maduka ya Vifaa vya Ujenzi (Hardware)',
-      'aud.wholesale': 'Wafanyabiashara wa Jumla & Wasambazaji',
-      'aud.clothing': 'Maduka ya Nguo, Viatu & Vipodozi',
-      'aud.electronics': 'Maduka ya Vifaa vya Umeme & Simu',
-      'aud.autoparts': 'Spea za Magari, Pikipiki & Karakana',
-      'aud.services': 'Watoa Huduma & Ofisi Ndogo',
+      // Pricing Section
+      'price.kicker': 'Bei ya Awali (Early Access)',
+      'price.title': 'Gharama Wazi za Waasisi',
+      'price.subtitle': 'Bei maalum ya mwaka wa kwanza kwa biashara 20 zitakazotangulia kutumia na kuboresha Zipoo.',
+      'price.1.badge': 'Biashara 5 za Kwanza',
+      'price.1.title': 'Washirika wa Ujenzi',
+      'price.1.price': 'Bure',
+      'price.1.period': 'wakati wa majaribio',
+      'price.1.desc': 'Fanya kazi kwa ukaribu na timu yetu kufanyia majaribio mfumo na kupendekeza maboresho.',
+      'price.1.b1': 'Matumizi kamili wakati wa majaribio',
+      'price.1.b2': 'Kusaidiwa bure kuweka biashara yako',
+      'price.1.b3': 'Mawasiliano na vikao vya maoni kila wiki',
+      'price.1.cta': 'Omba Nafasi ya Ushirika',
+      'price.2.badge': 'Biashara 6–20',
+      'price.2.title': 'Wateja Waasisi',
+      'price.2.price': 'TZS 15,000',
+      'price.2.period': '/ mwezi',
+      'price.2.alt': 'au TZS 150,000 / mwaka',
+      'price.2.desc': 'Bei maalum iliyopunguzwa itakayodumu kwa mwaka wako wote wa kwanza.',
+      'price.2.b1': 'Mfumo mzima wa mauzo, stoo na madeni',
+      'price.2.b2': 'Msaada wa kuweka na kuingiza bidhaa',
+      'price.2.b3': 'Kipaumbele cha huduma kwa wateja',
+      'price.2.b4': 'Kupata vipengele vipya mapema',
+      'price.2.cta': 'Jiunge na Biashara 20',
+      'price.3.badge': 'Baada ya Early Access',
+      'price.3.title': 'Zipoo ya Kawaida',
+      'price.3.price': 'Kuanzia TZS 25,000',
+      'price.3.period': '/ mwezi',
+      'price.3.desc': 'Bei itakayotumika pindi nafasi za waasisi zitakapofungwa na kuanza usajili wa umma.',
+      'price.3.b1': 'Usajili wa kawaida wa umma',
+      'price.3.b2': 'Kujiwekea mfumo mwenyewe kwa maelekezo',
+      'price.3.b3': 'Huduma ya kawaida ya mteja',
+      'price.3.cta': 'Inakuja Hivi Karibuni',
 
-      // Pricing Preview
-      'price.kicker': 'Gharama Zetu',
-      'price.title': 'Vifurushi Wazi kwa Kila Hatua ya Biashara',
-      'price.subtitle': 'Anza bure na ujiunge na vifurushi vya juu biashara yako inavyopanuka.',
-      'price.free.title': 'Majaribio ya Bure',
-      'price.free.desc': 'Bora kwa duka jipya linalotaka kuanza kusimamia biashara kidijitali.',
-      'price.free.price': 'Bure',
-      'price.free.period': 'Siku 14 za matumizi kamili',
-      'price.free.b1': 'Kuuza kwenye POS & kurekodi mauzo',
-      'price.free.b2': 'Usimamizi kamili wa stoo ya bidhaa',
-      'price.free.b3': 'Daftari la madeni ya wateja',
-      'price.free.b4': 'Kuchapisha risiti & ankara za PDF',
-      'price.free.cta': 'Anza Majaribio Bure',
-      'price.pro.popular': 'Maarufu Zaidi',
-      'price.pro.title': 'Biashara Pro',
-      'price.pro.desc': 'Kila kitu unachohitaji kuendesha duka la kisasa la reja reja au jumla.',
-      'price.pro.price': 'TZS 25,000',
-      'price.pro.period': '/ mwezi',
-      'price.pro.b1': 'Kila kitu kilichopo kwenye Starter',
-      'price.pro.b2': 'Akaunti za wafanyakazi & wauzaji wengi',
-      'price.pro.b3': 'Ukumbusho wa madeni kwa WhatsApp',
-      'price.pro.b4': 'Ripoti za kina za faida na hasara',
-      'price.pro.b5': 'Upashanaji wa droo ya pesa (Shift)',
-      'price.pro.cta': 'Jiunge na Pro',
-      'price.ent.title': 'Matawi Mengi',
-      'price.ent.desc': 'Kwa biashara zenye maduka na maghala zaidi ya moja.',
-      'price.ent.price': 'Maelewano',
-      'price.ent.period': 'kulingana na mahitaji',
-      'price.ent.b1': 'Usimamizi wa matawi mengi ya biashara',
-      'price.ent.b2': 'Uhamisho wa bidhaa kati ya matawi',
-      'price.ent.b3': 'Dashibodi ya pamoja ya mmiliki',
-      'price.ent.b4': 'Usaidizi wa moja kwa moja wa kipaumbele',
-      'price.ent.cta': 'Wasiliana Nasi',
+      // Social Proof
+      'proof.title': 'Tunaanza na biashara zetu 20 za kwanza.',
+      'proof.sub': 'Tukifanya kazi kwa ukaribu na wamiliki wa maduka Kariakoo na kote Tanzania katika mazingira halisi ya kazi.',
 
       // FAQ
-      'faq.kicker': 'Una Maswali?',
+      'faq.kicker': 'Maswali ya Kawaida',
       'faq.title': 'Maswali Yanayoulizwa Mara kwa Mara',
-      'faq.subtitle': 'Kila unachopaswa kujua kuhusu Zipoo na jinsi itakavyosaidia biashara yako.',
-      'faq.q1': 'Je, ninaweza kutumia Zipoo kwenye simu yangu ya mkononi?',
-      'faq.a1': 'Ndio! Zipoo imetengenezwa kufanya kazi vizuri sana kwenye simu yoyote ya Android, iPhone, tablet, au kompyuta kupitia kivinjari chako au kwa kuipakua kama app.',
-      'faq.q2': 'Nini kitatokea mtandao wa intaneti ukikatika?',
-      'faq.a2': 'Zipoo inafanya kazi hata bila intaneti. Unaweza kuendelea kuuza kwenye POS na kutoa risiti bila kukwama. Pindi mtandao utakapounganishwa tena, taarifa zote zitajiweka sawa kiotomatiki.',
-      'faq.q3': 'Je, ninaweza kuchapisha risiti kwa ajili ya wateja?',
-      'faq.a3': 'Ndio! Zipoo inafanya kazi na printa ndogo za kawaida za risiti (thermal printers za 58mm au 80mm) zinazotumia Bluetooth au USB. Pia unaweza kutuma ankara za PDF moja kwa moja kwa WhatsApp.',
-      'faq.q4': 'Je, Zipoo inanisaidiaje kufuatilia madeni ya wateja?',
-      'faq.a4': 'Kila unapouza kwa mkopo, Zipoo huunganisha deni hilo na jina la mteja. Unaweza kuona jumla ya madeni unayodai, kurekodi malipo ya kidogo kidogo, na kumtumia mteja ukumbusho kwa WhatsApp.',
-      'faq.q5': 'Je, taarifa za biashara yangu ziko salama?',
-      'faq.a5': 'Ndio, kwa 100%. Taarifa zako zimehifadhiwa kwa mifumo ya kisasa ya kidijitali yenye ulinzi wa hali ya juu. Wauzaji wako wanaona tu skrini ya kuuza, lakini ripoti za faida na siri za biashara ziko mikononi mwa mwenye duka pekee.',
+      'faq.subtitle': 'Kila unachopaswa kujua kuhusu hatua ya Early Access na mpango wa Biashara 20 za Kwanza za Zipoo.',
+      'faq.q1': 'Je, Zipoo iko tayari kutumika sasa?',
+      'faq.a1': 'Zipoo kwa sasa iko katika hatua ya majaribio ya awali (Early Access). Vipengele vya msingi kama kurekodi mauzo, kuweka bidhaa, wateja, matumizi na stoo ya msingi vinafanya kazi leo, huku vipengele vya ziada vikijengwa kwa ushirikiano na biashara zetu za kwanza.',
+      'faq.q2': 'Nani anayeweza kujiunga na Biashara 20 za Kwanza?',
+      'faq.a2': 'Hapo awali tunatafuta biashara za Kitanzania zinazouza bidhaa, zinazosimamia stoo au zinazodai wateja — kama vile maduka ya reja reja, vifaa vya ujenzi (hardware), wauzaji wa jumla, spea za magari, na maduka ya vifaa vya umeme/simu.',
+      'faq.q3': 'Je, ninahitaji kompyuta kuitumia?',
+      'faq.a3': 'Hapana! Zipoo inafanya kazi moja kwa moja kwenye simu za mkononi, tablet, laptop na kompyuta za kawaida kupitia kivinjari. Hauhitaji kununua vifaa vya gharama kubwa vya kompyuta.',
+      'faq.q4': 'Je, Zipoo inapatikana kwa Kiswahili?',
+      'faq.a4': 'Ndio! Zipoo inasaidia lugha zote mbili: Kiswahili na Kiingereza kwenye sehemu zote za mfumo.',
+      'faq.q5': 'Je, maoni yangu yatasikilizwa?',
+      'faq.a5': 'Ndio, kwa 100%. Lengo kuu la mpango wa Biashara 20 za Kwanza ni kujenga mfumo unaoendana na mahitaji halisi. Biashara za kwanza zitakuwa na mawasiliano ya moja kwa moja na waanzilishi wa Zipoo.',
+      'faq.q6': 'Gharama zake zikoje?',
+      'faq.a6': 'Biashara 5 za kwanza (Design Partners) zitatumia Zipoo bure kabisa wakati wa majaribio ya kwanza. Biashara 6 hadi 20 zitapata bei maalum ya waasisi ya TZS 15,000 kwa mwezi au TZS 150,000 kwa mwaka.',
 
-      // CTA
-      'cta.title': 'Uko tayari kusimamia biashara yako kwa uhakika?',
-      'cta.subtitle': 'Ungana na wafanyabiashara wajanja kote Tanzania wanaofuatilia mauzo, stoo na faida kwa uwazi na usahihi mkubwa.',
-      'cta.start': 'Anza Bure Sasa',
-      'cta.login': 'Ingia Kwenye Akaunti',
-      'cta.footnote': 'Kuanza huchukua sekunde 60 tu • Hauhitaji kadi ya benki',
+      // Final CTA
+      'cta.title': 'Tusaidie kujenga Zipoo kwa mahitaji halisi ya biashara.',
+      'cta.subtitle': 'Jiunge na biashara 20 za kwanza zinazotumia Zipoo na ushiriki kutengeneza mfumo unaoendana na biashara za Tanzania.',
+      'cta.primary': 'Omba Nafasi ya Biashara 20 za Kwanza',
+      'cta.secondary': 'Angalia Kile Zipoo Inachosaidia',
 
       // Footer
-      'footer.tagline': 'Mfumo wa kisasa wa biashara kwa ajili ya mauzo, stoo, madeni ya wateja na ripoti za kifedha.',
-      'footer.prod': 'Bidhaa',
-      'footer.features': 'Vipengele',
-      'footer.pos': 'Kuuza Kaunta (POS)',
-      'footer.inventory': 'Stoo & Bidhaa',
-      'footer.debts': 'Madeni ya Wateja',
-      'footer.reports': 'Ripoti za Faida',
+      'footer.tagline': 'Mfumo wa kisasa wa usimamizi wa biashara unaojengwa kwa ushirikiano na biashara halisi za Kitanzania.',
       'footer.co': 'Kampuni',
       'footer.about': 'Kuhusu Zipoo',
-      'footer.pricing': 'Gharama & Vifurushi',
-      'footer.login': 'Ingia Kwenye Mfumo',
-      'footer.register': 'Fungua Akaunti',
-      'footer.contact': 'Wasiliana Nasi',
+      'footer.pricing': 'Gharama za Awali',
+      'footer.login': 'Ingia Kwenye Akaunti',
+      'footer.contact': 'Mawasiliano & Usaidizi',
       'footer.location': 'Dar es Salaam, Tanzania',
       'footer.rights': 'Haki zote zimehifadhiwa. Simamia biashara yako. Zijue namba zako.',
     }
@@ -418,6 +623,14 @@
       }
     });
 
+    // Update inputs / textareas with placeholder translations
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((el) => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (translations[lang] && translations[lang][key] !== undefined) {
+        el.setAttribute('placeholder', translations[lang][key]);
+      }
+    });
+
     // Update active state of language buttons
     document.querySelectorAll('[data-lang-btn]').forEach((btn) => {
       const target = btn.getAttribute('data-lang-btn');
@@ -436,7 +649,6 @@
     toggleBtn.addEventListener('click', () => {
       const isOpen = drawer.classList.toggle('open');
       toggleBtn.setAttribute('aria-expanded', String(isOpen));
-      // Toggle icon between hamburger and close
       toggleBtn.innerHTML = isOpen
         ? `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>`
         : `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>`;
@@ -462,11 +674,9 @@
       if (!btn) return;
       btn.addEventListener('click', () => {
         const isActive = item.classList.contains('active');
-        // Close others
         faqItems.forEach((other) => {
           if (other !== item) other.classList.remove('active');
         });
-        // Toggle current
         item.classList.toggle('active', !isActive);
       });
     });
@@ -488,6 +698,92 @@
   }
 
   // ==========================================
+  // FOUNDING 20 APPLICATION FORM HANDLER
+  // ==========================================
+  function setupApplicationForm() {
+    const form = document.getElementById('foundingForm');
+    const successCard = document.getElementById('formSuccessCard');
+    if (!form || !successCard) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalBtnText = submitBtn ? submitBtn.innerHTML : '';
+
+      // Collect form data
+      const formData = new FormData(form);
+      const data = {
+        fullName: formData.get('fullName') || '',
+        phone: formData.get('phone') || '',
+        businessName: formData.get('businessName') || '',
+        businessType: formData.get('businessType') || '',
+        region: formData.get('region') || '',
+        district: formData.get('district') || '',
+        salesMethod: formData.get('salesMethod') || '',
+        numProducts: formData.get('numProducts') || '',
+        numStaff: formData.get('numStaff') || '',
+        numBranches: formData.get('numBranches') || '',
+        biggestProblem: formData.get('biggestProblem') || '',
+        notes: formData.get('notes') || '',
+        submittedAt: new Date().toISOString(),
+        language: currentLang
+      };
+
+      // Basic validation
+      if (!data.fullName.trim() || !data.phone.trim() || !data.businessName.trim()) {
+        alert(currentLang === 'sw' ? 'Tafadhali jaza taarifa zako muhimu (Jina, Simu, na Biashara).' : 'Please fill in all required fields (Name, Phone, and Business Name).');
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = translations[currentLang]['form.submitting'] || 'Submitting application...';
+      }
+
+      // Simulate submission & save locally
+      setTimeout(() => {
+        try {
+          const existingApps = JSON.parse(localStorage.getItem('zipoo_founding_applications') || '[]');
+          existingApps.push(data);
+          localStorage.setItem('zipoo_founding_applications', JSON.stringify(existingApps));
+        } catch (err) {
+          console.warn('Storage failed:', err);
+        }
+
+        // Prepare WhatsApp link on success card
+        const waMsg = encodeURIComponent(
+          `Habari Zipoo! Nimeomba nafasi ya Biashara 20 za Kwanza.\n\nJina: ${data.fullName}\nBiashara: ${data.businessName} (${data.businessType})\nEneo: ${data.district}, ${data.region}\nSimu: ${data.phone}`
+        );
+        const waBtn = document.getElementById('whatsappDirectBtn');
+        if (waBtn) {
+          waBtn.href = `https://wa.me/255700000000?text=${waMsg}`;
+        }
+
+        // Hide form, show success
+        form.style.display = 'none';
+        successCard.style.display = 'block';
+        successCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 600);
+    });
+  }
+
+  // ==========================================
+  // SMOOTH SCROLL TO FORM FOR CTA BUTTONS
+  // ==========================================
+  function setupCtaScroll() {
+    document.querySelectorAll('.cta-apply').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const target = document.getElementById('apply');
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  }
+
+  // ==========================================
   // INIT
   // ==========================================
   document.addEventListener('DOMContentLoaded', () => {
@@ -503,5 +799,7 @@
     setupMobileDrawer();
     setupFaq();
     setupHeaderScroll();
+    setupApplicationForm();
+    setupCtaScroll();
   });
 })();
