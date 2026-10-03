@@ -3681,8 +3681,25 @@ button.settings-list-row:focus-visible {
   gap: 0;
   border: 1px solid var(--color-line);
   border-radius: 12px;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  max-height: min(460px, 48vh);
   background: #fff;
+}
+
+.pos-product-list::-webkit-scrollbar {
+  width: 6px;
+}
+.pos-product-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.pos-product-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+.pos-product-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .pos-product-row {
@@ -4367,7 +4384,13 @@ button.settings-list-row:focus-visible {
 /* ======================= Desktop Point of Sale (supermarket layout, >= 1024px) ======================= */
 @media (min-width: 1024px) {
   /* The POS is the exception: it uses the full screen width, not the 1100px cap. */
-  [data-pos-workspace] .fullscreen-panel { max-width: none; margin-inline: 0; }
+  [data-pos-workspace] .fullscreen-panel {
+    max-width: none;
+    margin-inline: 0;
+    height: 100svh;
+    max-height: 100svh;
+    overflow: hidden;
+  }
 
   .pos-body {
     display: grid;
@@ -4383,6 +4406,7 @@ button.settings-list-row:focus-visible {
     width: 100%;
     max-width: none;
     height: 100%;
+    max-height: calc(100svh - 58px);
     padding: 16px;
     padding-bottom: 96px; /* room for the docked register bar */
     overflow: hidden;
@@ -4392,9 +4416,19 @@ button.settings-list-row:focus-visible {
   .pos-body > .pos-customer-bar { grid-area: customer; margin: 0; }
   .pos-body > .pos-search-wrap { grid-area: search; margin: 0; }
   .pos-body > .pos-category-filters { grid-area: filters; margin: 0; }
-  .pos-body > .pos-product-list { grid-area: products; overflow: auto; min-height: 0; align-content: start; }
+  .pos-body > .pos-product-list {
+    grid-area: products;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    min-height: 0;
+    max-height: none;
+    height: 100%;
+    align-content: start;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+  }
   .pos-body > [data-pos-product-empty] { grid-area: products; align-self: start; }
-  .pos-body > .pos-cart-wrap { grid-area: cart; overflow: auto; min-height: 0; margin: 0; align-self: stretch; }
+  .pos-body > .pos-cart-wrap { grid-area: cart; overflow-y: auto; min-height: 0; margin: 0; align-self: stretch; }
   .pos-body > [data-pos-cart-empty] { grid-area: cart; align-self: start; }
 
   /* Product tiles grid */
