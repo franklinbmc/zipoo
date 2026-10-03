@@ -3920,6 +3920,9 @@ button.settings-list-row:focus-visible {
 
 /* ======================= Desktop Point of Sale (supermarket layout, >= 1024px) ======================= */
 @media (min-width: 1024px) {
+  /* The POS is the exception: it uses the full screen width, not the 1100px cap. */
+  [data-pos-workspace] .fullscreen-panel { max-width: none; margin-inline: 0; }
+
   .pos-body {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 380px;

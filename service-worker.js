@@ -1,4 +1,4 @@
-const CACHE_NAME = "zipoo-phase-1-v133";
+const CACHE_NAME = "zipoo-phase-1-v134";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -80,6 +80,7 @@ const APP_SHELL = [
   "./assets/css/styles.css?v=69",
   "./assets/css/styles.css?v=70",
   "./assets/css/styles.css?v=73",
+  "./assets/css/styles.css?v=74",
   "./assets/js/app.js",
   "./assets/js/app.js?v=3",
   "./assets/js/app.js?v=4",
