@@ -6252,7 +6252,7 @@ const setupSalesPage = () => {
     posCustomer = (t.customer && t.customer.id) ? { ...t.customer } : { id: 0, name: "Walk-in Customer" };
     posPayment = t.payment || "cash";
     if (posCustomerNameEl) posCustomerNameEl.textContent = posCustomer.name;
-    posPaymentMethods?.querySelectorAll(".filter-pill").forEach((b) => b.classList.toggle("active", (b.dataset.posPayment || "cash") === posPayment));
+    posPaymentMethods?.querySelectorAll("[data-pos-payment]").forEach((b) => b.classList.toggle("active", (b.dataset.posPayment || "cash") === posPayment));
     renderPosCart();
   };
   const newPosTicket = (makeActive = true) => {
@@ -6622,17 +6622,65 @@ const setupSalesPage = () => {
     if (posChangeDue) posChangeDue.textContent = formatCurrency(change);
   };
 
-  // Mobile Money / Card are exact electronic payments: auto-fill the total and lock
-  // the field. Cash stays editable with live thousand-separator formatting.
+  // Mobile Money / Card / Bank are exact electronic payments: auto-fill the total and lock
+  // the field. Cash stays editable with live thousand-separator formatting and keypad.
+  const posKeypad = document.querySelector("[data-pos-keypad]");
+  const posReceivedBox = document.querySelector("[data-pos-received-box]");
+  const posBackspaceBtn = document.querySelector('[data-pos-key="backspace"]');
+
+  const appendKeyToAmount = (keyVal) => {
+    if (!posAmountPaid || posAmountPaid.disabled) return;
+    let raw = String(posAmountPaid.value || "").replace(/[^0-9]/g, "");
+    if (keyVal === "0" || keyVal === "00" || keyVal === "000") {
+      if (!raw || raw === "0") {
+        raw = "0";
+      } else {
+        raw += keyVal;
+      }
+    } else {
+      if (raw === "0") raw = "";
+      raw += keyVal;
+    }
+    posAmountPaid.value = groupAmount(raw);
+    updatePosChange();
+  };
+
+  const backspaceAmount = () => {
+    if (!posAmountPaid || posAmountPaid.disabled) return;
+    let raw = String(posAmountPaid.value || "").replace(/[^0-9]/g, "");
+    if (raw.length > 1) {
+      raw = raw.slice(0, -1);
+    } else {
+      raw = "";
+    }
+    posAmountPaid.value = groupAmount(raw);
+    updatePosChange();
+  };
+
+  posKeypad?.addEventListener("click", (e) => {
+    const key = e.target.closest("[data-pos-key]");
+    if (!key) return;
+    const val = key.dataset.posKey;
+    if (val === "backspace") {
+      backspaceAmount();
+    } else if (val) {
+      appendKeyToAmount(val);
+    }
+  });
+
+  posBackspaceBtn?.addEventListener("click", backspaceAmount);
+
   const applyAmountForMethod = ({ clearCash = false } = {}) => {
     if (!posAmountPaid) return;
     if (posPayment === "cash") {
       posAmountPaid.disabled = false;
       if (clearCash) posAmountPaid.value = "";
+      if (posKeypad) posKeypad.classList.remove("pos-keypad-disabled");
     } else {
       const { total } = posTotals();
-      posAmountPaid.value = total.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      posAmountPaid.value = groupAmount(Math.round(total));
       posAmountPaid.disabled = true;
+      if (posKeypad) posKeypad.classList.add("pos-keypad-disabled");
     }
     updatePosChange();
   };
@@ -6648,20 +6696,33 @@ const setupSalesPage = () => {
     if (posCheckoutTotal) posCheckoutTotal.textContent = formatCurrency(total);
     if (posCheckoutError) posCheckoutError.hidden = true;
     if (posAmountPaid) posAmountPaid.value = "";
-    applyAmountForMethod();
+    posPayment = "cash";
+    posPaymentMethods?.querySelectorAll("[data-pos-payment]").forEach((b) => {
+      b.classList.toggle("active", (b.dataset.posPayment || "cash") === "cash");
+    });
+    applyAmountForMethod({ clearCash: true });
     if (posCheckoutModal) posCheckoutModal.hidden = false;
+    setTimeout(() => { posAmountPaid?.focus(); }, 60);
   };
 
   posCheckoutBtn?.addEventListener("click", openPosCheckout);
   posCheckoutCloseBtn?.addEventListener("click", () => { if (posCheckoutModal) posCheckoutModal.hidden = true; });
+  posCheckoutModal?.addEventListener("click", (e) => {
+    if (e.target === posCheckoutModal) posCheckoutModal.hidden = true;
+  });
   posAmountPaid?.addEventListener("input", () => {
     posAmountPaid.value = groupAmount(posAmountPaid.value);
     updatePosChange();
   });
+  posAmountPaid?.addEventListener("focus", () => {
+    if (posPayment === "cash" && posKeypad) {
+      posKeypad.classList.remove("pos-keypad-disabled");
+    }
+  });
 
-  posPaymentMethods?.querySelectorAll(".filter-pill").forEach((btn) => {
+  posPaymentMethods?.querySelectorAll("[data-pos-payment]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      posPaymentMethods.querySelectorAll(".filter-pill").forEach((b) => b.classList.remove("active"));
+      posPaymentMethods.querySelectorAll("[data-pos-payment]").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
       posPayment = btn.dataset.posPayment || "cash";
       applyAmountForMethod({ clearCash: true });

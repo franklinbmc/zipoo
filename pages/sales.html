@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=75">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=76">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -209,44 +209,108 @@
     </section>
   </div>
 
-  <!-- POS: Checkout Modal -->
-  <div class="fullscreen-modal" hidden data-pos-checkout-modal>
-    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="pos-checkout-title">
-      <header class="fullscreen-header">
-        <button class="icon-button" type="button" data-pos-checkout-close aria-label="Back">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+  <!-- POS: Checkout Modal (Payment Workplace) -->
+  <div class="modal-backdrop pos-checkout-backdrop" hidden data-pos-checkout-modal>
+    <section class="pos-checkout-dialog" role="dialog" aria-modal="true" aria-labelledby="pos-checkout-title">
+      <!-- Header -->
+      <div class="pos-checkout-header">
+        <div>
+          <div class="pos-checkout-kicker">COMPLETE SALE</div>
+          <h2 id="pos-checkout-title" class="pos-checkout-title">Payment</h2>
+        </div>
+        <button type="button" class="pos-checkout-close-btn" data-pos-checkout-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true" width="20" height="20">
+            <path d="M368 368L144 144M368 144L144 368" stroke="currentColor" stroke-width="44" stroke-linecap="round"/>
+          </svg>
         </button>
-        <h2 id="pos-checkout-title">Checkout</h2>
-        <span class="topbar-spacer" aria-hidden="true"></span>
-      </header>
-      <div class="fullscreen-body">
-        <div style="background:#f8fafc;border:1px solid var(--color-line);border-radius:12px;padding:14px;margin-bottom:14px;">
-          <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;"><span style="color:var(--color-muted);">Customer</span><strong data-pos-checkout-customer>Walk-in Customer</strong></div>
-          <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;"><span style="color:var(--color-muted);">Subtotal</span><span data-pos-checkout-subtotal>TZS 0</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:0.9rem;margin-bottom:6px;" data-pos-checkout-vat-row hidden><span style="color:var(--color-muted);">VAT (<span data-pos-checkout-vat-rate>0</span>%)</span><span data-pos-checkout-vat>TZS 0</span></div>
-          <div style="display:flex;justify-content:space-between;font-size:1.05rem;font-weight:800;color:var(--color-blue);border-top:1px dashed var(--color-line);padding-top:8px;margin-top:2px;"><span>Total</span><strong data-pos-checkout-total>TZS 0</strong></div>
-        </div>
+      </div>
 
-        <label class="form-field">
-          <span>Payment Method</span>
-          <div class="filter-bar" data-pos-payment-methods style="margin-bottom:0;">
-            <button type="button" class="filter-pill active" data-pos-payment="cash">Cash</button>
-            <button type="button" class="filter-pill" data-pos-payment="mobile">Mobile Money</button>
-            <button type="button" class="filter-pill" data-pos-payment="card">Card</button>
+      <!-- Workplace 2-column body -->
+      <div class="pos-checkout-body">
+        <!-- Left: Total Due + Change + Payment Methods -->
+        <div class="pos-checkout-card">
+          <!-- Customer & VAT info (compact) -->
+          <div class="pos-checkout-meta-row">
+            <span class="pos-checkout-customer-pill" data-pos-checkout-customer>Walk-in Customer</span>
+            <div data-pos-checkout-vat-row hidden class="pos-checkout-vat-pill">
+              VAT (<span data-pos-checkout-vat-rate>0</span>%): <strong data-pos-checkout-vat>TZS 0</strong>
+              <span data-pos-checkout-subtotal hidden>TZS 0</span>
+            </div>
           </div>
-        </label>
 
-        <label class="form-field">
-          <span>Amount Received</span>
-          <input type="text" inputmode="numeric" data-pos-amount-paid placeholder="0">
-        </label>
-        <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:800;margin:4px 2px 14px;">
-          <span style="color:var(--color-muted);">Change Due</span>
-          <strong data-pos-change-due style="color:var(--color-teal);">TZS 0</strong>
+          <div class="pos-checkout-total-block">
+            <div class="pos-checkout-total-label">TOTAL DUE</div>
+            <div class="pos-checkout-total-val" data-pos-checkout-total>TZS 0</div>
+          </div>
+
+          <div class="pos-checkout-divider"></div>
+
+          <div class="pos-checkout-change-row">
+            <span class="pos-checkout-change-label">Change</span>
+            <strong class="pos-checkout-change-val" data-pos-change-due>TZS 0</strong>
+          </div>
+
+          <!-- Payment Method Tiles -->
+          <div class="pos-pay-tiles" data-pos-payment-methods>
+            <button type="button" class="pos-pay-tile active" data-pos-payment="cash">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M6 12h.01M18 12h.01"></path>
+              </svg>
+              <span>CASH</span>
+            </button>
+            <button type="button" class="pos-pay-tile" data-pos-payment="bank">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 21h18M3 10h18M5 10v8M9 10v8M15 10v8M19 10v8M12 3L2 8h20L12 3z"></path>
+              </svg>
+              <span>BANK</span>
+            </button>
+            <button type="button" class="pos-pay-tile" data-pos-payment="mobile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                <line x1="12" y1="18" x2="12.01" y2="18"></line>
+              </svg>
+              <span>LIPA KWA SIMU</span>
+            </button>
+          </div>
         </div>
 
-        <p class="inline-error" hidden data-pos-checkout-error></p>
-        <button class="btn btn-primary full" type="button" data-pos-complete-sale>Complete Sale</button>
+        <!-- Right: Received Input + Keypad + Complete Sale -->
+        <div class="pos-checkout-right">
+          <div class="pos-checkout-received-label">RECEIVED</div>
+
+          <div class="pos-received-box" data-pos-received-box>
+            <input type="text" inputmode="numeric" class="pos-received-input" data-pos-amount-paid placeholder="0" autocomplete="off">
+            <button type="button" class="pos-received-backspace" data-pos-key="backspace" aria-label="Backspace">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+                <line x1="18" y1="9" x2="12" y2="15"></line>
+                <line x1="12" y1="9" x2="18" y2="15"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Number Tab (Keypad) -->
+          <div class="pos-keypad" data-pos-keypad>
+            <button type="button" class="pos-key" data-pos-key="1">1</button>
+            <button type="button" class="pos-key" data-pos-key="2">2</button>
+            <button type="button" class="pos-key" data-pos-key="3">3</button>
+            <button type="button" class="pos-key" data-pos-key="4">4</button>
+            <button type="button" class="pos-key" data-pos-key="5">5</button>
+            <button type="button" class="pos-key" data-pos-key="6">6</button>
+            <button type="button" class="pos-key" data-pos-key="7">7</button>
+            <button type="button" class="pos-key" data-pos-key="8">8</button>
+            <button type="button" class="pos-key" data-pos-key="9">9</button>
+            <button type="button" class="pos-key" data-pos-key="0">0</button>
+            <button type="button" class="pos-key" data-pos-key="00">00</button>
+            <button type="button" class="pos-key" data-pos-key="000">000</button>
+          </div>
+
+          <p class="inline-error" hidden data-pos-checkout-error style="margin: 8px 0 0;"></p>
+
+          <button class="pos-complete-sale-btn" type="button" data-pos-complete-sale>COMPLETE SALE</button>
+        </div>
       </div>
     </section>
   </div>
@@ -602,6 +666,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=94" defer></script>
+  <script src="/assets/js/app.js?v=95" defer></script>
 </body>
 </html>
