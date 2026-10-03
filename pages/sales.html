@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=87">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=88">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -376,6 +376,84 @@
     </section>
   </div>
 
+  <!-- Shift Summary & Reports Modal (Download PDF, Excel, Send Email) -->
+  <div class="modal-backdrop" hidden data-shift-summary-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="shift-summary-title" style="max-width: 480px; width: min(480px, 94vw);">
+      <div style="text-align: center; margin-bottom: 8px;">
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; background: #dcfce7; color: #16a34a; margin-bottom: 6px;">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6L9 17l-5-5"/>
+          </svg>
+        </div>
+        <h2 id="shift-summary-title" style="margin: 0; font-size: 1.3rem; color: var(--color-navy);">Shift Closed Successfully</h2>
+        <p style="margin: 2px 0 0; color: var(--color-muted); font-size: 0.85rem;" data-shift-summary-meta>Shift #0 &bull; Cashier</p>
+      </div>
+
+      <!-- Financial Metrics Card -->
+      <div style="background: #f8fafc; border: 1px solid var(--color-line); border-radius: 12px; padding: 12px 14px; margin: 8px 0 12px; display: grid; gap: 6px;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+          <span style="color: var(--color-muted);">Total Shift Sales</span>
+          <strong data-sum-total-sales style="color: var(--color-navy);">TZS 0</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+          <span style="color: var(--color-muted);">Cash Sales</span>
+          <span data-sum-cash-sales>TZS 0</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+          <span style="color: var(--color-muted);">Expected Cash</span>
+          <span data-sum-expected>TZS 0</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.88rem;">
+          <span style="color: var(--color-muted);">Counted Cash</span>
+          <strong data-sum-counted>TZS 0</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.95rem; font-weight: 800; border-top: 1px dashed var(--color-line); padding-top: 6px;">
+          <span>Variance</span>
+          <strong data-sum-variance>TZS 0</strong>
+        </div>
+      </div>
+
+      <!-- Download Report Buttons -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+        <button class="btn btn-outline" type="button" data-shift-download-pdf style="display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="12" y1="18" x2="12" y2="12"/>
+            <line x1="9" y1="15" x2="15" y2="15"/>
+          </svg>
+          <span>Download PDF</span>
+        </button>
+        <button class="btn btn-outline" type="button" data-shift-download-excel style="display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <line x1="3" y1="9" x2="21" y2="9"/>
+            <line x1="3" y1="15" x2="21" y2="15"/>
+            <line x1="9" y1="3" x2="9" y2="21"/>
+            <line x1="15" y1="3" x2="15" y2="21"/>
+          </svg>
+          <span>Download Excel</span>
+        </button>
+      </div>
+
+      <!-- Email Section -->
+      <div style="background: #ffffff; border: 1px solid var(--color-line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px;">
+        <label style="display: block; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; color: var(--color-navy); margin-bottom: 4px;">
+          Send PDF Report via Email
+        </label>
+        <div style="display: flex; gap: 6px;">
+          <input type="email" data-shift-email-input placeholder="Enter recipient email..." style="flex: 1; min-height: 38px; padding: 0 10px; border: 1px solid var(--color-line); border-radius: 6px; font-size: 0.88rem;">
+          <button class="btn btn-primary" type="button" data-shift-send-email style="min-height: 38px; padding: 0 14px; font-size: 0.85rem; font-weight: 700; white-space: nowrap;">
+            Send
+          </button>
+        </div>
+        <p class="inline-error" hidden data-shift-email-status style="margin: 6px 0 0; font-size: 0.82rem;"></p>
+      </div>
+
+      <button class="btn btn-primary full" type="button" data-shift-summary-done>Done</button>
+    </section>
+  </div>
+
   <!-- Workspace: Sales History -->
   <div class="fullscreen-modal" hidden data-sales-history-workspace>
     <section class="fullscreen-panel" role="dialog" aria-modal="true">
@@ -666,6 +744,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=103" defer></script>
+  <script src="/assets/js/app.js?v=104" defer></script>
 </body>
 </html>

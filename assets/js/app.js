@@ -6434,6 +6434,93 @@ const setupSalesPage = () => {
       if (typeof loadShiftsList === "function") loadShiftsList();
     } catch (err) { if (startShiftError) { startShiftError.textContent = err.message; startShiftError.hidden = false; } }
   });
+  // Shift Summary & Reports Modal
+  const shiftSummaryModal = document.querySelector("[data-shift-summary-modal]");
+  const shiftSummaryMeta = document.querySelector("[data-shift-summary-meta]");
+  const sumTotalSales = document.querySelector("[data-sum-total-sales]");
+  const sumCashSales = document.querySelector("[data-sum-cash-sales]");
+  const sumExpected = document.querySelector("[data-sum-expected]");
+  const sumCounted = document.querySelector("[data-sum-counted]");
+  const sumVariance = document.querySelector("[data-sum-variance]");
+  const shiftDownloadPdfBtn = document.querySelector("[data-shift-download-pdf]");
+  const shiftDownloadExcelBtn = document.querySelector("[data-shift-download-excel]");
+  const shiftEmailInput = document.querySelector("[data-shift-email-input]");
+  const shiftSendEmailBtn = document.querySelector("[data-shift-send-email]");
+  const shiftEmailStatus = document.querySelector("[data-shift-email-status]");
+  let activeReportShiftId = 0;
+
+  const openShiftSummaryModal = (s, shiftObj) => {
+    activeReportShiftId = s.shift_id || (shiftObj ? shiftObj.id : 0);
+    if (shiftSummaryMeta) {
+      shiftSummaryMeta.textContent = `Shift #${activeReportShiftId} · Cashier: ${shiftObj?.cashier || "Cashier"}`;
+    }
+    if (sumTotalSales) sumTotalSales.textContent = formatCurrency(s.sales_total || 0);
+    if (sumCashSales) sumCashSales.textContent = formatCurrency(s.cash_sales || 0);
+    if (sumExpected) sumExpected.textContent = formatCurrency(s.expected_cash || 0);
+    if (sumCounted) sumCounted.textContent = formatCurrency(s.closing_balance || 0);
+    if (sumVariance) {
+      const v = Number(s.variance) || 0;
+      sumVariance.textContent = formatCurrency(v);
+      sumVariance.style.color = v === 0 ? "#16a34a" : (v < 0 ? "#dc2626" : "#2563eb");
+    }
+    if (shiftEmailStatus) { shiftEmailStatus.hidden = true; shiftEmailStatus.textContent = ""; }
+    if (shiftSummaryModal) shiftSummaryModal.hidden = false;
+  };
+
+  shiftDownloadPdfBtn?.addEventListener("click", () => {
+    if (activeReportShiftId) {
+      window.open(`${getBasePath()}api/shifts.php?action=export_pdf&id=${activeReportShiftId}`, "_blank");
+    }
+  });
+
+  shiftDownloadExcelBtn?.addEventListener("click", () => {
+    if (activeReportShiftId) {
+      window.location.href = `${getBasePath()}api/shifts.php?action=export_excel&id=${activeReportShiftId}`;
+    }
+  });
+
+  shiftSendEmailBtn?.addEventListener("click", async () => {
+    const email = shiftEmailInput?.value?.trim();
+    if (!email || !email.includes("@")) {
+      if (shiftEmailStatus) {
+        shiftEmailStatus.textContent = "Please enter a valid email address.";
+        shiftEmailStatus.style.color = "#dc2626";
+        shiftEmailStatus.hidden = false;
+      }
+      return;
+    }
+    if (shiftEmailStatus) {
+      shiftEmailStatus.textContent = "Sending PDF report via email...";
+      shiftEmailStatus.style.color = "var(--color-blue)";
+      shiftEmailStatus.hidden = false;
+    }
+    shiftSendEmailBtn.disabled = true;
+    try {
+      const b = new FormData();
+      b.set("action", "email_report");
+      b.set("id", String(activeReportShiftId));
+      b.set("email", email);
+      const res = await fetch(`${getBasePath()}api/shifts.php`, { method: "POST", body: b });
+      const d = await res.json();
+      if (!res.ok || !d.ok) throw new Error(d.message || "Failed to send email.");
+      if (shiftEmailStatus) {
+        shiftEmailStatus.textContent = d.message || "Report emailed successfully!";
+        shiftEmailStatus.style.color = "#16a34a";
+      }
+    } catch (err) {
+      if (shiftEmailStatus) {
+        shiftEmailStatus.textContent = err.message || "Failed to send email.";
+        shiftEmailStatus.style.color = "#dc2626";
+      }
+    } finally {
+      shiftSendEmailBtn.disabled = false;
+    }
+  });
+
+  document.querySelector("[data-shift-summary-done]")?.addEventListener("click", () => {
+    if (shiftSummaryModal) shiftSummaryModal.hidden = true;
+  });
+
   document.querySelector("[data-close-shift-confirm]")?.addEventListener("click", async () => {
     if (closeShiftError) closeShiftError.hidden = true;
     try {
@@ -6443,7 +6530,7 @@ const setupSalesPage = () => {
       if (!res.ok || !d.ok) throw new Error(d.message || "Could not close shift.");
       if (closeShiftModal) closeShiftModal.hidden = true;
       const s = d.summary || {};
-      await showAppModal("Shift closed", `Sales: ${s.sales_count || 0} (${formatCurrency(s.sales_total || 0)})\nExpected cash: ${formatCurrency(s.expected_cash || 0)}\nCounted: ${formatCurrency(s.closing_balance || 0)}\nVariance: ${formatCurrency(s.variance || 0)}`);
+      openShiftSummaryModal(s, currentShift);
       await refreshShift();
       if (typeof loadShiftsList === "function") loadShiftsList();
     } catch (err) { if (closeShiftError) { closeShiftError.textContent = err.message; closeShiftError.hidden = false; } }
@@ -6472,16 +6559,38 @@ const setupSalesPage = () => {
           const when = isNaN(o.getTime()) ? s.opened_at : o.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
           const badge = open ? `<span class="badge-stock in-stock">Open</span>` : `<span class="badge-stock out-of-stock">Closed</span>`;
           const extra = (!open && s.variance != null) ? ` · var ${formatCurrency(s.variance)}` : "";
-          return `<div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
-            <div style="min-width:0;text-align:left;">
-              <div style="font-weight:800;color:var(--color-navy);font-size:0.88rem;">${escH(s.cashier || "Cashier")} ${badge}</div>
-              <div style="font-size:0.75rem;color:var(--color-muted);">${when} · open ${formatCurrency(s.opening_balance)}${s.sales_total != null ? " · sales " + formatCurrency(s.sales_total) : ""}${extra}</div>
+          const reportActions = !open ? `
+            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+              <a href="${getBasePath()}api/shifts.php?action=export_pdf&id=${s.id}" target="_blank" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:3px 8px;" title="Download PDF Report">📄 PDF</a>
+              <a href="${getBasePath()}api/shifts.php?action=export_excel&id=${s.id}" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:3px 8px;" title="Download Excel Report">📊 Excel</a>
+              <button type="button" class="btn btn-outline btn-sm" data-shift-row-email="${s.id}" style="font-size:0.75rem;padding:3px 8px;" title="Send PDF via Email">✉️ Email</button>
             </div>
+          ` : "";
+          return `<div class="settings-list-row" style="display:flex;flex-direction:column;gap:6px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+              <div style="font-weight:800;color:var(--color-navy);font-size:0.88rem;">Shift #${s.id} · ${escH(s.cashier || "Cashier")}</div>
+              <div>${badge}</div>
+            </div>
+            <div style="font-size:0.75rem;color:var(--color-muted);">${when} · open ${formatCurrency(s.opening_balance)}${s.sales_total != null ? " · sales " + formatCurrency(s.sales_total) : ""}${extra}</div>
+            ${reportActions}
           </div>`;
         }).join("");
       }
     } catch { /* offline */ }
   };
+
+  shiftListEl?.addEventListener("click", (e) => {
+    const emailBtn = e.target.closest("[data-shift-row-email]");
+    if (emailBtn) {
+      const id = Number(emailBtn.dataset.shiftRowEmail);
+      if (id) {
+        activeReportShiftId = id;
+        if (shiftSummaryMeta) shiftSummaryMeta.textContent = `Shift #${id} Reports`;
+        if (shiftEmailStatus) { shiftEmailStatus.hidden = true; shiftEmailStatus.textContent = ""; }
+        if (shiftSummaryModal) shiftSummaryModal.hidden = false;
+      }
+    }
+  });
   document.querySelectorAll("[data-open-shift-workspace]").forEach((b) => b.addEventListener("click", () => { openWorkspace(shiftWorkspace); refreshShift(); loadShiftsList(); }));
   document.querySelector("[data-shift-close]")?.addEventListener("click", () => closeWorkspace(shiftWorkspace));
 

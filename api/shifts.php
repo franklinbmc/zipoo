@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/pos_lib.php';
 require_once __DIR__ . '/accounts_lib.php';
+require_once __DIR__ . '/shift_report_lib.php';
 
 session_start();
 
@@ -145,6 +146,63 @@ try {
             respond(200, ['ok' => true, 'shifts' => $shifts]);
         }
 
+        if ($action === 'report_details') {
+            $shiftId = (int) ($_GET['id'] ?? 0);
+            if ($shiftId <= 0) {
+                $cur = current_open_shift($pdo, $businessId, $userId);
+                $shiftId = (int) ($cur['id'] ?? 0);
+            }
+            if ($shiftId <= 0) {
+                respond(404, ['ok' => false, 'message' => 'No shift specified or open.']);
+            }
+            $data = get_shift_report_data($pdo, $businessId, $shiftId);
+            if (!$data) {
+                respond(404, ['ok' => false, 'message' => 'Shift report not found.']);
+            }
+            respond(200, ['ok' => true, 'report' => $data]);
+        }
+
+        if ($action === 'export_pdf') {
+            $shiftId = (int) ($_GET['id'] ?? 0);
+            if ($shiftId <= 0) {
+                $cur = current_open_shift($pdo, $businessId, $userId);
+                $shiftId = (int) ($cur['id'] ?? 0);
+            }
+            if ($shiftId <= 0) {
+                respond(404, ['ok' => false, 'message' => 'No shift specified.']);
+            }
+            $data = get_shift_report_data($pdo, $businessId, $shiftId);
+            if (!$data) {
+                respond(404, ['ok' => false, 'message' => 'Shift report data not found.']);
+            }
+
+            $pdf = render_shift_pdf($data);
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: inline; filename="Shift_Report_' . $shiftId . '.pdf"');
+            header('Cache-Control: private, max-age=0, must-revalidate');
+            header('Pragma: public');
+            echo $pdf;
+            exit;
+        }
+
+        if ($action === 'export_excel') {
+            $shiftId = (int) ($_GET['id'] ?? 0);
+            if ($shiftId <= 0) {
+                $cur = current_open_shift($pdo, $businessId, $userId);
+                $shiftId = (int) ($cur['id'] ?? 0);
+            }
+            if ($shiftId <= 0) {
+                respond(404, ['ok' => false, 'message' => 'No shift specified.']);
+            }
+            $data = get_shift_report_data($pdo, $businessId, $shiftId);
+            if (!$data) {
+                respond(404, ['ok' => false, 'message' => 'Shift report data not found.']);
+            }
+
+            export_shift_excel($data);
+            exit;
+        }
+
         respond(422, ['ok' => false, 'message' => 'Unknown action.']);
     }
 
@@ -191,6 +249,7 @@ try {
 
         $funds = account_funds($pdo, $businessId);
         respond(200, ['ok' => true, 'message' => 'Shift closed.', 'summary' => [
+            'shift_id' => (int) $shift['id'],
             'opening_balance' => (float) $shift['opening_balance'],
             'cash_sales' => $totals['cash_sales'],
             'expected_cash' => $expectedCash,
@@ -201,7 +260,26 @@ try {
         ], 'accounts' => $funds['accounts'], 'account_summary' => $funds['summary']]);
     }
 
+    if ($action === 'email_report') {
+        $shiftId = (int) ($_POST['id'] ?? 0);
+        $email = trim((string) ($_POST['email'] ?? ''));
+        if ($shiftId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Invalid shift ID.']);
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            respond(422, ['ok' => false, 'message' => 'Please enter a valid recipient email address.']);
+        }
+
+        $data = get_shift_report_data($pdo, $businessId, $shiftId);
+        if (!$data) {
+            respond(404, ['ok' => false, 'message' => 'Shift report data not found.']);
+        }
+
+        $res = send_shift_email_report($pdo, $data, $email);
+        respond($res['ok'] ? 200 : 422, $res);
+    }
+
     respond(422, ['ok' => false, 'message' => 'Unknown action.']);
 } catch (Throwable $error) {
-    respond(500, ['ok' => false, 'message' => 'Unable to process shift right now.']);
+    respond(500, ['ok' => false, 'message' => 'Unable to process shift right now: ' . $error->getMessage()]);
 }

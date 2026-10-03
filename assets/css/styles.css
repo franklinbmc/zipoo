@@ -1461,6 +1461,7 @@ body.offline .status-dot {
 
 [data-close-shift-modal],
 [data-start-shift-modal],
+[data-shift-summary-modal],
 [data-pos-customer-modal],
 [data-pos-receipt-modal] {
   z-index: 20020 !important;
