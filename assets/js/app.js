@@ -5555,7 +5555,27 @@ const setupSalesPage = () => {
   const openWorkspace = (el) => { if (el) el.hidden = false; };
   const closeWorkspace = (el) => { if (el) el.hidden = true; };
 
-  document.querySelector("[data-pos-workspace-close]")?.addEventListener("click", () => closeWorkspace(posWorkspace));
+  // POS full-screen (hide the header/back bar while immersive).
+  const enterPosFullscreen = () => {
+    const el = document.documentElement;
+    try { if (el.requestFullscreen) el.requestFullscreen().catch(() => {}); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); } catch { /* unsupported */ }
+  };
+  const exitFullscreen = () => {
+    try {
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+      else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+    } catch { /* ignore */ }
+  };
+  const syncPosFs = () => {
+    const fs = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    posWorkspace?.classList.toggle("pos-fs", fs && !posWorkspace.hidden);
+  };
+  document.addEventListener("fullscreenchange", syncPosFs);
+  document.addEventListener("webkitfullscreenchange", syncPosFs);
+  const closePos = () => { exitFullscreen(); posWorkspace?.classList.remove("pos-fs"); closeWorkspace(posWorkspace); };
+
+  document.querySelector("[data-pos-workspace-close]")?.addEventListener("click", closePos);
+  document.querySelector("[data-pos-fs-exit]")?.addEventListener("click", closePos);
   document.querySelectorAll("[data-open-invoices-workspace]").forEach((btn) => btn.addEventListener("click", () => { openWorkspace(invoicesWorkspace); loadInvoices(invoicesSearch?.value.trim() || ""); }));
   document.querySelector("[data-invoices-workspace-close]")?.addEventListener("click", () => closeWorkspace(invoicesWorkspace));
   document.querySelectorAll("[data-open-reports-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(reportsWorkspace)));
@@ -6543,7 +6563,7 @@ const setupSalesPage = () => {
 
   // Open / close POS
   document.querySelectorAll("[data-open-pos-workspace]").forEach((btn) => {
-    btn.addEventListener("click", () => { openWorkspace(posWorkspace); refreshPosCatalogue(); loadPosTickets(); refreshShift(); });
+    btn.addEventListener("click", () => { openWorkspace(posWorkspace); enterPosFullscreen(); refreshPosCatalogue(); loadPosTickets(); refreshShift(); });
   });
 
   let posSearchTimer;

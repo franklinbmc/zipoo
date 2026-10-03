@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=74">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=75">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -108,6 +108,9 @@
   <!-- Workspace: POS -->
   <div class="fullscreen-modal" hidden data-pos-workspace>
     <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="pos-workspace-title">
+      <button class="pos-fs-exit" type="button" data-pos-fs-exit aria-label="Exit full screen">
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+      </button>
       <header class="fullscreen-header">
         <button class="icon-button" type="button" data-pos-workspace-close aria-label="Back">
           <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
@@ -599,6 +602,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=93" defer></script>
+  <script src="/assets/js/app.js?v=94" defer></script>
 </body>
 </html>

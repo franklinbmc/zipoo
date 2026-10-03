@@ -4028,3 +4028,32 @@ button.settings-list-row:focus-visible {
 .pos-shift-strip .pos-shift-open { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
 .pos-shift-strip .pos-shift-closed { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
 .pos-shift-strip .btn { flex: 0 0 auto; }
+
+/* POS full-screen mode: hide the top bar/back button; show a small floating exit */
+.pos-fs-exit { display: none; }
+[data-pos-workspace].pos-fs .fullscreen-header { display: none; }
+[data-pos-workspace].pos-fs .pos-fs-exit {
+  display: inline-flex;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 60;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(18, 35, 63, 0.6);
+  color: #fff;
+  cursor: pointer;
+}
+[data-pos-workspace].pos-fs .pos-fs-exit svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 42px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
