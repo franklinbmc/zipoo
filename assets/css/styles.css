@@ -3907,22 +3907,7 @@ button.settings-list-row:focus-visible {
   /* Hub rows in two columns (KPI tiles are already 4-up above 600px) */
   .stock-hub { grid-template-columns: repeat(2, 1fr); align-items: start; }
 
-  /* Fullscreen workspaces & forms become centered dialog cards with a dimmed backdrop */
-  .fullscreen-modal {
-    display: grid;
-    place-items: center;
-    padding: 28px;
-    background: rgba(18, 35, 63, 0.45);
-    backdrop-filter: blur(4px);
-  }
-  .fullscreen-panel {
-    width: min(980px, 100%);
-    max-height: calc(100vh - 56px);
-    min-height: 0;
-    border: 1px solid var(--color-line);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    overflow: hidden;
-  }
-  .fullscreen-body { overflow: auto; }
+  /* Fullscreen workspaces stay full-height; just centre and cap their width at 1100 */
+  .fullscreen-modal { grid-template-columns: minmax(0, 1fr); }
+  .fullscreen-panel { width: 100%; max-width: 1100px; margin-inline: auto; }
 }
