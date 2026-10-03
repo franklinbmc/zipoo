@@ -3645,7 +3645,9 @@ button.settings-list-row:focus-visible {
   background: #e2e8f4;
 }
 
+.pos-qty-value,
 .pos-qty-stepper .pos-qty-value {
+  display: inline-block;
   min-width: 30px;
   text-align: center;
   font-weight: 800;

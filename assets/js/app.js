@@ -5519,7 +5519,11 @@ const setupSalesPage = () => {
   // ---- Local helpers ----
   const formatCurrency = (amount, cur = "TZS") => {
     const val = Number(amount) || 0;
-    return `${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${cur}`;
+    return `${cur} ${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  };
+  const formatAmount = (amount) => {
+    const val = Number(amount) || 0;
+    return val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
   const formatDate = (dateStr) => {
     if (!dateStr) return "-";
@@ -6103,25 +6107,14 @@ const setupSalesPage = () => {
 
     const priceTd = document.createElement("td");
     priceTd.style.textAlign = "right";
-    priceTd.textContent = formatCurrency(line.price);
+    priceTd.textContent = formatAmount(line.price);
 
     const qtyTd = document.createElement("td");
     qtyTd.style.textAlign = "center";
-    const stepper = document.createElement("div");
-    stepper.className = "pos-qty-stepper";
-    const minus = document.createElement("button");
-    minus.type = "button";
-    minus.textContent = "−";
     const qtyVal = document.createElement("span");
     qtyVal.className = "pos-qty-value";
     qtyVal.textContent = String(line.qty);
-    const plus = document.createElement("button");
-    plus.type = "button";
-    plus.textContent = "+";
-    minus.addEventListener("click", () => changePosQty(line.id, line.qty - 1));
-    plus.addEventListener("click", () => changePosQty(line.id, line.qty + 1));
-    stepper.append(minus, qtyVal, plus);
-    qtyTd.append(stepper);
+    qtyTd.append(qtyVal);
 
     const actTd = document.createElement("td");
     actTd.style.textAlign = "center";
@@ -6236,7 +6229,7 @@ const setupSalesPage = () => {
       const row = document.createElement("button");
       row.type = "button";
       row.className = "pos-product-row" + (out ? " is-out" : "");
-      const meta = isProduct ? `${p.category || "General"} • ${stock} ${p.unit || "pcs"} in stock` : `${p.category || "General"} • Service`;
+      const meta = isProduct ? `${stock} ${p.unit || "pcs"}` : "Service";
       row.innerHTML = `<span><span class="pos-product-name">${p.name}</span><span class="pos-product-meta">${meta}${out ? " — Out of stock" : ""}</span></span><span class="pos-product-price">${formatCurrency(p.selling_price)}</span>`;
       if (!out) row.addEventListener("click", () => addToPosCart(p));
       return row;
