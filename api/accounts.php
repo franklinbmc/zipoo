@@ -125,6 +125,61 @@ function account_summary(array $accounts): array
     ];
 }
 
+function category_payload(array $row): array
+{
+    return [
+        'id' => (int) $row['id'],
+        'name' => (string) $row['name'],
+        'status' => (string) ($row['status'] ?? 'active'),
+        'used_count' => (int) ($row['used_count'] ?? 0),
+        'created_at' => (string) ($row['created_at'] ?? ''),
+    ];
+}
+
+function load_expense_categories(PDO $pdo, int $businessId): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT c.*,
+                COALESCE((SELECT COUNT(*) FROM tbl_account_transactions t
+                          WHERE t.business_id = c.business_id
+                            AND t.expense_category_id = c.id
+                            AND t.type = "expense"), 0) AS used_count
+         FROM tbl_expense_categories c
+         WHERE c.business_id = :bid
+         ORDER BY c.status ASC, c.name ASC'
+    );
+    $stmt->execute([':bid' => $businessId]);
+    return array_map('category_payload', $stmt->fetchAll());
+}
+
+function ensure_default_expense_categories(PDO $pdo, int $businessId): void
+{
+    $stmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_expense_categories WHERE business_id = :bid');
+    $stmt->execute([':bid' => $businessId]);
+    if ((int) $stmt->fetchColumn() > 0) {
+        return;
+    }
+
+    $ins = $pdo->prepare(
+        'INSERT INTO tbl_expense_categories (business_id, name, status)
+         VALUES (:bid, :name, "active")'
+    );
+    foreach (['Rent', 'Transport', 'Supplies', 'Utilities'] as $name) {
+        $ins->execute([':bid' => $businessId, ':name' => $name]);
+    }
+}
+
+function fetch_category_or_404(PDO $pdo, int $businessId, int $categoryId): array
+{
+    $stmt = $pdo->prepare('SELECT * FROM tbl_expense_categories WHERE id = :id AND business_id = :bid LIMIT 1');
+    $stmt->execute([':id' => $categoryId, ':bid' => $businessId]);
+    $row = $stmt->fetch();
+    if (!$row) {
+        respond(404, ['ok' => false, 'message' => 'Category not found.']);
+    }
+    return $row;
+}
+
 function fetch_account_or_404(PDO $pdo, int $businessId, int $accountId): array
 {
     $stmt = $pdo->prepare('SELECT * FROM tbl_accounts WHERE id = :id AND business_id = :bid LIMIT 1');
@@ -148,6 +203,7 @@ try {
 
     // Lazy seed: guarantees a default Cash account for this (possibly pre-existing) business.
     ensure_default_account($pdo, $businessId);
+    ensure_default_expense_categories($pdo, $businessId);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         // Single account detail + its ledger.
@@ -183,9 +239,10 @@ try {
         // Recent activity across all accounts.
         if (($_GET['action'] ?? '') === 'activity') {
             $stmt = $pdo->prepare(
-                'SELECT t.*, a.name AS account_name, a.type AS account_type
+                'SELECT t.*, a.name AS account_name, a.type AS account_type, c.name AS category_name, c.status AS category_status
                  FROM tbl_account_transactions t
                  JOIN tbl_accounts a ON a.id = t.account_id
+                 LEFT JOIN tbl_expense_categories c ON c.id = t.expense_category_id AND c.business_id = t.business_id
                  WHERE t.business_id = :bid
                  ORDER BY t.id DESC LIMIT 100'
             );
@@ -203,11 +260,18 @@ try {
                     'amount' => (float) $t['amount'],
                     'reference_type' => (string) ($t['reference_type'] ?? ''),
                     'reference_id' => (string) ($t['reference_id'] ?? ''),
+                    'expense_category_id' => (int) ($t['expense_category_id'] ?? 0),
+                    'category_name' => (string) ($t['category_name'] ?? ''),
+                    'category_status' => (string) ($t['category_status'] ?? ''),
                     'notes' => (string) ($t['notes'] ?? ''),
                     'created_at' => (string) ($t['created_at'] ?? ''),
                 ];
             }, $stmt->fetchAll());
             respond(200, ['ok' => true, 'activity' => $activity]);
+        }
+
+        if (($_GET['action'] ?? '') === 'expense_categories') {
+            respond(200, ['ok' => true, 'categories' => load_expense_categories($pdo, $businessId)]);
         }
 
         $accounts = load_accounts($pdo, $businessId);
@@ -342,6 +406,7 @@ try {
         $accountId = (int) ($_POST['account_id'] ?? 0);
         $amount = round((float) ($_POST['amount'] ?? 0), 2);
         $notes = trim((string) ($_POST['notes'] ?? ''));
+        $categoryId = (int) ($_POST['category_id'] ?? 0);
         fetch_account_or_404($pdo, $businessId, $accountId);
 
         if ($amount <= 0) {
@@ -357,6 +422,13 @@ try {
         } else {
             $direction = 'out';
             $type = 'expense';
+            if ($categoryId <= 0) {
+                respond(422, ['ok' => false, 'message' => 'Choose an expense category.']);
+            }
+            $category = fetch_category_or_404($pdo, $businessId, $categoryId);
+            if (($category['status'] ?? 'active') !== 'active') {
+                respond(422, ['ok' => false, 'message' => 'Choose an active expense category.']);
+            }
         }
 
         if ($direction === 'out') {
@@ -366,10 +438,52 @@ try {
             }
         }
 
-        post_account_txn($pdo, $businessId, $accountId, $direction, $type, $amount, 'manual', null, $notes !== '' ? $notes : null, $userId);
+        post_account_txn($pdo, $businessId, $accountId, $direction, $type, $amount, 'manual', null, $notes !== '' ? $notes : null, $userId, null, $type === 'expense' ? $categoryId : null);
 
         $accounts = load_accounts($pdo, $businessId);
         respond(200, ['ok' => true, 'message' => 'Transaction recorded.', 'accounts' => $accounts, 'summary' => account_summary($accounts)]);
+    }
+
+    if ($action === 'create_expense_category') {
+        $name = trim((string) ($_POST['name'] ?? ''));
+        if ($name === '') {
+            respond(422, ['ok' => false, 'message' => 'Category name is required.']);
+        }
+        if (strlen($name) > 190) {
+            respond(422, ['ok' => false, 'message' => 'Category name is too long.']);
+        }
+        try {
+            $stmt = $pdo->prepare('INSERT INTO tbl_expense_categories (business_id, name, status) VALUES (:bid, :name, "active")');
+            $stmt->execute([':bid' => $businessId, ':name' => $name]);
+        } catch (PDOException $e) {
+            respond(422, ['ok' => false, 'message' => 'That category already exists.']);
+        }
+        respond(201, ['ok' => true, 'message' => 'Category added.', 'categories' => load_expense_categories($pdo, $businessId)]);
+    }
+
+    if ($action === 'set_expense_category_status') {
+        $categoryId = (int) ($_POST['category_id'] ?? 0);
+        $status = strtolower(trim((string) ($_POST['status'] ?? 'active')));
+        if (!in_array($status, ['active', 'inactive'], true)) {
+            respond(422, ['ok' => false, 'message' => 'Invalid category status.']);
+        }
+        fetch_category_or_404($pdo, $businessId, $categoryId);
+        $stmt = $pdo->prepare('UPDATE tbl_expense_categories SET status = :status WHERE id = :id AND business_id = :bid');
+        $stmt->execute([':status' => $status, ':id' => $categoryId, ':bid' => $businessId]);
+        respond(200, ['ok' => true, 'message' => 'Category updated.', 'categories' => load_expense_categories($pdo, $businessId)]);
+    }
+
+    if ($action === 'delete_expense_category') {
+        $categoryId = (int) ($_POST['category_id'] ?? 0);
+        fetch_category_or_404($pdo, $businessId, $categoryId);
+        $stmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_account_transactions WHERE business_id = :bid AND expense_category_id = :id AND type = "expense"');
+        $stmt->execute([':bid' => $businessId, ':id' => $categoryId]);
+        if ((int) $stmt->fetchColumn() > 0) {
+            respond(422, ['ok' => false, 'message' => 'This category is already used. Deactivate it instead.']);
+        }
+        $del = $pdo->prepare('DELETE FROM tbl_expense_categories WHERE id = :id AND business_id = :bid');
+        $del->execute([':id' => $categoryId, ':bid' => $businessId]);
+        respond(200, ['ok' => true, 'message' => 'Category deleted.', 'categories' => load_expense_categories($pdo, $businessId)]);
     }
 
     if ($action === 'transfer') {

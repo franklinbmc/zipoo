@@ -58,6 +58,21 @@
           <p>Record rent, transport, supplies, or any business cost here.</p>
         </div>
       </section>
+
+      <section class="expenses-panel">
+        <div class="expenses-panel-head">
+          <h2>Categories</h2>
+        </div>
+        <form class="expense-category-form" data-expense-category-form novalidate>
+          <label class="form-field">
+            <span>New Category</span>
+            <input type="text" name="name" placeholder="e.g. Marketing">
+          </label>
+          <button class="btn btn-primary btn-sm" type="submit" data-expense-category-submit>Add</button>
+        </form>
+        <p class="inline-error" hidden data-expense-category-error></p>
+        <div class="expense-category-list" data-expense-categories-list></div>
+      </section>
     </main>
   </div>
 
@@ -74,6 +89,10 @@
         <label class="form-field">
           <span>Account <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
           <select name="account_id" data-expense-account required></select>
+        </label>
+        <label class="form-field">
+          <span>Category <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="category_id" data-expense-category required></select>
         </label>
         <label class="form-field">
           <span>Amount <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
@@ -97,6 +116,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=108" defer></script>
+  <script src="/assets/js/app.js?v=109" defer></script>
 </body>
 </html>

@@ -7371,10 +7371,16 @@ const setupExpensesPage = () => {
   const modal = document.querySelector("[data-expense-modal]");
   const form = document.querySelector("[data-expense-form]");
   const accountSelect = document.querySelector("[data-expense-account]");
+  const categorySelect = document.querySelector("[data-expense-category]");
   const error = document.querySelector("[data-expense-error]");
   const submit = document.querySelector("[data-expense-submit]");
+  const categoryForm = document.querySelector("[data-expense-category-form]");
+  const categoryList = document.querySelector("[data-expense-categories-list]");
+  const categoryError = document.querySelector("[data-expense-category-error]");
+  const categorySubmit = document.querySelector("[data-expense-category-submit]");
 
   let accounts = [];
+  let categories = [];
 
   const setText = (el, value) => {
     if (el) el.textContent = value;
@@ -7393,6 +7399,42 @@ const setupExpensesPage = () => {
         return `<option value="${account.id}"${selected}>${esc(account.name)} (${esc(account.type_label)})</option>`;
       }).join("");
     }
+  };
+
+  const renderCategories = (rows) => {
+    categories = rows || [];
+    const activeCategories = categories.filter((category) => category.status === "active");
+    if (categorySelect) {
+      categorySelect.innerHTML = activeCategories.map((category) => (
+        `<option value="${category.id}">${esc(category.name)}</option>`
+      )).join("");
+    }
+
+    if (categoryList) {
+      categoryList.innerHTML = categories.map((category) => {
+        const used = Number(category.used_count) || 0;
+        const isActive = category.status === "active";
+        const statusText = isActive ? "Active" : "Inactive";
+        return `
+          <div class="expense-category-row${isActive ? "" : " inactive"}">
+            <span>
+              <strong>${esc(category.name)}</strong>
+              <small>${statusText} • ${used} expense${used === 1 ? "" : "s"}</small>
+            </span>
+            <span class="expense-category-actions">
+              <button class="btn btn-outline btn-sm" type="button" data-expense-category-status="${category.id}" data-status="${isActive ? "inactive" : "active"}">${isActive ? "Deactivate" : "Activate"}</button>
+              <button class="btn btn-danger-outline btn-sm" type="button" data-expense-category-delete="${category.id}"${used > 0 ? " disabled" : ""}>Delete</button>
+            </span>
+          </div>`;
+      }).join("");
+    }
+  };
+
+  const loadCategories = async () => {
+    const res = await fetch(`${getBasePath()}api/accounts.php?action=expense_categories`);
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.message || "Could not load categories.");
+    renderCategories(data.categories || []);
   };
 
   const renderExpenses = (rows) => {
@@ -7423,7 +7465,7 @@ const setupExpensesPage = () => {
     if (list) {
       list.innerHTML = expenses.slice(0, 20).map((row) => {
         const title = row.notes || "Expense";
-        const meta = [row.account_name, formatDate(row.created_at)].filter(Boolean).map(esc).join(" • ");
+        const meta = [row.category_name || "Uncategorized", row.account_name, formatDate(row.created_at)].filter(Boolean).map(esc).join(" • ");
         return `
           <div class="expense-row">
             <span>
@@ -7439,6 +7481,7 @@ const setupExpensesPage = () => {
   const loadExpenses = async () => {
     try {
       await loadAccounts();
+      await loadCategories();
       const res = await fetch(`${getBasePath()}api/accounts.php?action=activity`);
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.message || "Could not load expenses.");
@@ -7455,6 +7498,9 @@ const setupExpensesPage = () => {
     if (error) error.hidden = true;
     if (!accounts.length) {
       try { await loadAccounts(); } catch { /* handled on submit */ }
+    }
+    if (!categories.length) {
+      try { await loadCategories(); } catch { /* handled on submit */ }
     }
     if (modal) modal.hidden = false;
   };
@@ -7474,6 +7520,10 @@ const setupExpensesPage = () => {
       if (error) { error.textContent = "Choose an account."; error.hidden = false; }
       return;
     }
+    if (!categorySelect?.value) {
+      if (error) { error.textContent = "Choose an expense category."; error.hidden = false; }
+      return;
+    }
     if (amount <= 0) {
       if (error) { error.textContent = "Enter an amount greater than zero."; error.hidden = false; }
       return;
@@ -7484,6 +7534,7 @@ const setupExpensesPage = () => {
       const body = new FormData();
       body.set("action", "expense");
       body.set("account_id", accountSelect.value);
+      body.set("category_id", categorySelect.value);
       body.set("amount", String(amount));
       body.set("notes", form.elements.notes.value.trim());
       const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
@@ -7495,6 +7546,56 @@ const setupExpensesPage = () => {
       if (error) { error.textContent = err.message || "Could not save expense."; error.hidden = false; }
     } finally {
       if (submit) submit.disabled = false;
+    }
+  });
+
+  categoryForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (categoryError) categoryError.hidden = true;
+    const name = categoryForm.elements.name.value.trim();
+    if (!name) {
+      if (categoryError) { categoryError.textContent = "Category name is required."; categoryError.hidden = false; }
+      return;
+    }
+    if (categorySubmit) categorySubmit.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", "create_expense_category");
+      body.set("name", name);
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not add category.");
+      categoryForm.reset();
+      renderCategories(data.categories || []);
+    } catch (err) {
+      if (categoryError) { categoryError.textContent = err.message || "Could not add category."; categoryError.hidden = false; }
+    } finally {
+      if (categorySubmit) categorySubmit.disabled = false;
+    }
+  });
+
+  categoryList?.addEventListener("click", async (event) => {
+    const statusButton = event.target.closest("[data-expense-category-status]");
+    const deleteButton = event.target.closest("[data-expense-category-delete]");
+    if (!statusButton && !deleteButton) return;
+
+    if (categoryError) categoryError.hidden = true;
+    try {
+      const body = new FormData();
+      if (statusButton) {
+        body.set("action", "set_expense_category_status");
+        body.set("category_id", statusButton.dataset.expenseCategoryStatus);
+        body.set("status", statusButton.dataset.status);
+      } else {
+        body.set("action", "delete_expense_category");
+        body.set("category_id", deleteButton.dataset.expenseCategoryDelete);
+      }
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not update category.");
+      renderCategories(data.categories || []);
+    } catch (err) {
+      if (categoryError) { categoryError.textContent = err.message || "Could not update category."; categoryError.hidden = false; }
     }
   });
 

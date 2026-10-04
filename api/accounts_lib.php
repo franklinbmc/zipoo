@@ -41,14 +41,50 @@ function ensure_accounts_tables(PDO $pdo): void
             reference_type VARCHAR(50) NULL,
             reference_id VARCHAR(100) NULL,
             counterparty_account_id INT UNSIGNED NULL,
+            expense_category_id INT UNSIGNED NULL,
             notes TEXT NULL,
             created_by INT UNSIGNED NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             KEY idx_at_biz_acc (business_id, account_id),
             KEY idx_at_date (created_at),
+            KEY idx_at_exp_cat (business_id, expense_category_id),
             KEY idx_at_ref (business_id, reference_type, reference_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS tbl_expense_categories (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            business_id INT UNSIGNED NOT NULL,
+            name VARCHAR(190) NOT NULL,
+            status ENUM("active", "inactive") NOT NULL DEFAULT "active",
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_expense_category_name (business_id, name),
+            KEY idx_expense_category_status (business_id, status)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+
+    ensure_account_column($pdo, 'expense_category_id', 'INT UNSIGNED NULL AFTER counterparty_account_id');
+    ensure_account_index($pdo, 'idx_at_exp_cat', 'ADD KEY idx_at_exp_cat (business_id, expense_category_id)');
+}
+
+function ensure_account_column(PDO $pdo, string $column, string $definition): void
+{
+    $stmt = $pdo->prepare('SHOW COLUMNS FROM tbl_account_transactions LIKE :column');
+    $stmt->execute([':column' => $column]);
+    if (!$stmt->fetch()) {
+        $pdo->exec("ALTER TABLE tbl_account_transactions ADD COLUMN {$column} {$definition}");
+    }
+}
+
+function ensure_account_index(PDO $pdo, string $indexName, string $definition): void
+{
+    $stmt = $pdo->prepare('SHOW INDEX FROM tbl_account_transactions WHERE Key_name = :idx');
+    $stmt->execute([':idx' => $indexName]);
+    if (!$stmt->fetch()) {
+        $pdo->exec("ALTER TABLE tbl_account_transactions {$definition}");
+    }
 }
 
 /**
@@ -154,12 +190,13 @@ function post_account_txn(
     ?string $referenceId = null,
     ?string $notes = null,
     ?int $userId = null,
-    ?int $counterpartyAccountId = null
+    ?int $counterpartyAccountId = null,
+    ?int $expenseCategoryId = null
 ): int {
     $stmt = $pdo->prepare(
         'INSERT INTO tbl_account_transactions
-            (business_id, account_id, direction, type, amount, reference_type, reference_id, counterparty_account_id, notes, created_by)
-         VALUES (:bid, :acc, :dir, :type, :amt, :rtype, :rid, :cp, :notes, :uid)'
+            (business_id, account_id, direction, type, amount, reference_type, reference_id, counterparty_account_id, expense_category_id, notes, created_by)
+         VALUES (:bid, :acc, :dir, :type, :amt, :rtype, :rid, :cp, :cat, :notes, :uid)'
     );
     $stmt->execute([
         ':bid' => $businessId,
@@ -170,6 +207,7 @@ function post_account_txn(
         ':rtype' => $referenceType,
         ':rid' => $referenceId,
         ':cp' => $counterpartyAccountId,
+        ':cat' => $expenseCategoryId,
         ':notes' => $notes,
         ':uid' => $userId,
     ]);
