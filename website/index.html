@@ -4,11 +4,32 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <meta name="theme-color" content="#0D2B5B">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="description" content="Zipoo - Run your business. Know your numbers. Modern all-in-one software for retail and wholesale businesses in Tanzania. Manage sales, stock, customer debts, expenses, and profits simply.">
   <title>Zipoo — Run your business. Know your numbers.</title>
   
   <link rel="icon" href="./assets/images/logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261004_2">
+
+  <script>
+    // Clean up any stale Service Worker or cache from previous deployments
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        for (var i = 0; i < regs.length; i++) {
+          regs[i].unregister();
+        }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(function(keys) {
+        for (var j = 0; j < keys.length; j++) {
+          caches.delete(keys[j]);
+        }
+      });
+    }
+  </script>
 </head>
 <body>
 
@@ -932,6 +953,6 @@
     </a>
   </div>
 
-  <script src="./assets/js/main.js"></script>
+  <script src="./assets/js/main.js?v=20261004_2"></script>
 </body>
 </html>
