@@ -7438,6 +7438,7 @@ const setupExpensesPage = () => {
   let payrollRun = null;
   let expenseRows = [];
   let expenseView = { level: "years", year: "", month: "", date: "" };
+  let categoryView = { level: "categories", categoryId: "", year: "", month: "", date: "" };
 
   const setText = (el, value) => {
     if (el) el.textContent = value;
@@ -7478,30 +7479,113 @@ const setupExpensesPage = () => {
     if (categoriesCountBadge) {
       categoriesCountBadge.textContent = `${categories.length} categor${categories.length === 1 ? "y" : "ies"}`;
     }
-    if (categoriesWorkspaceSubtitle) {
-      categoriesWorkspaceSubtitle.textContent = `${categories.length} total categories`;
+    renderCategoryDrilldown();
+  };
+
+  const categoryRows = (categoryId) => expenseRows.filter((row) => String(row.expense_category_id || 0) === String(categoryId));
+
+  const renderCategoryDrilldown = () => {
+    if (!categoryList) return;
+
+    const currentCategory = categories.find((category) => String(category.id) === String(categoryView.categoryId));
+    if (categoryView.level !== "categories" && !currentCategory) {
+      categoryView = { level: "categories", categoryId: "", year: "", month: "", date: "" };
     }
 
-    if (categoryList) {
+    if (categoryView.level === "categories") {
+      if (categoriesWorkspaceSubtitle) {
+        categoriesWorkspaceSubtitle.textContent = `${categories.length} total categories`;
+      }
       categoryList.innerHTML = categories.map((category) => {
-        const used = Number(category.used_count) || 0;
+        const rows = categoryRows(category.id);
+        const total = rows.reduce((sum, row) => sum + num(row.amount), 0);
+        const used = Number(category.used_count) || rows.length || 0;
         const isActive = category.status === "active";
         const statusText = isActive ? "Active" : "Inactive";
         return `
-          <div class="expense-category-row${isActive ? "" : " inactive"}">
+          <div class="expense-category-row${isActive ? "" : " inactive"}" data-expense-category-row="${category.id}">
             <span class="expense-category-info">
               <strong>${esc(category.name)}</strong>
-              <small>${statusText} • ${used} expense${used === 1 ? "" : "s"}</small>
+              <small>${statusText} • ${used} expense${used === 1 ? "" : "s"} • Total: ${fmt(total)}</small>
             </span>
             <div class="expense-category-meta-wrap">
               <span class="expense-category-actions">
                 <button class="btn btn-outline btn-sm icon-only" type="button" data-expense-category-status="${category.id}" data-status="${isActive ? "inactive" : "active"}" aria-label="${isActive ? "Deactivate category" : "Activate category"}" title="${isActive ? "Deactivate" : "Activate"}">${svgMarkup(isActive ? "close" : "check", { size: 14 })}</button>
                 <button class="btn btn-danger-outline btn-sm icon-only" type="button" data-expense-category-delete="${category.id}" aria-label="Delete category" title="Delete"${used > 0 ? " disabled" : ""}>${svgMarkup("close", { size: 14 })}</button>
               </span>
+              <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
             </div>
           </div>`;
       }).join("");
+      return;
     }
+
+    const rows = categoryRows(categoryView.categoryId);
+    if (categoryView.level === "years") {
+      if (categoriesWorkspaceSubtitle) {
+        categoriesWorkspaceSubtitle.textContent = `${currentCategory.name} • ${rows.length} expense${rows.length === 1 ? "" : "s"}`;
+      }
+      const years = Object.values(groupedTotals(rows, (row) => String(row.created_at || "").slice(0, 4))).sort((a, b) => b.key.localeCompare(a.key));
+      categoryList.innerHTML = years.map((year) => `
+        <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-category-year="${year.key}">
+          <span class="stock-hub-label expense-group-info">
+            <strong>${esc(year.key)}</strong>
+            <small>${year.count} expense${year.count === 1 ? "" : "s"} • Total: ${fmt(year.total)}</small>
+          </span>
+          <span class="stock-summary-meta expense-group-meta"><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
+        </button>`).join("") || '<div class="expenses-empty"><strong>No expenses yet</strong><p>This category has no recorded expenses.</p></div>';
+      return;
+    }
+
+    if (categoryView.level === "months") {
+      const yearRows = rows.filter((row) => String(row.created_at || "").slice(0, 4) === categoryView.year);
+      if (categoriesWorkspaceSubtitle) categoriesWorkspaceSubtitle.textContent = `${currentCategory.name} • ${categoryView.year}`;
+      const months = Object.values(groupedTotals(yearRows, (row) => String(row.created_at || "").slice(0, 7))).sort((a, b) => b.key.localeCompare(a.key));
+      categoryList.innerHTML = months.map((month) => `
+        <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-category-month="${month.key}">
+          <span class="stock-hub-label expense-group-info">
+            <strong>${esc(monthLabel(month.key))}</strong>
+            <small>${month.count} expense${month.count === 1 ? "" : "s"} • Total: ${fmt(month.total)}</small>
+          </span>
+          <span class="stock-summary-meta expense-group-meta"><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
+        </button>`).join("");
+      return;
+    }
+
+    if (categoryView.level === "days") {
+      const monthRows = rows.filter((row) => String(row.created_at || "").slice(0, 7) === categoryView.month);
+      if (categoriesWorkspaceSubtitle) categoriesWorkspaceSubtitle.textContent = `${currentCategory.name} • ${monthLabel(categoryView.month)}`;
+      const days = Object.values(groupedTotals(monthRows, (row) => String(row.created_at || "").slice(0, 10))).sort((a, b) => b.key.localeCompare(a.key));
+      categoryList.innerHTML = days.map((day) => `
+        <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-category-date="${day.key}">
+          <span class="stock-hub-label expense-group-info">
+            <strong>${esc(dateLabel(day.key))}</strong>
+            <small>${day.count} expense${day.count === 1 ? "" : "s"} • Total: ${fmt(day.total)}</small>
+          </span>
+          <span class="stock-summary-meta expense-group-meta"><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
+        </button>`).join("");
+      return;
+    }
+
+    const dayRows = rows.filter((row) => String(row.created_at || "").slice(0, 10) === categoryView.date);
+    if (categoriesWorkspaceSubtitle) categoriesWorkspaceSubtitle.textContent = `${currentCategory.name} • ${dateLabel(categoryView.date)}`;
+    categoryList.innerHTML = dayRows.map((row) => {
+      const title = row.notes || "Expense";
+      const acc = row.account_name || "Default Account";
+      const dateObj = parseDate(row.created_at);
+      const timeStr = dateObj ? dateObj.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "";
+      return `
+        <div class="expense-item-row">
+          <div class="expense-item-main">
+            <strong class="expense-item-title">${esc(title)}</strong>
+            <div class="expense-item-tags">
+              <span class="expense-item-account">${esc(acc)}</span>
+              ${timeStr ? `<span class="expense-item-time">${esc(timeStr)}</span>` : ""}
+            </div>
+          </div>
+          <div class="expense-item-amount"><b>${fmt(row.amount)}</b></div>
+        </div>`;
+    }).join("");
   };
 
   const loadCategories = async () => {
@@ -8022,7 +8106,26 @@ const setupExpensesPage = () => {
   categoryList?.addEventListener("click", async (event) => {
     const statusButton = event.target.closest("[data-expense-category-status]");
     const deleteButton = event.target.closest("[data-expense-category-delete]");
-    if (!statusButton && !deleteButton) return;
+    const categoryRow = event.target.closest("[data-expense-category-row]");
+    const categoryYear = event.target.closest("[data-category-year]")?.dataset.categoryYear;
+    const categoryMonth = event.target.closest("[data-category-month]")?.dataset.categoryMonth;
+    const categoryDate = event.target.closest("[data-category-date]")?.dataset.categoryDate;
+    if (!statusButton && !deleteButton) {
+      if (categoryRow) {
+        categoryView = { level: "years", categoryId: categoryRow.dataset.expenseCategoryRow, year: "", month: "", date: "" };
+        renderCategoryDrilldown();
+      } else if (categoryYear) {
+        categoryView = { ...categoryView, level: "months", year: categoryYear, month: "", date: "" };
+        renderCategoryDrilldown();
+      } else if (categoryMonth) {
+        categoryView = { ...categoryView, level: "days", month: categoryMonth, date: "" };
+        renderCategoryDrilldown();
+      } else if (categoryDate) {
+        categoryView = { ...categoryView, level: "items", date: categoryDate };
+        renderCategoryDrilldown();
+      }
+      return;
+    }
 
     if (categoryError) categoryError.hidden = true;
     try {
@@ -8038,6 +8141,7 @@ const setupExpensesPage = () => {
       const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.message || "Could not update category.");
+      categoryView = { level: "categories", categoryId: "", year: "", month: "", date: "" };
       renderCategories(data.categories || []);
     } catch (err) {
       if (categoryError) { categoryError.textContent = err.message || "Could not update category."; categoryError.hidden = false; }
@@ -8199,7 +8303,21 @@ const setupExpensesPage = () => {
   });
 
   categoriesWorkspaceBack?.addEventListener("click", () => {
-    if (categoriesWorkspace) categoriesWorkspace.hidden = true;
+    if (categoryView.level === "items") {
+      categoryView = { ...categoryView, level: "days", date: "" };
+      renderCategoryDrilldown();
+    } else if (categoryView.level === "days") {
+      categoryView = { ...categoryView, level: "months", month: "", date: "" };
+      renderCategoryDrilldown();
+    } else if (categoryView.level === "months") {
+      categoryView = { ...categoryView, level: "years", year: "", month: "", date: "" };
+      renderCategoryDrilldown();
+    } else if (categoryView.level === "years") {
+      categoryView = { level: "categories", categoryId: "", year: "", month: "", date: "" };
+      renderCategoryDrilldown();
+    } else if (categoriesWorkspace) {
+      categoriesWorkspace.hidden = true;
+    }
   });
 
   categoriesExportExcelBtn?.addEventListener("click", () => {
