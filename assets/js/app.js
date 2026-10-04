@@ -7475,15 +7475,11 @@ const setupExpensesPage = () => {
       )).join("");
     }
 
-    const totalCategorySpent = categories.reduce((sum, c) => sum + num(c.total_amount || 0), 0);
     if (categoriesCountBadge) {
       categoriesCountBadge.textContent = `${categories.length} categor${categories.length === 1 ? "y" : "ies"}`;
     }
-    if (categoriesTotalBadge) {
-      categoriesTotalBadge.textContent = fmt(totalCategorySpent);
-    }
     if (categoriesWorkspaceSubtitle) {
-      categoriesWorkspaceSubtitle.textContent = `${categories.length} total categories • Total Spent: ${fmt(totalCategorySpent)}`;
+      categoriesWorkspaceSubtitle.textContent = `${categories.length} total categories`;
     }
 
     if (categoryList) {
@@ -7491,7 +7487,6 @@ const setupExpensesPage = () => {
         const used = Number(category.used_count) || 0;
         const isActive = category.status === "active";
         const statusText = isActive ? "Active" : "Inactive";
-        const catSpent = num(category.total_amount || 0);
         return `
           <div class="expense-category-row${isActive ? "" : " inactive"}">
             <span class="expense-category-info">
@@ -7499,10 +7494,9 @@ const setupExpensesPage = () => {
               <small>${statusText} • ${used} expense${used === 1 ? "" : "s"}</small>
             </span>
             <div class="expense-category-meta-wrap">
-              <strong class="category-amount-badge">${fmt(catSpent)}</strong>
               <span class="expense-category-actions">
-                <button class="btn btn-outline btn-sm" type="button" data-expense-category-status="${category.id}" data-status="${isActive ? "inactive" : "active"}">${isActive ? "Deactivate" : "Activate"}</button>
-                <button class="btn btn-danger-outline btn-sm" type="button" data-expense-category-delete="${category.id}"${used > 0 ? " disabled" : ""}>Delete</button>
+                <button class="btn btn-outline btn-sm icon-only" type="button" data-expense-category-status="${category.id}" data-status="${isActive ? "inactive" : "active"}" aria-label="${isActive ? "Deactivate category" : "Activate category"}" title="${isActive ? "Deactivate" : "Activate"}">${svgMarkup(isActive ? "close" : "check", { size: 14 })}</button>
+                <button class="btn btn-danger-outline btn-sm icon-only" type="button" data-expense-category-delete="${category.id}" aria-label="Delete category" title="Delete"${used > 0 ? " disabled" : ""}>${svgMarkup("close", { size: 14 })}</button>
               </span>
             </div>
           </div>`;
