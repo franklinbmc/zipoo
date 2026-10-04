@@ -8158,6 +8158,137 @@ const setupSupportModal = () => {
   });
 };
 
+const setupDashboardPage = () => {
+  const page = document.querySelector("[data-dashboard-page]");
+  if (!page) return;
+
+  const fmt = (amount, cur = "TZS") => {
+    const val = Number(amount) || 0;
+    return `${cur} ${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  };
+  const escText = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[char]));
+  const setText = (selector, value) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = value;
+  };
+  const methodLabel = (method) => {
+    const key = String(method || "").toLowerCase();
+    if (key === "mobile" || key === "mobile_money") return "Lipa kwa simu";
+    if (key === "bank" || key === "card") return "Bank/Card";
+    if (key === "credit") return "Credit";
+    return "Cash";
+  };
+  const shortTime = (value) => {
+    if (!value) return "";
+    const d = new Date(String(value).replace(" ", "T"));
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const { user, selectedBusiness } = getStoredBusinessState();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  setText("[data-dashboard-greeting]", greeting);
+  setText("[data-dashboard-user]", user.full_name || user.name || "there");
+  setText("[data-dashboard-business]", selectedBusiness?.business_name || user.business_name || "Your business");
+
+  const renderSales = (sales = []) => {
+    const list = document.querySelector("[data-dashboard-sales-list]");
+    if (!list) return;
+    const recent = sales.slice(0, 4);
+    if (!recent.length) {
+      list.innerHTML = '<p class="dashboard-empty">No recent POS sales yet.</p>';
+      return;
+    }
+    list.innerHTML = recent.map((sale) => `
+      <div class="dashboard-list-row">
+        <div>
+          <strong>${escText(sale.receipt_number || "POS Sale")}</strong>
+          <span>${escText(sale.customer_name || "Walk-in Customer")} &bull; ${methodLabel(sale.payment_method)}${shortTime(sale.created_at) ? ` &bull; ${shortTime(sale.created_at)}` : ""}</span>
+        </div>
+        <b>${fmt(sale.total_amount)}</b>
+      </div>
+    `).join("");
+  };
+
+  const renderStock = (items = []) => {
+    const list = document.querySelector("[data-dashboard-stock-list]");
+    if (!list) return;
+    const low = items.filter((item) => item.is_low_stock).slice(0, 4);
+    if (!low.length) {
+      list.innerHTML = '<p class="dashboard-empty">No low-stock products.</p>';
+      return;
+    }
+    list.innerHTML = low.map((item) => {
+      const max = Math.max(Number(item.min_stock_alert) || 1, Number(item.current_stock) || 0, 1);
+      const pct = Math.max(4, Math.min(100, ((Number(item.current_stock) || 0) / max) * 100));
+      return `
+        <div class="dashboard-stock-row">
+          <div>
+            <strong>${escText(item.name)}</strong>
+            <span>${Number(item.current_stock) || 0} ${escText(item.unit || "pcs")} left &bull; reorder at ${Number(item.min_stock_alert) || 0}</span>
+          </div>
+          <i style="--stock-width:${pct}%"></i>
+        </div>
+      `;
+    }).join("");
+  };
+
+  const loadDashboard = async () => {
+    try {
+      const [invoiceRes, posRes, stockRes, accountRes] = await Promise.allSettled([
+        fetch(`${getBasePath()}api/sales.php`),
+        fetch(`${getBasePath()}api/sales.php?history=pos`),
+        fetch(`${getBasePath()}api/items.php`),
+        fetch(`${getBasePath()}api/accounts.php`),
+      ]);
+
+      if (invoiceRes.status === "fulfilled" && invoiceRes.value.ok) {
+        const data = await invoiceRes.value.json();
+        const stats = data.stats || {};
+        setText("[data-dashboard-sales-today]", fmt(stats.sales_today));
+        setText("[data-dashboard-sales-month]", fmt(stats.sales_month));
+        setText("[data-dashboard-sales-count]", `${stats.txn_today || 0} sales recorded`);
+        setText("[data-dashboard-amount-due]", fmt(stats.amount_due));
+        setText("[data-dashboard-overdue]", `${stats.overdue || 0} overdue invoices`);
+      }
+
+      if (posRes.status === "fulfilled" && posRes.value.ok) {
+        const data = await posRes.value.json();
+        renderSales(data.sales || []);
+      }
+
+      if (stockRes.status === "fulfilled" && stockRes.value.ok) {
+        const data = await stockRes.value.json();
+        setText("[data-dashboard-low-stock]", String(data.stats?.low_stock || 0));
+        setText("[data-dashboard-stock-note]", `${data.stats?.total || 0} products tracked`);
+        renderStock(data.items || []);
+      }
+
+      if (accountRes.status === "fulfilled" && accountRes.value.ok) {
+        const data = await accountRes.value.json();
+        const summary = data.summary || {};
+        setText("[data-dashboard-cash]", fmt(summary.cash));
+        setText("[data-dashboard-bank]", fmt(summary.bank));
+        setText("[data-dashboard-mobile]", fmt(summary.mobile));
+        setText("[data-dashboard-net]", fmt(summary.net));
+      }
+
+      fitAmounts(document);
+    } catch {
+      /* Keep the static empty states when offline or unauthenticated. */
+    }
+  };
+
+  loadDashboard();
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-lang]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.lang));
@@ -8179,6 +8310,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSalesPage();
   setupBankPage();
   setupRealEstatePage();
+  setupDashboardPage();
   initAmountAutosize();
   updateConnectionStatus();
   registerServiceWorker();
