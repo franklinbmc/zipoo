@@ -2278,6 +2278,11 @@ const setupCompanyUsersPage = () => {
   const detailStatus = document.querySelector("[data-user-detail-status]");
   const detailPhone = document.querySelector("[data-user-detail-phone]");
   const detailEmail = document.querySelector("[data-user-detail-email]");
+  const detailSalary = document.querySelector("[data-user-detail-salary]");
+  const detailTin = document.querySelector("[data-user-detail-tin]");
+  const detailNida = document.querySelector("[data-user-detail-nida]");
+  const detailNssf = document.querySelector("[data-user-detail-nssf]");
+  const detailHeslb = document.querySelector("[data-user-detail-heslb]");
   const detailCreatedAt = document.querySelector("[data-user-detail-created-at]");
   const detailEditBtn = document.querySelector("[data-user-detail-edit-btn]");
   const detailDeleteBtn = document.querySelector("[data-user-detail-delete-btn]");
@@ -2288,6 +2293,9 @@ const setupCompanyUsersPage = () => {
   const createForm = document.querySelector("[data-user-create-form]");
   const createError = document.querySelector("[data-user-create-error]");
   const createSubmit = document.querySelector("[data-user-create-submit]");
+  const createSalary = document.querySelector("[data-user-create-salary]");
+  const createAdvancedToggle = document.querySelector("[data-user-create-advanced-toggle]");
+  const createAdvancedPanel = document.querySelector("[data-user-create-advanced]");
 
   // Edit Modal
   const editModal = document.querySelector("[data-user-edit-modal]");
@@ -2301,10 +2309,21 @@ const setupCompanyUsersPage = () => {
   const editEmail = document.querySelector("[data-edit-user-email]");
   const editRole = document.querySelector("[data-edit-user-role]");
   const editStatus = document.querySelector("[data-edit-user-status]");
+  const editSalary = document.querySelector("[data-edit-user-salary]");
+  const editTin = document.querySelector("[data-edit-user-tin]");
+  const editNida = document.querySelector("[data-edit-user-nida]");
+  const editNssf = document.querySelector("[data-edit-user-nssf]");
+  const editHeslb = document.querySelector("[data-edit-user-heslb]");
   const editPassword = document.querySelector("[data-edit-user-password]");
+  const editAdvancedToggle = document.querySelector("[data-user-edit-advanced-toggle]");
+  const editAdvancedPanel = document.querySelector("[data-user-edit-advanced]");
 
   let cachedUsers = [];
   let currentUser = null;
+  const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
+
+  attachThousandsFormatting(createSalary);
+  attachThousandsFormatting(editSalary);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "-";
@@ -2315,6 +2334,21 @@ const setupCompanyUsersPage = () => {
       return dateStr;
     }
   };
+
+  const formatSalary = (amount) => {
+    const value = Number(amount || 0);
+    if (!value) return "-";
+    return `${currency} ${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+  };
+
+  const setAdvancedPanel = (panel, toggle, open) => {
+    if (!panel || !toggle) return;
+    panel.hidden = !open;
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    toggle.textContent = open ? "Hide advanced" : "Show advanced";
+  };
+
+  const valueOrDash = (value) => String(value || "").trim() || "-";
 
   const renderUsersList = (users = []) => {
     if (usersCountLabel) {
@@ -2433,6 +2467,11 @@ const setupCompanyUsersPage = () => {
     }
     if (detailPhone) detailPhone.textContent = user.phone || "-";
     if (detailEmail) detailEmail.textContent = user.email || "-";
+    if (detailSalary) detailSalary.textContent = formatSalary(user.monthly_salary);
+    if (detailTin) detailTin.textContent = valueOrDash(user.tin);
+    if (detailNida) detailNida.textContent = valueOrDash(user.nida);
+    if (detailNssf) detailNssf.textContent = valueOrDash(user.nssf);
+    if (detailHeslb) detailHeslb.textContent = valueOrDash(user.heslb);
     if (detailCreatedAt) detailCreatedAt.textContent = formatDate(user.created_at);
 
     if (detailModal) detailModal.hidden = false;
@@ -2446,6 +2485,7 @@ const setupCompanyUsersPage = () => {
   const openCreateModal = () => {
     if (createError) createError.hidden = true;
     createForm?.reset();
+    setAdvancedPanel(createAdvancedPanel, createAdvancedToggle, false);
     if (createModal) createModal.hidden = false;
     createForm?.querySelector('input[name="full_name"]')?.focus();
   };
@@ -2465,7 +2505,14 @@ const setupCompanyUsersPage = () => {
     if (editEmail) editEmail.value = user.email || "";
     if (editRole) editRole.value = user.role || "staff";
     if (editStatus) editStatus.value = user.status || "active";
+    if (editSalary) editSalary.value = user.monthly_salary ? groupThousands(String(user.monthly_salary)) : "";
+    if (editTin) editTin.value = user.tin || "";
+    if (editNida) editNida.value = user.nida || "";
+    if (editNssf) editNssf.value = user.nssf || "";
+    if (editHeslb) editHeslb.value = user.heslb || "";
     if (editPassword) editPassword.value = "";
+    const hasAdvancedValues = [user.tin, user.nida, user.nssf, user.heslb].some((value) => String(value || "").trim() !== "");
+    setAdvancedPanel(editAdvancedPanel, editAdvancedToggle, hasAdvancedValues);
     if (editModal) editModal.hidden = false;
     editFullName?.focus();
   };
@@ -2480,6 +2527,12 @@ const setupCompanyUsersPage = () => {
   createCloseBtn?.addEventListener("click", closeCreateModal);
   detailCloseBtn?.addEventListener("click", closeUserDetail);
   editCloseBtn?.addEventListener("click", closeEditModal);
+  createAdvancedToggle?.addEventListener("click", () => {
+    setAdvancedPanel(createAdvancedPanel, createAdvancedToggle, Boolean(createAdvancedPanel?.hidden));
+  });
+  editAdvancedToggle?.addEventListener("click", () => {
+    setAdvancedPanel(editAdvancedPanel, editAdvancedToggle, Boolean(editAdvancedPanel?.hidden));
+  });
 
   detailEditBtn?.addEventListener("click", () => {
     const userToEdit = currentUser;

@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=75">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=105">
 </head>
 <body>
   <div class="app-shell customers-page-shell">
@@ -81,6 +81,26 @@
             <strong data-user-detail-email>-</strong>
           </div>
           <div class="settings-list-row field-display-row">
+            <span>Salary</span>
+            <strong data-user-detail-salary>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>TIN</span>
+            <strong data-user-detail-tin>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>NIDA</span>
+            <strong data-user-detail-nida>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>NSSF</span>
+            <strong data-user-detail-nssf>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
+            <span>HESLB</span>
+            <strong data-user-detail-heslb>-</strong>
+          </div>
+          <div class="settings-list-row field-display-row">
             <span>Added on</span>
             <strong data-user-detail-created-at>-</strong>
           </div>
@@ -127,6 +147,29 @@
             <option value="accountant">Accountant</option>
           </select>
         </label>
+        <label class="form-field">
+          <span>Salary</span>
+          <input type="text" name="monthly_salary" inputmode="decimal" placeholder="0" data-user-create-salary>
+        </label>
+        <button class="btn btn-outline btn-sm" type="button" data-user-create-advanced-toggle aria-expanded="false">Show advanced</button>
+        <div hidden data-user-create-advanced style="display: grid; gap: 12px;">
+          <label class="form-field">
+            <span>TIN</span>
+            <input type="text" name="tin" placeholder="Tax identification number">
+          </label>
+          <label class="form-field">
+            <span>NIDA</span>
+            <input type="text" name="nida" placeholder="National ID number">
+          </label>
+          <label class="form-field">
+            <span>NSSF</span>
+            <input type="text" name="nssf" placeholder="NSSF number">
+          </label>
+          <label class="form-field">
+            <span>HESLB</span>
+            <input type="text" name="heslb" placeholder="HESLB number">
+          </label>
+        </div>
         <label class="form-field">
           <span>Account Password <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
           <input type="password" name="password" placeholder="Minimum 4 characters" minlength="4" required>
@@ -179,6 +222,29 @@
           </select>
         </label>
         <label class="form-field">
+          <span>Salary</span>
+          <input type="text" name="monthly_salary" inputmode="decimal" data-edit-user-salary>
+        </label>
+        <button class="btn btn-outline btn-sm" type="button" data-user-edit-advanced-toggle aria-expanded="false">Show advanced</button>
+        <div hidden data-user-edit-advanced style="display: grid; gap: 12px;">
+          <label class="form-field">
+            <span>TIN</span>
+            <input type="text" name="tin" data-edit-user-tin>
+          </label>
+          <label class="form-field">
+            <span>NIDA</span>
+            <input type="text" name="nida" data-edit-user-nida>
+          </label>
+          <label class="form-field">
+            <span>NSSF</span>
+            <input type="text" name="nssf" data-edit-user-nssf>
+          </label>
+          <label class="form-field">
+            <span>HESLB</span>
+            <input type="text" name="heslb" data-edit-user-heslb>
+          </label>
+        </div>
+        <label class="form-field">
           <span>Status</span>
           <select name="status" data-edit-user-status>
             <option value="active">Active</option>
@@ -204,6 +270,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=94" defer></script>
+  <script src="/assets/js/app.js?v=125" defer></script>
 </body>
 </html>

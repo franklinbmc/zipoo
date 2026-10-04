@@ -72,6 +72,41 @@ function ensure_user_columns(PDO $pdo): void
     if (empty($statusCol)) {
         $pdo->exec("ALTER TABLE tbl_users ADD COLUMN status ENUM('active', 'inactive') NOT NULL DEFAULT 'active' AFTER role");
     }
+
+    $salaryCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'monthly_salary'")->fetchAll();
+    if (empty($salaryCol)) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN monthly_salary DECIMAL(14,2) NOT NULL DEFAULT 0.00 AFTER status");
+    }
+
+    $tinCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'tin'")->fetchAll();
+    if (empty($tinCol)) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN tin VARCHAR(50) NULL AFTER monthly_salary");
+    }
+
+    $nidaCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'nida'")->fetchAll();
+    if (empty($nidaCol)) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN nida VARCHAR(50) NULL AFTER tin");
+    }
+
+    $nssfCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'nssf'")->fetchAll();
+    if (empty($nssfCol)) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN nssf VARCHAR(50) NULL AFTER nida");
+    }
+
+    $heslbCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'heslb'")->fetchAll();
+    if (empty($heslbCol)) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN heslb VARCHAR(50) NULL AFTER nssf");
+    }
+}
+
+function money_value($value): float
+{
+    $clean = preg_replace('/[^0-9.\-]/', '', (string) $value);
+    if ($clean === '' || $clean === '-' || $clean === '.') {
+        return 0.0;
+    }
+
+    return round((float) $clean, 2);
 }
 
 function user_payload(array $row, int $ownerId): array
@@ -84,6 +119,11 @@ function user_payload(array $row, int $ownerId): array
         'email' => (string) ($row['email'] ?? ''),
         'role' => (string) ($row['role'] ?? 'staff'),
         'status' => (string) ($row['status'] ?? 'active'),
+        'monthly_salary' => (float) ($row['monthly_salary'] ?? 0),
+        'tin' => (string) ($row['tin'] ?? ''),
+        'nida' => (string) ($row['nida'] ?? ''),
+        'nssf' => (string) ($row['nssf'] ?? ''),
+        'heslb' => (string) ($row['heslb'] ?? ''),
         'is_owner' => ((int) $row['id'] === $ownerId),
         'created_at' => (string) ($row['created_at'] ?? ''),
         'updated_at' => (string) ($row['updated_at'] ?? ''),
@@ -159,6 +199,11 @@ try {
         $email = trim((string) ($_POST['email'] ?? ''));
         $role = trim((string) ($_POST['role'] ?? 'staff'));
         $status = trim((string) ($_POST['status'] ?? 'active'));
+        $monthlySalary = money_value($_POST['monthly_salary'] ?? 0);
+        $tin = trim((string) ($_POST['tin'] ?? ''));
+        $nida = trim((string) ($_POST['nida'] ?? ''));
+        $nssf = trim((string) ($_POST['nssf'] ?? ''));
+        $heslb = trim((string) ($_POST['heslb'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
 
         if ($fullName === '') {
@@ -196,13 +241,18 @@ try {
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         $stmt = $pdo->prepare(
-            'INSERT INTO tbl_users (business_id, role, status, full_name, phone, email, business_name, business_type, region_code, district_code, password_hash) 
-             VALUES (:bid, :role, :status, :full_name, :phone, :email, :bname, :btype, :region, :district, :password_hash)'
+            'INSERT INTO tbl_users (business_id, role, status, monthly_salary, tin, nida, nssf, heslb, full_name, phone, email, business_name, business_type, region_code, district_code, password_hash)
+             VALUES (:bid, :role, :status, :monthly_salary, :tin, :nida, :nssf, :heslb, :full_name, :phone, :email, :bname, :btype, :region, :district, :password_hash)'
         );
         $stmt->execute([
             ':bid' => $businessId,
             ':role' => $role !== '' ? $role : 'staff',
             ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
+            ':monthly_salary' => $monthlySalary,
+            ':tin' => $tin !== '' ? $tin : null,
+            ':nida' => $nida !== '' ? $nida : null,
+            ':nssf' => $nssf !== '' ? $nssf : null,
+            ':heslb' => $heslb !== '' ? $heslb : null,
             ':full_name' => $fullName,
             ':phone' => $phone,
             ':email' => $email !== '' ? $email : null,
@@ -232,6 +282,11 @@ try {
         $email = trim((string) ($_POST['email'] ?? ''));
         $role = trim((string) ($_POST['role'] ?? 'staff'));
         $status = trim((string) ($_POST['status'] ?? 'active'));
+        $monthlySalary = money_value($_POST['monthly_salary'] ?? 0);
+        $tin = trim((string) ($_POST['tin'] ?? ''));
+        $nida = trim((string) ($_POST['nida'] ?? ''));
+        $nssf = trim((string) ($_POST['nssf'] ?? ''));
+        $heslb = trim((string) ($_POST['heslb'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
 
         if ($targetUserId <= 0) {
@@ -283,7 +338,7 @@ try {
             }
             $stmt = $pdo->prepare(
                 'UPDATE tbl_users 
-                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status, password_hash = :pwd 
+                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status, monthly_salary = :monthly_salary, tin = :tin, nida = :nida, nssf = :nssf, heslb = :heslb, password_hash = :pwd
                  WHERE id = :id AND business_id = :bid'
             );
             $stmt->execute([
@@ -294,12 +349,17 @@ try {
                 ':email' => $email !== '' ? $email : null,
                 ':role' => $role !== '' ? $role : 'staff',
                 ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
+                ':monthly_salary' => $monthlySalary,
+                ':tin' => $tin !== '' ? $tin : null,
+                ':nida' => $nida !== '' ? $nida : null,
+                ':nssf' => $nssf !== '' ? $nssf : null,
+                ':heslb' => $heslb !== '' ? $heslb : null,
                 ':pwd' => password_hash($password, PASSWORD_DEFAULT),
             ]);
         } else {
             $stmt = $pdo->prepare(
                 'UPDATE tbl_users 
-                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status 
+                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status, monthly_salary = :monthly_salary, tin = :tin, nida = :nida, nssf = :nssf, heslb = :heslb
                  WHERE id = :id AND business_id = :bid'
             );
             $stmt->execute([
@@ -310,6 +370,11 @@ try {
                 ':email' => $email !== '' ? $email : null,
                 ':role' => $role !== '' ? $role : 'staff',
                 ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
+                ':monthly_salary' => $monthlySalary,
+                ':tin' => $tin !== '' ? $tin : null,
+                ':nida' => $nida !== '' ? $nida : null,
+                ':nssf' => $nssf !== '' ? $nssf : null,
+                ':heslb' => $heslb !== '' ? $heslb : null,
             ]);
         }
 

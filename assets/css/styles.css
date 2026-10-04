@@ -1767,7 +1767,8 @@ body.offline .status-dot {
 .css-formatted-select,
 .expenses-page select,
 [data-expense-modal] select,
-.payroll-controls select {
+.payroll-controls select,
+.customers-page-shell select {
   appearance: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
@@ -1795,7 +1796,8 @@ body.offline .status-dot {
 .css-formatted-select:hover,
 .expenses-page select:hover,
 [data-expense-modal] select:hover,
-.payroll-controls select:hover {
+.payroll-controls select:hover,
+.customers-page-shell select:hover {
   border-color: var(--color-blue) !important;
   background-color: #fbfdff !important;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='none' stroke='%231477ff' stroke-width='48' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M112 184l144 144 144-144'/%3E%3C/svg%3E") !important;
@@ -1808,7 +1810,9 @@ body.offline .status-dot {
 [data-expense-modal] select:focus,
 [data-expense-modal] select:focus-visible,
 .payroll-controls select:focus,
-.payroll-controls select:focus-visible {
+.payroll-controls select:focus-visible,
+.customers-page-shell select:focus,
+.customers-page-shell select:focus-visible {
   outline: none !important;
   border-color: var(--color-blue) !important;
   box-shadow: 0 0 0 3.5px rgba(20, 119, 255, 0.18) !important;
@@ -1818,7 +1822,8 @@ body.offline .status-dot {
 .css-formatted-select:disabled,
 .expenses-page select:disabled,
 [data-expense-modal] select:disabled,
-.payroll-controls select:disabled {
+.payroll-controls select:disabled,
+.customers-page-shell select:disabled {
   background-color: #f1f5f9 !important;
   color: var(--color-muted) !important;
   border-color: var(--color-line) !important;
@@ -1829,7 +1834,8 @@ body.offline .status-dot {
 .css-formatted-select option,
 .expenses-page select option,
 [data-expense-modal] select option,
-.payroll-controls select option {
+.payroll-controls select option,
+.customers-page-shell select option {
   color: var(--color-navy);
   background-color: #ffffff;
   font-size: 0.94rem;
