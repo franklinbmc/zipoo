@@ -2011,6 +2011,202 @@ body.offline .status-dot {
   font-size: 0.84rem;
 }
 
+/* ==========================================================================
+   Expenses Page — 100% Full Width Cards & Workspace Drilldown
+   ========================================================================== */
+.settings-page.expenses-page {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding-left: clamp(14px, 3vw, 24px) !important;
+  padding-right: clamp(14px, 3vw, 24px) !important;
+  box-sizing: border-box !important;
+}
+
+.expenses-page .stock-hub,
+.expenses-page .stock-hub-row,
+.expenses-page .stock-kpi-grid,
+.expenses-page .stock-kpi-card,
+.expenses-page .expenses-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.expenses-page .stock-hub-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Workspace Fullscreen Full-Width */
+[data-expenses-workspace] .fullscreen-panel {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+[data-expenses-workspace] .fullscreen-body.stock-workspace-body {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding-left: clamp(14px, 3vw, 24px) !important;
+  padding-right: clamp(14px, 3vw, 24px) !important;
+}
+
+[data-expenses-workspace] .expenses-list {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+[data-expenses-workspace] .expense-group-row,
+[data-expenses-workspace] .expense-item-row {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Expenses Workspace Export Bar */
+.workspace-export-bar {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  background: #ffffff;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(13, 43, 91, 0.03);
+}
+
+.workspace-export-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.workspace-export-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.workspace-export-title {
+  color: var(--color-navy);
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.workspace-export-sub {
+  color: var(--color-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.workspace-export-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.export-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.export-btn svg {
+  flex-shrink: 0;
+}
+
+.export-btn.export-excel {
+  color: #15803d;
+  border-color: rgba(22, 163, 74, 0.3);
+  background: #f0fdf4;
+}
+
+.export-btn.export-excel:hover {
+  background: #dcfce7;
+  border-color: #16a34a;
+  color: #14532d;
+}
+
+.export-btn.export-pdf {
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+  background: #fef2f2;
+}
+
+.export-btn.export-pdf:hover {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #991b1b;
+}
+
+.export-btn.export-email {
+  color: var(--color-blue);
+  border-color: rgba(20, 119, 255, 0.3);
+  background: #eff6ff;
+}
+
+.export-btn.export-email:hover,
+.export-btn.export-email.active {
+  background: #dbeafe;
+  border-color: var(--color-blue);
+  color: var(--color-navy);
+}
+
+.workspace-export-email-panel {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--color-line);
+}
+
+.workspace-export-email-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.workspace-export-email-form input[type="email"] {
+  flex: 1;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-navy);
+  background: #f8fafc;
+}
+
+.workspace-export-email-form input[type="email"]:focus {
+  background: #fff;
+  border-color: var(--color-blue);
+  outline: none;
+}
+
+.workspace-export-email-status {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .expense-category-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

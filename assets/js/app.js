@@ -7391,6 +7391,16 @@ const setupExpensesPage = () => {
   const payrollList = document.querySelector("[data-payroll-list]");
   const payrollError = document.querySelector("[data-payroll-error]");
   const payrollPay = document.querySelector("[data-payroll-pay]");
+  const exportBar = document.querySelector("[data-expenses-export-bar]");
+  const exportTitle = document.querySelector("[data-expenses-export-title]");
+  const exportSub = document.querySelector("[data-expenses-export-sub]");
+  const exportExcelBtn = document.querySelector('[data-expenses-export="excel"]');
+  const exportPdfBtn = document.querySelector('[data-expenses-export="pdf"]');
+  const exportEmailToggleBtn = document.querySelector('[data-expenses-export="email-toggle"]');
+  const exportEmailPanel = document.querySelector("[data-expenses-email-panel]");
+  const exportEmailInput = document.querySelector("[data-expenses-email-input]");
+  const exportEmailSendBtn = document.querySelector("[data-expenses-email-send]");
+  const exportEmailStatus = document.querySelector("[data-expenses-email-status]");
 
   let accounts = [];
   let categories = [];
@@ -7572,6 +7582,7 @@ const setupExpensesPage = () => {
     if (!expenseRows.length) {
       list?.replaceChildren();
       if (empty) empty.hidden = false;
+      if (exportBar) exportBar.hidden = true;
       setText(workspaceTitle, "Expenses");
       if (workspaceSubtitle) workspaceSubtitle.hidden = true;
       return;
@@ -7581,12 +7592,39 @@ const setupExpensesPage = () => {
     renderExpenseDrilldown();
   };
 
+  const updateExportBar = () => {
+    if (!exportBar) return;
+    if (!expenseRows.length) {
+      exportBar.hidden = true;
+      return;
+    }
+    exportBar.hidden = false;
+    if (exportEmailPanel) exportEmailPanel.hidden = true;
+    if (exportEmailStatus) exportEmailStatus.hidden = true;
+    if (exportEmailToggleBtn) exportEmailToggleBtn.classList.remove("active");
+
+    if (expenseView.level === "years") {
+      setText(exportTitle, "Export Expenses: All Years");
+      setText(exportSub, "Summary report of all years");
+    } else if (expenseView.level === "months") {
+      setText(exportTitle, `Export Expenses: Year ${expenseView.year}`);
+      setText(exportSub, "Monthly breakdown report");
+    } else if (expenseView.level === "days") {
+      setText(exportTitle, `Export Expenses: ${monthLabel(expenseView.month)}`);
+      setText(exportSub, "Daily breakdown report");
+    } else {
+      setText(exportTitle, `Export Expenses: ${dateLabel(expenseView.date)}`);
+      setText(exportSub, "Detailed itemized transactions report");
+    }
+  };
+
   const renderExpenseDrilldown = () => {
     if (!list) return;
 
     if (!expenseRows.length) {
       list.replaceChildren();
       if (empty) empty.hidden = false;
+      if (exportBar) exportBar.hidden = true;
       setText(workspaceTitle, "Expenses");
       if (workspaceSubtitle) workspaceSubtitle.hidden = true;
       return;
@@ -7603,6 +7641,8 @@ const setupExpensesPage = () => {
     if (expenseView.level === "items" && !expenseRows.some((row) => String(row.created_at || "").slice(0, 10) === expenseView.date)) {
       expenseView = { level: "years", year: "", month: "", date: "" };
     }
+
+    updateExportBar();
 
     // LEVEL 1: YEARS
     if (expenseView.level === "years") {
@@ -7753,6 +7793,67 @@ const setupExpensesPage = () => {
       renderExpenseDrilldown();
     } else {
       if (workspace) workspace.hidden = true;
+    }
+  });
+
+  exportExcelBtn?.addEventListener("click", () => {
+    const url = `${getBasePath()}api/accounts.php?action=export_expenses_excel&level=${encodeURIComponent(expenseView.level)}&year=${encodeURIComponent(expenseView.year)}&month=${encodeURIComponent(expenseView.month)}&date=${encodeURIComponent(expenseView.date)}`;
+    window.location.href = url;
+  });
+
+  exportPdfBtn?.addEventListener("click", () => {
+    const url = `${getBasePath()}api/accounts.php?action=export_expenses_pdf&level=${encodeURIComponent(expenseView.level)}&year=${encodeURIComponent(expenseView.year)}&month=${encodeURIComponent(expenseView.month)}&date=${encodeURIComponent(expenseView.date)}`;
+    window.open(url, "_blank");
+  });
+
+  exportEmailToggleBtn?.addEventListener("click", () => {
+    if (!exportEmailPanel) return;
+    const isHidden = exportEmailPanel.hidden;
+    exportEmailPanel.hidden = !isHidden;
+    exportEmailToggleBtn.classList.toggle("active", !exportEmailPanel.hidden);
+    if (!exportEmailPanel.hidden && exportEmailInput) {
+      exportEmailInput.focus();
+    }
+  });
+
+  exportEmailSendBtn?.addEventListener("click", async () => {
+    const recipient = exportEmailInput?.value?.trim();
+    if (!recipient || !recipient.includes("@")) {
+      if (exportEmailStatus) {
+        exportEmailStatus.textContent = "Please enter a valid recipient email address.";
+        exportEmailStatus.style.color = "#dc2626";
+        exportEmailStatus.hidden = false;
+      }
+      return;
+    }
+    if (exportEmailStatus) {
+      exportEmailStatus.textContent = "Sending PDF report via email...";
+      exportEmailStatus.style.color = "var(--color-blue)";
+      exportEmailStatus.hidden = false;
+    }
+    exportEmailSendBtn.disabled = true;
+    try {
+      const b = new FormData();
+      b.set("action", "email_expenses_pdf");
+      b.set("level", expenseView.level);
+      b.set("year", expenseView.year);
+      b.set("month", expenseView.month);
+      b.set("date", expenseView.date);
+      b.set("recipient_email", recipient);
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body: b });
+      const d = await res.json();
+      if (!res.ok || !d.ok) throw new Error(d.message || "Failed to send email.");
+      if (exportEmailStatus) {
+        exportEmailStatus.textContent = d.message || "Report sent successfully!";
+        exportEmailStatus.style.color = "#16a34a";
+      }
+    } catch (err) {
+      if (exportEmailStatus) {
+        exportEmailStatus.textContent = err.message || "Failed to send email.";
+        exportEmailStatus.style.color = "#dc2626";
+      }
+    } finally {
+      exportEmailSendBtn.disabled = false;
     }
   });
 

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/accounts_lib.php';
+require_once __DIR__ . '/expenses_export_lib.php';
 
 session_start();
 
@@ -370,6 +371,24 @@ try {
                 ];
             }, $stmt->fetchAll());
             respond(200, ['ok' => true, 'expenses' => $expenses]);
+        }
+
+        if (($_GET['action'] ?? '') === 'export_expenses_excel') {
+            $level = trim((string) ($_GET['level'] ?? 'years'));
+            $year = trim((string) ($_GET['year'] ?? ''));
+            $month = trim((string) ($_GET['month'] ?? ''));
+            $date = trim((string) ($_GET['date'] ?? ''));
+            export_expenses_excel($pdo, $businessId, $level, $year, $month, $date);
+            exit;
+        }
+
+        if (($_GET['action'] ?? '') === 'export_expenses_pdf') {
+            $level = trim((string) ($_GET['level'] ?? 'years'));
+            $year = trim((string) ($_GET['year'] ?? ''));
+            $month = trim((string) ($_GET['month'] ?? ''));
+            $date = trim((string) ($_GET['date'] ?? ''));
+            export_expenses_pdf_download($pdo, $businessId, $level, $year, $month, $date);
+            exit;
         }
 
         if (($_GET['action'] ?? '') === 'expense_categories') {
@@ -758,6 +777,19 @@ try {
 
         $accounts = load_accounts($pdo, $businessId);
         respond(200, ['ok' => true, 'message' => 'Transfer completed.', 'accounts' => $accounts, 'summary' => account_summary($accounts)]);
+    }
+
+    if ($action === 'email_expenses_pdf') {
+        $level = trim((string) ($_POST['level'] ?? 'years'));
+        $year = trim((string) ($_POST['year'] ?? ''));
+        $month = trim((string) ($_POST['month'] ?? ''));
+        $date = trim((string) ($_POST['date'] ?? ''));
+        $recipient = trim((string) ($_POST['recipient_email'] ?? ''));
+        if ($recipient === '' || !filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            respond(422, ['ok' => false, 'message' => 'Please provide a valid recipient email address.']);
+        }
+        $result = send_expenses_email($pdo, $businessId, $level, $year, $month, $date, $recipient);
+        respond($result['ok'] ? 200 : 422, $result);
     }
 
     respond(422, ['ok' => false, 'message' => 'Unknown account action.']);
