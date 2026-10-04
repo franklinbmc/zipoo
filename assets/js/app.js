@@ -7498,7 +7498,6 @@ const setupExpensesPage = () => {
       }
       categoryList.innerHTML = categories.map((category) => {
         const rows = categoryRows(category.id);
-        const total = rows.reduce((sum, row) => sum + num(row.amount), 0);
         const used = Number(category.used_count) || rows.length || 0;
         const isActive = category.status === "active";
         const statusText = isActive ? "Active" : "Inactive";
@@ -7506,7 +7505,7 @@ const setupExpensesPage = () => {
           <div class="expense-category-row${isActive ? "" : " inactive"}" data-expense-category-row="${category.id}">
             <span class="expense-category-info">
               <strong>${esc(category.name)}</strong>
-              <small>${statusText} • ${used} expense${used === 1 ? "" : "s"} • Total: ${fmt(total)}</small>
+              <small>${statusText} • ${used} expense${used === 1 ? "" : "s"}</small>
             </span>
             <div class="expense-category-meta-wrap">
               <span class="expense-category-actions">
@@ -7530,9 +7529,9 @@ const setupExpensesPage = () => {
         <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-category-year="${year.key}">
           <span class="stock-hub-label expense-group-info">
             <strong>${esc(year.key)}</strong>
-            <small>${year.count} expense${year.count === 1 ? "" : "s"} • Total: ${fmt(year.total)}</small>
+            <small>${year.count} expense${year.count === 1 ? "" : "s"}</small>
           </span>
-          <span class="stock-summary-meta expense-group-meta"><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
+          <span class="stock-summary-meta expense-group-meta"><strong class="expense-right-total">${fmt(year.total)}</strong><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
         </button>`).join("") || '<div class="expenses-empty"><strong>No expenses yet</strong><p>This category has no recorded expenses.</p></div>';
       return;
     }
@@ -7545,9 +7544,9 @@ const setupExpensesPage = () => {
         <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-category-month="${month.key}">
           <span class="stock-hub-label expense-group-info">
             <strong>${esc(monthLabel(month.key))}</strong>
-            <small>${month.count} expense${month.count === 1 ? "" : "s"} • Total: ${fmt(month.total)}</small>
+            <small>${month.count} expense${month.count === 1 ? "" : "s"}</small>
           </span>
-          <span class="stock-summary-meta expense-group-meta"><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
+          <span class="stock-summary-meta expense-group-meta"><strong class="expense-right-total">${fmt(month.total)}</strong><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
         </button>`).join("");
       return;
     }
@@ -7560,9 +7559,9 @@ const setupExpensesPage = () => {
         <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-category-date="${day.key}">
           <span class="stock-hub-label expense-group-info">
             <strong>${esc(dateLabel(day.key))}</strong>
-            <small>${day.count} expense${day.count === 1 ? "" : "s"} • Total: ${fmt(day.total)}</small>
+            <small>${day.count} expense${day.count === 1 ? "" : "s"}</small>
           </span>
-          <span class="stock-summary-meta expense-group-meta"><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
+          <span class="stock-summary-meta expense-group-meta"><strong class="expense-right-total">${fmt(day.total)}</strong><span class="expense-view-chevron" aria-hidden="true">${chevron}</span></span>
         </button>`).join("");
       return;
     }
