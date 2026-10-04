@@ -2012,18 +2012,25 @@ body.offline .status-dot {
 }
 
 /* ==========================================================================
-   Expenses Page — 100% Full Width Cards & Workspace Drilldown
+   Expenses Page — Big Screen (1100px max-width) & 100% Full Width Cards
    ========================================================================== */
 .settings-page.expenses-page {
   width: 100% !important;
-  max-width: 100% !important;
-  margin: 0 !important;
+  max-width: 1100px !important; /* 100% of 1100px on big screen, 100% on mobile */
+  margin: 0 auto !important;
   padding-left: clamp(14px, 3vw, 24px) !important;
   padding-right: clamp(14px, 3vw, 24px) !important;
   box-sizing: border-box !important;
 }
 
-.expenses-page .stock-hub,
+/* Ensure stock-hub takes 100% width on big screen (overriding desktop 2-col) */
+.expenses-page .stock-hub {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
 .expenses-page .stock-hub-row,
 .expenses-page .stock-kpi-grid,
 .expenses-page .stock-kpi-card,
@@ -2037,20 +2044,92 @@ body.offline .status-dot {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
+  min-height: 68px;
+  padding: 16px 20px !important;
+  border-radius: 14px;
 }
 
-/* Workspace Fullscreen Full-Width */
+/* KPI Cards readability & prominent amounts */
+.expenses-page .stock-kpi-card {
+  padding: 16px 18px;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(13, 43, 91, 0.04);
+}
+
+.expenses-page .stock-kpi-card .kpi-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+
+.expenses-page .stock-kpi-card .kpi-val {
+  font-size: clamp(1.22rem, 1.8vw, 1.55rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.25 !important;
+  color: var(--color-navy, #0d2b5b);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+
+.expenses-page .stock-kpi-card .kpi-val[data-expenses-today],
+.expenses-page .stock-kpi-card .kpi-val[data-expenses-month] {
+  color: #dc2626 !important; /* Bold vivid readable red */
+}
+
+/* Main Hub Card Total Amount Badge */
+.expense-card-total-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 14px;
+  background: #fef2f2;
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 1.05rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.stock-page .settings-accordion-link.stock-hub-row:hover .expense-card-total-badge {
+  background: #fee2e2;
+  border-color: rgba(220, 38, 38, 0.45);
+  color: #991b1b;
+}
+
+/* Workspace Fullscreen — Centered and 1100px max on big screen */
 [data-expenses-workspace] .fullscreen-panel {
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 1100px !important;
+  margin-inline: auto !important;
 }
 
 [data-expenses-workspace] .fullscreen-body.stock-workspace-body {
   width: 100% !important;
-  max-width: 100% !important;
+  max-width: 1100px !important;
+  margin-inline: auto !important;
   box-sizing: border-box !important;
   padding-left: clamp(14px, 3vw, 24px) !important;
   padding-right: clamp(14px, 3vw, 24px) !important;
+}
+
+[data-expenses-workspace] .workspace-header-title h2 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--color-navy);
+  margin: 0;
+}
+
+[data-expenses-workspace] .workspace-header-title small {
+  display: block;
+  color: #b91c1c !important;
+  font-size: 0.88rem !important;
+  font-weight: 800 !important;
+  margin-top: 2px;
 }
 
 [data-expenses-workspace] .expenses-list {
@@ -2059,11 +2138,117 @@ body.offline .status-dot {
   box-sizing: border-box !important;
 }
 
-[data-expenses-workspace] .expense-group-row,
-[data-expenses-workspace] .expense-item-row {
+/* Year, Month, Day Group Cards */
+[data-expenses-workspace] .expense-group-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px;
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
+  padding: 16px 20px !important;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: #fff;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(13, 43, 91, 0.03);
+}
+
+[data-expenses-workspace] .expense-group-row:hover {
+  border-color: var(--color-blue);
+  background: #f8fbff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(20, 119, 255, 0.08);
+}
+
+[data-expenses-workspace] .expense-group-info strong {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: var(--color-navy);
+}
+
+[data-expenses-workspace] .expense-group-info small {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+
+[data-expenses-workspace] .expense-amount-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 16px;
+  background: #fef2f2;
+  border: 1px solid rgba(220, 38, 38, 0.22);
+  border-radius: 10px;
+  color: #b91c1c; /* Deep, vivid, high-contrast red */
+  font-size: 1.1rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.05);
+  transition: all 0.15s ease;
+}
+
+[data-expenses-workspace] .expense-group-row:hover .expense-amount-badge {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #991b1b;
+  transform: scale(1.02);
+}
+
+/* Item Detail Cards */
+[data-expenses-workspace] .expense-item-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 14px 18px !important;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: #fff;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(13, 43, 91, 0.02);
+}
+
+[data-expenses-workspace] .expense-item-row:hover {
+  background: #fbfdff;
+  border-color: rgba(20, 119, 255, 0.35);
+  box-shadow: 0 4px 12px rgba(20, 119, 255, 0.06);
+}
+
+[data-expenses-workspace] .expense-item-title {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--color-navy);
+}
+
+[data-expenses-workspace] .expense-item-amount {
+  flex-shrink: 0;
+  text-align: right;
+  display: flex;
+  align-items: center;
+}
+
+[data-expenses-workspace] .expense-item-amount b {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  background: #fef2f2;
+  border: 1px solid rgba(220, 38, 38, 0.22);
+  border-radius: 9px;
+  color: #b91c1c; /* Deep, vivid, highly readable red */
+  font-size: 1.08rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 /* Expenses Workspace Export Bar */

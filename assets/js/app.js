@@ -7372,6 +7372,7 @@ const setupExpensesPage = () => {
   const workspaceTitle = document.querySelector("[data-expenses-workspace-title]");
   const workspaceSubtitle = document.querySelector("[data-expenses-workspace-subtitle]");
   const countBadge = document.querySelector("[data-expenses-count-badge]");
+  const totalBadge = document.querySelector("[data-expenses-total-badge]");
   const list = document.querySelector("[data-expenses-list]");
   const empty = document.querySelector("[data-expenses-empty]");
   const modal = document.querySelector("[data-expense-modal]");
@@ -7575,8 +7576,12 @@ const setupExpensesPage = () => {
     setText(todayValue, fmt(todayTotal));
     setText(monthValue, fmt(monthTotal));
     setText(countValue, String(expenseRows.length));
+    const grandTotal = expenseRows.reduce((sum, row) => sum + num(row.amount), 0);
     if (countBadge) {
       countBadge.textContent = `${expenseRows.length} expense${expenseRows.length === 1 ? "" : "s"}`;
+    }
+    if (totalBadge) {
+      totalBadge.textContent = fmt(grandTotal);
     }
 
     if (!expenseRows.length) {
