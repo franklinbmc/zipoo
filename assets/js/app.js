@@ -7366,6 +7366,8 @@ const setupExpensesPage = () => {
   const monthValue = document.querySelector("[data-expenses-month]");
   const countValue = document.querySelector("[data-expenses-count]");
   const accountValue = document.querySelector("[data-expenses-account]");
+  const expensesTitle = document.querySelector("[data-expenses-title]");
+  const expensesBack = document.querySelector("[data-expenses-back]");
   const list = document.querySelector("[data-expenses-list]");
   const empty = document.querySelector("[data-expenses-empty]");
   const modal = document.querySelector("[data-expense-modal]");
@@ -7389,6 +7391,8 @@ const setupExpensesPage = () => {
   let accounts = [];
   let categories = [];
   let payrollRun = null;
+  let expenseRows = [];
+  let expenseView = { level: "months", month: "", date: "" };
 
   const setText = (el, value) => {
     if (el) el.textContent = value;
@@ -7504,33 +7508,110 @@ const setupExpensesPage = () => {
     renderPayroll(data);
   };
 
+  const monthLabel = (key) => {
+    const date = new Date(`${key}-01T00:00:00`);
+    return isNaN(date.getTime()) ? key : date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+  };
+
+  const dateLabel = (key) => {
+    const date = new Date(`${key}T00:00:00`);
+    return isNaN(date.getTime()) ? key : date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  };
+
+  const chevron = '<svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>';
+
+  const groupedTotals = (rows, keyFn) => rows.reduce((acc, row) => {
+    const key = keyFn(row);
+    if (!key) return acc;
+    if (!acc[key]) acc[key] = { key, total: 0, count: 0, rows: [] };
+    acc[key].total += num(row.amount);
+    acc[key].count += 1;
+    acc[key].rows.push(row);
+    return acc;
+  }, {});
+
   const renderExpenses = (rows) => {
-    const expenses = rows.filter((row) => row.type === "expense");
+    expenseRows = rows.filter((row) => row.type === "expense");
     const now = new Date();
     const todayKey = now.toISOString().slice(0, 10);
     const monthKey = todayKey.slice(0, 7);
-    const todayTotal = expenses.reduce((sum, row) => {
+    const todayTotal = expenseRows.reduce((sum, row) => {
       const key = String(row.created_at || "").slice(0, 10);
       return key === todayKey ? sum + num(row.amount) : sum;
     }, 0);
-    const monthTotal = expenses.reduce((sum, row) => {
+    const monthTotal = expenseRows.reduce((sum, row) => {
       const key = String(row.created_at || "").slice(0, 7);
       return key === monthKey ? sum + num(row.amount) : sum;
     }, 0);
 
     setText(todayValue, fmt(todayTotal));
     setText(monthValue, fmt(monthTotal));
-    setText(countValue, String(expenses.length));
+    setText(countValue, String(expenseRows.length));
 
-    if (!expenses.length) {
+    if (!expenseRows.length) {
       list?.replaceChildren();
       if (empty) empty.hidden = false;
+      if (expensesBack) expensesBack.hidden = true;
+      setText(expensesTitle, "Expenses");
       return;
     }
 
     if (empty) empty.hidden = true;
-    if (list) {
-      list.innerHTML = expenses.slice(0, 20).map((row) => {
+    renderExpenseDrilldown();
+  };
+
+  const renderExpenseDrilldown = () => {
+    if (!list) return;
+    if (expenseView.level === "dates" && !expenseRows.some((row) => String(row.created_at || "").slice(0, 7) === expenseView.month)) {
+      expenseView = { level: "months", month: "", date: "" };
+    }
+    if (expenseView.level === "items" && !expenseRows.some((row) => String(row.created_at || "").slice(0, 10) === expenseView.date)) {
+      expenseView = { level: "months", month: "", date: "" };
+    }
+
+    if (expenseView.level === "months") {
+      setText(expensesTitle, "Expenses");
+      if (expensesBack) expensesBack.hidden = true;
+      const months = Object.values(groupedTotals(expenseRows, (row) => String(row.created_at || "").slice(0, 7)))
+        .sort((a, b) => b.key.localeCompare(a.key));
+      list.innerHTML = months.map((month) => `
+        <button class="expense-group-row" type="button" data-expense-month="${month.key}">
+          <span>
+            <strong>${esc(monthLabel(month.key))}</strong>
+            <small>${month.count} expense${month.count === 1 ? "" : "s"}</small>
+          </span>
+          <span class="expense-group-amount">
+            <b>${fmt(month.total)}</b>
+            ${chevron}
+          </span>
+        </button>`).join("");
+      return;
+    }
+
+    if (expenseView.level === "dates") {
+      setText(expensesTitle, monthLabel(expenseView.month));
+      if (expensesBack) expensesBack.hidden = false;
+      const monthRows = expenseRows.filter((row) => String(row.created_at || "").slice(0, 7) === expenseView.month);
+      const dates = Object.values(groupedTotals(monthRows, (row) => String(row.created_at || "").slice(0, 10)))
+        .sort((a, b) => b.key.localeCompare(a.key));
+      list.innerHTML = dates.map((day) => `
+        <button class="expense-group-row" type="button" data-expense-date="${day.key}">
+          <span>
+            <strong>${esc(dateLabel(day.key))}</strong>
+            <small>${day.count} expense${day.count === 1 ? "" : "s"}</small>
+          </span>
+          <span class="expense-group-amount">
+            <b>${fmt(day.total)}</b>
+            ${chevron}
+          </span>
+        </button>`).join("");
+      return;
+    }
+
+    setText(expensesTitle, dateLabel(expenseView.date));
+    if (expensesBack) expensesBack.hidden = false;
+    const dayRows = expenseRows.filter((row) => String(row.created_at || "").slice(0, 10) === expenseView.date);
+    list.innerHTML = dayRows.map((row) => {
         const title = row.notes || "Expense";
         const meta = [row.category_name || "Uncategorized", row.account_name, formatDate(row.created_at)].filter(Boolean).map(esc).join(" • ");
         return `
@@ -7542,7 +7623,6 @@ const setupExpensesPage = () => {
             <b>${fmt(row.amount)}</b>
           </div>`;
       }).join("");
-    }
   };
 
   const loadExpenses = async () => {
@@ -7550,10 +7630,10 @@ const setupExpensesPage = () => {
       await loadAccounts();
       await loadCategories();
       await loadPayroll();
-      const res = await fetch(`${getBasePath()}api/accounts.php?action=activity`);
+      const res = await fetch(`${getBasePath()}api/accounts.php?action=expenses`);
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.message || "Could not load expenses.");
-      renderExpenses(data.activity || []);
+      renderExpenses(data.expenses || []);
       fitAmounts(page);
     } catch {
       /* Keep the static empty state when offline or signed out. */
@@ -7578,6 +7658,27 @@ const setupExpensesPage = () => {
   });
   document.querySelector("[data-expense-close]")?.addEventListener("click", () => {
     if (modal) modal.hidden = true;
+  });
+
+  list?.addEventListener("click", (event) => {
+    const month = event.target.closest("[data-expense-month]")?.dataset.expenseMonth;
+    const date = event.target.closest("[data-expense-date]")?.dataset.expenseDate;
+    if (month) {
+      expenseView = { level: "dates", month, date: "" };
+      renderExpenseDrilldown();
+    } else if (date) {
+      expenseView = { level: "items", month: expenseView.month, date };
+      renderExpenseDrilldown();
+    }
+  });
+
+  expensesBack?.addEventListener("click", () => {
+    if (expenseView.level === "items") {
+      expenseView = { level: "dates", month: expenseView.month, date: "" };
+    } else {
+      expenseView = { level: "months", month: "", date: "" };
+    }
+    renderExpenseDrilldown();
   });
 
   form?.addEventListener("submit", async (event) => {

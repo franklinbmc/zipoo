@@ -1684,6 +1684,23 @@ body.offline .status-dot {
   font-size: 1rem;
 }
 
+.expenses-page select,
+[data-expense-modal] select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border-color: var(--color-line);
+  border-radius: 10px;
+  padding-right: 42px;
+  color: var(--color-navy);
+  font-weight: 800;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='none' stroke='%236b7892' stroke-width='48' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M112 184l144 144 144-144'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+}
+
 .expenses-list {
   display: grid;
   gap: 9px;
@@ -1718,6 +1735,62 @@ body.offline .status-dot {
   color: var(--color-danger);
   font-size: 0.9rem;
   white-space: nowrap;
+}
+
+.expense-group-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.expense-group-row strong {
+  display: block;
+  color: var(--color-navy);
+  font-size: 0.92rem;
+}
+
+.expense-group-row small {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.expense-group-row:hover {
+  border-color: rgba(20, 119, 255, 0.26);
+  background: rgba(20, 119, 255, 0.04);
+}
+
+.expense-group-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-navy);
+}
+
+.expense-group-amount b {
+  color: var(--color-danger);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.expense-group-amount svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 42px;
 }
 
 .expenses-empty {

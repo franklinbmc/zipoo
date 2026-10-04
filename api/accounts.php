@@ -340,6 +340,38 @@ try {
             respond(200, ['ok' => true, 'activity' => $activity]);
         }
 
+        if (($_GET['action'] ?? '') === 'expenses') {
+            $stmt = $pdo->prepare(
+                'SELECT t.*, a.name AS account_name, a.type AS account_type, c.name AS category_name, c.status AS category_status
+                 FROM tbl_account_transactions t
+                 JOIN tbl_accounts a ON a.id = t.account_id
+                 LEFT JOIN tbl_expense_categories c ON c.id = t.expense_category_id AND c.business_id = t.business_id
+                 WHERE t.business_id = :bid AND t.type = "expense"
+                 ORDER BY t.created_at DESC, t.id DESC'
+            );
+            $stmt->execute([':bid' => $businessId]);
+            $expenses = array_map(static function ($t) {
+                return [
+                    'id' => (int) $t['id'],
+                    'account_id' => (int) $t['account_id'],
+                    'account_name' => (string) $t['account_name'],
+                    'account_type' => (string) $t['account_type'],
+                    'direction' => (string) $t['direction'],
+                    'type' => 'expense',
+                    'type_label' => TXN_TYPE_LABELS['expense'],
+                    'amount' => (float) $t['amount'],
+                    'reference_type' => (string) ($t['reference_type'] ?? ''),
+                    'reference_id' => (string) ($t['reference_id'] ?? ''),
+                    'expense_category_id' => (int) ($t['expense_category_id'] ?? 0),
+                    'category_name' => (string) ($t['category_name'] ?? ''),
+                    'category_status' => (string) ($t['category_status'] ?? ''),
+                    'notes' => (string) ($t['notes'] ?? ''),
+                    'created_at' => (string) ($t['created_at'] ?? ''),
+                ];
+            }, $stmt->fetchAll());
+            respond(200, ['ok' => true, 'expenses' => $expenses]);
+        }
+
         if (($_GET['action'] ?? '') === 'expense_categories') {
             respond(200, ['ok' => true, 'categories' => load_expense_categories($pdo, $businessId)]);
         }
