@@ -7738,7 +7738,7 @@ const setupExpensesPage = () => {
         <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-expense-year="${y.key}">
           <span class="stock-hub-label expense-group-info">
             <strong>${esc(y.key)}</strong>
-            <small>${y.count} expense${y.count === 1 ? "" : "s"}</small>
+            <small>${y.count} expense${y.count === 1 ? "" : "s"} • Total: ${fmt(y.total)}</small>
           </span>
           <span class="stock-summary-meta expense-group-meta">
             <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
@@ -7762,7 +7762,7 @@ const setupExpensesPage = () => {
         <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-expense-month="${m.key}">
           <span class="stock-hub-label expense-group-info">
             <strong>${esc(monthLabel(m.key))}</strong>
-            <small>${m.count} expense${m.count === 1 ? "" : "s"}</small>
+            <small>${m.count} expense${m.count === 1 ? "" : "s"} • Total: ${fmt(m.total)}</small>
           </span>
           <span class="stock-summary-meta expense-group-meta">
             <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
@@ -7786,7 +7786,7 @@ const setupExpensesPage = () => {
         <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-expense-date="${d.key}">
           <span class="stock-hub-label expense-group-info">
             <strong>${esc(dateLabel(d.key))}</strong>
-            <small>${d.count} expense${d.count === 1 ? "" : "s"}</small>
+            <small>${d.count} expense${d.count === 1 ? "" : "s"} • Total: ${fmt(d.total)}</small>
           </span>
           <span class="stock-summary-meta expense-group-meta">
             <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
