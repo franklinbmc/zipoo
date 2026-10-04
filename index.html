@@ -46,14 +46,14 @@
 
         <!-- Mobile Menu Toggle Button -->
         <button type="button" class="mobile-toggle" data-mobile-toggle aria-label="Open Navigation Menu" aria-expanded="false">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <path d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
       </div>
     </div>
 
-    <!-- Mobile Drawer Navigation -->
+    <!-- Mobile Drawer Navigation (Slide-down, strictly toggled) -->
     <div class="mobile-drawer" data-mobile-drawer aria-label="Mobile Navigation">
       <ul class="mobile-nav-list">
         <li><a href="#why-zipoo" class="mobile-nav-link" data-i18n="nav.whyZipoo">Why Zipoo</a></li>
@@ -131,17 +131,17 @@
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
                 <span data-i18n="mockup.location">Demo Business • Retail Store</span>
               </div>
-              <span class="table-pill" style="background: #eef5ff; color: #1477ff; font-weight: 800;" data-i18n="mockup.badge">Sample Zipoo Dashboard</span>
+              <span class="table-pill" style="background: #eef5ff; color: #1477ff;" data-i18n="mockup.badge">Sample Zipoo Dashboard</span>
             </div>
 
-            <!-- Metric Cards (Truthful Sample Numbers) -->
+            <!-- Metric Cards (Truthful Demonstration Figures) -->
             <div class="mockup-grid">
               <div class="mockup-metric">
                 <div class="mockup-metric-label" data-i18n="mockup.todaySales">Today's Sales</div>
                 <div class="mockup-metric-val">TZS 1,450,000</div>
                 <div class="mockup-metric-trend">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                  <span>42 Transactions</span>
+                  <span>42 Sales recorded</span>
                 </div>
               </div>
 
@@ -170,10 +170,10 @@
               </div>
 
               <!-- POS Live Feed Preview -->
-              <div class="mockup-preview-table" style="grid-column: 1 / -1;">
+              <div class="mockup-preview-table">
                 <div class="table-header-row">
-                  <span class="table-header-title" data-i18n="mockup.streamTitle">Sample POS Sales Stream</span>
-                  <span class="table-pill">Shift Active</span>
+                  <span data-i18n="mockup.streamTitle">Sample POS Sales Stream</span>
+                  <span class="table-pill" style="background: #e6faf5; color: #078c71;">Shift Active</span>
                 </div>
 
                 <div class="preview-row">
@@ -182,8 +182,8 @@
                       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
                     </div>
                     <div>
-                      <strong style="color: var(--navy); display: block;">Azam Energy Drink 330ml (x24)</strong>
-                      <small style="color: var(--text-muted);"><span data-i18n="mockup.cash">Cash</span> &bull; 10:42 AM</small>
+                      <strong style="color: var(--navy); display: block; font-size: 0.92rem;">Azam Energy Drink 330ml (x24)</strong>
+                      <small style="color: var(--text-muted); font-size: 0.78rem;"><span data-i18n="mockup.cash">Cash</span> &bull; 10:42 AM</small>
                     </div>
                   </div>
                   <span class="preview-row-amount">TZS 26,000</span>
@@ -195,8 +195,8 @@
                       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
                     </div>
                     <div>
-                      <strong style="color: var(--navy); display: block;">Kilimanjaro Water 1.5L (x12)</strong>
-                      <small style="color: var(--text-muted);"><span data-i18n="mockup.mpesa">Lipa kwa Simu</span> &bull; 10:38 AM</small>
+                      <strong style="color: var(--navy); display: block; font-size: 0.92rem;">Kilimanjaro Water 1.5L (x12)</strong>
+                      <small style="color: var(--text-muted); font-size: 0.78rem;"><span data-i18n="mockup.mpesa">Lipa kwa Simu</span> &bull; 10:38 AM</small>
                     </div>
                   </div>
                   <span class="preview-row-amount">TZS 18,000</span>
@@ -246,7 +246,7 @@
           </div>
         </div>
 
-        <!-- Resolution Box -->
+        <!-- Resolution Banner -->
         <div class="answers-banner">
           <h3 class="answers-banner-title" data-i18n="prob.resolution.title">Zipoo brings these answers together in one place.</h3>
           <p class="answers-banner-sub" data-i18n="prob.resolution.sub">
@@ -328,7 +328,7 @@
     <!-- =====================================================================
          5. AVAILABLE VS COMING SOON
          ===================================================================== -->
-    <section class="platform-section" id="status" style="background: #f1f5f9; padding: 72px 0;">
+    <section class="platform-section" id="status" style="background: #ffffff;">
       <div class="container">
         <div class="section-head">
           <div class="section-kicker" data-i18n="status.kicker">Transparent Development</div>
@@ -441,9 +441,9 @@
     <!-- =====================================================================
          6. TARGET BUSINESSES
          ===================================================================== -->
-    <section class="audience-section" style="padding: 64px 0 32px;">
+    <section class="audience-section" style="padding: 50px 0; background: var(--bg-page);">
       <div class="container" style="text-align: center;">
-        <div class="section-head" style="margin-bottom: 28px;">
+        <div class="section-head" style="margin-bottom: 24px;">
           <div class="section-kicker" data-i18n="target.kicker">Target Audience</div>
           <h2 class="section-title" data-i18n="target.title">Built for Businesses Managing Stock, Customers &amp; Sales</h2>
           <p class="section-subtitle" data-i18n="target.subtitle">Initially focusing on businesses with inventory and counter operations in Tanzania.</p>
@@ -465,11 +465,11 @@
     <!-- =====================================================================
          7. FOUNDING 20 SECTION & STRUCTURE
          ===================================================================== -->
-    <section class="founding-section" id="founding-20" style="padding: 60px 0 80px;">
+    <section class="founding-section" id="founding-20" style="padding: 70px 0;">
       <div class="container">
         <!-- Big Founding 20 Showcase Banner -->
         <div class="founding-banner">
-          <div class="founding-badge-wrap">
+          <div style="margin-bottom: 14px;">
             <span class="badge" style="background: rgba(11, 191, 154, 0.2); color: #0bbf9a; border: 1px solid rgba(11, 191, 154, 0.4);">
               <span data-i18n="f20.kicker">Exclusive Early Programme</span>
             </span>
@@ -536,7 +536,7 @@
               <span class="tier-period" data-i18n="tier.1.period">during initial pilot</span>
             </div>
 
-            <ul class="feature-bullet-list" style="margin-bottom: 24px;">
+            <ul class="feature-bullet-list">
               <li class="feature-bullet">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
                 <span data-i18n="tier.1.b1">Zero subscription fee during pilot</span>
@@ -572,7 +572,7 @@
               <span class="tier-note" data-i18n="tier.2.note">Special founder pricing applies during your first year.</span>
             </div>
 
-            <ul class="feature-bullet-list" style="margin-bottom: 24px;">
+            <ul class="feature-bullet-list">
               <li class="feature-bullet">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
                 <span data-i18n="tier.2.b1">Complete POS &amp; business management</span>
@@ -600,9 +600,9 @@
     <!-- =====================================================================
          8. APPLICATION FORM
          ===================================================================== -->
-    <section class="form-section" id="apply" style="padding: 72px 0; background: #f8fafc;">
+    <section class="form-section" id="apply" style="padding: 70px 0; background: var(--bg-page);">
       <div class="container">
-        <div class="section-head" style="margin-bottom: 36px;">
+        <div class="section-head" style="margin-bottom: 32px;">
           <div class="section-kicker" data-i18n="form.kicker">Apply Now</div>
           <h2 class="section-title" data-i18n="form.title">Founding 20 Application Form</h2>
           <p class="section-subtitle" data-i18n="form.subtitle">
@@ -775,7 +775,7 @@
               </div>
 
               <!-- Submit Button -->
-              <div class="form-group form-col-full" style="margin-top: 10px;">
+              <div class="form-group form-col-full" style="margin-top: 8px;">
                 <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
                   <span data-i18n="form.submit">Apply for Early Access</span>
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -803,7 +803,7 @@
     <!-- =====================================================================
          9. ONE BUSINESS. EVERY DEVICE
          ===================================================================== -->
-    <section class="platform-section" id="devices" style="padding: 72px 0;">
+    <section class="platform-section" id="devices" style="padding: 70px 0; background: #ffffff;">
       <div class="container">
         <div class="platform-split">
           <div>
@@ -840,13 +840,13 @@
           <div class="device-composition">
             <div class="device-badge-row">
               <span class="badge badge-teal">Web &amp; PWA</span>
-              <span class="badge badge-blue">Zero Special Hardware</span>
+              <span class="badge badge-blue" style="background: rgba(20, 119, 255, 0.2); color: #93c5fd;">Zero Special Hardware</span>
             </div>
 
-            <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 12px;" data-i18n="plat.box.title">
+            <h3 style="font-size: 1.45rem; font-weight: 900; margin-bottom: 10px;" data-i18n="plat.box.title">
               Zero Expensive Hardware Required
             </h3>
-            <p style="color: #cbd5e1; font-size: 0.94rem; margin-bottom: 24px;" data-i18n="plat.box.sub">
+            <p style="color: #cbd5e1; font-size: 0.92rem; margin-bottom: 20px;" data-i18n="plat.box.sub">
               Access Zipoo seamlessly from standard devices you already have:
             </p>
 
@@ -869,7 +869,7 @@
               </div>
             </div>
 
-            <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.15);">
+            <div style="margin-top: 28px; padding-top: 18px; border-top: 1px solid rgba(255, 255, 255, 0.15);">
               <a href="#apply" class="btn btn-white btn-lg cta-apply" style="width: 100%;" data-i18n="hero.primaryCta">
                 Join the Founding 20
               </a>
@@ -882,7 +882,7 @@
     <!-- =====================================================================
          10. BUILT FOR BUSINESSES IN TANZANIA 🇹🇿
          ===================================================================== -->
-    <section class="tanzania-section" style="padding: 72px 0; background: #ffffff;">
+    <section class="tanzania-section" style="padding: 70px 0; background: var(--bg-page);">
       <div class="container">
         <div class="section-head" style="text-align: center;">
           <div class="section-kicker" data-i18n="tz.kicker">Local Context</div>
@@ -929,10 +929,10 @@
     <!-- =====================================================================
          11. HOW IT WORKS (3 SIMPLE STEPS)
          ===================================================================== -->
-    <section class="steps-section" id="how-it-works" style="padding: 72px 0; background: #f8fafc;">
+    <section class="steps-section" id="how-it-works" style="padding: 70px 0; background: #ffffff;">
       <div class="container">
         <div class="section-head">
-          <div class="section-kicker">Simple Onboarding</div>
+          <div class="section-kicker">Simple Setup</div>
           <h2 class="section-title">How Joining Founding 20 Works</h2>
           <p class="section-subtitle">A straightforward, personal process to get your shop running smoothly.</p>
         </div>
@@ -962,7 +962,7 @@
     <!-- =====================================================================
          12. EARLY ACCESS PRICING
          ===================================================================== -->
-    <section class="pricing-section" id="pricing" style="padding: 72px 0;">
+    <section class="pricing-section" id="pricing" style="padding: 70px 0; background: var(--bg-page);">
       <div class="container">
         <div class="section-head">
           <div class="section-kicker" data-i18n="price.kicker">Early Access Pricing</div>
@@ -997,7 +997,7 @@
               </li>
             </ul>
 
-            <a href="#apply" class="btn btn-outline cta-apply" style="width: 100%;" data-i18n="price.1.cta">Apply as Design Partner</a>
+            <a href="#apply" class="btn btn-outline cta-apply" style="width: 100%; margin-top: auto;" data-i18n="price.1.cta">Apply as Design Partner</a>
           </div>
 
           <!-- Tier 2: Founding Customer (Featured) -->
@@ -1010,7 +1010,7 @@
               <span class="pricing-price" data-i18n="price.2.price">TZS 15,000</span>
               <span class="pricing-period" data-i18n="price.2.period">/ month</span>
             </div>
-            <div style="font-size: 0.85rem; font-weight: 700; color: #1477ff; margin-top: -12px; margin-bottom: 18px;" data-i18n="price.2.alt">
+            <div style="font-size: 0.82rem; font-weight: 700; color: #1477ff; margin-top: -12px; margin-bottom: 16px;" data-i18n="price.2.alt">
               or TZS 150,000 / year
             </div>
 
@@ -1033,17 +1033,17 @@
               </li>
             </ul>
 
-            <a href="#apply" class="btn btn-primary cta-apply" style="width: 100%;" data-i18n="price.2.cta">Apply for Founding 20</a>
+            <a href="#apply" class="btn btn-primary cta-apply" style="width: 100%; margin-top: auto;" data-i18n="price.2.cta">Apply for Founding 20</a>
           </div>
 
           <!-- Tier 3: Standard Post-Launch -->
-          <div class="pricing-card" style="opacity: 0.85;">
+          <div class="pricing-card" style="opacity: 0.9;">
             <span class="pricing-popular-badge" style="background: #e2e8f0; color: #475569;" data-i18n="price.3.badge">Coming After Early Access</span>
             <h3 class="pricing-tier-name" data-i18n="price.3.title">Standard Zipoo</h3>
             <p class="pricing-tier-desc" data-i18n="price.3.desc">Standard commercial pricing when Zipoo opens for general public registration.</p>
             
             <div class="pricing-price-wrap">
-              <span class="pricing-price" style="font-size: 1.8rem;" data-i18n="price.3.price">From TZS 25,000</span>
+              <span class="pricing-price" style="font-size: 1.6rem;" data-i18n="price.3.price">From TZS 25,000</span>
               <span class="pricing-period" data-i18n="price.3.period">/ month</span>
             </div>
 
@@ -1062,7 +1062,7 @@
               </li>
             </ul>
 
-            <button type="button" class="btn btn-outline" style="width: 100%; cursor: not-allowed; opacity: 0.6;" disabled data-i18n="price.3.cta">Coming Soon</button>
+            <button type="button" class="btn btn-outline" style="width: 100%; cursor: not-allowed; opacity: 0.6; margin-top: auto;" disabled data-i18n="price.3.cta">Coming Soon</button>
           </div>
         </div>
       </div>
@@ -1071,12 +1071,12 @@
     <!-- =====================================================================
          13. SOCIAL PROOF (NO FAKE METRICS)
          ===================================================================== -->
-    <section class="proof-section" style="padding: 48px 0; background: #071b3d; color: #ffffff; text-align: center;">
+    <section class="proof-section" style="padding: 44px 0; background: #071b3d; color: #ffffff; text-align: center;">
       <div class="container">
-        <h3 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 8px;" data-i18n="proof.title">
+        <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 6px;" data-i18n="proof.title">
           We're starting with our first 20 businesses.
         </h3>
-        <p style="color: #94a3b8; font-size: 1rem; max-width: 600px; margin: 0 auto;" data-i18n="proof.sub">
+        <p style="color: #94a3b8; font-size: 0.95rem; max-width: 580px; margin: 0 auto;" data-i18n="proof.sub">
           Real businesses in Kariakoo and across Tanzania testing every workflow in real shop environments.
         </p>
       </div>
@@ -1085,7 +1085,7 @@
     <!-- =====================================================================
          14. FREQUENTLY ASKED QUESTIONS (FAQ)
          ===================================================================== -->
-    <section class="faq-section" id="faq" style="padding: 72px 0;">
+    <section class="faq-section" id="faq" style="padding: 70px 0; background: #ffffff;">
       <div class="container">
         <div class="section-head">
           <div class="section-kicker" data-i18n="faq.kicker">Common Questions</div>
@@ -1178,7 +1178,7 @@
     <!-- =====================================================================
          15. FINAL CALL TO ACTION (CTA)
          ===================================================================== -->
-    <section class="cta-section">
+    <section class="cta-section" style="padding: 70px 0; background: var(--bg-page);">
       <div class="container">
         <div class="cta-banner">
           <h2 class="cta-title" data-i18n="cta.title">Help us build Zipoo around real businesses.</h2>
@@ -1218,7 +1218,7 @@
           <p class="footer-tagline" data-i18n="footer.tagline">
             A modern business management platform being built with real Tanzanian businesses.
           </p>
-          <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
             📍 <span data-i18n="footer.location">Dar es Salaam, Tanzania</span>
           </div>
         </div>
@@ -1267,7 +1267,7 @@
   </footer>
 
   <!-- =====================================================================
-       17. MOBILE FLOATING ACTION BAR
+       17. MOBILE FLOATING ACTION BAR (Fixed on Mobile Viewports < 768px)
        ===================================================================== -->
   <div class="mobile-floating-cta" aria-label="Quick Access">
     <a href="#apply" class="btn btn-primary mobile-floating-btn cta-apply" data-i18n="hero.primaryCta">
