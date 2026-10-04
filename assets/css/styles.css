@@ -5008,9 +5008,9 @@ button.settings-list-row:focus-visible {
 }
 
 .dashboard-hero p {
-  margin: 0;
+  margin: 8px 0 0;
   color: var(--color-muted);
-  font-size: 1rem;
+  font-size: 1.04rem;
   font-weight: 750;
   line-height: 1.45;
 }
