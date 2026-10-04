@@ -7718,19 +7718,26 @@ const setupExpensesPage = () => {
     if (payrollList) {
       payrollList.innerHTML = items.map((item) => {
         const paid = item.status === "paid";
+        const salary = num(item.salary_amount);
         return `
           <div class="payroll-row${paid ? " paid" : ""}" data-payroll-item="${item.id}">
-            <span class="payroll-row-info">
-              <strong>${esc(item.staff_name)}</strong>
-              <small>
-                ${esc(item.role || "staff")}
-                <span class="payroll-status-pill ${paid ? "paid" : "pending"}">${paid ? "Paid" : "Pending"}</span>
-              </small>
-            </span>
-            <div class="payroll-row-amount-wrap">
-              <span class="payroll-currency-prefix">${esc(currency)}</span>
-              <input class="payroll-row-amount-input" type="text" inputmode="numeric" value="${num(item.salary_amount).toLocaleString()}" data-payroll-amount ${paid ? "disabled" : ""}>
-              <button class="btn btn-outline btn-sm" type="button" data-payroll-save="${item.id}" ${paid ? "disabled" : ""}>Save</button>
+            <button class="payroll-row-main" type="button" data-payroll-toggle="${item.id}" aria-expanded="false">
+              <span class="payroll-row-info">
+                <strong>${esc(item.staff_name)}</strong>
+                <small>
+                  ${esc(item.role || "staff")}
+                  <span class="payroll-status-pill ${paid ? "paid" : "pending"}">${paid ? "Paid" : "Pending"}</span>
+                </small>
+              </span>
+              <strong class="payroll-row-display-amount">${fmtPayroll(salary)}</strong>
+            </button>
+            <div class="payroll-row-editor" hidden data-payroll-editor>
+              <p>${paid ? "This salary has already been paid." : "If this staff salary has issues, correct the amount here before paying payroll."}</p>
+              <div class="payroll-row-amount-wrap">
+                <span class="payroll-currency-prefix">${esc(currency)}</span>
+                <input class="payroll-row-amount-input" type="text" inputmode="numeric" value="${salary.toLocaleString()}" data-payroll-amount ${paid ? "disabled" : ""}>
+                <button class="btn btn-outline btn-sm" type="button" data-payroll-save="${item.id}" ${paid ? "disabled" : ""}>Save</button>
+              </div>
             </div>
           </div>`;
       }).join("");
@@ -8254,6 +8261,21 @@ const setupExpensesPage = () => {
   });
 
   payrollList?.addEventListener("click", async (event) => {
+    const toggle = event.target.closest("[data-payroll-toggle]");
+    if (toggle) {
+      const row = toggle.closest("[data-payroll-item]");
+      const editor = row?.querySelector("[data-payroll-editor]");
+      if (editor) {
+        const open = editor.hidden;
+        editor.hidden = !open;
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        if (open) {
+          row?.querySelector("[data-payroll-amount]")?.focus();
+        }
+      }
+      return;
+    }
+
     const button = event.target.closest("[data-payroll-save]");
     if (!button) return;
     if (payrollError) payrollError.hidden = true;
