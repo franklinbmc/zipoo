@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#F6F8FC">
+  <meta name="description" content="Zipoo Expenses: record and review business expenses.">
+  <title>Expenses - Zipoo</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=93">
+</head>
+<body>
+  <div class="app-shell stock-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
+      </a>
+      <h1>Expenses</h1>
+      <button class="icon-button" type="button" data-expense-open aria-label="Record expense">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M256 112v288M112 256h288" />
+        </svg>
+      </button>
+    </header>
+
+    <main class="settings-page stock-page expenses-page" data-expenses-page>
+      <section class="stock-kpi-grid">
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Today</span>
+          <strong class="kpi-val amount-fit" data-expenses-today>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">This Month</span>
+          <strong class="kpi-val amount-fit" data-expenses-month>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Entries</span>
+          <strong class="kpi-val" data-expenses-count>0</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Default Account</span>
+          <strong class="kpi-val compact" data-expenses-account>-</strong>
+        </div>
+      </section>
+
+      <section class="expenses-panel">
+        <div class="expenses-panel-head">
+          <h2>Recent Expenses</h2>
+          <button class="btn btn-primary btn-sm" type="button" data-expense-open>Record Expense</button>
+        </div>
+        <div class="expenses-list" data-expenses-list></div>
+        <div class="company-users-empty expenses-empty" hidden data-expenses-empty>
+          <strong>No expenses yet</strong>
+          <p>Record rent, transport, supplies, or any business cost here.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="fullscreen-modal" hidden data-expense-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="expense-form-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-expense-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="expense-form-title">Record Expense</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-expense-form novalidate>
+        <label class="form-field">
+          <span>Account <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <select name="account_id" data-expense-account required></select>
+        </label>
+        <label class="form-field">
+          <span>Amount <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
+          <input type="text" inputmode="numeric" name="amount" step="0.01" min="0.01" placeholder="0.00" required>
+        </label>
+        <label class="form-field">
+          <span>Notes</span>
+          <input type="text" name="notes" placeholder="e.g. Rent, transport, supplies">
+        </label>
+        <p class="inline-error" hidden data-expense-error></p>
+        <button class="btn btn-primary full" type="submit" data-expense-submit>Save Expense</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-close>OK</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=108" defer></script>
+</body>
+</html>

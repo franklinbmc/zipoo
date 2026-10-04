@@ -1,4 +1,4 @@
-const CACHE_NAME = "zipoo-phase-1-v147";
+const CACHE_NAME = "zipoo-phase-1-v148";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -9,6 +9,7 @@ const APP_SHELL = [
   "./pages/stock.html",
   "./pages/sales.html",
   "./pages/bank.html",
+  "./pages/expenses.html",
   "./pages/realestate.html",
   "./pages/users.html",
   "./pages/login.html",
@@ -262,6 +263,8 @@ self.addEventListener("fetch", (event) => {
             ? "./pages/stock.html"
             : url.pathname.includes("bank")
             ? "./pages/bank.html"
+            : url.pathname.includes("expenses")
+            ? "./pages/expenses.html"
             : url.pathname.includes("realestate") || url.pathname.includes("real-estate")
             ? "./pages/realestate.html"
             : url.pathname.includes("register")

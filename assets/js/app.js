@@ -7345,6 +7345,162 @@ const setupBankPage = () => {
   loadAccounts();
 };
 
+const setupExpensesPage = () => {
+  const page = document.querySelector("[data-expenses-page]");
+  if (!page) return;
+
+  const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
+  const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${currency}`;
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const num = (v) => parseFloat(String(v ?? "").replace(/[^0-9.\-]/g, "")) || 0;
+  const parseDate = (value) => {
+    const date = new Date(String(value || "").replace(" ", "T"));
+    return isNaN(date.getTime()) ? null : date;
+  };
+  const formatDate = (value) => {
+    const date = parseDate(value);
+    return date ? date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "";
+  };
+
+  const todayValue = document.querySelector("[data-expenses-today]");
+  const monthValue = document.querySelector("[data-expenses-month]");
+  const countValue = document.querySelector("[data-expenses-count]");
+  const accountValue = document.querySelector("[data-expenses-account]");
+  const list = document.querySelector("[data-expenses-list]");
+  const empty = document.querySelector("[data-expenses-empty]");
+  const modal = document.querySelector("[data-expense-modal]");
+  const form = document.querySelector("[data-expense-form]");
+  const accountSelect = document.querySelector("[data-expense-account]");
+  const error = document.querySelector("[data-expense-error]");
+  const submit = document.querySelector("[data-expense-submit]");
+
+  let accounts = [];
+
+  const setText = (el, value) => {
+    if (el) el.textContent = value;
+  };
+
+  const loadAccounts = async () => {
+    const res = await fetch(`${getBasePath()}api/accounts.php`);
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.message || "Could not load accounts.");
+    accounts = data.accounts || [];
+    const defaultAccount = accounts.find((account) => account.is_default) || accounts[0] || null;
+    setText(accountValue, defaultAccount ? defaultAccount.name : "-");
+    if (accountSelect) {
+      accountSelect.innerHTML = accounts.map((account) => {
+        const selected = defaultAccount && String(account.id) === String(defaultAccount.id) ? " selected" : "";
+        return `<option value="${account.id}"${selected}>${esc(account.name)} (${esc(account.type_label)})</option>`;
+      }).join("");
+    }
+  };
+
+  const renderExpenses = (rows) => {
+    const expenses = rows.filter((row) => row.type === "expense");
+    const now = new Date();
+    const todayKey = now.toISOString().slice(0, 10);
+    const monthKey = todayKey.slice(0, 7);
+    const todayTotal = expenses.reduce((sum, row) => {
+      const key = String(row.created_at || "").slice(0, 10);
+      return key === todayKey ? sum + num(row.amount) : sum;
+    }, 0);
+    const monthTotal = expenses.reduce((sum, row) => {
+      const key = String(row.created_at || "").slice(0, 7);
+      return key === monthKey ? sum + num(row.amount) : sum;
+    }, 0);
+
+    setText(todayValue, fmt(todayTotal));
+    setText(monthValue, fmt(monthTotal));
+    setText(countValue, String(expenses.length));
+
+    if (!expenses.length) {
+      list?.replaceChildren();
+      if (empty) empty.hidden = false;
+      return;
+    }
+
+    if (empty) empty.hidden = true;
+    if (list) {
+      list.innerHTML = expenses.slice(0, 20).map((row) => {
+        const title = row.notes || "Expense";
+        const meta = [row.account_name, formatDate(row.created_at)].filter(Boolean).map(esc).join(" • ");
+        return `
+          <div class="expense-row">
+            <span>
+              <strong>${esc(title)}</strong>
+              <small>${meta}</small>
+            </span>
+            <b>${fmt(row.amount)}</b>
+          </div>`;
+      }).join("");
+    }
+  };
+
+  const loadExpenses = async () => {
+    try {
+      await loadAccounts();
+      const res = await fetch(`${getBasePath()}api/accounts.php?action=activity`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not load expenses.");
+      renderExpenses(data.activity || []);
+      fitAmounts(page);
+    } catch {
+      /* Keep the static empty state when offline or signed out. */
+    }
+  };
+
+  const openModal = async () => {
+    if (!form) return;
+    form.reset();
+    if (error) error.hidden = true;
+    if (!accounts.length) {
+      try { await loadAccounts(); } catch { /* handled on submit */ }
+    }
+    if (modal) modal.hidden = false;
+  };
+
+  document.querySelectorAll("[data-expense-open]").forEach((button) => {
+    button.addEventListener("click", openModal);
+  });
+  document.querySelector("[data-expense-close]")?.addEventListener("click", () => {
+    if (modal) modal.hidden = true;
+  });
+
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (error) error.hidden = true;
+    const amount = num(form.elements.amount.value);
+    if (!accountSelect?.value) {
+      if (error) { error.textContent = "Choose an account."; error.hidden = false; }
+      return;
+    }
+    if (amount <= 0) {
+      if (error) { error.textContent = "Enter an amount greater than zero."; error.hidden = false; }
+      return;
+    }
+
+    if (submit) submit.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", "expense");
+      body.set("account_id", accountSelect.value);
+      body.set("amount", String(amount));
+      body.set("notes", form.elements.notes.value.trim());
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not save expense.");
+      if (modal) modal.hidden = true;
+      await loadExpenses();
+    } catch (err) {
+      if (error) { error.textContent = err.message || "Could not save expense."; error.hidden = false; }
+    } finally {
+      if (submit) submit.disabled = false;
+    }
+  });
+
+  loadExpenses();
+};
+
 const setupRealEstatePage = () => {
   const page = document.querySelector("[data-realestate-page]");
   if (!page) return;
@@ -8273,6 +8429,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupStockPage();
   setupSalesPage();
   setupBankPage();
+  setupExpensesPage();
   setupRealEstatePage();
   setupDashboardPage();
   initAmountAutosize();
