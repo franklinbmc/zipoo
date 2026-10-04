@@ -1738,6 +1738,31 @@ body.offline .status-dot {
   font-weight: 700;
 }
 
+.workspace-header-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 0;
+}
+
+.workspace-header-title h2 {
+  margin: 0;
+  color: var(--color-navy);
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.workspace-header-title small {
+  display: block;
+  margin-top: 2px;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 /* CSS-formatted select — custom chevron, consistent across the app */
 .css-formatted-select,
 .expenses-page select,

@@ -7366,9 +7366,12 @@ const setupExpensesPage = () => {
   const monthValue = document.querySelector("[data-expenses-month]");
   const countValue = document.querySelector("[data-expenses-count]");
   const accountValue = document.querySelector("[data-expenses-account]");
-  const expensesTitle = document.querySelector("[data-expenses-title]");
-  const expensesSubtitle = document.querySelector("[data-expenses-subtitle]");
-  const expensesBack = document.querySelector("[data-expenses-back]");
+  const workspace = document.querySelector("[data-expenses-workspace]");
+  const openWorkspace = document.querySelector("[data-open-expenses-workspace]");
+  const workspaceBack = document.querySelector("[data-expenses-workspace-back]");
+  const workspaceTitle = document.querySelector("[data-expenses-workspace-title]");
+  const workspaceSubtitle = document.querySelector("[data-expenses-workspace-subtitle]");
+  const countBadge = document.querySelector("[data-expenses-count-badge]");
   const list = document.querySelector("[data-expenses-list]");
   const empty = document.querySelector("[data-expenses-empty]");
   const modal = document.querySelector("[data-expense-modal]");
@@ -7393,7 +7396,7 @@ const setupExpensesPage = () => {
   let categories = [];
   let payrollRun = null;
   let expenseRows = [];
-  let expenseView = { level: "months", month: "", date: "" };
+  let expenseView = { level: "years", year: "", month: "", date: "" };
 
   const setText = (el, value) => {
     if (el) el.textContent = value;
@@ -7562,13 +7565,15 @@ const setupExpensesPage = () => {
     setText(todayValue, fmt(todayTotal));
     setText(monthValue, fmt(monthTotal));
     setText(countValue, String(expenseRows.length));
+    if (countBadge) {
+      countBadge.textContent = `${expenseRows.length} expense${expenseRows.length === 1 ? "" : "s"}`;
+    }
 
     if (!expenseRows.length) {
       list?.replaceChildren();
       if (empty) empty.hidden = false;
-      if (expensesBack) expensesBack.hidden = true;
-      if (expensesSubtitle) expensesSubtitle.hidden = true;
-      setText(expensesTitle, "Expenses");
+      setText(workspaceTitle, "Expenses");
+      if (workspaceSubtitle) workspaceSubtitle.hidden = true;
       return;
     }
 
@@ -7578,87 +7583,130 @@ const setupExpensesPage = () => {
 
   const renderExpenseDrilldown = () => {
     if (!list) return;
-    if (expenseView.level === "dates" && !expenseRows.some((row) => String(row.created_at || "").slice(0, 7) === expenseView.month)) {
-      expenseView = { level: "months", month: "", date: "" };
+
+    if (!expenseRows.length) {
+      list.replaceChildren();
+      if (empty) empty.hidden = false;
+      setText(workspaceTitle, "Expenses");
+      if (workspaceSubtitle) workspaceSubtitle.hidden = true;
+      return;
+    }
+    if (empty) empty.hidden = true;
+
+    // Validate states
+    if (expenseView.level === "months" && !expenseRows.some((row) => String(row.created_at || "").slice(0, 4) === expenseView.year)) {
+      expenseView = { level: "years", year: "", month: "", date: "" };
+    }
+    if (expenseView.level === "days" && !expenseRows.some((row) => String(row.created_at || "").slice(0, 7) === expenseView.month)) {
+      expenseView = { level: "years", year: "", month: "", date: "" };
     }
     if (expenseView.level === "items" && !expenseRows.some((row) => String(row.created_at || "").slice(0, 10) === expenseView.date)) {
-      expenseView = { level: "months", month: "", date: "" };
+      expenseView = { level: "years", year: "", month: "", date: "" };
     }
 
-    if (expenseView.level === "months") {
-      setText(expensesTitle, "Expenses");
-      if (expensesSubtitle) expensesSubtitle.hidden = true;
-      if (expensesBack) expensesBack.hidden = true;
-      const months = Object.values(groupedTotals(expenseRows, (row) => String(row.created_at || "").slice(0, 7)))
+    // LEVEL 1: YEARS
+    if (expenseView.level === "years") {
+      const grandTotal = expenseRows.reduce((sum, r) => sum + num(r.amount), 0);
+      setText(workspaceTitle, "Expenses");
+      if (workspaceSubtitle) {
+        workspaceSubtitle.textContent = `${expenseRows.length} expense${expenseRows.length === 1 ? "" : "s"} • Total: ${fmt(grandTotal)}`;
+        workspaceSubtitle.hidden = false;
+      }
+      const years = Object.values(groupedTotals(expenseRows, (row) => String(row.created_at || "").slice(0, 4)))
         .sort((a, b) => b.key.localeCompare(a.key));
-      list.innerHTML = months.map((month) => `
-        <button class="expense-group-row" type="button" data-expense-month="${month.key}">
-          <span class="expense-group-info">
-            <strong>${esc(monthLabel(month.key))}</strong>
-            <small>${month.count} expense${month.count === 1 ? "" : "s"}</small>
+      list.innerHTML = years.map((y) => `
+        <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-expense-year="${y.key}">
+          <span class="stock-hub-label expense-group-info">
+            <strong>${esc(y.key)}</strong>
+            <small>${y.count} expense${y.count === 1 ? "" : "s"}</small>
           </span>
-          <span class="expense-group-meta">
-            <strong class="expense-amount-badge">${fmt(month.total)}</strong>
+          <span class="stock-summary-meta expense-group-meta">
+            <strong class="expense-amount-badge">${fmt(y.total)}</strong>
             <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
           </span>
         </button>`).join("");
       return;
     }
 
-    if (expenseView.level === "dates") {
+    // LEVEL 2: MONTHS (in selected year)
+    if (expenseView.level === "months") {
+      const yearRows = expenseRows.filter((row) => String(row.created_at || "").slice(0, 4) === expenseView.year);
+      const yearTotal = yearRows.reduce((sum, r) => sum + num(r.amount), 0);
+      setText(workspaceTitle, expenseView.year);
+      if (workspaceSubtitle) {
+        workspaceSubtitle.textContent = `${yearRows.length} expense${yearRows.length === 1 ? "" : "s"} • Total: ${fmt(yearTotal)}`;
+        workspaceSubtitle.hidden = false;
+      }
+      const months = Object.values(groupedTotals(yearRows, (row) => String(row.created_at || "").slice(0, 7)))
+        .sort((a, b) => b.key.localeCompare(a.key));
+      list.innerHTML = months.map((m) => `
+        <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-expense-month="${m.key}">
+          <span class="stock-hub-label expense-group-info">
+            <strong>${esc(monthLabel(m.key))}</strong>
+            <small>${m.count} expense${m.count === 1 ? "" : "s"}</small>
+          </span>
+          <span class="stock-summary-meta expense-group-meta">
+            <strong class="expense-amount-badge">${fmt(m.total)}</strong>
+            <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
+          </span>
+        </button>`).join("");
+      return;
+    }
+
+    // LEVEL 3: DAYS (in selected month)
+    if (expenseView.level === "days") {
       const monthRows = expenseRows.filter((row) => String(row.created_at || "").slice(0, 7) === expenseView.month);
       const monthTotal = monthRows.reduce((sum, r) => sum + num(r.amount), 0);
-      setText(expensesTitle, monthLabel(expenseView.month));
-      if (expensesSubtitle) {
-        expensesSubtitle.textContent = `${monthRows.length} expense${monthRows.length === 1 ? "" : "s"} • Total: ${fmt(monthTotal)}`;
-        expensesSubtitle.hidden = false;
+      setText(workspaceTitle, monthLabel(expenseView.month));
+      if (workspaceSubtitle) {
+        workspaceSubtitle.textContent = `${monthRows.length} expense${monthRows.length === 1 ? "" : "s"} • Total: ${fmt(monthTotal)}`;
+        workspaceSubtitle.hidden = false;
       }
-      if (expensesBack) expensesBack.hidden = false;
-      const dates = Object.values(groupedTotals(monthRows, (row) => String(row.created_at || "").slice(0, 10)))
+      const days = Object.values(groupedTotals(monthRows, (row) => String(row.created_at || "").slice(0, 10)))
         .sort((a, b) => b.key.localeCompare(a.key));
-      list.innerHTML = dates.map((day) => `
-        <button class="expense-group-row" type="button" data-expense-date="${day.key}">
-          <span class="expense-group-info">
-            <strong>${esc(dateLabel(day.key))}</strong>
-            <small>${day.count} expense${day.count === 1 ? "" : "s"}</small>
+      list.innerHTML = days.map((d) => `
+        <button class="settings-accordion-link stock-hub-row expense-group-row" type="button" data-expense-date="${d.key}">
+          <span class="stock-hub-label expense-group-info">
+            <strong>${esc(dateLabel(d.key))}</strong>
+            <small>${d.count} expense${d.count === 1 ? "" : "s"}</small>
           </span>
-          <span class="expense-group-meta">
-            <strong class="expense-amount-badge">${fmt(day.total)}</strong>
+          <span class="stock-summary-meta expense-group-meta">
+            <strong class="expense-amount-badge">${fmt(d.total)}</strong>
             <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
           </span>
         </button>`).join("");
       return;
     }
 
+    // LEVEL 4: DETAILS EXPENSES (on selected day)
     const dayRows = expenseRows.filter((row) => String(row.created_at || "").slice(0, 10) === expenseView.date);
     const dayTotal = dayRows.reduce((sum, r) => sum + num(r.amount), 0);
-    setText(expensesTitle, dateLabel(expenseView.date));
-    if (expensesSubtitle) {
-      expensesSubtitle.textContent = `${dayRows.length} expense${dayRows.length === 1 ? "" : "s"} • Total: ${fmt(dayTotal)}`;
-      expensesSubtitle.hidden = false;
+    setText(workspaceTitle, dateLabel(expenseView.date));
+    if (workspaceSubtitle) {
+      workspaceSubtitle.textContent = `${dayRows.length} expense${dayRows.length === 1 ? "" : "s"} • Total: ${fmt(dayTotal)}`;
+      workspaceSubtitle.hidden = false;
     }
-    if (expensesBack) expensesBack.hidden = false;
     list.innerHTML = dayRows.map((row) => {
-        const title = row.notes || "Expense";
-        const cat = row.category_name || "Uncategorized";
-        const acc = row.account_name || "Default Account";
-        const dateObj = parseDate(row.created_at);
-        const timeStr = dateObj ? dateObj.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "";
-        return `
-          <div class="expense-item-row">
-            <div class="expense-item-main">
-              <strong class="expense-item-title">${esc(title)}</strong>
-              <div class="expense-item-tags">
-                <span class="expense-item-category">${esc(cat)}</span>
-                <span class="expense-item-account">${esc(acc)}</span>
-                ${timeStr ? `<span class="expense-item-time">${esc(timeStr)}</span>` : ""}
-              </div>
+      const title = row.notes || "Expense";
+      const cat = row.category_name || "Uncategorized";
+      const acc = row.account_name || "Default Account";
+      const dateObj = parseDate(row.created_at);
+      const timeStr = dateObj ? dateObj.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "";
+      return `
+        <div class="expense-item-row">
+          <div class="expense-item-main">
+            <strong class="expense-item-title">${esc(title)}</strong>
+            <div class="expense-item-tags">
+              <span class="expense-item-category">${esc(cat)}</span>
+              <span class="expense-item-account">${esc(acc)}</span>
+              ${timeStr ? `<span class="expense-item-time">${esc(timeStr)}</span>` : ""}
             </div>
-            <div class="expense-item-amount">
-              <b>${fmt(row.amount)}</b>
-            </div>
-          </div>`;
-      }).join("");
+          </div>
+          <div class="expense-item-amount">
+            <b>${fmt(row.amount)}</b>
+          </div>
+        </div>`;
+    }).join("");
   };
 
   const loadExpenses = async () => {
@@ -7687,6 +7735,27 @@ const setupExpensesPage = () => {
     if (modal) modal.hidden = false;
   };
 
+  openWorkspace?.addEventListener("click", () => {
+    expenseView = { level: "years", year: "", month: "", date: "" };
+    renderExpenseDrilldown();
+    if (workspace) workspace.hidden = false;
+  });
+
+  workspaceBack?.addEventListener("click", () => {
+    if (expenseView.level === "items") {
+      expenseView = { level: "days", year: expenseView.year, month: expenseView.month, date: "" };
+      renderExpenseDrilldown();
+    } else if (expenseView.level === "days") {
+      expenseView = { level: "months", year: expenseView.year, month: "", date: "" };
+      renderExpenseDrilldown();
+    } else if (expenseView.level === "months") {
+      expenseView = { level: "years", year: "", month: "", date: "" };
+      renderExpenseDrilldown();
+    } else {
+      if (workspace) workspace.hidden = true;
+    }
+  });
+
   document.querySelectorAll("[data-expense-open]").forEach((button) => {
     button.addEventListener("click", openModal);
   });
@@ -7695,24 +7764,25 @@ const setupExpensesPage = () => {
   });
 
   list?.addEventListener("click", (event) => {
-    const month = event.target.closest("[data-expense-month]")?.dataset.expenseMonth;
-    const date = event.target.closest("[data-expense-date]")?.dataset.expenseDate;
-    if (month) {
-      expenseView = { level: "dates", month, date: "" };
+    const yearBtn = event.target.closest("[data-expense-year]");
+    const monthBtn = event.target.closest("[data-expense-month]");
+    const dateBtn = event.target.closest("[data-expense-date]");
+    if (yearBtn) {
+      const year = yearBtn.dataset.expenseYear;
+      expenseView = { level: "months", year, month: "", date: "" };
       renderExpenseDrilldown();
-    } else if (date) {
-      expenseView = { level: "items", month: expenseView.month, date };
+    } else if (monthBtn) {
+      const month = monthBtn.dataset.expenseMonth;
+      const year = month.slice(0, 4);
+      expenseView = { level: "days", year, month, date: "" };
+      renderExpenseDrilldown();
+    } else if (dateBtn) {
+      const date = dateBtn.dataset.expenseDate;
+      const month = date.slice(0, 7);
+      const year = date.slice(0, 4);
+      expenseView = { level: "items", year, month, date };
       renderExpenseDrilldown();
     }
-  });
-
-  expensesBack?.addEventListener("click", () => {
-    if (expenseView.level === "items") {
-      expenseView = { level: "dates", month: expenseView.month, date: "" };
-    } else {
-      expenseView = { level: "months", month: "", date: "" };
-    }
-    renderExpenseDrilldown();
   });
 
   form?.addEventListener("submit", async (event) => {

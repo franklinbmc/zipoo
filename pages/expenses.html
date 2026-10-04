@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=96">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=97">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -47,25 +47,19 @@
         </div>
       </section>
 
-      <section class="expenses-panel">
-        <div class="expenses-panel-head">
-          <div class="expenses-title-group">
-            <button class="icon-button expenses-back-btn" type="button" data-expenses-back hidden aria-label="Back">
-              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
-            </button>
-            <div class="expenses-title-text">
-              <h2 data-expenses-title>Expenses</h2>
-              <small data-expenses-subtitle hidden></small>
-            </div>
-          </div>
-          <button class="btn btn-primary btn-sm" type="button" data-expense-open>Record Expense</button>
-        </div>
-        <div class="expenses-list" data-expenses-list></div>
-        <div class="company-users-empty expenses-empty" hidden data-expenses-empty>
-          <strong>No expenses yet</strong>
-          <p>Record rent, transport, supplies, or any business cost here.</p>
-        </div>
-      </section>
+      <!-- Expenses Hub Row: opens workspace -->
+      <nav class="stock-hub">
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-expenses-workspace>
+          <span class="stock-hub-label">
+            <strong>Expenses</strong>
+            <small>Review business expenses by year, month &amp; day</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-expenses-count-badge>0 expenses</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+      </nav>
 
       <section class="expenses-panel">
         <div class="expenses-panel-head">
@@ -105,6 +99,32 @@
         <div class="expense-category-list" data-expense-categories-list></div>
       </section>
     </main>
+  </div>
+
+  <!-- Workspace: Expenses -->
+  <div class="fullscreen-modal" hidden data-expenses-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="expenses-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-expenses-workspace-back aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <div class="workspace-header-title">
+          <h2 id="expenses-workspace-title" data-expenses-workspace-title>Expenses</h2>
+          <small data-expenses-workspace-subtitle hidden></small>
+        </div>
+        <button class="icon-button" type="button" data-expense-open aria-label="Record expense">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        </button>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="expenses-list" data-expenses-list></div>
+        <div class="company-users-empty expenses-empty" hidden data-expenses-empty>
+          <strong>No expenses yet</strong>
+          <p>Record rent, transport, supplies, or any business cost here.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-expense-open style="margin-top: 12px;">Record Expense</button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <div class="fullscreen-modal" hidden data-expense-modal>
