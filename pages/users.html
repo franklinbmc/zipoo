@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=105">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=106">
 </head>
 <body>
   <div class="app-shell customers-page-shell">
@@ -138,6 +138,10 @@
           <input type="email" name="email" placeholder="e.g. baraka@company.com">
         </label>
         <label class="form-field">
+          <span>DP Photo</span>
+          <input type="file" name="photo" accept="image/png,image/jpeg,image/webp">
+        </label>
+        <label class="form-field">
           <span>User Role <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
           <select name="role" required>
             <option value="cashier">Cashier / Sales</option>
@@ -165,9 +169,12 @@
             <span>NSSF</span>
             <input type="text" name="nssf" placeholder="NSSF number">
           </label>
-          <label class="form-field">
-            <span>HESLB</span>
-            <input type="text" name="heslb" placeholder="HESLB number">
+          <label class="switch-row">
+            <span class="switch-label">HESLB</span>
+            <span class="switch">
+              <input type="checkbox" name="heslb" value="yes">
+              <span class="switch-track"><span class="switch-thumb"></span></span>
+            </span>
           </label>
         </div>
         <label class="form-field">
@@ -212,6 +219,10 @@
           <input type="email" name="email" data-edit-user-email>
         </label>
         <label class="form-field">
+          <span>DP Photo</span>
+          <input type="file" name="photo" accept="image/png,image/jpeg,image/webp" data-edit-user-photo>
+        </label>
+        <label class="form-field">
           <span>User Role <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
           <select name="role" data-edit-user-role required>
             <option value="cashier">Cashier / Sales</option>
@@ -239,9 +250,12 @@
             <span>NSSF</span>
             <input type="text" name="nssf" data-edit-user-nssf>
           </label>
-          <label class="form-field">
-            <span>HESLB</span>
-            <input type="text" name="heslb" data-edit-user-heslb>
+          <label class="switch-row">
+            <span class="switch-label">HESLB</span>
+            <span class="switch">
+              <input type="checkbox" name="heslb" value="yes" data-edit-user-heslb>
+              <span class="switch-track"><span class="switch-thumb"></span></span>
+            </span>
           </label>
         </div>
         <label class="form-field">
@@ -270,6 +284,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=125" defer></script>
+  <script src="/assets/js/app.js?v=126" defer></script>
 </body>
 </html>

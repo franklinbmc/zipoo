@@ -97,6 +97,11 @@ function ensure_user_columns(PDO $pdo): void
     if (empty($heslbCol)) {
         $pdo->exec("ALTER TABLE tbl_users ADD COLUMN heslb VARCHAR(50) NULL AFTER nssf");
     }
+
+    $photoCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'photo_path'")->fetchAll();
+    if (empty($photoCol)) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN photo_path VARCHAR(255) NULL AFTER heslb");
+    }
 }
 
 function money_value($value): float
@@ -107,6 +112,44 @@ function money_value($value): float
     }
 
     return round((float) $clean, 2);
+}
+
+function upload_user_photo(string $field): ?string
+{
+    if (empty($_FILES[$field]) || ($_FILES[$field]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    if ($_FILES[$field]['error'] !== UPLOAD_ERR_OK) {
+        respond(422, ['ok' => false, 'message' => 'Photo upload failed.']);
+    }
+
+    if ((int) ($_FILES[$field]['size'] ?? 0) > 3 * 1024 * 1024) {
+        respond(422, ['ok' => false, 'message' => 'Photo must be 3MB or smaller.']);
+    }
+
+    $allowed = [
+        'image/png' => 'png',
+        'image/jpeg' => 'jpg',
+        'image/webp' => 'webp',
+    ];
+    $mime = mime_content_type($_FILES[$field]['tmp_name']);
+    if (!isset($allowed[$mime])) {
+        respond(422, ['ok' => false, 'message' => 'Only PNG, JPG, and WEBP photos are allowed.']);
+    }
+
+    $directory = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'users';
+    if (!is_dir($directory)) {
+        mkdir($directory, 0775, true);
+    }
+
+    $filename = 'user-' . date('YmdHis') . '-' . bin2hex(random_bytes(4)) . '.' . $allowed[$mime];
+    $target = $directory . DIRECTORY_SEPARATOR . $filename;
+    if (!move_uploaded_file($_FILES[$field]['tmp_name'], $target)) {
+        respond(500, ['ok' => false, 'message' => 'Unable to save user photo.']);
+    }
+
+    return '/uploads/users/' . $filename;
 }
 
 function user_payload(array $row, int $ownerId): array
@@ -124,6 +167,7 @@ function user_payload(array $row, int $ownerId): array
         'nida' => (string) ($row['nida'] ?? ''),
         'nssf' => (string) ($row['nssf'] ?? ''),
         'heslb' => (string) ($row['heslb'] ?? ''),
+        'photo_path' => (string) ($row['photo_path'] ?? ''),
         'is_owner' => ((int) $row['id'] === $ownerId),
         'created_at' => (string) ($row['created_at'] ?? ''),
         'updated_at' => (string) ($row['updated_at'] ?? ''),
@@ -204,6 +248,7 @@ try {
         $nida = trim((string) ($_POST['nida'] ?? ''));
         $nssf = trim((string) ($_POST['nssf'] ?? ''));
         $heslb = trim((string) ($_POST['heslb'] ?? ''));
+        $photoPath = upload_user_photo('photo');
         $password = (string) ($_POST['password'] ?? '');
 
         if ($fullName === '') {
@@ -241,8 +286,8 @@ try {
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
         $stmt = $pdo->prepare(
-            'INSERT INTO tbl_users (business_id, role, status, monthly_salary, tin, nida, nssf, heslb, full_name, phone, email, business_name, business_type, region_code, district_code, password_hash)
-             VALUES (:bid, :role, :status, :monthly_salary, :tin, :nida, :nssf, :heslb, :full_name, :phone, :email, :bname, :btype, :region, :district, :password_hash)'
+            'INSERT INTO tbl_users (business_id, role, status, monthly_salary, tin, nida, nssf, heslb, photo_path, full_name, phone, email, business_name, business_type, region_code, district_code, password_hash)
+             VALUES (:bid, :role, :status, :monthly_salary, :tin, :nida, :nssf, :heslb, :photo_path, :full_name, :phone, :email, :bname, :btype, :region, :district, :password_hash)'
         );
         $stmt->execute([
             ':bid' => $businessId,
@@ -253,6 +298,7 @@ try {
             ':nida' => $nida !== '' ? $nida : null,
             ':nssf' => $nssf !== '' ? $nssf : null,
             ':heslb' => $heslb !== '' ? $heslb : null,
+            ':photo_path' => $photoPath,
             ':full_name' => $fullName,
             ':phone' => $phone,
             ':email' => $email !== '' ? $email : null,
@@ -287,6 +333,7 @@ try {
         $nida = trim((string) ($_POST['nida'] ?? ''));
         $nssf = trim((string) ($_POST['nssf'] ?? ''));
         $heslb = trim((string) ($_POST['heslb'] ?? ''));
+        $photoPath = upload_user_photo('photo');
         $password = (string) ($_POST['password'] ?? '');
 
         if ($targetUserId <= 0) {
@@ -338,7 +385,7 @@ try {
             }
             $stmt = $pdo->prepare(
                 'UPDATE tbl_users 
-                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status, monthly_salary = :monthly_salary, tin = :tin, nida = :nida, nssf = :nssf, heslb = :heslb, password_hash = :pwd
+                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status, monthly_salary = :monthly_salary, tin = :tin, nida = :nida, nssf = :nssf, heslb = :heslb, photo_path = COALESCE(:photo_path, photo_path), password_hash = :pwd
                  WHERE id = :id AND business_id = :bid'
             );
             $stmt->execute([
@@ -354,12 +401,13 @@ try {
                 ':nida' => $nida !== '' ? $nida : null,
                 ':nssf' => $nssf !== '' ? $nssf : null,
                 ':heslb' => $heslb !== '' ? $heslb : null,
+                ':photo_path' => $photoPath,
                 ':pwd' => password_hash($password, PASSWORD_DEFAULT),
             ]);
         } else {
             $stmt = $pdo->prepare(
                 'UPDATE tbl_users 
-                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status, monthly_salary = :monthly_salary, tin = :tin, nida = :nida, nssf = :nssf, heslb = :heslb
+                 SET full_name = :full_name, phone = :phone, email = :email, role = :role, status = :status, monthly_salary = :monthly_salary, tin = :tin, nida = :nida, nssf = :nssf, heslb = :heslb, photo_path = COALESCE(:photo_path, photo_path)
                  WHERE id = :id AND business_id = :bid'
             );
             $stmt->execute([
@@ -375,6 +423,7 @@ try {
                 ':nida' => $nida !== '' ? $nida : null,
                 ':nssf' => $nssf !== '' ? $nssf : null,
                 ':heslb' => $heslb !== '' ? $heslb : null,
+                ':photo_path' => $photoPath,
             ]);
         }
 

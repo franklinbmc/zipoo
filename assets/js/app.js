@@ -2307,6 +2307,7 @@ const setupCompanyUsersPage = () => {
   const editFullName = document.querySelector("[data-edit-user-fullname]");
   const editPhone = document.querySelector("[data-edit-user-phone]");
   const editEmail = document.querySelector("[data-edit-user-email]");
+  const editPhoto = document.querySelector("[data-edit-user-photo]");
   const editRole = document.querySelector("[data-edit-user-role]");
   const editStatus = document.querySelector("[data-edit-user-status]");
   const editSalary = document.querySelector("[data-edit-user-salary]");
@@ -2341,6 +2342,24 @@ const setupCompanyUsersPage = () => {
     return `${currency} ${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
   };
 
+  const userInitial = (user) => (user.full_name ? user.full_name.trim().charAt(0).toUpperCase() : "U");
+
+  const setUserAvatar = (avatar, user) => {
+    if (!avatar) return;
+    avatar.replaceChildren();
+    avatar.style.backgroundImage = "";
+    avatar.classList.remove("has-photo");
+    if (user?.photo_path) {
+      const img = document.createElement("img");
+      img.src = user.photo_path;
+      img.alt = user.full_name ? `${user.full_name} photo` : "User photo";
+      avatar.classList.add("has-photo");
+      avatar.append(img);
+      return;
+    }
+    avatar.textContent = userInitial(user || {});
+  };
+
   const setAdvancedPanel = (panel, toggle, open) => {
     if (!panel || !toggle) return;
     panel.hidden = !open;
@@ -2349,6 +2368,7 @@ const setupCompanyUsersPage = () => {
   };
 
   const valueOrDash = (value) => String(value || "").trim() || "-";
+  const isCheckedValue = (value) => ["1", "yes", "true", "on"].includes(String(value || "").trim().toLowerCase());
 
   const renderUsersList = (users = []) => {
     if (usersCountLabel) {
@@ -2389,7 +2409,7 @@ const setupCompanyUsersPage = () => {
       avatar.style.width = "36px";
       avatar.style.height = "36px";
       avatar.style.fontSize = "0.9rem";
-      avatar.textContent = (user.full_name ? user.full_name.trim().charAt(0).toUpperCase() : "U");
+      setUserAvatar(avatar, user);
 
       const info = document.createElement("div");
       const name = document.createElement("div");
@@ -2453,9 +2473,7 @@ const setupCompanyUsersPage = () => {
 
   const openUserDetail = (user) => {
     currentUser = user;
-    if (detailAvatar) {
-      detailAvatar.textContent = (user.full_name ? user.full_name.trim().charAt(0).toUpperCase() : "U");
-    }
+    setUserAvatar(detailAvatar, user);
     if (detailName) detailName.textContent = user.full_name || "-";
     if (detailMeta) {
       const roleCap = user.role.charAt(0).toUpperCase() + user.role.slice(1);
@@ -2471,7 +2489,7 @@ const setupCompanyUsersPage = () => {
     if (detailTin) detailTin.textContent = valueOrDash(user.tin);
     if (detailNida) detailNida.textContent = valueOrDash(user.nida);
     if (detailNssf) detailNssf.textContent = valueOrDash(user.nssf);
-    if (detailHeslb) detailHeslb.textContent = valueOrDash(user.heslb);
+    if (detailHeslb) detailHeslb.textContent = isCheckedValue(user.heslb) ? "Yes" : "No";
     if (detailCreatedAt) detailCreatedAt.textContent = formatDate(user.created_at);
 
     if (detailModal) detailModal.hidden = false;
@@ -2503,13 +2521,14 @@ const setupCompanyUsersPage = () => {
     if (editFullName) editFullName.value = user.full_name || "";
     if (editPhone) editPhone.value = user.phone || "";
     if (editEmail) editEmail.value = user.email || "";
+    if (editPhoto) editPhoto.value = "";
     if (editRole) editRole.value = user.role || "staff";
     if (editStatus) editStatus.value = user.status || "active";
     if (editSalary) editSalary.value = user.monthly_salary ? groupThousands(String(user.monthly_salary)) : "";
     if (editTin) editTin.value = user.tin || "";
     if (editNida) editNida.value = user.nida || "";
     if (editNssf) editNssf.value = user.nssf || "";
-    if (editHeslb) editHeslb.value = user.heslb || "";
+    if (editHeslb) editHeslb.checked = isCheckedValue(user.heslb);
     if (editPassword) editPassword.value = "";
     const hasAdvancedValues = [user.tin, user.nida, user.nssf, user.heslb].some((value) => String(value || "").trim() !== "");
     setAdvancedPanel(editAdvancedPanel, editAdvancedToggle, hasAdvancedValues);
