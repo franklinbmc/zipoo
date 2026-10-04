@@ -4967,6 +4967,7 @@ button.settings-list-row:focus-visible {
 .dashboard-entry > .dashboard-main {
   display: block;
   width: min(1100px, 94%);
+  justify-self: stretch;
   margin: 0 auto;
   padding: 12px 0 92px;
   overflow-y: auto;
@@ -4984,7 +4985,10 @@ button.settings-list-row:focus-visible {
 
 .dashboard-hero {
   display: grid;
+  grid-column: 1 / -1;
+  justify-self: stretch;
   width: 100%;
+  max-width: 100%;
   gap: 16px;
   margin-bottom: 12px;
   padding: 18px;
