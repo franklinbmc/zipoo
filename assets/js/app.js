@@ -33,6 +33,7 @@ const ICONS = {
   cash: "M48 144h416v224H48zM256 200a56 56 0 100 112 56 56 0 000-112",
   user: "M256 96a64 64 0 100 128 64 64 0 000-128M96 432c0-82 72-128 160-128s160 46 160 128",
   check: "M112 268l96 96 192-224",
+  eye: "M48 256s76-128 208-128 208 128 208 128-76 128-208 128S48 256 48 256zM256 200a56 56 0 100 112 56 56 0 000-112",
   close: "M112 112l288 288M400 112L112 400",
 };
 
@@ -7509,7 +7510,7 @@ const setupExpensesPage = () => {
             </span>
             <div class="expense-category-meta-wrap">
               <span class="expense-category-actions">
-                <button class="btn btn-outline btn-sm icon-only" type="button" data-expense-category-status="${category.id}" data-status="${isActive ? "inactive" : "active"}" aria-label="${isActive ? "Deactivate category" : "Activate category"}" title="${isActive ? "Deactivate" : "Activate"}">${svgMarkup(isActive ? "close" : "check", { size: 14 })}</button>
+                <button class="btn btn-outline btn-sm icon-only" type="button" data-expense-category-status="${category.id}" data-status="${isActive ? "inactive" : "active"}" aria-label="${isActive ? "Deactivate category" : "Activate category"}" title="${isActive ? "Deactivate" : "Activate"}">${svgMarkup(isActive ? "eye" : "check", { size: 14 })}</button>
                 <button class="btn btn-danger-outline btn-sm icon-only" type="button" data-expense-category-delete="${category.id}" aria-label="Delete category" title="Delete"${used > 0 ? " disabled" : ""}>${svgMarkup("close", { size: 14 })}</button>
               </span>
               <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
@@ -8130,10 +8131,26 @@ const setupExpensesPage = () => {
     try {
       const body = new FormData();
       if (statusButton) {
+        const nextStatus = statusButton.dataset.status;
+        const category = categories.find((item) => String(item.id) === String(statusButton.dataset.expenseCategoryStatus));
+        const ok = await showConfirmModal({
+          title: nextStatus === "inactive" ? "Deactivate category" : "Activate category",
+          message: `${nextStatus === "inactive" ? "Deactivate" : "Activate"} "${category?.name || "this category"}"?`,
+          confirmLabel: nextStatus === "inactive" ? "Deactivate" : "Activate",
+        });
+        if (!ok) return;
         body.set("action", "set_expense_category_status");
         body.set("category_id", statusButton.dataset.expenseCategoryStatus);
-        body.set("status", statusButton.dataset.status);
+        body.set("status", nextStatus);
       } else {
+        const category = categories.find((item) => String(item.id) === String(deleteButton.dataset.expenseCategoryDelete));
+        const ok = await showConfirmModal({
+          title: "Delete category",
+          message: `Delete "${category?.name || "this category"}"? This can only be done when it has no expenses.`,
+          confirmLabel: "Delete",
+          danger: true,
+        });
+        if (!ok) return;
         body.set("action", "delete_expense_category");
         body.set("category_id", deleteButton.dataset.expenseCategoryDelete);
       }
