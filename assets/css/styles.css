@@ -4961,12 +4961,12 @@ button.settings-list-row:focus-visible {
 
 /* ======================= Owner Dashboard ======================= */
 .dashboard-entry > .app-topbar {
-  width: min(1120px, 94%);
+  width: min(1100px, 94%);
 }
 
 .dashboard-entry > .dashboard-main {
   display: block;
-  width: min(1120px, 94%);
+  width: min(1100px, 94%);
   margin: 0 auto;
   padding: 12px 0 92px;
   overflow-y: auto;
@@ -5013,13 +5013,6 @@ button.settings-list-row:focus-visible {
   font-size: 1.04rem;
   font-weight: 750;
   line-height: 1.45;
-}
-
-.dashboard-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-self: end;
 }
 
 .dashboard-kpi-grid,
@@ -5204,8 +5197,6 @@ button.settings-list-row:focus-visible {
 
 @media (min-width: 760px) {
   .dashboard-hero {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
     padding: 22px;
   }
 
