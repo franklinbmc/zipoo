@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=99">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=100">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -47,8 +47,9 @@
         </div>
       </section>
 
-      <!-- Expenses Hub Row: opens workspace -->
+      <!-- Expenses Hub: Each row opens its own fullscreen workspace -->
       <nav class="stock-hub">
+        <!-- Expenses Hub Row -->
         <button class="settings-accordion-link stock-hub-row" type="button" data-open-expenses-workspace>
           <span class="stock-hub-label">
             <strong>Expenses</strong>
@@ -60,45 +61,33 @@
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </span>
         </button>
+
+        <!-- Payroll Hub Row -->
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-payroll-workspace>
+          <span class="stock-hub-label">
+            <strong>Payroll</strong>
+            <small>Staff salary sheets, preparation &amp; payments</small>
+          </span>
+          <span class="stock-summary-meta">
+            <span class="stock-count-badge" data-payroll-count-badge>0 staff</span>
+            <strong class="expense-card-total-badge" data-payroll-total-badge>TZS 0</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+
+        <!-- Categories Hub Row -->
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-categories-workspace>
+          <span class="stock-hub-label">
+            <strong>Categories</strong>
+            <small>Expense types, allocations &amp; category tracking</small>
+          </span>
+          <span class="stock-summary-meta">
+            <span class="stock-count-badge" data-categories-count-badge>0 categories</span>
+            <strong class="expense-card-total-badge" data-categories-total-badge>TZS 0</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
       </nav>
-
-      <section class="expenses-panel">
-        <div class="expenses-panel-head">
-          <h2>Payroll</h2>
-        </div>
-        <div class="payroll-controls">
-          <label class="form-field">
-            <span>Month</span>
-            <input type="month" data-payroll-month>
-          </label>
-          <label class="form-field">
-            <span>Pay From</span>
-            <select class="css-formatted-select" data-payroll-account></select>
-          </label>
-          <button class="btn btn-primary btn-sm" type="button" data-payroll-prepare>Prepare</button>
-        </div>
-        <div class="payroll-summary" hidden data-payroll-summary></div>
-        <div class="payroll-list" data-payroll-list></div>
-        <div class="payroll-actions">
-          <p class="inline-error" hidden data-payroll-error></p>
-          <button class="btn btn-primary full" type="button" data-payroll-pay hidden>Pay Payroll</button>
-        </div>
-      </section>
-
-      <section class="expenses-panel">
-        <div class="expenses-panel-head">
-          <h2>Categories</h2>
-        </div>
-        <form class="expense-category-form" data-expense-category-form novalidate>
-          <label class="form-field">
-            <span>New Category</span>
-            <input type="text" name="name" placeholder="e.g. Marketing">
-          </label>
-          <button class="btn btn-primary btn-sm" type="submit" data-expense-category-submit>Add</button>
-        </form>
-        <p class="inline-error" hidden data-expense-category-error></p>
-        <div class="expense-category-list" data-expense-categories-list></div>
-      </section>
     </main>
   </div>
 
@@ -173,6 +162,162 @@
     </section>
   </div>
 
+  <!-- Workspace: Payroll -->
+  <div class="fullscreen-modal" hidden data-payroll-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="payroll-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-payroll-workspace-back aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <div class="workspace-header-title">
+          <h2 id="payroll-workspace-title">Payroll</h2>
+          <small data-payroll-workspace-subtitle>Monthly salary preparation &amp; payments</small>
+        </div>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <!-- Payroll Export Bar -->
+        <div class="workspace-export-bar" data-payroll-export-bar>
+          <div class="workspace-export-header">
+            <div class="workspace-export-info">
+              <span class="workspace-export-title" data-payroll-export-title>Export Payroll Sheet</span>
+              <small class="workspace-export-sub" data-payroll-export-sub>Monthly staff salary report</small>
+            </div>
+            <div class="workspace-export-btns">
+              <button class="export-btn export-excel" type="button" data-payroll-export="excel" title="Download Excel">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="3" y1="9" x2="21" y2="9"/>
+                  <line x1="3" y1="15" x2="21" y2="15"/>
+                  <line x1="9" y1="3" x2="9" y2="21"/>
+                  <line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+                <span>Excel</span>
+              </button>
+              <button class="export-btn export-pdf" type="button" data-payroll-export="pdf" title="Download PDF">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                <span>PDF</span>
+              </button>
+              <button class="export-btn export-email" type="button" data-payroll-export="email-toggle" title="Send Email">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2-2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <span>Email</span>
+              </button>
+            </div>
+          </div>
+          <div class="workspace-export-email-panel" hidden data-payroll-email-panel>
+            <div class="workspace-export-email-form">
+              <input type="email" data-payroll-email-input placeholder="Enter recipient email..." autocomplete="email">
+              <button class="btn btn-primary btn-sm" type="button" data-payroll-email-send>Send</button>
+            </div>
+            <p class="inline-error" hidden data-payroll-email-status></p>
+          </div>
+        </div>
+
+        <section class="expenses-panel payroll-panel">
+          <div class="payroll-controls">
+            <label class="form-field">
+              <span>Month</span>
+              <input type="month" data-payroll-month>
+            </label>
+            <label class="form-field">
+              <span>Pay From Account</span>
+              <select class="css-formatted-select" data-payroll-account></select>
+            </label>
+            <button class="btn btn-primary btn-sm" type="button" data-payroll-prepare>Prepare Payroll</button>
+          </div>
+          <div class="payroll-summary" hidden data-payroll-summary></div>
+          <div class="payroll-list" data-payroll-list></div>
+          <div class="payroll-actions">
+            <p class="inline-error" hidden data-payroll-error></p>
+            <button class="btn btn-primary full" type="button" data-payroll-pay hidden>Pay Payroll</button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Categories -->
+  <div class="fullscreen-modal" hidden data-categories-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="categories-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-categories-workspace-back aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <div class="workspace-header-title">
+          <h2 id="categories-workspace-title">Expense Categories</h2>
+          <small data-categories-workspace-subtitle>Manage categories and track expenditures</small>
+        </div>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <!-- Categories Export Bar -->
+        <div class="workspace-export-bar" data-categories-export-bar>
+          <div class="workspace-export-header">
+            <div class="workspace-export-info">
+              <span class="workspace-export-title">Export Categories Summary</span>
+              <small class="workspace-export-sub">Breakdown of categories and expenditures</small>
+            </div>
+            <div class="workspace-export-btns">
+              <button class="export-btn export-excel" type="button" data-categories-export="excel" title="Download Excel">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="3" y1="9" x2="21" y2="9"/>
+                  <line x1="3" y1="15" x2="21" y2="15"/>
+                  <line x1="9" y1="3" x2="9" y2="21"/>
+                  <line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+                <span>Excel</span>
+              </button>
+              <button class="export-btn export-pdf" type="button" data-categories-export="pdf" title="Download PDF">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="12" y1="18" x2="12" y2="12"/>
+                  <line x1="9" y1="15" x2="15" y2="15"/>
+                </svg>
+                <span>PDF</span>
+              </button>
+              <button class="export-btn export-email" type="button" data-categories-export="email-toggle" title="Send Email">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2-2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <span>Email</span>
+              </button>
+            </div>
+          </div>
+          <div class="workspace-export-email-panel" hidden data-categories-email-panel>
+            <div class="workspace-export-email-form">
+              <input type="email" data-categories-email-input placeholder="Enter recipient email..." autocomplete="email">
+              <button class="btn btn-primary btn-sm" type="button" data-categories-email-send>Send</button>
+            </div>
+            <p class="inline-error" hidden data-categories-email-status></p>
+          </div>
+        </div>
+
+        <section class="expenses-panel categories-panel">
+          <form class="expense-category-form" data-expense-category-form novalidate>
+            <label class="form-field">
+              <span>New Category Name</span>
+              <input type="text" name="name" placeholder="e.g. Marketing, Office Supplies, Logistics">
+            </label>
+            <button class="btn btn-primary btn-sm" type="submit" data-expense-category-submit>Add Category</button>
+          </form>
+          <p class="inline-error" hidden data-expense-category-error></p>
+          <div class="expense-category-list" data-expense-categories-list></div>
+        </section>
+      </div>
+    </section>
+  </div>
+
   <div class="fullscreen-modal" hidden data-expense-modal>
     <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="expense-form-title">
       <header class="fullscreen-header">
@@ -213,6 +358,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=116" defer></script>
+  <script src="/assets/js/app.js?v=117" defer></script>
 </body>
 </html>

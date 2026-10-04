@@ -7403,6 +7403,36 @@ const setupExpensesPage = () => {
   const exportEmailSendBtn = document.querySelector("[data-expenses-email-send]");
   const exportEmailStatus = document.querySelector("[data-expenses-email-status]");
 
+  // Payroll Workspace selectors
+  const openPayrollWorkspace = document.querySelector("[data-open-payroll-workspace]");
+  const payrollWorkspace = document.querySelector("[data-payroll-workspace]");
+  const payrollWorkspaceBack = document.querySelector("[data-payroll-workspace-back]");
+  const payrollWorkspaceSubtitle = document.querySelector("[data-payroll-workspace-subtitle]");
+  const payrollCountBadge = document.querySelector("[data-payroll-count-badge]");
+  const payrollTotalBadge = document.querySelector("[data-payroll-total-badge]");
+  const payrollExportExcelBtn = document.querySelector('[data-payroll-export="excel"]');
+  const payrollExportPdfBtn = document.querySelector('[data-payroll-export="pdf"]');
+  const payrollExportEmailToggleBtn = document.querySelector('[data-payroll-export="email-toggle"]');
+  const payrollEmailPanel = document.querySelector("[data-payroll-email-panel]");
+  const payrollEmailInput = document.querySelector("[data-payroll-email-input]");
+  const payrollEmailSendBtn = document.querySelector("[data-payroll-email-send]");
+  const payrollEmailStatus = document.querySelector("[data-payroll-email-status]");
+
+  // Categories Workspace selectors
+  const openCategoriesWorkspace = document.querySelector("[data-open-categories-workspace]");
+  const categoriesWorkspace = document.querySelector("[data-categories-workspace]");
+  const categoriesWorkspaceBack = document.querySelector("[data-categories-workspace-back]");
+  const categoriesWorkspaceSubtitle = document.querySelector("[data-categories-workspace-subtitle]");
+  const categoriesCountBadge = document.querySelector("[data-categories-count-badge]");
+  const categoriesTotalBadge = document.querySelector("[data-categories-total-badge]");
+  const categoriesExportExcelBtn = document.querySelector('[data-categories-export="excel"]');
+  const categoriesExportPdfBtn = document.querySelector('[data-categories-export="pdf"]');
+  const categoriesExportEmailToggleBtn = document.querySelector('[data-categories-export="email-toggle"]');
+  const categoriesEmailPanel = document.querySelector("[data-categories-email-panel]");
+  const categoriesEmailInput = document.querySelector("[data-categories-email-input]");
+  const categoriesEmailSendBtn = document.querySelector("[data-categories-email-send]");
+  const categoriesEmailStatus = document.querySelector("[data-categories-email-status]");
+
   let accounts = [];
   let categories = [];
   let payrollRun = null;
@@ -7445,21 +7475,36 @@ const setupExpensesPage = () => {
       )).join("");
     }
 
+    const totalCategorySpent = categories.reduce((sum, c) => sum + num(c.total_amount || 0), 0);
+    if (categoriesCountBadge) {
+      categoriesCountBadge.textContent = `${categories.length} categor${categories.length === 1 ? "y" : "ies"}`;
+    }
+    if (categoriesTotalBadge) {
+      categoriesTotalBadge.textContent = fmt(totalCategorySpent);
+    }
+    if (categoriesWorkspaceSubtitle) {
+      categoriesWorkspaceSubtitle.textContent = `${categories.length} total categories • Total Spent: ${fmt(totalCategorySpent)}`;
+    }
+
     if (categoryList) {
       categoryList.innerHTML = categories.map((category) => {
         const used = Number(category.used_count) || 0;
         const isActive = category.status === "active";
         const statusText = isActive ? "Active" : "Inactive";
+        const catSpent = num(category.total_amount || 0);
         return `
           <div class="expense-category-row${isActive ? "" : " inactive"}">
-            <span>
+            <span class="expense-category-info">
               <strong>${esc(category.name)}</strong>
               <small>${statusText} • ${used} expense${used === 1 ? "" : "s"}</small>
             </span>
-            <span class="expense-category-actions">
-              <button class="btn btn-outline btn-sm" type="button" data-expense-category-status="${category.id}" data-status="${isActive ? "inactive" : "active"}">${isActive ? "Deactivate" : "Activate"}</button>
-              <button class="btn btn-danger-outline btn-sm" type="button" data-expense-category-delete="${category.id}"${used > 0 ? " disabled" : ""}>Delete</button>
-            </span>
+            <div class="expense-category-meta-wrap">
+              <strong class="category-amount-badge">${fmt(catSpent)}</strong>
+              <span class="expense-category-actions">
+                <button class="btn btn-outline btn-sm" type="button" data-expense-category-status="${category.id}" data-status="${isActive ? "inactive" : "active"}">${isActive ? "Deactivate" : "Activate"}</button>
+                <button class="btn btn-danger-outline btn-sm" type="button" data-expense-category-delete="${category.id}"${used > 0 ? " disabled" : ""}>Delete</button>
+              </span>
+            </div>
           </div>`;
       }).join("");
     }
@@ -7478,13 +7523,38 @@ const setupExpensesPage = () => {
     payrollRun = data.run || null;
     const items = data.items || [];
     const summary = data.summary || {};
+    const totalAmount = num(summary.total || 0);
+    const staffCount = Number(summary.staff_count || (payrollRun ? items.length : 0)) || 0;
+
+    if (payrollCountBadge) {
+      payrollCountBadge.textContent = `${staffCount} staff`;
+    }
+    if (payrollTotalBadge) {
+      payrollTotalBadge.textContent = fmt(totalAmount);
+    }
+    if (payrollWorkspaceSubtitle) {
+      payrollWorkspaceSubtitle.textContent = `${monthLabel(currentPayrollMonth())} • Total: ${fmt(totalAmount)}`;
+    }
+
     if (payrollSummary) {
       payrollSummary.hidden = !payrollRun;
       payrollSummary.innerHTML = payrollRun ? `
-        <span>Staff<strong>${summary.staff_count || 0}</strong></span>
-        <span>Total<strong>${fmt(summary.total || 0)}</strong></span>
-        <span>Paid<strong>${fmt(summary.paid || 0)}</strong></span>
-        <span>Pending<strong>${fmt(summary.pending || 0)}</strong></span>
+        <div class="payroll-summary-card">
+          <span class="kpi-sublabel">Staff</span>
+          <strong class="kpi-subval">${staffCount}</strong>
+        </div>
+        <div class="payroll-summary-card total">
+          <span class="kpi-sublabel">Total</span>
+          <strong class="kpi-subval">${fmt(totalAmount)}</strong>
+        </div>
+        <div class="payroll-summary-card paid">
+          <span class="kpi-sublabel">Paid</span>
+          <strong class="kpi-subval">${fmt(summary.paid || 0)}</strong>
+        </div>
+        <div class="payroll-summary-card pending">
+          <span class="kpi-sublabel">Pending</span>
+          <strong class="kpi-subval">${fmt(summary.pending || 0)}</strong>
+        </div>
       ` : "";
     }
     if (payrollPay) {
@@ -7503,12 +7573,17 @@ const setupExpensesPage = () => {
         const paid = item.status === "paid";
         return `
           <div class="payroll-row${paid ? " paid" : ""}" data-payroll-item="${item.id}">
-            <span>
+            <span class="payroll-row-info">
               <strong>${esc(item.staff_name)}</strong>
-              <small>${esc(item.role || "staff")} • ${paid ? "Paid" : "Pending"}</small>
+              <small>
+                ${esc(item.role || "staff")}
+                <span class="payroll-status-pill ${paid ? "paid" : "pending"}">${paid ? "Paid" : "Pending"}</span>
+              </small>
             </span>
-            <input type="text" inputmode="numeric" value="${num(item.salary_amount).toLocaleString()}" data-payroll-amount ${paid ? "disabled" : ""}>
-            <button class="btn btn-outline btn-sm" type="button" data-payroll-save="${item.id}" ${paid ? "disabled" : ""}>Save</button>
+            <div class="payroll-row-amount-wrap">
+              <input class="payroll-row-amount-input" type="text" inputmode="numeric" value="${num(item.salary_amount).toLocaleString()}" data-payroll-amount ${paid ? "disabled" : ""}>
+              <button class="btn btn-outline btn-sm" type="button" data-payroll-save="${item.id}" ${paid ? "disabled" : ""}>Save</button>
+            </div>
           </div>`;
       }).join("");
       payrollList.querySelectorAll("[data-payroll-amount]").forEach(attachThousandsFormatting);
@@ -8056,6 +8131,141 @@ const setupExpensesPage = () => {
   payrollMonth?.addEventListener("change", () => {
     if (payrollError) payrollError.hidden = true;
     loadPayroll().catch(() => renderPayroll({ run: null, items: [], summary: {} }));
+  });
+
+  // Payroll Workspace Open/Back/Export Handlers
+  openPayrollWorkspace?.addEventListener("click", () => {
+    if (payrollWorkspace) payrollWorkspace.hidden = false;
+    loadPayroll().catch(() => {});
+  });
+
+  payrollWorkspaceBack?.addEventListener("click", () => {
+    if (payrollWorkspace) payrollWorkspace.hidden = true;
+  });
+
+  payrollExportExcelBtn?.addEventListener("click", () => {
+    const url = `${getBasePath()}api/accounts.php?action=export_payroll_excel&month=${encodeURIComponent(currentPayrollMonth())}`;
+    window.location.href = url;
+  });
+
+  payrollExportPdfBtn?.addEventListener("click", () => {
+    const url = `${getBasePath()}api/accounts.php?action=export_payroll_pdf&month=${encodeURIComponent(currentPayrollMonth())}`;
+    window.open(url, "_blank");
+  });
+
+  payrollExportEmailToggleBtn?.addEventListener("click", () => {
+    if (!payrollEmailPanel) return;
+    const isHidden = payrollEmailPanel.hidden;
+    payrollEmailPanel.hidden = !isHidden;
+    payrollExportEmailToggleBtn.classList.toggle("active", !payrollEmailPanel.hidden);
+    if (!payrollEmailPanel.hidden && payrollEmailInput) {
+      payrollEmailInput.focus();
+    }
+  });
+
+  payrollEmailSendBtn?.addEventListener("click", async () => {
+    const recipient = payrollEmailInput?.value?.trim();
+    if (!recipient || !recipient.includes("@")) {
+      if (payrollEmailStatus) {
+        payrollEmailStatus.textContent = "Please enter a valid recipient email address.";
+        payrollEmailStatus.style.color = "#dc2626";
+        payrollEmailStatus.hidden = false;
+      }
+      return;
+    }
+    if (payrollEmailStatus) {
+      payrollEmailStatus.textContent = "Sending Payroll PDF via email...";
+      payrollEmailStatus.style.color = "var(--color-blue)";
+      payrollEmailStatus.hidden = false;
+    }
+    payrollEmailSendBtn.disabled = true;
+    try {
+      const b = new FormData();
+      b.set("action", "email_payroll_pdf");
+      b.set("month", currentPayrollMonth());
+      b.set("recipient_email", recipient);
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body: b });
+      const d = await res.json();
+      if (!res.ok || !d.ok) throw new Error(d.message || "Failed to send email.");
+      if (payrollEmailStatus) {
+        payrollEmailStatus.textContent = d.message || "Payroll report sent successfully!";
+        payrollEmailStatus.style.color = "#16a34a";
+      }
+    } catch (err) {
+      if (payrollEmailStatus) {
+        payrollEmailStatus.textContent = err.message || "Failed to send email.";
+        payrollEmailStatus.style.color = "#dc2626";
+      }
+    } finally {
+      payrollEmailSendBtn.disabled = false;
+    }
+  });
+
+  // Categories Workspace Open/Back/Export Handlers
+  openCategoriesWorkspace?.addEventListener("click", () => {
+    if (categoriesWorkspace) categoriesWorkspace.hidden = false;
+    loadCategories().catch(() => {});
+  });
+
+  categoriesWorkspaceBack?.addEventListener("click", () => {
+    if (categoriesWorkspace) categoriesWorkspace.hidden = true;
+  });
+
+  categoriesExportExcelBtn?.addEventListener("click", () => {
+    const url = `${getBasePath()}api/accounts.php?action=export_categories_excel`;
+    window.location.href = url;
+  });
+
+  categoriesExportPdfBtn?.addEventListener("click", () => {
+    const url = `${getBasePath()}api/accounts.php?action=export_categories_pdf`;
+    window.open(url, "_blank");
+  });
+
+  categoriesExportEmailToggleBtn?.addEventListener("click", () => {
+    if (!categoriesEmailPanel) return;
+    const isHidden = categoriesEmailPanel.hidden;
+    categoriesEmailPanel.hidden = !isHidden;
+    categoriesExportEmailToggleBtn.classList.toggle("active", !categoriesEmailPanel.hidden);
+    if (!categoriesEmailPanel.hidden && categoriesEmailInput) {
+      categoriesEmailInput.focus();
+    }
+  });
+
+  categoriesEmailSendBtn?.addEventListener("click", async () => {
+    const recipient = categoriesEmailInput?.value?.trim();
+    if (!recipient || !recipient.includes("@")) {
+      if (categoriesEmailStatus) {
+        categoriesEmailStatus.textContent = "Please enter a valid recipient email address.";
+        categoriesEmailStatus.style.color = "#dc2626";
+        categoriesEmailStatus.hidden = false;
+      }
+      return;
+    }
+    if (categoriesEmailStatus) {
+      categoriesEmailStatus.textContent = "Sending Categories PDF via email...";
+      categoriesEmailStatus.style.color = "var(--color-blue)";
+      categoriesEmailStatus.hidden = false;
+    }
+    categoriesEmailSendBtn.disabled = true;
+    try {
+      const b = new FormData();
+      b.set("action", "email_categories_pdf");
+      b.set("recipient_email", recipient);
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body: b });
+      const d = await res.json();
+      if (!res.ok || !d.ok) throw new Error(d.message || "Failed to send email.");
+      if (categoriesEmailStatus) {
+        categoriesEmailStatus.textContent = d.message || "Categories report sent successfully!";
+        categoriesEmailStatus.style.color = "#16a34a";
+      }
+    } catch (err) {
+      if (categoriesEmailStatus) {
+        categoriesEmailStatus.textContent = err.message || "Failed to send email.";
+        categoriesEmailStatus.style.color = "#dc2626";
+      }
+    } finally {
+      categoriesEmailSendBtn.disabled = false;
+    }
   });
 
   loadExpenses();

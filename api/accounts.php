@@ -133,6 +133,7 @@ function category_payload(array $row): array
         'name' => (string) $row['name'],
         'status' => (string) ($row['status'] ?? 'active'),
         'used_count' => (int) ($row['used_count'] ?? 0),
+        'total_amount' => (float) ($row['total_amount'] ?? 0),
         'created_at' => (string) ($row['created_at'] ?? ''),
     ];
 }
@@ -144,7 +145,11 @@ function load_expense_categories(PDO $pdo, int $businessId): array
                 COALESCE((SELECT COUNT(*) FROM tbl_account_transactions t
                           WHERE t.business_id = c.business_id
                             AND t.expense_category_id = c.id
-                            AND t.type = "expense"), 0) AS used_count
+                            AND t.type = "expense"), 0) AS used_count,
+                COALESCE((SELECT SUM(t.amount) FROM tbl_account_transactions t
+                          WHERE t.business_id = c.business_id
+                            AND t.expense_category_id = c.id
+                            AND t.type = "expense"), 0) AS total_amount
          FROM tbl_expense_categories c
          WHERE c.business_id = :bid
          ORDER BY c.status ASC, c.name ASC'
@@ -395,12 +400,34 @@ try {
             respond(200, ['ok' => true, 'categories' => load_expense_categories($pdo, $businessId)]);
         }
 
+        if (($_GET['action'] ?? '') === 'export_categories_excel') {
+            export_categories_excel($pdo, $businessId);
+            exit;
+        }
+
+        if (($_GET['action'] ?? '') === 'export_categories_pdf') {
+            export_categories_pdf_download($pdo, $businessId);
+            exit;
+        }
+
         if (($_GET['action'] ?? '') === 'payroll') {
             $month = trim((string) ($_GET['month'] ?? date('Y-m')));
             if (!valid_payroll_month($month)) {
                 respond(422, ['ok' => false, 'message' => 'Choose a valid payroll month.']);
             }
             respond(200, ['ok' => true] + payroll_payload($pdo, $businessId, $month));
+        }
+
+        if (($_GET['action'] ?? '') === 'export_payroll_excel') {
+            $month = trim((string) ($_GET['month'] ?? date('Y-m')));
+            export_payroll_excel($pdo, $businessId, $month);
+            exit;
+        }
+
+        if (($_GET['action'] ?? '') === 'export_payroll_pdf') {
+            $month = trim((string) ($_GET['month'] ?? date('Y-m')));
+            export_payroll_pdf_download($pdo, $businessId, $month);
+            exit;
         }
 
         $accounts = load_accounts($pdo, $businessId);
@@ -789,6 +816,25 @@ try {
             respond(422, ['ok' => false, 'message' => 'Please provide a valid recipient email address.']);
         }
         $result = send_expenses_email($pdo, $businessId, $level, $year, $month, $date, $recipient);
+        respond($result['ok'] ? 200 : 422, $result);
+    }
+
+    if ($action === 'email_payroll_pdf') {
+        $month = trim((string) ($_POST['month'] ?? date('Y-m')));
+        $recipient = trim((string) ($_POST['recipient_email'] ?? ''));
+        if ($recipient === '' || !filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            respond(422, ['ok' => false, 'message' => 'Please provide a valid recipient email address.']);
+        }
+        $result = send_payroll_email($pdo, $businessId, $month, $recipient);
+        respond($result['ok'] ? 200 : 422, $result);
+    }
+
+    if ($action === 'email_categories_pdf') {
+        $recipient = trim((string) ($_POST['recipient_email'] ?? ''));
+        if ($recipient === '' || !filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            respond(422, ['ok' => false, 'message' => 'Please provide a valid recipient email address.']);
+        }
+        $result = send_categories_email($pdo, $businessId, $recipient);
         respond($result['ok'] ? 200 : 422, $result);
     }
 
