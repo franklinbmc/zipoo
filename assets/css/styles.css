@@ -2082,7 +2082,7 @@ body.offline .status-dot {
 
 .expenses-page .stock-kpi-card .kpi-val[data-expenses-today],
 .expenses-page .stock-kpi-card .kpi-val[data-expenses-month] {
-  color: #dc2626 !important; /* Bold vivid readable red */
+  color: var(--color-navy) !important;
 }
 
 /* Main Hub Card Total Amount Badge */
@@ -2091,20 +2091,20 @@ body.offline .status-dot {
   align-items: center;
   justify-content: center;
   padding: 6px 14px;
-  background: #fef2f2;
-  border: 1px solid rgba(220, 38, 38, 0.25);
+  background: #f8fafc;
+  border: 1px solid var(--color-line);
   border-radius: 8px;
-  color: #b91c1c;
-  font-size: 1.05rem;
-  font-weight: 900;
+  color: var(--color-navy);
+  font-size: 0.84rem;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
 .stock-page .settings-accordion-link.stock-hub-row:hover .expense-card-total-badge {
-  background: #fee2e2;
-  border-color: rgba(220, 38, 38, 0.45);
-  color: #991b1b;
+  background: #f8fafc;
+  border-color: var(--color-line);
+  color: var(--color-navy);
 }
 
 /* Workspace Fullscreen — Centered and 1100px max on big screen */
@@ -2132,8 +2132,8 @@ body.offline .status-dot {
 
 [data-expenses-workspace] .workspace-header-title small {
   display: block;
-  color: #b91c1c !important;
-  font-size: 0.88rem !important;
+  color: var(--color-muted) !important;
+  font-size: 0.76rem !important;
   font-weight: 800 !important;
   margin-top: 2px;
 }
