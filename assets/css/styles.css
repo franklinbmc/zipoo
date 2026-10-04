@@ -2049,6 +2049,12 @@ body.offline .status-dot {
   border-radius: 14px;
 }
 
+.expenses-page .stock-hub-label strong {
+  font-size: 1.08rem;
+  font-weight: 900;
+  color: var(--color-navy);
+}
+
 /* KPI Cards readability & prominent amounts */
 .expenses-page .stock-kpi-card {
   padding: 16px 18px;
