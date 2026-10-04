@@ -2149,11 +2149,11 @@ body.offline .status-dot {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 16px;
+  gap: 10px;
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
-  padding: 16px 20px !important;
+  padding: 11px 12px !important;
   border: 1px solid var(--color-line);
   border-radius: 12px;
   background: #fff;
@@ -2169,13 +2169,13 @@ body.offline .status-dot {
 }
 
 [data-expenses-workspace] .expense-group-info strong {
-  font-size: 1.05rem;
-  font-weight: 900;
+  font-size: 0.86rem;
+  font-weight: 800;
   color: var(--color-navy);
 }
 
 [data-expenses-workspace] .expense-group-info small {
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--color-muted);
   margin-top: 2px;
@@ -2186,13 +2186,13 @@ body.offline .status-dot {
   align-items: center;
   justify-content: center;
   padding: 7px 16px;
-  background: #fef2f2;
-  border: 1px solid rgba(220, 38, 38, 0.22);
+  background: #f8fafc;
+  border: 1px solid var(--color-line);
   border-radius: 10px;
-  color: #b91c1c; /* Deep, vivid, high-contrast red */
-  font-size: 1.1rem;
-  font-weight: 900;
-  letter-spacing: -0.01em;
+  color: var(--color-navy);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   box-shadow: 0 1px 3px rgba(220, 38, 38, 0.05);
@@ -2200,10 +2200,10 @@ body.offline .status-dot {
 }
 
 [data-expenses-workspace] .expense-group-row:hover .expense-amount-badge {
-  background: #fee2e2;
-  border-color: #dc2626;
-  color: #991b1b;
-  transform: scale(1.02);
+  background: #f8fafc;
+  border-color: var(--color-line);
+  color: var(--color-navy);
+  transform: none;
 }
 
 /* Item Detail Cards */
@@ -2211,11 +2211,11 @@ body.offline .status-dot {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 16px;
+  gap: 10px;
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
-  padding: 14px 18px !important;
+  padding: 10px 12px !important;
   border: 1px solid var(--color-line);
   border-radius: 12px;
   background: #fff;
@@ -2230,8 +2230,8 @@ body.offline .status-dot {
 }
 
 [data-expenses-workspace] .expense-item-title {
-  font-size: 1rem;
-  font-weight: 900;
+  font-size: 0.84rem;
+  font-weight: 800;
   color: var(--color-navy);
 }
 
@@ -2245,14 +2245,14 @@ body.offline .status-dot {
 [data-expenses-workspace] .expense-item-amount b {
   display: inline-flex;
   align-items: center;
-  padding: 7px 14px;
-  background: #fef2f2;
-  border: 1px solid rgba(220, 38, 38, 0.22);
-  border-radius: 9px;
-  color: #b91c1c; /* Deep, vivid, highly readable red */
-  font-size: 1.08rem;
-  font-weight: 900;
-  letter-spacing: -0.01em;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--color-navy);
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }

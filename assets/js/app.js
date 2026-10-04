@@ -7741,7 +7741,6 @@ const setupExpensesPage = () => {
             <small>${y.count} expense${y.count === 1 ? "" : "s"}</small>
           </span>
           <span class="stock-summary-meta expense-group-meta">
-            <strong class="expense-amount-badge">${fmt(y.total)}</strong>
             <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
           </span>
         </button>`).join("");
@@ -7766,7 +7765,6 @@ const setupExpensesPage = () => {
             <small>${m.count} expense${m.count === 1 ? "" : "s"}</small>
           </span>
           <span class="stock-summary-meta expense-group-meta">
-            <strong class="expense-amount-badge">${fmt(m.total)}</strong>
             <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
           </span>
         </button>`).join("");
@@ -7791,7 +7789,6 @@ const setupExpensesPage = () => {
             <small>${d.count} expense${d.count === 1 ? "" : "s"}</small>
           </span>
           <span class="stock-summary-meta expense-group-meta">
-            <strong class="expense-amount-badge">${fmt(d.total)}</strong>
             <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
           </span>
         </button>`).join("");
