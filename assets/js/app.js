@@ -7367,6 +7367,7 @@ const setupExpensesPage = () => {
   const countValue = document.querySelector("[data-expenses-count]");
   const accountValue = document.querySelector("[data-expenses-account]");
   const expensesTitle = document.querySelector("[data-expenses-title]");
+  const expensesSubtitle = document.querySelector("[data-expenses-subtitle]");
   const expensesBack = document.querySelector("[data-expenses-back]");
   const list = document.querySelector("[data-expenses-list]");
   const empty = document.querySelector("[data-expenses-empty]");
@@ -7509,11 +7510,25 @@ const setupExpensesPage = () => {
   };
 
   const monthLabel = (key) => {
+    const parts = String(key || "").split("-");
+    if (parts.length >= 2) {
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString(undefined, { month: "long", year: "numeric" });
+      }
+    }
     const date = new Date(`${key}-01T00:00:00`);
     return isNaN(date.getTime()) ? key : date.toLocaleDateString(undefined, { month: "long", year: "numeric" });
   };
 
   const dateLabel = (key) => {
+    const parts = String(key || "").split("-");
+    if (parts.length === 3) {
+      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+      }
+    }
     const date = new Date(`${key}T00:00:00`);
     return isNaN(date.getTime()) ? key : date.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
   };
@@ -7552,6 +7567,7 @@ const setupExpensesPage = () => {
       list?.replaceChildren();
       if (empty) empty.hidden = false;
       if (expensesBack) expensesBack.hidden = true;
+      if (expensesSubtitle) expensesSubtitle.hidden = true;
       setText(expensesTitle, "Expenses");
       return;
     }
@@ -7571,72 +7587,90 @@ const setupExpensesPage = () => {
 
     if (expenseView.level === "months") {
       setText(expensesTitle, "Expenses");
+      if (expensesSubtitle) expensesSubtitle.hidden = true;
       if (expensesBack) expensesBack.hidden = true;
       const months = Object.values(groupedTotals(expenseRows, (row) => String(row.created_at || "").slice(0, 7)))
         .sort((a, b) => b.key.localeCompare(a.key));
       list.innerHTML = months.map((month) => `
         <button class="expense-group-row" type="button" data-expense-month="${month.key}">
-          <span>
+          <span class="expense-group-info">
             <strong>${esc(monthLabel(month.key))}</strong>
             <small>${month.count} expense${month.count === 1 ? "" : "s"}</small>
           </span>
-          <span class="expense-group-amount">
-            <b>${fmt(month.total)}</b>
-            ${chevron}
+          <span class="expense-group-meta">
+            <strong class="expense-amount-badge">${fmt(month.total)}</strong>
+            <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
           </span>
         </button>`).join("");
       return;
     }
 
     if (expenseView.level === "dates") {
-      setText(expensesTitle, monthLabel(expenseView.month));
-      if (expensesBack) expensesBack.hidden = false;
       const monthRows = expenseRows.filter((row) => String(row.created_at || "").slice(0, 7) === expenseView.month);
+      const monthTotal = monthRows.reduce((sum, r) => sum + num(r.amount), 0);
+      setText(expensesTitle, monthLabel(expenseView.month));
+      if (expensesSubtitle) {
+        expensesSubtitle.textContent = `${monthRows.length} expense${monthRows.length === 1 ? "" : "s"} • Total: ${fmt(monthTotal)}`;
+        expensesSubtitle.hidden = false;
+      }
+      if (expensesBack) expensesBack.hidden = false;
       const dates = Object.values(groupedTotals(monthRows, (row) => String(row.created_at || "").slice(0, 10)))
         .sort((a, b) => b.key.localeCompare(a.key));
       list.innerHTML = dates.map((day) => `
         <button class="expense-group-row" type="button" data-expense-date="${day.key}">
-          <span>
+          <span class="expense-group-info">
             <strong>${esc(dateLabel(day.key))}</strong>
             <small>${day.count} expense${day.count === 1 ? "" : "s"}</small>
           </span>
-          <span class="expense-group-amount">
-            <b>${fmt(day.total)}</b>
-            ${chevron}
+          <span class="expense-group-meta">
+            <strong class="expense-amount-badge">${fmt(day.total)}</strong>
+            <span class="expense-view-chevron" aria-hidden="true">${chevron}</span>
           </span>
         </button>`).join("");
       return;
     }
 
-    setText(expensesTitle, dateLabel(expenseView.date));
-    if (expensesBack) expensesBack.hidden = false;
     const dayRows = expenseRows.filter((row) => String(row.created_at || "").slice(0, 10) === expenseView.date);
+    const dayTotal = dayRows.reduce((sum, r) => sum + num(r.amount), 0);
+    setText(expensesTitle, dateLabel(expenseView.date));
+    if (expensesSubtitle) {
+      expensesSubtitle.textContent = `${dayRows.length} expense${dayRows.length === 1 ? "" : "s"} • Total: ${fmt(dayTotal)}`;
+      expensesSubtitle.hidden = false;
+    }
+    if (expensesBack) expensesBack.hidden = false;
     list.innerHTML = dayRows.map((row) => {
         const title = row.notes || "Expense";
-        const meta = [row.category_name || "Uncategorized", row.account_name, formatDate(row.created_at)].filter(Boolean).map(esc).join(" • ");
+        const cat = row.category_name || "Uncategorized";
+        const acc = row.account_name || "Default Account";
+        const dateObj = parseDate(row.created_at);
+        const timeStr = dateObj ? dateObj.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }) : "";
         return `
-          <div class="expense-row">
-            <span>
-              <strong>${esc(title)}</strong>
-              <small>${meta}</small>
-            </span>
-            <b>${fmt(row.amount)}</b>
+          <div class="expense-item-row">
+            <div class="expense-item-main">
+              <strong class="expense-item-title">${esc(title)}</strong>
+              <div class="expense-item-tags">
+                <span class="expense-item-category">${esc(cat)}</span>
+                <span class="expense-item-account">${esc(acc)}</span>
+                ${timeStr ? `<span class="expense-item-time">${esc(timeStr)}</span>` : ""}
+              </div>
+            </div>
+            <div class="expense-item-amount">
+              <b>${fmt(row.amount)}</b>
+            </div>
           </div>`;
       }).join("");
   };
 
   const loadExpenses = async () => {
     try {
-      await loadAccounts();
-      await loadCategories();
-      await loadPayroll();
+      await Promise.allSettled([loadAccounts(), loadCategories(), loadPayroll()]);
       const res = await fetch(`${getBasePath()}api/accounts.php?action=expenses`);
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.message || "Could not load expenses.");
       renderExpenses(data.expenses || []);
       fitAmounts(page);
     } catch {
-      /* Keep the static empty state when offline or signed out. */
+      if (empty && !expenseRows.length) empty.hidden = false;
     }
   };
 

@@ -342,9 +342,9 @@ try {
 
         if (($_GET['action'] ?? '') === 'expenses') {
             $stmt = $pdo->prepare(
-                'SELECT t.*, a.name AS account_name, a.type AS account_type, c.name AS category_name, c.status AS category_status
+                'SELECT t.*, COALESCE(a.name, "Default Account") AS account_name, COALESCE(a.type, "cash") AS account_type, c.name AS category_name, c.status AS category_status
                  FROM tbl_account_transactions t
-                 JOIN tbl_accounts a ON a.id = t.account_id
+                 LEFT JOIN tbl_accounts a ON a.id = t.account_id
                  LEFT JOIN tbl_expense_categories c ON c.id = t.expense_category_id AND c.business_id = t.business_id
                  WHERE t.business_id = :bid AND t.type = "expense"
                  ORDER BY t.created_at DESC, t.id DESC'

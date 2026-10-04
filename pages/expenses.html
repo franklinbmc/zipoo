@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=95">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=96">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -49,8 +49,15 @@
 
       <section class="expenses-panel">
         <div class="expenses-panel-head">
-          <h2 data-expenses-title>Expenses</h2>
-          <button class="btn btn-outline btn-sm" type="button" data-expenses-back hidden>Back</button>
+          <div class="expenses-title-group">
+            <button class="icon-button expenses-back-btn" type="button" data-expenses-back hidden aria-label="Back">
+              <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+            </button>
+            <div class="expenses-title-text">
+              <h2 data-expenses-title>Expenses</h2>
+              <small data-expenses-subtitle hidden></small>
+            </div>
+          </div>
           <button class="btn btn-primary btn-sm" type="button" data-expense-open>Record Expense</button>
         </div>
         <div class="expenses-list" data-expenses-list></div>
@@ -71,7 +78,7 @@
           </label>
           <label class="form-field">
             <span>Pay From</span>
-            <select data-payroll-account></select>
+            <select class="css-formatted-select" data-payroll-account></select>
           </label>
           <button class="btn btn-primary btn-sm" type="button" data-payroll-prepare>Prepare</button>
         </div>
@@ -112,11 +119,11 @@
       <form class="fullscreen-body" data-expense-form novalidate>
         <label class="form-field">
           <span>Account <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select name="account_id" data-expense-account required></select>
+          <select class="css-formatted-select" name="account_id" data-expense-account required></select>
         </label>
         <label class="form-field">
           <span>Category <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select name="category_id" data-expense-category required></select>
+          <select class="css-formatted-select" name="category_id" data-expense-category required></select>
         </label>
         <label class="form-field">
           <span>Amount <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
@@ -140,6 +147,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=112" defer></script>
+  <script src="/assets/js/app.js?v=113" defer></script>
 </body>
 </html>
