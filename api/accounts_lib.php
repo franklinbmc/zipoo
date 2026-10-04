@@ -87,6 +87,60 @@ function ensure_account_index(PDO $pdo, string $indexName, string $definition): 
     }
 }
 
+function ensure_payroll_tables(PDO $pdo): void
+{
+    ensure_accounts_tables($pdo);
+
+    $roleCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'role'")->fetch();
+    if (!$roleCol) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'staff' AFTER business_id");
+    }
+
+    $statusCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'status'")->fetch();
+    if (!$statusCol) {
+        $pdo->exec("ALTER TABLE tbl_users ADD COLUMN status ENUM('active', 'inactive') NOT NULL DEFAULT 'active' AFTER role");
+    }
+
+    $salaryCol = $pdo->query("SHOW COLUMNS FROM tbl_users LIKE 'monthly_salary'")->fetch();
+    if (!$salaryCol) {
+        $pdo->exec('ALTER TABLE tbl_users ADD COLUMN monthly_salary DECIMAL(14, 2) NOT NULL DEFAULT 0.00 AFTER status');
+    }
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS tbl_payroll_runs (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            business_id INT UNSIGNED NOT NULL,
+            payroll_month CHAR(7) NOT NULL,
+            status ENUM("prepared", "partial", "paid") NOT NULL DEFAULT "prepared",
+            expense_category_id INT UNSIGNED NULL,
+            created_by INT UNSIGNED NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_payroll_month (business_id, payroll_month),
+            KEY idx_payroll_biz (business_id, status)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+
+    $pdo->exec(
+        'CREATE TABLE IF NOT EXISTS tbl_payroll_items (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            run_id BIGINT UNSIGNED NOT NULL,
+            business_id INT UNSIGNED NOT NULL,
+            user_id INT UNSIGNED NOT NULL,
+            staff_name VARCHAR(190) NOT NULL,
+            role VARCHAR(50) NULL,
+            salary_amount DECIMAL(14, 2) NOT NULL DEFAULT 0.00,
+            status ENUM("pending", "paid") NOT NULL DEFAULT "pending",
+            account_txn_id BIGINT UNSIGNED NULL,
+            paid_at DATETIME NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY uniq_payroll_item (run_id, user_id),
+            KEY idx_payroll_item_biz (business_id, status)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
+    );
+}
+
 /**
  * Self-heals the account-transaction `type` ENUM on databases created before
  * the `rent` value existed. Cheap: one SHOW COLUMNS, ALTER only when missing.

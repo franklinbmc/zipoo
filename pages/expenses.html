@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=93">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=94">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -56,6 +56,29 @@
         <div class="company-users-empty expenses-empty" hidden data-expenses-empty>
           <strong>No expenses yet</strong>
           <p>Record rent, transport, supplies, or any business cost here.</p>
+        </div>
+      </section>
+
+      <section class="expenses-panel">
+        <div class="expenses-panel-head">
+          <h2>Payroll</h2>
+        </div>
+        <div class="payroll-controls">
+          <label class="form-field">
+            <span>Month</span>
+            <input type="month" data-payroll-month>
+          </label>
+          <label class="form-field">
+            <span>Pay From</span>
+            <select data-payroll-account></select>
+          </label>
+          <button class="btn btn-primary btn-sm" type="button" data-payroll-prepare>Prepare</button>
+        </div>
+        <div class="payroll-summary" hidden data-payroll-summary></div>
+        <div class="payroll-list" data-payroll-list></div>
+        <div class="payroll-actions">
+          <p class="inline-error" hidden data-payroll-error></p>
+          <button class="btn btn-primary full" type="button" data-payroll-pay hidden>Pay Payroll</button>
         </div>
       </section>
 
@@ -116,6 +139,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=109" defer></script>
+  <script src="/assets/js/app.js?v=110" defer></script>
 </body>
 </html>

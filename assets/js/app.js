@@ -7378,9 +7378,17 @@ const setupExpensesPage = () => {
   const categoryList = document.querySelector("[data-expense-categories-list]");
   const categoryError = document.querySelector("[data-expense-category-error]");
   const categorySubmit = document.querySelector("[data-expense-category-submit]");
+  const payrollMonth = document.querySelector("[data-payroll-month]");
+  const payrollAccount = document.querySelector("[data-payroll-account]");
+  const payrollPrepare = document.querySelector("[data-payroll-prepare]");
+  const payrollSummary = document.querySelector("[data-payroll-summary]");
+  const payrollList = document.querySelector("[data-payroll-list]");
+  const payrollError = document.querySelector("[data-payroll-error]");
+  const payrollPay = document.querySelector("[data-payroll-pay]");
 
   let accounts = [];
   let categories = [];
+  let payrollRun = null;
 
   const setText = (el, value) => {
     if (el) el.textContent = value;
@@ -7397,6 +7405,12 @@ const setupExpensesPage = () => {
       accountSelect.innerHTML = accounts.map((account) => {
         const selected = defaultAccount && String(account.id) === String(defaultAccount.id) ? " selected" : "";
         return `<option value="${account.id}"${selected}>${esc(account.name)} (${esc(account.type_label)})</option>`;
+      }).join("");
+    }
+    if (payrollAccount) {
+      payrollAccount.innerHTML = accounts.map((account) => {
+        const selected = defaultAccount && String(account.id) === String(defaultAccount.id) ? " selected" : "";
+        return `<option value="${account.id}"${selected}>${esc(account.name)} (${fmt(account.balance)})</option>`;
       }).join("");
     }
   };
@@ -7435,6 +7449,56 @@ const setupExpensesPage = () => {
     const data = await res.json();
     if (!res.ok || !data.ok) throw new Error(data.message || "Could not load categories.");
     renderCategories(data.categories || []);
+  };
+
+  const currentPayrollMonth = () => payrollMonth?.value || new Date().toISOString().slice(0, 7);
+
+  const renderPayroll = (data) => {
+    payrollRun = data.run || null;
+    const items = data.items || [];
+    const summary = data.summary || {};
+    if (payrollSummary) {
+      payrollSummary.hidden = !payrollRun;
+      payrollSummary.innerHTML = payrollRun ? `
+        <span>Staff<strong>${summary.staff_count || 0}</strong></span>
+        <span>Total<strong>${fmt(summary.total || 0)}</strong></span>
+        <span>Paid<strong>${fmt(summary.paid || 0)}</strong></span>
+        <span>Pending<strong>${fmt(summary.pending || 0)}</strong></span>
+      ` : "";
+    }
+    if (payrollPay) {
+      payrollPay.hidden = !payrollRun || !items.some((item) => item.status !== "paid" && num(item.salary_amount) > 0);
+    }
+    if (!payrollRun) {
+      if (payrollList) payrollList.innerHTML = '<div class="expenses-empty"><strong>No payroll prepared</strong><p>Choose a month and prepare payroll to load staff salaries.</p></div>';
+      return;
+    }
+    if (!items.length) {
+      if (payrollList) payrollList.innerHTML = '<div class="expenses-empty"><strong>No active staff</strong><p>Add staff users first, then prepare payroll again.</p></div>';
+      return;
+    }
+    if (payrollList) {
+      payrollList.innerHTML = items.map((item) => {
+        const paid = item.status === "paid";
+        return `
+          <div class="payroll-row${paid ? " paid" : ""}" data-payroll-item="${item.id}">
+            <span>
+              <strong>${esc(item.staff_name)}</strong>
+              <small>${esc(item.role || "staff")} • ${paid ? "Paid" : "Pending"}</small>
+            </span>
+            <input type="text" inputmode="numeric" value="${num(item.salary_amount).toLocaleString()}" data-payroll-amount ${paid ? "disabled" : ""}>
+            <button class="btn btn-outline btn-sm" type="button" data-payroll-save="${item.id}" ${paid ? "disabled" : ""}>Save</button>
+          </div>`;
+      }).join("");
+    }
+  };
+
+  const loadPayroll = async () => {
+    if (!payrollMonth) return;
+    const res = await fetch(`${getBasePath()}api/accounts.php?action=payroll&month=${encodeURIComponent(currentPayrollMonth())}`);
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.message || "Could not load payroll.");
+    renderPayroll(data);
   };
 
   const renderExpenses = (rows) => {
@@ -7482,6 +7546,7 @@ const setupExpensesPage = () => {
     try {
       await loadAccounts();
       await loadCategories();
+      await loadPayroll();
       const res = await fetch(`${getBasePath()}api/accounts.php?action=activity`);
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.message || "Could not load expenses.");
@@ -7597,6 +7662,86 @@ const setupExpensesPage = () => {
     } catch (err) {
       if (categoryError) { categoryError.textContent = err.message || "Could not update category."; categoryError.hidden = false; }
     }
+  });
+
+  payrollPrepare?.addEventListener("click", async () => {
+    if (payrollError) payrollError.hidden = true;
+    if (payrollPrepare) payrollPrepare.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", "prepare_payroll");
+      body.set("month", currentPayrollMonth());
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not prepare payroll.");
+      renderPayroll(data);
+      await loadCategories();
+    } catch (err) {
+      if (payrollError) { payrollError.textContent = err.message || "Could not prepare payroll."; payrollError.hidden = false; }
+    } finally {
+      if (payrollPrepare) payrollPrepare.disabled = false;
+    }
+  });
+
+  payrollList?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-payroll-save]");
+    if (!button) return;
+    if (payrollError) payrollError.hidden = true;
+    const row = button.closest("[data-payroll-item]");
+    const amountInput = row?.querySelector("[data-payroll-amount]");
+    button.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", "update_payroll_item");
+      body.set("item_id", button.dataset.payrollSave);
+      body.set("salary_amount", String(num(amountInput?.value)));
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not save salary.");
+      renderPayroll(data);
+    } catch (err) {
+      if (payrollError) { payrollError.textContent = err.message || "Could not save salary."; payrollError.hidden = false; }
+      button.disabled = false;
+    }
+  });
+
+  payrollPay?.addEventListener("click", async () => {
+    if (!payrollRun) return;
+    if (payrollError) payrollError.hidden = true;
+    if (!payrollAccount?.value) {
+      if (payrollError) { payrollError.textContent = "Choose an account to pay from."; payrollError.hidden = false; }
+      return;
+    }
+    const confirmed = await showConfirmModal({
+      title: "Pay payroll",
+      message: `Pay salaries for ${currentPayrollMonth()} from the selected account?`,
+      confirmLabel: "Pay",
+    });
+    if (!confirmed) return;
+    payrollPay.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", "pay_payroll");
+      body.set("run_id", String(payrollRun.id));
+      body.set("account_id", payrollAccount.value);
+      const res = await fetch(`${getBasePath()}api/accounts.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not pay payroll.");
+      renderPayroll(data);
+      await loadExpenses();
+    } catch (err) {
+      if (payrollError) { payrollError.textContent = err.message || "Could not pay payroll."; payrollError.hidden = false; }
+    } finally {
+      payrollPay.disabled = false;
+    }
+  });
+
+  if (payrollMonth && !payrollMonth.value) {
+    payrollMonth.value = new Date().toISOString().slice(0, 7);
+  }
+  payrollMonth?.addEventListener("change", () => {
+    if (payrollError) payrollError.hidden = true;
+    loadPayroll().catch(() => renderPayroll({ run: null, items: [], summary: {} }));
   });
 
   loadExpenses();

@@ -169,6 +169,22 @@ function ensure_default_expense_categories(PDO $pdo, int $businessId): void
     }
 }
 
+function ensure_salary_category(PDO $pdo, int $businessId): int
+{
+    $stmt = $pdo->prepare('SELECT id FROM tbl_expense_categories WHERE business_id = :bid AND name = "Salaries" LIMIT 1');
+    $stmt->execute([':bid' => $businessId]);
+    $id = (int) ($stmt->fetchColumn() ?: 0);
+    if ($id > 0) {
+        $pdo->prepare('UPDATE tbl_expense_categories SET status = "active" WHERE id = :id AND business_id = :bid')
+            ->execute([':id' => $id, ':bid' => $businessId]);
+        return $id;
+    }
+
+    $ins = $pdo->prepare('INSERT INTO tbl_expense_categories (business_id, name, status) VALUES (:bid, "Salaries", "active")');
+    $ins->execute([':bid' => $businessId]);
+    return (int) $pdo->lastInsertId();
+}
+
 function fetch_category_or_404(PDO $pdo, int $businessId, int $categoryId): array
 {
     $stmt = $pdo->prepare('SELECT * FROM tbl_expense_categories WHERE id = :id AND business_id = :bid LIMIT 1');
@@ -178,6 +194,59 @@ function fetch_category_or_404(PDO $pdo, int $businessId, int $categoryId): arra
         respond(404, ['ok' => false, 'message' => 'Category not found.']);
     }
     return $row;
+}
+
+function valid_payroll_month(string $month): bool
+{
+    return (bool) preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $month);
+}
+
+function payroll_payload(PDO $pdo, int $businessId, string $month): array
+{
+    $runStmt = $pdo->prepare('SELECT * FROM tbl_payroll_runs WHERE business_id = :bid AND payroll_month = :month LIMIT 1');
+    $runStmt->execute([':bid' => $businessId, ':month' => $month]);
+    $run = $runStmt->fetch();
+    if (!$run) {
+        return ['run' => null, 'items' => [], 'summary' => ['total' => 0, 'paid' => 0, 'pending' => 0, 'staff_count' => 0]];
+    }
+
+    $itemStmt = $pdo->prepare('SELECT * FROM tbl_payroll_items WHERE business_id = :bid AND run_id = :run ORDER BY staff_name ASC');
+    $itemStmt->execute([':bid' => $businessId, ':run' => (int) $run['id']]);
+    $items = array_map(static function ($row) {
+        return [
+            'id' => (int) $row['id'],
+            'user_id' => (int) $row['user_id'],
+            'staff_name' => (string) $row['staff_name'],
+            'role' => (string) ($row['role'] ?? ''),
+            'salary_amount' => (float) $row['salary_amount'],
+            'status' => (string) $row['status'],
+            'paid_at' => (string) ($row['paid_at'] ?? ''),
+        ];
+    }, $itemStmt->fetchAll());
+
+    $total = 0.0;
+    $paid = 0.0;
+    foreach ($items as $item) {
+        $total += (float) $item['salary_amount'];
+        if ($item['status'] === 'paid') {
+            $paid += (float) $item['salary_amount'];
+        }
+    }
+
+    return [
+        'run' => [
+            'id' => (int) $run['id'],
+            'payroll_month' => (string) $run['payroll_month'],
+            'status' => (string) $run['status'],
+        ],
+        'items' => $items,
+        'summary' => [
+            'total' => round($total, 2),
+            'paid' => round($paid, 2),
+            'pending' => round($total - $paid, 2),
+            'staff_count' => count($items),
+        ],
+    ];
 }
 
 function fetch_account_or_404(PDO $pdo, int $businessId, int $accountId): array
@@ -195,6 +264,7 @@ try {
     $pdo = db();
     $userId = require_user();
     ensure_accounts_tables($pdo);
+    ensure_payroll_tables($pdo);
 
     $businessId = active_business_id($pdo, $userId);
     if ($businessId <= 0) {
@@ -272,6 +342,14 @@ try {
 
         if (($_GET['action'] ?? '') === 'expense_categories') {
             respond(200, ['ok' => true, 'categories' => load_expense_categories($pdo, $businessId)]);
+        }
+
+        if (($_GET['action'] ?? '') === 'payroll') {
+            $month = trim((string) ($_GET['month'] ?? date('Y-m')));
+            if (!valid_payroll_month($month)) {
+                respond(422, ['ok' => false, 'message' => 'Choose a valid payroll month.']);
+            }
+            respond(200, ['ok' => true] + payroll_payload($pdo, $businessId, $month));
         }
 
         $accounts = load_accounts($pdo, $businessId);
@@ -484,6 +562,136 @@ try {
         $del = $pdo->prepare('DELETE FROM tbl_expense_categories WHERE id = :id AND business_id = :bid');
         $del->execute([':id' => $categoryId, ':bid' => $businessId]);
         respond(200, ['ok' => true, 'message' => 'Category deleted.', 'categories' => load_expense_categories($pdo, $businessId)]);
+    }
+
+    if ($action === 'prepare_payroll') {
+        $month = trim((string) ($_POST['month'] ?? date('Y-m')));
+        if (!valid_payroll_month($month)) {
+            respond(422, ['ok' => false, 'message' => 'Choose a valid payroll month.']);
+        }
+        $salaryCategoryId = ensure_salary_category($pdo, $businessId);
+
+        $pdo->beginTransaction();
+        try {
+            $runStmt = $pdo->prepare('SELECT id FROM tbl_payroll_runs WHERE business_id = :bid AND payroll_month = :month LIMIT 1');
+            $runStmt->execute([':bid' => $businessId, ':month' => $month]);
+            $runId = (int) ($runStmt->fetchColumn() ?: 0);
+            if ($runId <= 0) {
+                $ins = $pdo->prepare('INSERT INTO tbl_payroll_runs (business_id, payroll_month, expense_category_id, created_by) VALUES (:bid, :month, :cat, :uid)');
+                $ins->execute([':bid' => $businessId, ':month' => $month, ':cat' => $salaryCategoryId, ':uid' => $userId]);
+                $runId = (int) $pdo->lastInsertId();
+            }
+
+            $ownerStmt = $pdo->prepare('SELECT owner_user_id FROM tbl_businesses WHERE id = :bid LIMIT 1');
+            $ownerStmt->execute([':bid' => $businessId]);
+            $ownerId = (int) ($ownerStmt->fetchColumn() ?: 0);
+
+            $staffStmt = $pdo->prepare('SELECT id, full_name, role, monthly_salary FROM tbl_users WHERE business_id = :bid AND id != :owner AND status = "active" ORDER BY full_name ASC');
+            $staffStmt->execute([':bid' => $businessId, ':owner' => $ownerId]);
+            $itemIns = $pdo->prepare(
+                'INSERT IGNORE INTO tbl_payroll_items (run_id, business_id, user_id, staff_name, role, salary_amount)
+                 VALUES (:run, :bid, :uid, :name, :role, :salary)'
+            );
+            foreach ($staffStmt->fetchAll() as $staff) {
+                $itemIns->execute([
+                    ':run' => $runId,
+                    ':bid' => $businessId,
+                    ':uid' => (int) $staff['id'],
+                    ':name' => (string) $staff['full_name'],
+                    ':role' => (string) ($staff['role'] ?? 'staff'),
+                    ':salary' => round((float) ($staff['monthly_salary'] ?? 0), 2),
+                ]);
+            }
+            $pdo->commit();
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+
+        respond(200, ['ok' => true, 'message' => 'Payroll prepared.'] + payroll_payload($pdo, $businessId, $month));
+    }
+
+    if ($action === 'update_payroll_item') {
+        $itemId = (int) ($_POST['item_id'] ?? 0);
+        $amount = round((float) ($_POST['salary_amount'] ?? 0), 2);
+        if ($amount < 0) {
+            respond(422, ['ok' => false, 'message' => 'Salary cannot be negative.']);
+        }
+        $stmt = $pdo->prepare(
+            'SELECT i.*, r.payroll_month FROM tbl_payroll_items i
+             JOIN tbl_payroll_runs r ON r.id = i.run_id
+             WHERE i.id = :id AND i.business_id = :bid LIMIT 1'
+        );
+        $stmt->execute([':id' => $itemId, ':bid' => $businessId]);
+        $item = $stmt->fetch();
+        if (!$item) {
+            respond(404, ['ok' => false, 'message' => 'Payroll item not found.']);
+        }
+        if (($item['status'] ?? 'pending') === 'paid') {
+            respond(422, ['ok' => false, 'message' => 'Paid salary cannot be changed.']);
+        }
+        $pdo->prepare('UPDATE tbl_payroll_items SET salary_amount = :amount WHERE id = :id AND business_id = :bid')
+            ->execute([':amount' => $amount, ':id' => $itemId, ':bid' => $businessId]);
+        respond(200, ['ok' => true, 'message' => 'Salary updated.'] + payroll_payload($pdo, $businessId, (string) $item['payroll_month']));
+    }
+
+    if ($action === 'pay_payroll') {
+        $runId = (int) ($_POST['run_id'] ?? 0);
+        $accountId = (int) ($_POST['account_id'] ?? 0);
+        fetch_account_or_404($pdo, $businessId, $accountId);
+        $runStmt = $pdo->prepare('SELECT * FROM tbl_payroll_runs WHERE id = :id AND business_id = :bid LIMIT 1');
+        $runStmt->execute([':id' => $runId, ':bid' => $businessId]);
+        $run = $runStmt->fetch();
+        if (!$run) {
+            respond(404, ['ok' => false, 'message' => 'Payroll run not found.']);
+        }
+
+        $itemsStmt = $pdo->prepare('SELECT * FROM tbl_payroll_items WHERE run_id = :run AND business_id = :bid AND status = "pending" ORDER BY staff_name ASC');
+        $itemsStmt->execute([':run' => $runId, ':bid' => $businessId]);
+        $items = $itemsStmt->fetchAll();
+        $payable = array_values(array_filter($items, static fn($item) => (float) $item['salary_amount'] > 0));
+        if (empty($payable)) {
+            respond(422, ['ok' => false, 'message' => 'Set at least one salary amount before paying.']);
+        }
+        $total = array_reduce($payable, static fn($sum, $item) => $sum + (float) $item['salary_amount'], 0.0);
+        $balance = account_balance($pdo, $businessId, $accountId);
+        if ($total > $balance) {
+            respond(422, ['ok' => false, 'message' => 'Insufficient balance. Available: ' . number_format($balance, 0) . '.']);
+        }
+        $salaryCategoryId = ensure_salary_category($pdo, $businessId);
+
+        $pdo->beginTransaction();
+        try {
+            foreach ($payable as $item) {
+                $txnId = post_account_txn(
+                    $pdo,
+                    $businessId,
+                    $accountId,
+                    'out',
+                    'expense',
+                    (float) $item['salary_amount'],
+                    'payroll',
+                    (string) $item['id'],
+                    'Salary ' . $run['payroll_month'] . ' - ' . $item['staff_name'],
+                    $userId,
+                    null,
+                    $salaryCategoryId
+                );
+                $pdo->prepare('UPDATE tbl_payroll_items SET status = "paid", account_txn_id = :txn, paid_at = NOW() WHERE id = :id AND business_id = :bid')
+                    ->execute([':txn' => $txnId, ':id' => (int) $item['id'], ':bid' => $businessId]);
+            }
+            $remainingStmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_payroll_items WHERE run_id = :run AND business_id = :bid AND status = "pending" AND salary_amount > 0');
+            $remainingStmt->execute([':run' => $runId, ':bid' => $businessId]);
+            $status = (int) $remainingStmt->fetchColumn() > 0 ? 'partial' : 'paid';
+            $pdo->prepare('UPDATE tbl_payroll_runs SET status = :status, expense_category_id = :cat WHERE id = :id AND business_id = :bid')
+                ->execute([':status' => $status, ':cat' => $salaryCategoryId, ':id' => $runId, ':bid' => $businessId]);
+            $pdo->commit();
+        } catch (Throwable $e) {
+            $pdo->rollBack();
+            throw $e;
+        }
+
+        respond(200, ['ok' => true, 'message' => 'Payroll paid.'] + payroll_payload($pdo, $businessId, (string) $run['payroll_month']));
     }
 
     if ($action === 'transfer') {
