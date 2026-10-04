@@ -7424,6 +7424,7 @@ const setupExpensesPage = () => {
 
   const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
   const fmt = (a) => `${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} ${currency}`;
+  const fmtPayroll = (a) => `${currency} ${(Number(a) || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const num = (v) => parseFloat(String(v ?? "").replace(/[^0-9.\-]/g, "")) || 0;
   const parseDate = (value) => {
@@ -7535,7 +7536,7 @@ const setupExpensesPage = () => {
     if (payrollAccount) {
       payrollAccount.innerHTML = accounts.map((account) => {
         const selected = defaultAccount && String(account.id) === String(defaultAccount.id) ? " selected" : "";
-        return `<option value="${account.id}"${selected}>${esc(account.name)} (${fmt(account.balance)})</option>`;
+        return `<option value="${account.id}"${selected}>${esc(account.name)} (${fmtPayroll(account.balance)})</option>`;
       }).join("");
     }
   };
@@ -7677,33 +7678,29 @@ const setupExpensesPage = () => {
     const staffCount = Number(summary.staff_count || (payrollRun ? items.length : 0)) || 0;
 
     if (payrollCountBadge) {
-      payrollCountBadge.textContent = `${staffCount} staff`;
+      payrollCountBadge.textContent = fmtPayroll(totalAmount);
     }
     if (payrollTotalBadge) {
-      payrollTotalBadge.textContent = fmt(totalAmount);
+      payrollTotalBadge.textContent = fmtPayroll(totalAmount);
     }
     if (payrollWorkspaceSubtitle) {
-      payrollWorkspaceSubtitle.textContent = `${monthLabel(currentPayrollMonth())} • Total: ${fmt(totalAmount)}`;
+      payrollWorkspaceSubtitle.textContent = `${monthLabel(currentPayrollMonth())} • Total: ${fmtPayroll(totalAmount)}`;
     }
 
     if (payrollSummary) {
       payrollSummary.hidden = !payrollRun;
       payrollSummary.innerHTML = payrollRun ? `
-        <div class="payroll-summary-card">
-          <span class="kpi-sublabel">Staff</span>
-          <strong class="kpi-subval">${staffCount}</strong>
-        </div>
         <div class="payroll-summary-card total">
           <span class="kpi-sublabel">Total</span>
-          <strong class="kpi-subval">${fmt(totalAmount)}</strong>
+          <strong class="kpi-subval">${fmtPayroll(totalAmount)}</strong>
         </div>
         <div class="payroll-summary-card paid">
           <span class="kpi-sublabel">Paid</span>
-          <strong class="kpi-subval">${fmt(summary.paid || 0)}</strong>
+          <strong class="kpi-subval">${fmtPayroll(summary.paid || 0)}</strong>
         </div>
         <div class="payroll-summary-card pending">
           <span class="kpi-sublabel">Pending</span>
-          <strong class="kpi-subval">${fmt(summary.pending || 0)}</strong>
+          <strong class="kpi-subval">${fmtPayroll(summary.pending || 0)}</strong>
         </div>
       ` : "";
     }
@@ -7731,6 +7728,7 @@ const setupExpensesPage = () => {
               </small>
             </span>
             <div class="payroll-row-amount-wrap">
+              <span class="payroll-currency-prefix">${esc(currency)}</span>
               <input class="payroll-row-amount-input" type="text" inputmode="numeric" value="${num(item.salary_amount).toLocaleString()}" data-payroll-amount ${paid ? "disabled" : ""}>
               <button class="btn btn-outline btn-sm" type="button" data-payroll-save="${item.id}" ${paid ? "disabled" : ""}>Save</button>
             </div>
