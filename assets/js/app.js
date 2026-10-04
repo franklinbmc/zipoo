@@ -7394,6 +7394,8 @@ const setupExpensesPage = () => {
     if (el) el.textContent = value;
   };
 
+  attachThousandsFormatting(form?.elements.amount);
+
   const loadAccounts = async () => {
     const res = await fetch(`${getBasePath()}api/accounts.php`);
     const data = await res.json();
@@ -7490,6 +7492,7 @@ const setupExpensesPage = () => {
             <button class="btn btn-outline btn-sm" type="button" data-payroll-save="${item.id}" ${paid ? "disabled" : ""}>Save</button>
           </div>`;
       }).join("");
+      payrollList.querySelectorAll("[data-payroll-amount]").forEach(attachThousandsFormatting);
     }
   };
 
