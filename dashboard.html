@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0D2B5B">
+  <meta name="description" content="Zipoo business dashboard for sales, stock, customers, debts, expenses, and reports.">
+  <title>Zipoo Dashboard</title>
+  <link rel="icon" href="./assets/images/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/css/dashboard.css?v=20261004_1">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" data-sidebar>
+      <div class="sidebar-top">
+        <a href="./dashboard.html" class="brand-wrap" aria-label="Zipoo Dashboard">
+          <img src="./assets/images/logo.svg" alt="Zipoo Logo" class="brand-logo-img">
+          <span class="brand-title">Zipoo<span>.</span></span>
+        </a>
+        <button class="icon-btn sidebar-close" type="button" data-sidebar-close aria-label="Close menu">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <nav class="side-nav" aria-label="Dashboard navigation">
+        <a class="side-link active" href="#overview">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/></svg>
+          Overview
+        </a>
+        <a class="side-link" href="#sales">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20M7 15h3"/></svg>
+          Sales
+        </a>
+        <a class="side-link" href="#stock">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="m3 8 9 5v8l-9-5V8Z"/><path d="m21 8-9 5v8l9-5V8Z"/></svg>
+          Stock
+        </a>
+        <a class="side-link" href="#customers">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Customers
+        </a>
+        <a class="side-link" href="#reports">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-7"/></svg>
+          Reports
+        </a>
+      </nav>
+
+      <div class="sidebar-card">
+        <span class="badge badge-teal"><span class="badge-pulse"></span>Shift Active</span>
+        <strong>Dar Shop Main</strong>
+        <p>Counter is open. Last sync completed 2 minutes ago.</p>
+      </div>
+    </aside>
+
+    <div class="sidebar-backdrop" data-sidebar-backdrop></div>
+
+    <main class="dashboard-main">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" type="button" data-sidebar-open aria-label="Open menu">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div>
+          <p class="eyebrow">Business Dashboard</p>
+          <h1>Run your business. Know your numbers.</h1>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" type="button">Export Report</button>
+          <button class="btn btn-primary" type="button">New Sale</button>
+        </div>
+      </header>
+
+      <section class="hero-band" id="overview">
+        <div>
+          <span class="badge badge-teal"><span class="badge-pulse"></span>Today, 04 Oct 2026</span>
+          <h2>Good afternoon, Amina.</h2>
+          <p>Your sales are moving well today. Stock alerts need attention before the evening rush.</p>
+        </div>
+        <div class="hero-actions">
+          <button class="quick-action" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Add Stock
+          </button>
+          <button class="quick-action" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></svg>
+            Debt Reminder
+          </button>
+        </div>
+      </section>
+
+      <section class="metric-grid" aria-label="Key business metrics">
+        <article class="metric-card">
+          <div class="metric-icon blue"><svg viewBox="0 0 24 24"><path d="M3 12h18M7 8h10M8 16h8"/></svg></div>
+          <span>Today's Sales</span>
+          <strong>TZS 1,450,000</strong>
+          <small class="positive">42 sales recorded</small>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon teal"><svg viewBox="0 0 24 24"><path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M12 13v8"/></svg></div>
+          <span>Gross Profit</span>
+          <strong>TZS 412,000</strong>
+          <small class="positive">28.4% margin</small>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon amber"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg></div>
+          <span>Low Stock</span>
+          <strong>8 Products</strong>
+          <small class="warning">3 critical items</small>
+        </article>
+        <article class="metric-card">
+          <div class="metric-icon red"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <span>Customer Debts</span>
+          <strong>TZS 640,000</strong>
+          <small class="danger">5 customers due</small>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel sales-panel" id="sales">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Sales Flow</p>
+              <h2>Today's sales stream</h2>
+            </div>
+            <span class="table-pill green">Live</span>
+          </div>
+          <div class="sales-chart" aria-label="Hourly sales chart">
+            <span style="height: 42%"></span>
+            <span style="height: 58%"></span>
+            <span style="height: 35%"></span>
+            <span style="height: 72%"></span>
+            <span style="height: 66%"></span>
+            <span style="height: 88%"></span>
+            <span style="height: 76%"></span>
+          </div>
+          <div class="activity-list">
+            <div class="activity-row">
+              <div><strong>Azam Energy Drink 330ml (x24)</strong><span>Cash &bull; 10:42 AM</span></div>
+              <b>TZS 26,000</b>
+            </div>
+            <div class="activity-row">
+              <div><strong>Kilimanjaro Water 1.5L (x12)</strong><span>Lipa kwa Simu &bull; 10:38 AM</span></div>
+              <b>TZS 18,000</b>
+            </div>
+            <div class="activity-row">
+              <div><strong>Rice 25kg, premium</strong><span>Credit &bull; 10:19 AM</span></div>
+              <b>TZS 72,000</b>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" id="stock">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Inventory</p>
+              <h2>Stock alerts</h2>
+            </div>
+            <button class="text-btn" type="button">View all</button>
+          </div>
+          <div class="stock-list">
+            <div class="stock-row">
+              <div><strong>Azam Cola 500ml</strong><span>6 left &bull; Reorder 48</span></div>
+              <meter min="0" max="48" value="6"></meter>
+            </div>
+            <div class="stock-row">
+              <div><strong>Cooking Oil 5L</strong><span>9 left &bull; Reorder 24</span></div>
+              <meter min="0" max="24" value="9"></meter>
+            </div>
+            <div class="stock-row">
+              <div><strong>Sugar 1kg</strong><span>13 left &bull; Reorder 60</span></div>
+              <meter min="0" max="60" value="13"></meter>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel" id="customers">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Customers</p>
+              <h2>Debts due soon</h2>
+            </div>
+            <button class="text-btn" type="button">Send reminders</button>
+          </div>
+          <div class="debt-list">
+            <div class="debt-row"><span>Rehema Store</span><strong>TZS 210,000</strong><small>Due today</small></div>
+            <div class="debt-row"><span>Baraka Hardware</span><strong>TZS 175,000</strong><small>Due tomorrow</small></div>
+            <div class="debt-row"><span>Mama Lishe Kijitonyama</span><strong>TZS 92,000</strong><small>2 days</small></div>
+          </div>
+        </article>
+
+        <article class="panel" id="reports">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Reports</p>
+              <h2>Cash position</h2>
+            </div>
+            <span class="table-pill blue">Balanced</span>
+          </div>
+          <div class="cash-grid">
+            <div><span>Cash drawer</span><strong>TZS 684,000</strong></div>
+            <div><span>Mobile money</span><strong>TZS 511,000</strong></div>
+            <div><span>Expenses</span><strong>TZS 185,000</strong></div>
+            <div><span>Net today</span><strong>TZS 1,010,000</strong></div>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="./assets/js/dashboard.js?v=20261004_1"></script>
+</body>
+</html>
