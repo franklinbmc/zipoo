@@ -8191,13 +8191,6 @@ const setupDashboardPage = () => {
     return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
   };
 
-  const { user, selectedBusiness } = getStoredBusinessState();
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  setText("[data-dashboard-greeting]", greeting);
-  setText("[data-dashboard-user]", user.full_name || user.name || "there");
-  setText("[data-dashboard-business]", selectedBusiness?.business_name || user.business_name || "Your business");
-
   const renderSales = (sales = []) => {
     const list = document.querySelector("[data-dashboard-sales-list]");
     if (!list) return;
