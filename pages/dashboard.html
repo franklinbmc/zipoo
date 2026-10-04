@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=91">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=92">
 </head>
 <body>
   <div class="app-shell login-entry dashboard-entry" data-dashboard-page>
@@ -32,86 +32,32 @@
           <small data-dashboard-sales-count>0 sales recorded</small>
         </article>
         <article class="dashboard-kpi-card">
-          <span class="dashboard-kpi-label">Month Sales</span>
-          <strong class="dashboard-kpi-value amount-fit" data-dashboard-sales-month>TZS 0</strong>
-          <small>Invoices and POS this month</small>
+          <span class="dashboard-kpi-label">Expenses</span>
+          <strong class="dashboard-kpi-value muted amount-fit" data-dashboard-expenses>TZS 185,000</strong>
+          <small>Rent &amp; transport entries</small>
+        </article>
+        <article class="dashboard-kpi-card">
+          <span class="dashboard-kpi-label">Outstanding Credit</span>
+          <strong class="dashboard-kpi-value danger amount-fit" data-dashboard-amount-due>TZS 0</strong>
+          <small class="danger" data-dashboard-overdue>0 customers due</small>
         </article>
         <article class="dashboard-kpi-card">
           <span class="dashboard-kpi-label">Low Stock</span>
-          <strong class="dashboard-kpi-value" data-dashboard-low-stock>0</strong>
-          <small data-dashboard-stock-note>Products need attention</small>
-        </article>
-        <article class="dashboard-kpi-card">
-          <span class="dashboard-kpi-label">Customer Debts</span>
-          <strong class="dashboard-kpi-value amount-fit" data-dashboard-amount-due>TZS 0</strong>
-          <small data-dashboard-overdue>0 overdue invoices</small>
+          <strong class="dashboard-kpi-value warning"><span data-dashboard-low-stock>0</span> Products</strong>
+          <small class="warning">Re-order recommended</small>
         </article>
       </section>
 
-      <section class="dashboard-grid">
+      <section class="dashboard-stream-section">
         <article class="dashboard-panel dashboard-sales-panel">
           <div class="dashboard-panel-head">
             <div>
-              <span class="dashboard-section-label">Sales Flow</span>
-              <h2>Recent POS sales</h2>
+              <h2>Sample POS Sales Stream</h2>
             </div>
-            <a class="dashboard-link" href="/sales">View sales</a>
-          </div>
-          <div class="dashboard-bars" aria-label="Sales momentum">
-            <span style="height: 42%"></span>
-            <span style="height: 58%"></span>
-            <span style="height: 35%"></span>
-            <span style="height: 72%"></span>
-            <span style="height: 66%"></span>
-            <span style="height: 88%"></span>
-            <span style="height: 76%"></span>
+            <span class="dashboard-status-pill">Shift Active</span>
           </div>
           <div class="dashboard-list" data-dashboard-sales-list>
             <p class="dashboard-empty">No recent POS sales yet.</p>
-          </div>
-        </article>
-
-        <article class="dashboard-panel">
-          <div class="dashboard-panel-head">
-            <div>
-              <span class="dashboard-section-label">Inventory</span>
-              <h2>Stock alerts</h2>
-            </div>
-            <a class="dashboard-link" href="/stock">View stock</a>
-          </div>
-          <div class="dashboard-list" data-dashboard-stock-list>
-            <p class="dashboard-empty">No low-stock products.</p>
-          </div>
-        </article>
-
-        <article class="dashboard-panel">
-          <div class="dashboard-panel-head">
-            <div>
-              <span class="dashboard-section-label">Cash Position</span>
-              <h2>Bank &amp; Cash</h2>
-            </div>
-            <a class="dashboard-link" href="/bank">Open bank</a>
-          </div>
-          <div class="dashboard-cash-grid">
-            <div><span>Cash</span><strong data-dashboard-cash>TZS 0</strong></div>
-            <div><span>Bank</span><strong data-dashboard-bank>TZS 0</strong></div>
-            <div><span>Mobile</span><strong data-dashboard-mobile>TZS 0</strong></div>
-            <div><span>Net</span><strong data-dashboard-net>TZS 0</strong></div>
-          </div>
-        </article>
-
-        <article class="dashboard-panel">
-          <div class="dashboard-panel-head">
-            <div>
-              <span class="dashboard-section-label">Quick Work</span>
-              <h2>Common actions</h2>
-            </div>
-          </div>
-          <div class="dashboard-action-grid">
-            <a href="/sales?workspace=invoices">Create invoice</a>
-            <a href="/customers">Add customer</a>
-            <a href="/suppliers">Suppliers</a>
-            <a href="/settings">Settings</a>
           </div>
         </article>
       </section>
@@ -327,6 +273,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=106" defer></script>
+  <script src="/assets/js/app.js?v=107" defer></script>
 </body>
 </html>

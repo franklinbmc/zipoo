@@ -8194,62 +8194,44 @@ const setupDashboardPage = () => {
   const renderSales = (sales = []) => {
     const list = document.querySelector("[data-dashboard-sales-list]");
     if (!list) return;
-    const recent = sales.slice(0, 4);
+    const recent = sales.slice(0, 2);
     if (!recent.length) {
       list.innerHTML = '<p class="dashboard-empty">No recent POS sales yet.</p>';
       return;
     }
-    list.innerHTML = recent.map((sale) => `
+    list.innerHTML = recent.map((sale) => {
+      const isMobile = ["mobile", "mobile_money"].includes(String(sale.payment_method || "").toLowerCase());
+      const icon = isMobile
+        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M12 18h.01"/></svg>'
+        : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>';
+      return `
       <div class="dashboard-list-row">
+        <span class="dashboard-sale-icon${isMobile ? " mobile" : ""}">${icon}</span>
         <div>
           <strong>${escText(sale.receipt_number || "POS Sale")}</strong>
           <span>${escText(sale.customer_name || "Walk-in Customer")} &bull; ${methodLabel(sale.payment_method)}${shortTime(sale.created_at) ? ` &bull; ${shortTime(sale.created_at)}` : ""}</span>
         </div>
         <b>${fmt(sale.total_amount)}</b>
       </div>
-    `).join("");
-  };
-
-  const renderStock = (items = []) => {
-    const list = document.querySelector("[data-dashboard-stock-list]");
-    if (!list) return;
-    const low = items.filter((item) => item.is_low_stock).slice(0, 4);
-    if (!low.length) {
-      list.innerHTML = '<p class="dashboard-empty">No low-stock products.</p>';
-      return;
-    }
-    list.innerHTML = low.map((item) => {
-      const max = Math.max(Number(item.min_stock_alert) || 1, Number(item.current_stock) || 0, 1);
-      const pct = Math.max(4, Math.min(100, ((Number(item.current_stock) || 0) / max) * 100));
-      return `
-        <div class="dashboard-stock-row">
-          <div>
-            <strong>${escText(item.name)}</strong>
-            <span>${Number(item.current_stock) || 0} ${escText(item.unit || "pcs")} left &bull; reorder at ${Number(item.min_stock_alert) || 0}</span>
-          </div>
-          <i style="--stock-width:${pct}%"></i>
-        </div>
       `;
     }).join("");
   };
 
   const loadDashboard = async () => {
     try {
-      const [invoiceRes, posRes, stockRes, accountRes] = await Promise.allSettled([
+      const [invoiceRes, posRes, stockRes] = await Promise.allSettled([
         fetch(`${getBasePath()}api/sales.php`),
         fetch(`${getBasePath()}api/sales.php?history=pos`),
         fetch(`${getBasePath()}api/items.php`),
-        fetch(`${getBasePath()}api/accounts.php`),
       ]);
 
       if (invoiceRes.status === "fulfilled" && invoiceRes.value.ok) {
         const data = await invoiceRes.value.json();
         const stats = data.stats || {};
         setText("[data-dashboard-sales-today]", fmt(stats.sales_today));
-        setText("[data-dashboard-sales-month]", fmt(stats.sales_month));
         setText("[data-dashboard-sales-count]", `${stats.txn_today || 0} sales recorded`);
         setText("[data-dashboard-amount-due]", fmt(stats.amount_due));
-        setText("[data-dashboard-overdue]", `${stats.overdue || 0} overdue invoices`);
+        setText("[data-dashboard-overdue]", `${stats.overdue || 0} customers due`);
       }
 
       if (posRes.status === "fulfilled" && posRes.value.ok) {
@@ -8260,17 +8242,6 @@ const setupDashboardPage = () => {
       if (stockRes.status === "fulfilled" && stockRes.value.ok) {
         const data = await stockRes.value.json();
         setText("[data-dashboard-low-stock]", String(data.stats?.low_stock || 0));
-        setText("[data-dashboard-stock-note]", `${data.stats?.total || 0} products tracked`);
-        renderStock(data.items || []);
-      }
-
-      if (accountRes.status === "fulfilled" && accountRes.value.ok) {
-        const data = await accountRes.value.json();
-        const summary = data.summary || {};
-        setText("[data-dashboard-cash]", fmt(summary.cash));
-        setText("[data-dashboard-bank]", fmt(summary.bank));
-        setText("[data-dashboard-mobile]", fmt(summary.mobile));
-        setText("[data-dashboard-net]", fmt(summary.net));
       }
 
       fitAmounts(document);

@@ -4977,48 +4977,37 @@ button.settings-list-row:focus-visible {
 .dashboard-kpi-card,
 .dashboard-panel {
   border: 1px solid var(--color-line);
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--color-surface);
-  box-shadow: 0 12px 32px rgba(13, 43, 91, 0.08);
-}
-
-.dashboard-section-label {
-  display: inline-flex;
-  width: fit-content;
-  color: var(--color-blue);
-  font-size: 0.75rem;
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  box-shadow: none;
 }
 
 .dashboard-kpi-grid,
-.dashboard-grid,
-.dashboard-cash-grid,
-.dashboard-action-grid {
+.dashboard-stream-section {
   display: grid;
-  gap: 10px;
+  gap: 14px;
 }
 
 .dashboard-kpi-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .dashboard-kpi-card {
   display: grid;
-  gap: 4px;
+  gap: 8px;
   min-width: 0;
-  padding: 14px;
+  min-height: 116px;
+  padding: 18px;
+  background: #f1f5f9;
 }
 
-.dashboard-kpi-label,
-.dashboard-cash-grid span {
-  color: var(--color-muted);
-  font-size: 0.72rem;
-  font-weight: 850;
-  letter-spacing: 0.04em;
+.dashboard-kpi-label {
+  color: #516988;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.035em;
   text-transform: uppercase;
 }
 
@@ -5026,144 +5015,136 @@ button.settings-list-row:focus-visible {
   display: block;
   min-width: 0;
   color: var(--color-navy);
-  font-size: calc(1.35rem * var(--amount-scale, 1));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: calc(1.45rem * var(--amount-scale, 1));
   font-weight: 900;
   line-height: 1.12;
   white-space: nowrap;
 }
 
+.dashboard-kpi-value.muted {
+  color: #64748b;
+}
+
+.dashboard-kpi-value.danger,
+.dashboard-kpi-card small.danger {
+  color: #e11438;
+}
+
+.dashboard-kpi-value.warning,
+.dashboard-kpi-card small.warning {
+  color: #d97706;
+}
+
 .dashboard-kpi-card small {
   color: var(--color-muted);
   font-size: 0.78rem;
-  font-weight: 750;
+  font-weight: 900;
 }
 
-.dashboard-grid {
-  grid-template-columns: 1fr;
+.dashboard-kpi-card:first-child small {
+  color: var(--color-teal);
+}
+
+.dashboard-stream-section {
   width: 100%;
 }
 
 .dashboard-panel {
   min-width: 0;
   padding: 14px;
+  background: #ffffff;
 }
 
 .dashboard-panel-head {
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  min-height: 28px;
+  margin-bottom: 16px;
 }
 
 .dashboard-panel h2 {
-  margin: 2px 0 0;
+  margin: 0;
   color: var(--color-navy);
-  font-size: 1.05rem;
-}
-
-.dashboard-link {
-  color: var(--color-blue);
-  font-size: 0.82rem;
+  font-size: 0.98rem;
   font-weight: 900;
-  white-space: nowrap;
 }
 
-.dashboard-bars {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  align-items: end;
-  height: 136px;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  background: #f8fafc;
-}
-
-.dashboard-bars span {
-  min-height: 20px;
-  border-radius: 8px 8px 4px 4px;
-  background: linear-gradient(180deg, var(--color-blue), var(--color-teal));
+.dashboard-status-pill {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 7px 13px;
+  color: #047857;
+  font-size: 0.78rem;
+  font-weight: 900;
+  background: #e6faf5;
 }
 
 .dashboard-list {
   display: grid;
-  gap: 8px;
 }
 
-.dashboard-list-row,
-.dashboard-stock-row {
+.dashboard-list-row {
   display: grid;
-  gap: 8px;
-  padding-top: 10px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 70px;
+  padding: 10px 0;
   border-top: 1px solid var(--color-line);
 }
 
-.dashboard-list-row strong,
-.dashboard-stock-row strong {
+.dashboard-list-row:first-child {
+  border-top: 0;
+}
+
+.dashboard-sale-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 8px;
+  color: var(--color-blue);
+  background: #eef5ff;
+}
+
+.dashboard-sale-icon.mobile {
+  color: var(--color-teal);
+  background: #e6faf5;
+}
+
+.dashboard-sale-icon svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2px;
+}
+
+.dashboard-list-row strong {
   display: block;
   color: var(--color-navy);
-  font-size: 0.92rem;
+  font-size: 0.98rem;
+  line-height: 1.25;
 }
 
 .dashboard-list-row span,
-.dashboard-stock-row span,
 .dashboard-empty {
   color: var(--color-muted);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 750;
 }
 
-.dashboard-list-row b,
-.dashboard-cash-grid strong {
+.dashboard-list-row b {
   color: var(--color-navy);
-  font-size: 0.9rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 0.92rem;
   font-weight: 900;
   white-space: nowrap;
-}
-
-.dashboard-stock-row i {
-  display: block;
-  overflow: hidden;
-  height: 8px;
-  border-radius: 999px;
-  background: #e2e8f0;
-}
-
-.dashboard-stock-row i::before {
-  display: block;
-  width: var(--stock-width, 0%);
-  height: 100%;
-  border-radius: inherit;
-  content: "";
-  background: var(--color-warning);
-}
-
-.dashboard-cash-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.dashboard-cash-grid div,
-.dashboard-action-grid a {
-  border-radius: 12px;
-  padding: 12px;
-  background: #f8fafc;
-}
-
-.dashboard-cash-grid div {
-  display: grid;
-  gap: 3px;
-}
-
-.dashboard-action-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.dashboard-action-grid a {
-  color: var(--color-navy);
-  font-weight: 900;
-  text-align: center;
 }
 
 .dashboard-empty {
@@ -5178,19 +5159,6 @@ button.settings-list-row:focus-visible {
   .dashboard-kpi-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-
-  .dashboard-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .dashboard-sales-panel {
-    grid-column: 1 / -1;
-  }
-
-  .dashboard-list-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-  }
 }
 
 @media (max-width: 430px) {
@@ -5198,9 +5166,15 @@ button.settings-list-row:focus-visible {
     width: calc(100% - 24px);
   }
 
-  .dashboard-kpi-grid,
-  .dashboard-cash-grid,
-  .dashboard-action-grid {
+  .dashboard-kpi-grid {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-list-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .dashboard-list-row b {
+    grid-column: 2;
   }
 }
