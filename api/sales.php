@@ -625,10 +625,11 @@ try {
                 SUM(CASE WHEN status = "sent" AND (due_date IS NULL OR due_date >= CURDATE()) THEN 1 ELSE 0 END) AS sent_count,
                 SUM(CASE WHEN status = "paid" THEN 1 ELSE 0 END) AS paid_count,
                 SUM(CASE WHEN status = "sent" AND due_date IS NOT NULL AND due_date < CURDATE() THEN 1 ELSE 0 END) AS overdue_count,
+                COUNT(DISTINCT CASE WHEN status = "sent" AND total_amount > amount_paid THEN COALESCE(NULLIF(customer_name, ""), invoice_number) ELSE NULL END) AS due_customers,
                 SUM(CASE WHEN status IN ("sent") THEN (total_amount - amount_paid) ELSE 0 END) AS amount_due,
-                SUM(CASE WHEN status != "cancelled" AND issue_date = CURDATE() THEN total_amount ELSE 0 END) AS sales_today,
-                SUM(CASE WHEN status != "cancelled" AND issue_date = CURDATE() THEN 1 ELSE 0 END) AS txn_today,
-                SUM(CASE WHEN status != "cancelled" AND YEAR(issue_date) = YEAR(CURDATE()) AND MONTH(issue_date) = MONTH(CURDATE()) THEN total_amount ELSE 0 END) AS sales_month
+                SUM(CASE WHEN status NOT IN ("cancelled", "draft") AND issue_date = CURDATE() THEN total_amount ELSE 0 END) AS sales_today,
+                SUM(CASE WHEN status NOT IN ("cancelled", "draft") AND issue_date = CURDATE() THEN 1 ELSE 0 END) AS txn_today,
+                SUM(CASE WHEN status NOT IN ("cancelled", "draft") AND YEAR(issue_date) = YEAR(CURDATE()) AND MONTH(issue_date) = MONTH(CURDATE()) THEN total_amount ELSE 0 END) AS sales_month
              FROM tbl_sales WHERE business_id = :bid AND sale_type = "invoice"'
         );
         $statStmt->execute([':bid' => $businessId]);
@@ -646,7 +647,7 @@ try {
         $posDebt = $posDebtStmt->fetch() ?: [];
         $invoiceDue = (float) ($stats['amount_due'] ?? 0);
         $payLaterDue = (float) ($posDebt['pay_later_due'] ?? 0);
-        $invoiceDueCount = (int) ($stats['overdue_count'] ?? 0);
+        $invoiceDueCount = (int) ($stats['due_customers'] ?? 0);
         $payLaterCustomers = (int) ($posDebt['pay_later_customers'] ?? 0);
 
         respond(200, [
