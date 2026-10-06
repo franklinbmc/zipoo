@@ -5902,13 +5902,13 @@ const setupSalesPage = () => {
     reportList.innerHTML = rows.slice(0, 20).map((row) => {
       const dt = new Date(String(row.date || "").replace(" ", "T"));
       const when = isNaN(dt.getTime()) ? row.date : dt.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-      return `<div class="report-list-row">
+      return `<button type="button" class="report-list-row" data-report-sale-id="${row.id}">
         <div class="report-list-info">
           <div class="report-list-title">${escH(row.number)} <span class="badge-stock in-stock">${escH(row.type)}</span></div>
           <div class="report-list-meta">${escH(row.customer || "Walk-in Customer")} · ${escH(when || "-")} · ${row.items} item${row.items === 1 ? "" : "s"}</div>
         </div>
         <strong class="report-list-amount amount-fit" style="--amount-fit-base:0.9rem;">${formatCurrency(row.amount)}</strong>
-      </div>`;
+      </button>`;
     }).join("");
     fitAmounts(reportList);
   };
@@ -5930,6 +5930,7 @@ const setupSalesPage = () => {
           .filter((inv) => inDateRange(inv.issue_date || inv.created_at, from, to))
           .map((inv) => ({
             type: "Invoice",
+            id: inv.id,
             number: inv.invoice_number || `Invoice #${inv.id}`,
             customer: inv.customer_name || "Walk-in Customer",
             amount: Number(inv.total_amount || 0) || 0,
@@ -5944,6 +5945,7 @@ const setupSalesPage = () => {
           .filter((sale) => String(sale.status || "").toLowerCase() !== "cancelled")
           .map((sale) => ({
             type: "POS",
+            id: sale.id,
             number: sale.receipt_number || `POS #${sale.id}`,
             customer: sale.customer_name || "Walk-in Customer",
             amount: Number(sale.total_amount || 0) || 0,
@@ -5973,6 +5975,12 @@ const setupSalesPage = () => {
       const action = type === "pdf" ? "export_report_pdf" : "export_report_excel";
       window.open(`${getBasePath()}api/sales.php?action=${action}&range=${encodeURIComponent(reportRangeVal)}`, "_blank");
     });
+  });
+
+  reportList?.addEventListener("click", (event) => {
+    const row = event.target.closest("[data-report-sale-id]");
+    const id = row?.dataset.reportSaleId;
+    if (id) loadSingleInvoiceAndOpen(id);
   });
 
   // ---- Invoice form: line items ----

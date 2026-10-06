@@ -4796,6 +4796,16 @@ button.settings-list-row:focus-visible {
   border: 1px solid var(--color-line);
   border-radius: 10px;
   overflow: hidden;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.report-list-row:hover,
+button.report-list-row:focus-visible {
+  background: #f8fbff;
+  border-color: rgba(20, 119, 255, 0.35);
+  outline: none;
 }
 
 .report-list-info {
