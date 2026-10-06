@@ -5942,6 +5942,11 @@ button.report-list-row:focus-visible {
   /* Fullscreen workspaces stay full-height; just centre and cap their width at 1100 */
   .fullscreen-modal { grid-template-columns: minmax(0, 1fr); }
   .fullscreen-panel { width: 100%; max-width: 1100px; margin-inline: auto; }
+
+  [data-invoices-workspace] .fullscreen-body.stock-workspace-body {
+    width: min(1100px, 94%);
+    max-width: 94%;
+  }
 }
 
 /* ======================= Desktop Point of Sale (supermarket layout, >= 1024px) ======================= */
