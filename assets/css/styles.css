@@ -6562,6 +6562,13 @@ button.report-list-row:focus-visible {
   background: #e6faf5;
 }
 
+.dashboard-stream-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
 .dashboard-list {
   display: grid;
 }
@@ -6572,12 +6579,25 @@ button.report-list-row:focus-visible {
   align-items: center;
   gap: 12px;
   min-height: 70px;
+  width: 100%;
   padding: 10px 0;
+  border: 0;
   border-top: 1px solid var(--color-line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .dashboard-list-row:first-child {
   border-top: 0;
+}
+
+.dashboard-list-row:hover,
+.dashboard-list-row:focus-visible {
+  background: #f8fbff;
+  outline: none;
 }
 
 .dashboard-sale-icon {

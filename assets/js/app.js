@@ -9669,11 +9669,30 @@ const setupDashboardPage = () => {
   const todayKey = isoDate();
   const monthKey = todayKey.slice(0, 7);
   const dateKey = (value) => String(value || "").slice(0, 10);
+  let streamRange = "today";
+
+  const streamRangeDates = () => {
+    const today = new Date();
+    const start = new Date(today);
+    if (streamRange === "yesterday") {
+      start.setDate(start.getDate() - 1);
+      return { from: isoDate(start), to: isoDate(start) };
+    }
+    if (streamRange === "week") {
+      start.setDate(start.getDate() - 6);
+      return { from: isoDate(start), to: isoDate(today) };
+    }
+    if (streamRange === "month") {
+      start.setDate(1);
+      return { from: isoDate(start), to: isoDate(today) };
+    }
+    return { from: todayKey, to: todayKey };
+  };
 
   const renderSales = (sales = []) => {
     const list = document.querySelector("[data-dashboard-sales-list]");
     if (!list) return;
-    const recent = sales.slice(0, 2);
+    const recent = sales.slice(0, 20);
     if (!recent.length) {
       list.innerHTML = '<p class="dashboard-empty">No recent POS sales yet.</p>';
       return;
@@ -9684,23 +9703,64 @@ const setupDashboardPage = () => {
         ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M12 18h.01"/></svg>'
         : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>';
       return `
-      <div class="dashboard-list-row">
+      <button type="button" class="dashboard-list-row" data-dashboard-sale-id="${sale.id}">
         <span class="dashboard-sale-icon${isMobile ? " mobile" : ""}">${icon}</span>
         <div>
           <strong>${escText(sale.receipt_number || "POS Sale")}</strong>
           <span>${escText(sale.customer_name || "Walk-in Customer")} &bull; ${methodLabel(sale.payment_method)}${shortTime(sale.created_at) ? ` &bull; ${shortTime(sale.created_at)}` : ""}</span>
         </div>
         <b>${fmt(sale.total_amount)}</b>
-      </div>
+      </button>
       `;
     }).join("");
   };
 
+  const openDashboardSale = async (id) => {
+    const modal = document.querySelector("[data-dashboard-sale-modal]");
+    const title = document.querySelector("[data-dashboard-sale-title]");
+    const meta = document.querySelector("[data-dashboard-sale-meta]");
+    const itemsEl = document.querySelector("[data-dashboard-sale-items]");
+    const totalEl = document.querySelector("[data-dashboard-sale-total]");
+    if (!modal || !id) return;
+    if (itemsEl) itemsEl.innerHTML = '<p class="dashboard-empty">Loading sale items...</p>';
+    modal.hidden = false;
+    try {
+      const res = await fetch(`${getBasePath()}api/sales.php?id=${encodeURIComponent(id)}`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not load sale.");
+      const sale = data.invoice || {};
+      if (title) title.textContent = sale.invoice_number || "POS Sale";
+      if (meta) meta.textContent = `${sale.customer_name || "Walk-in Customer"} • ${methodLabel(sale.payment_method)} • ${sale.created_at || sale.issue_date || ""}`;
+      if (totalEl) totalEl.textContent = fmt(sale.total_amount || 0);
+      const items = Array.isArray(sale.items) ? sale.items : [];
+      if (itemsEl) {
+        itemsEl.innerHTML = items.length ? items.map((item) => `
+          <div class="shift-detail-row">
+            <span>${escText(item.item_name || "Item")} • ${Number(item.quantity || 0).toLocaleString()} sold</span>
+            <strong>${fmt(item.line_total || 0)}</strong>
+          </div>
+        `).join("") : '<p class="dashboard-empty">No items found for this sale.</p>';
+      }
+    } catch (err) {
+      if (itemsEl) itemsEl.innerHTML = `<p class="dashboard-empty">${escText(err.message || "Could not load sale.")}</p>`;
+    }
+  };
+
+  document.querySelector("[data-dashboard-sales-list]")?.addEventListener("click", (event) => {
+    const id = event.target.closest("[data-dashboard-sale-id]")?.dataset.dashboardSaleId;
+    if (id) openDashboardSale(id);
+  });
+  document.querySelector("[data-dashboard-sale-close]")?.addEventListener("click", () => {
+    const modal = document.querySelector("[data-dashboard-sale-modal]");
+    if (modal) modal.hidden = true;
+  });
+
   const loadDashboard = async () => {
     try {
+      const range = streamRangeDates();
       const [invoiceRes, posRes, stockRes, expensesRes] = await Promise.allSettled([
         fetch(`${getBasePath()}api/sales.php`),
-        fetch(`${getBasePath()}api/sales.php?history=pos&from=${encodeURIComponent(todayKey)}&to=${encodeURIComponent(todayKey)}`),
+        fetch(`${getBasePath()}api/sales.php?history=pos&from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`),
         fetch(`${getBasePath()}api/items.php`),
         fetch(`${getBasePath()}api/accounts.php?action=expenses`),
       ]);
@@ -9750,6 +9810,15 @@ const setupDashboardPage = () => {
       /* Keep the static empty states when offline or unauthenticated. */
     }
   };
+
+  document.querySelectorAll("[data-dashboard-stream-range]").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll("[data-dashboard-stream-range]").forEach((btn) => btn.classList.remove("active"));
+      button.classList.add("active");
+      streamRange = button.dataset.dashboardStreamRange || "today";
+      loadDashboard();
+    });
+  });
 
   loadDashboard();
 };

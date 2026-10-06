@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=113">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=127">
 </head>
 <body>
   <div class="app-shell login-entry dashboard-entry" data-dashboard-page>
@@ -55,6 +55,12 @@
               <h2>POS Sales Stream</h2>
             </div>
             <span class="dashboard-status-pill" data-dashboard-stream-status>Live</span>
+          </div>
+          <div class="dashboard-stream-filters" data-dashboard-stream-filters>
+            <button type="button" class="filter-pill active" data-dashboard-stream-range="today">Today</button>
+            <button type="button" class="filter-pill" data-dashboard-stream-range="yesterday">Yesterday</button>
+            <button type="button" class="filter-pill" data-dashboard-stream-range="week">This Week</button>
+            <button type="button" class="filter-pill" data-dashboard-stream-range="month">This Month</button>
           </div>
           <div class="dashboard-list" data-dashboard-sales-list>
             <p class="dashboard-empty">No recent POS sales yet.</p>
@@ -279,6 +285,19 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=129" defer></script>
+  <div class="modal-backdrop" hidden data-dashboard-sale-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="dashboard-sale-title">
+      <h2 id="dashboard-sale-title" data-dashboard-sale-title>POS Sale</h2>
+      <p data-dashboard-sale-meta style="margin:0 0 12px;color:var(--color-muted);font-size:0.86rem;font-weight:700;"></p>
+      <div data-dashboard-sale-items style="display:grid;gap:8px;"></div>
+      <div style="display:flex;justify-content:space-between;border-top:1px dashed var(--color-line);padding-top:10px;margin-top:12px;font-weight:900;color:var(--color-navy);">
+        <span>Total</span>
+        <strong data-dashboard-sale-total>TZS 0</strong>
+      </div>
+      <button class="btn btn-primary full" type="button" data-dashboard-sale-close style="margin-top:14px;">Close</button>
+    </section>
+  </div>
+
+  <script src="/assets/js/app.js?v=139" defer></script>
 </body>
 </html>
