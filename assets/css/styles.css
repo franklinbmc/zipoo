@@ -5943,7 +5943,8 @@ button.report-list-row:focus-visible {
   .fullscreen-modal { grid-template-columns: minmax(0, 1fr); }
   .fullscreen-panel { width: 100%; max-width: 1100px; margin-inline: auto; }
 
-  [data-invoices-workspace] .fullscreen-body.stock-workspace-body {
+  [data-invoices-workspace] .fullscreen-body.stock-workspace-body,
+  [data-debts-workspace] .fullscreen-body.stock-workspace-body {
     width: min(1100px, 94%);
     max-width: 94%;
   }
