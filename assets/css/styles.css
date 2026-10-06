@@ -1768,6 +1768,7 @@ body.offline .status-dot {
 .expenses-page select,
 [data-expense-modal] select,
 .payroll-controls select,
+.payroll-controls [data-payroll-account],
 .customers-page-shell select {
   appearance: none !important;
   -webkit-appearance: none !important;
@@ -1797,6 +1798,7 @@ body.offline .status-dot {
 .expenses-page select:hover,
 [data-expense-modal] select:hover,
 .payroll-controls select:hover,
+.payroll-controls [data-payroll-account]:hover,
 .customers-page-shell select:hover {
   border-color: var(--color-blue) !important;
   background-color: #fbfdff !important;
@@ -1811,6 +1813,8 @@ body.offline .status-dot {
 [data-expense-modal] select:focus-visible,
 .payroll-controls select:focus,
 .payroll-controls select:focus-visible,
+.payroll-controls [data-payroll-account]:focus,
+.payroll-controls [data-payroll-account]:focus-visible,
 .customers-page-shell select:focus,
 .customers-page-shell select:focus-visible {
   outline: none !important;
@@ -1823,6 +1827,7 @@ body.offline .status-dot {
 .expenses-page select:disabled,
 [data-expense-modal] select:disabled,
 .payroll-controls select:disabled,
+.payroll-controls [data-payroll-account]:disabled,
 .customers-page-shell select:disabled {
   background-color: #f1f5f9 !important;
   color: var(--color-muted) !important;
@@ -1835,6 +1840,7 @@ body.offline .status-dot {
 .expenses-page select option,
 [data-expense-modal] select option,
 .payroll-controls select option,
+.payroll-controls [data-payroll-account] option,
 .customers-page-shell select option {
   color: var(--color-navy);
   background-color: #ffffff;
@@ -2164,6 +2170,45 @@ body.offline .status-dot {
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
+}
+
+[data-categories-workspace] .expense-category-list,
+[data-categories-workspace] .expense-group-row,
+[data-categories-workspace] .expense-category-row {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+[data-categories-workspace] .expense-group-row,
+[data-categories-workspace] .expense-category-row {
+  overflow: hidden;
+}
+
+[data-categories-workspace] .expense-group-info,
+[data-categories-workspace] .expense-category-info {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+[data-categories-workspace] .expense-group-meta,
+[data-categories-workspace] .stock-summary-meta {
+  min-width: 0 !important;
+  max-width: 58% !important;
+  flex: 0 1 auto !important;
+  justify-content: flex-end !important;
+}
+
+[data-categories-workspace] .expense-right-total {
+  display: block;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word;
+  white-space: normal !important;
+  text-align: right;
+  line-height: 1.15;
 }
 
 /* Year, Month, Day Group Cards */
