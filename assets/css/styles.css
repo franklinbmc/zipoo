@@ -5947,6 +5947,12 @@ button.report-list-row:focus-visible {
     width: min(1100px, 94%);
     max-width: 94%;
   }
+
+  [data-invoice-form-modal] .fullscreen-body,
+  [data-invoice-detail-modal] .fullscreen-body {
+    width: min(1100px, 94%);
+    max-width: 94%;
+  }
 }
 
 /* ======================= Desktop Point of Sale (supermarket layout, >= 1024px) ======================= */
