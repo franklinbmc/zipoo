@@ -5687,14 +5687,17 @@ const setupSalesPage = () => {
   }, { passive: true });
   document.querySelectorAll("[data-open-invoices-workspace]").forEach((btn) => btn.addEventListener("click", () => { openWorkspace(invoicesWorkspace); loadInvoices(invoicesSearch?.value.trim() || ""); }));
   document.querySelector("[data-invoices-workspace-close]")?.addEventListener("click", () => closeWorkspace(invoicesWorkspace));
-  document.querySelectorAll("[data-open-reports-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(reportsWorkspace)));
+  document.querySelectorAll("[data-open-reports-workspace]").forEach((btn) => btn.addEventListener("click", () => { openWorkspace(reportsWorkspace); loadSalesReports(); }));
   document.querySelector("[data-reports-workspace-close]")?.addEventListener("click", () => closeWorkspace(reportsWorkspace));
 
+  let reportRangeVal = "today";
   document.querySelectorAll("[data-report-range-filters] .filter-pill").forEach((btn) => {
     btn.addEventListener("click", () => {
       const group = btn.closest(".filter-bar");
       group?.querySelectorAll(".filter-pill").forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
+      reportRangeVal = btn.dataset.filterRange || "today";
+      loadSalesReports();
     });
   });
 
@@ -5707,6 +5710,12 @@ const setupSalesPage = () => {
   const invoicesList = document.querySelector("[data-invoices-list]");
   const invoicesEmpty = document.querySelector("[data-invoices-empty]");
   const invoicesSearch = document.querySelector("[data-invoices-search]");
+  const reportTotalSales = document.querySelector("[data-report-total-sales]");
+  const reportTxnCount = document.querySelector("[data-report-txn-count]");
+  const reportAvgSale = document.querySelector("[data-report-avg-sale]");
+  const reportItemsSold = document.querySelector("[data-report-items-sold]");
+  const reportList = document.querySelector("[data-report-list]");
+  const reportEmpty = document.querySelector("[data-report-empty]");
   const invoiceStatusFilters = document.querySelectorAll("[data-filter-invoice]");
   const openCreateInvoiceBtns = document.querySelectorAll("[data-open-create-invoice]");
 
@@ -5860,6 +5869,101 @@ const setupSalesPage = () => {
       renderInvoicesList(Array.isArray(data.invoices) ? data.invoices : []);
       applyInvoiceStats(data.stats || {});
     } catch { /* offline */ }
+  };
+
+  const reportRangeToDates = (range) => {
+    const today = new Date();
+    const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const start = new Date(today);
+    if (range === "year") {
+      start.setMonth(0, 1);
+    } else if (range === "month") {
+      start.setDate(1);
+    } else if (range === "week") {
+      start.setDate(today.getDate() - 6);
+    }
+    return { from: iso(range === "today" ? today : start), to: iso(today) };
+  };
+
+  const inDateRange = (dateValue, from, to) => {
+    const key = String(dateValue || "").slice(0, 10);
+    return key && key >= from && key <= to;
+  };
+
+  const renderSalesReportRows = (rows) => {
+    if (!reportList) return;
+    if (!rows.length) {
+      reportList.replaceChildren();
+      if (reportEmpty) reportEmpty.hidden = false;
+      return;
+    }
+    if (reportEmpty) reportEmpty.hidden = true;
+    reportList.innerHTML = rows.slice(0, 20).map((row) => {
+      const dt = new Date(String(row.date || "").replace(" ", "T"));
+      const when = isNaN(dt.getTime()) ? row.date : dt.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+      return `<div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;text-align:left;">
+        <div style="min-width:0;">
+          <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(row.number)} <span class="badge-stock in-stock">${escH(row.type)}</span></div>
+          <div style="font-size:0.76rem;color:var(--color-muted);">${escH(row.customer || "Walk-in Customer")} · ${escH(when || "-")} · ${row.items} item${row.items === 1 ? "" : "s"}</div>
+        </div>
+        <strong class="amount-fit" style="--amount-fit-base:0.9rem;color:var(--color-navy);text-align:right;">${formatCurrency(row.amount)}</strong>
+      </div>`;
+    }).join("");
+    fitAmounts(reportList);
+  };
+
+  const loadSalesReports = async () => {
+    const { from, to } = reportRangeToDates(reportRangeVal);
+    try {
+      const posParams = new URLSearchParams({ history: "pos", from, to });
+      const [invoiceRes, posRes] = await Promise.allSettled([
+        fetch(`${getBasePath()}api/sales.php`),
+        fetch(`${getBasePath()}api/sales.php?${posParams.toString()}`),
+      ]);
+
+      let reportRows = [];
+      if (invoiceRes.status === "fulfilled" && invoiceRes.value.ok) {
+        const data = await invoiceRes.value.json();
+        reportRows = reportRows.concat((data.invoices || [])
+          .filter((inv) => !["cancelled", "draft"].includes(String(inv.status || "").toLowerCase()))
+          .filter((inv) => inDateRange(inv.issue_date || inv.created_at, from, to))
+          .map((inv) => ({
+            type: "Invoice",
+            number: inv.invoice_number || `Invoice #${inv.id}`,
+            customer: inv.customer_name || "Walk-in Customer",
+            amount: Number(inv.total_amount || 0) || 0,
+            items: Number(inv.items_count || 0) || 0,
+            date: inv.issue_date || inv.created_at || "",
+          })));
+      }
+
+      if (posRes.status === "fulfilled" && posRes.value.ok) {
+        const data = await posRes.value.json();
+        reportRows = reportRows.concat((data.sales || [])
+          .filter((sale) => String(sale.status || "").toLowerCase() !== "cancelled")
+          .map((sale) => ({
+            type: "POS",
+            number: sale.receipt_number || `POS #${sale.id}`,
+            customer: sale.customer_name || "Walk-in Customer",
+            amount: Number(sale.total_amount || 0) || 0,
+            items: Number(sale.items_count || 0) || 0,
+            date: sale.created_at || "",
+          })));
+      }
+
+      reportRows.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+      const total = reportRows.reduce((sum, row) => sum + row.amount, 0);
+      const count = reportRows.length;
+      const items = reportRows.reduce((sum, row) => sum + row.items, 0);
+      if (reportTotalSales) reportTotalSales.textContent = formatCurrency(total);
+      if (reportTxnCount) reportTxnCount.textContent = String(count);
+      if (reportAvgSale) reportAvgSale.textContent = formatCurrency(count ? total / count : 0);
+      if (reportItemsSold) reportItemsSold.textContent = Number(items.toFixed(2)).toLocaleString();
+      renderSalesReportRows(reportRows);
+      fitAmounts(document);
+    } catch {
+      renderSalesReportRows([]);
+    }
   };
 
   // ---- Invoice form: line items ----
@@ -7010,6 +7114,9 @@ const setupSalesPage = () => {
   } else if (targetWorkspace === "invoices") {
     openWorkspace(invoicesWorkspace);
     loadInvoices(invoicesSearch?.value.trim() || "");
+  } else if (targetWorkspace === "reports") {
+    openWorkspace(reportsWorkspace);
+    loadSalesReports();
   }
 };
 

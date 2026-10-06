@@ -423,7 +423,8 @@ try {
             $hwhere = implode(' AND ', $conds);
             $stmt = $pdo->prepare(
                 "SELECT s.id, s.invoice_number, s.customer_name, s.total_amount, s.amount_paid, s.payment_method, s.status, s.created_at,
-                        u.full_name AS cashier
+                        u.full_name AS cashier,
+                        (SELECT COALESCE(SUM(si.quantity), 0) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_count
                  FROM tbl_sales s LEFT JOIN tbl_users u ON u.id = s.created_by
                  WHERE {$hwhere} ORDER BY s.id DESC LIMIT 300"
             );
@@ -441,6 +442,7 @@ try {
                     'payment_method' => (string) ($r['payment_method'] ?? ''),
                     'status' => (string) $r['status'],
                     'cashier' => (string) ($r['cashier'] ?? ''),
+                    'items_count' => (float) ($r['items_count'] ?? 0),
                     'created_at' => (string) $r['created_at'],
                 ];
             }, $rows);
