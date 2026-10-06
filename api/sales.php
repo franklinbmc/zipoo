@@ -859,6 +859,11 @@ try {
             $customerId = (int) ($_POST['customer_id'] ?? 0);
             $customerNameInput = trim((string) ($_POST['customer_name'] ?? ''));
             $paymentMethod = trim((string) ($_POST['payment_method'] ?? 'cash'));
+            $paymentKey = strtolower($paymentMethod);
+            $isPayLater = in_array($paymentKey, ['pay_later', 'paylater', 'credit'], true);
+            if ($isPayLater) {
+                $paymentMethod = 'pay_later';
+            }
             $amountPaidInput = isset($_POST['amount_paid']) ? (float) $_POST['amount_paid'] : null;
             $itemsRaw = $_POST['items'] ?? '[]';
             $items = is_string($itemsRaw) ? json_decode($itemsRaw, true) : $itemsRaw;
@@ -941,9 +946,12 @@ try {
             $subtotal = round($subtotal, 2);
             $taxAmount = round(($taxableNet * $taxRate) / 100, 2);
             $totalAmount = round($subtotal + $taxAmount, 2);
-            // POS sales are settled immediately; default paid = total.
-            $amountPaid = ($amountPaidInput !== null && $amountPaidInput >= $totalAmount) ? $amountPaidInput : $totalAmount;
+            // POS sales are settled immediately, except Pay Later which becomes outstanding credit.
+            $amountPaid = $isPayLater ? 0.0 : (($amountPaidInput !== null && $amountPaidInput >= $totalAmount) ? $amountPaidInput : $totalAmount);
             $changeDue = round($amountPaid - $totalAmount, 2);
+            if ($changeDue < 0) {
+                $changeDue = 0.0;
+            }
 
             // A shift (till) must be open before any counter sale can be made.
             $openShift = current_open_shift($pdo, $businessId, $userId);
@@ -958,12 +966,12 @@ try {
             $payType = account_type_for_payment_method($paymentMethod);
             $requestedAccountId = (int) ($_POST['account_id'] ?? 0);
             $postAccountId = 0;
-            if ($requestedAccountId > 0) {
+            if (!$isPayLater && $requestedAccountId > 0) {
                 $accChk = $pdo->prepare('SELECT id FROM tbl_accounts WHERE id = :id AND business_id = :bid AND status = "active" LIMIT 1');
                 $accChk->execute([':id' => $requestedAccountId, ':bid' => $businessId]);
                 $postAccountId = (int) ($accChk->fetchColumn() ?: 0);
             }
-            if ($postAccountId <= 0) {
+            if (!$isPayLater && $postAccountId <= 0) {
                 if ($payType === 'cash') {
                     $postAccountId = ensure_default_account($pdo, $businessId);
                 } else {
@@ -984,12 +992,13 @@ try {
                 $seq = ((int) $countStmt->fetchColumn()) + 1;
                 $receiptNumber = 'POS-' . date('Ym') . '-' . str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
                 $today = date('Y-m-d');
+                $saleStatus = $isPayLater ? 'sent' : 'paid';
 
                 $ins = $pdo->prepare(
                     'INSERT INTO tbl_sales
                         (business_id, sale_type, invoice_number, customer_id, customer_name, status, issue_date, due_date,
                          subtotal, discount, tax_rate, tax_amount, total_amount, amount_paid, notes, created_by, shift_id, payment_method)
-                     VALUES (:bid, "pos", :inv, :cid, :cname, "paid", :idate, NULL,
+                     VALUES (:bid, "pos", :inv, :cid, :cname, :status, :idate, NULL,
                          :sub, 0.00, :trate, :tamt, :tot, :paid, :notes, :uid, :shift, :pm)'
                 );
                 $ins->execute([
@@ -997,13 +1006,14 @@ try {
                     ':inv' => $receiptNumber,
                     ':cid' => $customerId > 0 ? $customerId : null,
                     ':cname' => $customerName,
+                    ':status' => $saleStatus,
                     ':idate' => $today,
                     ':sub' => $subtotal,
                     ':trate' => $taxRate,
                     ':tamt' => $taxAmount,
                     ':tot' => $totalAmount,
                     ':paid' => min($amountPaid, $totalAmount), // store settled amount, not change
-                    ':notes' => 'POS sale (' . $paymentMethod . ')',
+                    ':notes' => $isPayLater ? 'POS sale (pay later)' : 'POS sale (' . $paymentMethod . ')',
                     ':uid' => $userId,
                     ':shift' => $shiftId,
                     ':pm' => $paymentMethod,

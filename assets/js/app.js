@@ -7093,6 +7093,10 @@ const setupSalesPage = () => {
       posAmountPaid.disabled = false;
       if (clearCash) posAmountPaid.value = "";
       if (posKeypad) posKeypad.classList.remove("pos-keypad-disabled");
+    } else if (posPayment === "pay_later") {
+      posAmountPaid.value = "0";
+      posAmountPaid.disabled = true;
+      if (posKeypad) posKeypad.classList.add("pos-keypad-disabled");
     } else {
       const { total } = posTotals();
       posAmountPaid.value = groupAmount(Math.round(total));
@@ -7126,9 +7130,6 @@ const setupSalesPage = () => {
 
   posCheckoutBtn?.addEventListener("click", openPosCheckout);
   posCheckoutCloseBtn?.addEventListener("click", () => { if (posCheckoutModal) posCheckoutModal.hidden = true; });
-  posCheckoutModal?.addEventListener("click", (e) => {
-    if (e.target === posCheckoutModal) posCheckoutModal.hidden = true;
-  });
   posAmountPaid?.addEventListener("input", () => {
     posAmountPaid.value = groupAmount(posAmountPaid.value);
     updatePosChange();
@@ -7160,7 +7161,7 @@ const setupSalesPage = () => {
       body.set("items", JSON.stringify(items));
       body.set("customer_id", String(posCustomer.id || 0));
       body.set("payment_method", posPayment);
-      const paid = num(posAmountPaid?.value);
+      const paid = posPayment === "pay_later" ? 0 : num(posAmountPaid?.value);
       if (paid > 0) body.set("amount_paid", String(paid));
 
       const res = await fetch(`${getBasePath()}api/sales.php`, { method: "POST", body });
@@ -9525,6 +9526,7 @@ const setupDashboardPage = () => {
     const key = String(method || "").toLowerCase();
     if (key === "mobile" || key === "mobile_money") return "Lipa kwa simu";
     if (key === "bank" || key === "card") return "Bank/Card";
+    if (key === "pay_later" || key === "paylater") return "Pay Later";
     if (key === "credit") return "Credit";
     return "Cash";
   };
