@@ -2186,6 +2186,13 @@ body.offline .status-dot {
   overflow: hidden;
 }
 
+[data-categories-workspace] .expense-group-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(96px, min(42%, 180px));
+  align-items: center !important;
+  gap: 10px !important;
+}
+
 [data-categories-workspace] .expense-group-info,
 [data-categories-workspace] .expense-category-info {
   min-width: 0 !important;
@@ -2195,8 +2202,13 @@ body.offline .status-dot {
 [data-categories-workspace] .expense-group-meta,
 [data-categories-workspace] .stock-summary-meta {
   min-width: 0 !important;
-  max-width: 58% !important;
-  flex: 0 1 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center !important;
+  gap: 6px !important;
+  flex: initial !important;
   justify-content: flex-end !important;
 }
 
@@ -2209,6 +2221,11 @@ body.offline .status-dot {
   white-space: normal !important;
   text-align: right;
   line-height: 1.15;
+}
+
+[data-categories-workspace] .expense-view-chevron {
+  flex: 0 0 auto;
+  justify-self: end;
 }
 
 /* Year, Month, Day Group Cards */
