@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/accounts_lib.php';
 require_once __DIR__ . '/audit_lib.php';
+require_once __DIR__ . '/permissions_lib.php';
 require_once __DIR__ . '/expenses_export_lib.php';
 
 session_start();
@@ -447,6 +448,7 @@ try {
     $action = trim((string) ($_POST['action'] ?? ''));
 
     if ($action === 'create' || $action === 'update') {
+        require_permission($pdo, $businessId, $userId, 'accounts.manage');
         $name = trim((string) ($_POST['name'] ?? ''));
         $type = strtolower(trim((string) ($_POST['type'] ?? 'cash')));
         if (!in_array($type, ['cash', 'bank', 'mobile'], true)) {
@@ -516,6 +518,7 @@ try {
     }
 
     if ($action === 'set_default') {
+        require_permission($pdo, $businessId, $userId, 'accounts.manage');
         $accountId = (int) ($_POST['account_id'] ?? 0);
         fetch_account_or_404($pdo, $businessId, $accountId);
         $pdo->beginTransaction();
@@ -533,6 +536,7 @@ try {
     }
 
     if ($action === 'delete') {
+        require_permission($pdo, $businessId, $userId, 'accounts.manage');
         $accountId = (int) ($_POST['account_id'] ?? 0);
         $row = fetch_account_or_404($pdo, $businessId, $accountId);
         if ((int) $row['is_default'] === 1) {
@@ -612,6 +616,7 @@ try {
     }
 
     if ($action === 'create_expense_category') {
+        require_permission($pdo, $businessId, $userId, 'expenses.manage_categories');
         $name = trim((string) ($_POST['name'] ?? ''));
         if ($name === '') {
             respond(422, ['ok' => false, 'message' => 'Category name is required.']);
@@ -629,6 +634,7 @@ try {
     }
 
     if ($action === 'set_expense_category_status') {
+        require_permission($pdo, $businessId, $userId, 'expenses.manage_categories');
         $categoryId = (int) ($_POST['category_id'] ?? 0);
         $status = strtolower(trim((string) ($_POST['status'] ?? 'active')));
         if (!in_array($status, ['active', 'inactive'], true)) {
@@ -646,6 +652,7 @@ try {
     }
 
     if ($action === 'delete_expense_category') {
+        require_permission($pdo, $businessId, $userId, 'expenses.manage_categories');
         $categoryId = (int) ($_POST['category_id'] ?? 0);
         $category = fetch_category_or_404($pdo, $businessId, $categoryId);
         $stmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_account_transactions WHERE business_id = :bid AND expense_category_id = :id AND type = "expense"');
@@ -660,6 +667,7 @@ try {
     }
 
     if ($action === 'prepare_payroll') {
+        require_permission($pdo, $businessId, $userId, 'payroll.manage');
         $month = trim((string) ($_POST['month'] ?? date('Y-m')));
         if (!valid_payroll_month($month)) {
             respond(422, ['ok' => false, 'message' => 'Choose a valid payroll month.']);
@@ -707,6 +715,7 @@ try {
     }
 
     if ($action === 'update_payroll_item') {
+        require_permission($pdo, $businessId, $userId, 'payroll.manage');
         $itemId = (int) ($_POST['item_id'] ?? 0);
         $amount = round((float) ($_POST['salary_amount'] ?? 0), 2);
         if ($amount < 0) {
@@ -737,6 +746,7 @@ try {
     }
 
     if ($action === 'pay_payroll') {
+        require_permission($pdo, $businessId, $userId, 'payroll.manage');
         $runId = (int) ($_POST['run_id'] ?? 0);
         $accountId = (int) ($_POST['account_id'] ?? 0);
         fetch_account_or_404($pdo, $businessId, $accountId);
@@ -805,6 +815,7 @@ try {
     }
 
     if ($action === 'transfer') {
+        require_permission($pdo, $businessId, $userId, 'accounts.transfer');
         $fromId = (int) ($_POST['account_id'] ?? 0);
         $toId = (int) ($_POST['to_account_id'] ?? 0);
         $amount = round((float) ($_POST['amount'] ?? 0), 2);

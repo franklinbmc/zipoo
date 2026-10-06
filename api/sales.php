@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/accounts_lib.php';
 require_once __DIR__ . '/audit_lib.php';
+require_once __DIR__ . '/permissions_lib.php';
 require_once __DIR__ . '/vat_lib.php';
 require_once __DIR__ . '/pos_lib.php';
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -1221,6 +1222,7 @@ try {
         }
 
         if ($action === 'cancel_invoice' || $action === 'uncancel_invoice') {
+            require_permission($pdo, $businessId, $userId, 'sales.manage_invoices');
             $saleId = (int) ($_POST['invoice_id'] ?? 0);
             $chk = $pdo->prepare('SELECT id, status FROM tbl_sales WHERE id = :id AND business_id = :bid LIMIT 1');
             $chk->execute([':id' => $saleId, ':bid' => $businessId]);
@@ -1255,6 +1257,7 @@ try {
         }
 
         if ($action === 'delete_invoice') {
+            require_permission($pdo, $businessId, $userId, 'sales.manage_invoices');
             $saleId = (int) ($_POST['invoice_id'] ?? 0);
             $chk = $pdo->prepare('SELECT * FROM tbl_sales WHERE id = :id AND business_id = :bid LIMIT 1');
             $chk->execute([':id' => $saleId, ':bid' => $businessId]);

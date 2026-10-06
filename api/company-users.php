@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/permissions_lib.php';
 
 session_start();
 
@@ -238,6 +239,7 @@ try {
     $action = trim((string) ($_POST['action'] ?? 'create'));
 
     if ($action === 'create') {
+        require_permission($pdo, $businessId, $currentUserId, 'users.manage');
         $fullName = trim((string) ($_POST['full_name'] ?? ''));
         $phone = trim((string) ($_POST['phone'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
@@ -322,6 +324,7 @@ try {
     }
 
     if ($action === 'update') {
+        require_permission($pdo, $businessId, $currentUserId, 'users.manage');
         $targetUserId = (int) ($_POST['user_id'] ?? 0);
         $fullName = trim((string) ($_POST['full_name'] ?? ''));
         $phone = trim((string) ($_POST['phone'] ?? ''));
@@ -439,6 +442,7 @@ try {
     }
 
     if ($action === 'delete') {
+        require_permission($pdo, $businessId, $currentUserId, 'users.manage');
         $targetUserId = (int) ($_POST['user_id'] ?? 0);
         if ($targetUserId <= 0) {
             respond(422, ['ok' => false, 'message' => 'Invalid user ID.']);
