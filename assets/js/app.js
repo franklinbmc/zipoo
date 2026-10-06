@@ -6736,6 +6736,11 @@ const setupSalesPage = () => {
 
   // ---- Shift workspace ----
   const shiftWorkspace = document.querySelector("[data-shift-workspace]");
+  const shiftDetailWorkspace = document.querySelector("[data-shift-detail-workspace]");
+  const shiftDetailTitle = document.querySelector("[data-shift-detail-title]");
+  const shiftDetailSummary = document.querySelector("[data-shift-detail-summary]");
+  const shiftDetailItems = document.querySelector("[data-shift-detail-items]");
+  const shiftDetailTransactions = document.querySelector("[data-shift-detail-transactions]");
   const shiftListEl = document.querySelector("[data-shift-list]");
   const shiftEmptyEl = document.querySelector("[data-shift-empty]");
   const loadShiftsList = async () => {
@@ -6761,7 +6766,7 @@ const setupSalesPage = () => {
             </div>
           ` : "";
           return `<div class="shift-list-card" data-shift-card="${s.id}">
-            <button type="button" class="shift-list-main" data-shift-detail-id="${s.id}" aria-expanded="false">
+            <button type="button" class="shift-list-main" data-shift-detail-id="${s.id}">
               <div class="shift-list-head">
                 <div class="shift-list-title">Shift #${s.id} · ${escH(s.cashier || "Cashier")}</div>
                 <div>${badge}</div>
@@ -6769,17 +6774,38 @@ const setupSalesPage = () => {
               <div class="shift-list-meta">${when} · open ${formatCurrency(s.opening_balance)}${s.sales_total != null ? " · sales " + formatCurrency(s.sales_total) : ""}${extra}</div>
             </button>
             ${reportActions}
-            <div class="shift-detail-panel" data-shift-detail-panel="${s.id}" hidden></div>
           </div>`;
         }).join("");
       }
     } catch { /* offline */ }
   };
 
-  const renderShiftDetailPanel = (panel, report) => {
+  const renderShiftDetailWorkspace = (report) => {
     const summary = report?.sales_summary || {};
+    const shift = report?.shift || {};
     const items = Array.isArray(report?.sold_items) ? report.sold_items : [];
     const transactions = Array.isArray(report?.transactions) ? report.transactions : [];
+    if (shiftDetailTitle) shiftDetailTitle.textContent = `Shift #${shift.id || ""} Sales`;
+    if (shiftDetailSummary) {
+      shiftDetailSummary.innerHTML = `
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Total Sales</span>
+          <strong class="kpi-val">${formatCurrency(summary.total_sales || 0)}</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Transactions</span>
+          <strong class="kpi-val">${Number(summary.tx_count || 0).toLocaleString()}</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Cash</span>
+          <strong class="kpi-val">${formatCurrency(summary.cash_sales || 0)}</strong>
+        </div>
+        <div class="stock-kpi-card">
+          <span class="kpi-label">Mobile / Bank</span>
+          <strong class="kpi-val">${formatCurrency((Number(summary.mobile_sales || 0) || 0) + (Number(summary.bank_sales || 0) || 0))}</strong>
+        </div>
+      `;
+    }
     const itemRows = items.length ? items.map((item) => {
       const qty = Number(item.quantity || 0);
       return `<div class="shift-detail-row">
@@ -6787,7 +6813,8 @@ const setupSalesPage = () => {
         <strong>${formatCurrency(item.line_total || 0)}</strong>
       </div>`;
     }).join("") : `<p class="shift-detail-empty">No items sold under this shift.</p>`;
-    const txRows = transactions.length ? transactions.slice(0, 6).map((tx) => {
+    if (shiftDetailItems) shiftDetailItems.innerHTML = itemRows;
+    const txRows = transactions.length ? transactions.map((tx) => {
       const whenRaw = tx.created_at || tx.issue_date || "";
       const whenDate = new Date(String(whenRaw).replace(" ", "T"));
       const when = isNaN(whenDate.getTime()) ? whenRaw : whenDate.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -6795,41 +6822,25 @@ const setupSalesPage = () => {
         <span>${escH(tx.invoice_number || ("Sale #" + tx.id))} · ${escH(tx.customer_name || "Walk-in Customer")} · ${escH(when || "-")}</span>
         <strong>${formatCurrency(tx.total_amount || 0)}</strong>
       </div>`;
-    }).join("") : "";
-    const moreTx = transactions.length > 6 ? `<p class="shift-detail-empty">${transactions.length - 6} more sales included in this shift total.</p>` : "";
-    panel.innerHTML = `
-      <div class="shift-detail-row">
-        <span>${Number(summary.tx_count || 0).toLocaleString()} sales · cash ${formatCurrency(summary.cash_sales || 0)} · bank ${formatCurrency(summary.bank_sales || 0)} · mobile ${formatCurrency(summary.mobile_sales || 0)}</span>
-        <strong>${formatCurrency(summary.total_sales || 0)}</strong>
-      </div>
-      <div class="shift-detail-grid">${itemRows}</div>
-      ${txRows ? `<div class="shift-detail-grid">${txRows}${moreTx}</div>` : ""}
-    `;
+    }).join("") : `<p class="shift-detail-empty">No sales recorded under this shift.</p>`;
+    if (shiftDetailTransactions) shiftDetailTransactions.innerHTML = txRows;
   };
 
-  const toggleShiftDetails = async (button) => {
+  const openShiftDetailsWorkspace = async (button) => {
     const id = Number(button?.dataset.shiftDetailId || 0);
     if (!id) return;
-    const panel = shiftListEl?.querySelector(`[data-shift-detail-panel="${id}"]`);
-    if (!panel) return;
-    const isOpen = !panel.hidden;
-    if (isOpen) {
-      panel.hidden = true;
-      button.setAttribute("aria-expanded", "false");
-      return;
-    }
-    panel.hidden = false;
-    button.setAttribute("aria-expanded", "true");
-    if (panel.dataset.loaded === "1") return;
-    panel.innerHTML = `<p class="shift-detail-empty">Loading sold items...</p>`;
+    openWorkspace(shiftDetailWorkspace);
+    if (shiftDetailTitle) shiftDetailTitle.textContent = `Shift #${id} Sales`;
+    if (shiftDetailSummary) shiftDetailSummary.innerHTML = "";
+    if (shiftDetailItems) shiftDetailItems.innerHTML = `<p class="shift-detail-empty">Loading sold items...</p>`;
+    if (shiftDetailTransactions) shiftDetailTransactions.innerHTML = "";
     try {
       const res = await fetch(`${getBasePath()}api/shifts.php?action=report_details&id=${id}`);
       const d = await res.json();
       if (!res.ok || !d.ok) throw new Error(d.message || "Could not load shift sold items.");
-      renderShiftDetailPanel(panel, d.report);
-      panel.dataset.loaded = "1";
+      renderShiftDetailWorkspace(d.report);
     } catch (err) {
-      panel.innerHTML = `<p class="shift-detail-empty">${escH(err.message || "Could not load shift sold items.")}</p>`;
+      if (shiftDetailItems) shiftDetailItems.innerHTML = `<p class="shift-detail-empty">${escH(err.message || "Could not load shift sold items.")}</p>`;
     }
   };
 
@@ -6848,10 +6859,11 @@ const setupSalesPage = () => {
     }
     if (e.target.closest("a")) return;
     const detailBtn = e.target.closest("[data-shift-detail-id]");
-    if (detailBtn) toggleShiftDetails(detailBtn);
+    if (detailBtn) openShiftDetailsWorkspace(detailBtn);
   });
   document.querySelectorAll("[data-open-shift-workspace]").forEach((b) => b.addEventListener("click", () => { openWorkspace(shiftWorkspace); refreshShift(); loadShiftsList(); }));
   document.querySelector("[data-shift-close]")?.addEventListener("click", () => closeWorkspace(shiftWorkspace));
+  document.querySelector("[data-shift-detail-close]")?.addEventListener("click", () => closeWorkspace(shiftDetailWorkspace));
 
   // ---- Sales history workspace ----
   const salesHistoryWorkspace = document.querySelector("[data-sales-history-workspace]");

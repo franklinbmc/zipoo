@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=118">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=119">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -504,6 +504,30 @@
     </section>
   </div>
 
+  <!-- Workspace: Shift Sold Items -->
+  <div class="fullscreen-modal" hidden data-shift-detail-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="shift-detail-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-shift-detail-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="shift-detail-title" data-shift-detail-title>Shift Sales</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="stock-kpi-grid shift-detail-summary" data-shift-detail-summary></div>
+        <div class="shift-detail-section">
+          <div class="shift-detail-section-title">Sold Items</div>
+          <div class="shift-detail-grid" data-shift-detail-items></div>
+        </div>
+        <div class="shift-detail-section">
+          <div class="shift-detail-section-title">Sales</div>
+          <div class="shift-detail-grid" data-shift-detail-transactions></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <!-- Workspace: Invoices -->
   <div class="fullscreen-modal" hidden data-invoices-workspace>
     <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="invoices-workspace-title">
@@ -750,6 +774,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=133" defer></script>
+  <script src="/assets/js/app.js?v=134" defer></script>
 </body>
 </html>
