@@ -5716,6 +5716,7 @@ const setupSalesPage = () => {
   const reportItemsSold = document.querySelector("[data-report-items-sold]");
   const reportList = document.querySelector("[data-report-list]");
   const reportEmpty = document.querySelector("[data-report-empty]");
+  const reportExportButtons = document.querySelectorAll("[data-report-export]");
   const invoiceStatusFilters = document.querySelectorAll("[data-filter-invoice]");
   const openCreateInvoiceBtns = document.querySelectorAll("[data-open-create-invoice]");
 
@@ -5901,12 +5902,12 @@ const setupSalesPage = () => {
     reportList.innerHTML = rows.slice(0, 20).map((row) => {
       const dt = new Date(String(row.date || "").replace(" ", "T"));
       const when = isNaN(dt.getTime()) ? row.date : dt.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-      return `<div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;text-align:left;">
-        <div style="min-width:0;">
-          <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(row.number)} <span class="badge-stock in-stock">${escH(row.type)}</span></div>
-          <div style="font-size:0.76rem;color:var(--color-muted);">${escH(row.customer || "Walk-in Customer")} · ${escH(when || "-")} · ${row.items} item${row.items === 1 ? "" : "s"}</div>
+      return `<div class="report-list-row">
+        <div class="report-list-info">
+          <div class="report-list-title">${escH(row.number)} <span class="badge-stock in-stock">${escH(row.type)}</span></div>
+          <div class="report-list-meta">${escH(row.customer || "Walk-in Customer")} · ${escH(when || "-")} · ${row.items} item${row.items === 1 ? "" : "s"}</div>
         </div>
-        <strong class="amount-fit" style="--amount-fit-base:0.9rem;color:var(--color-navy);text-align:right;">${formatCurrency(row.amount)}</strong>
+        <strong class="report-list-amount amount-fit" style="--amount-fit-base:0.9rem;">${formatCurrency(row.amount)}</strong>
       </div>`;
     }).join("");
     fitAmounts(reportList);
@@ -5965,6 +5966,14 @@ const setupSalesPage = () => {
       renderSalesReportRows([]);
     }
   };
+
+  reportExportButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const type = button.dataset.reportExport === "pdf" ? "pdf" : "excel";
+      const action = type === "pdf" ? "export_report_pdf" : "export_report_excel";
+      window.open(`${getBasePath()}api/sales.php?action=${action}&range=${encodeURIComponent(reportRangeVal)}`, "_blank");
+    });
+  });
 
   // ---- Invoice form: line items ----
   const calculateInvoiceTotals = () => {

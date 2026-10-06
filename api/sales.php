@@ -9,6 +9,10 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 
 session_start();
 
@@ -336,6 +340,125 @@ function render_invoice_pdf(array $sale, array $items, array $customer, array $b
     return $dompdf->output();
 }
 
+function sales_report_dates(string $range): array
+{
+    $today = new DateTimeImmutable('today');
+    if ($range === 'year') {
+        $from = $today->setDate((int) $today->format('Y'), 1, 1);
+    } elseif ($range === 'month') {
+        $from = $today->modify('first day of this month');
+    } elseif ($range === 'week') {
+        $from = $today->modify('-6 days');
+    } else {
+        $from = $today;
+        $range = 'today';
+    }
+    return [$from->format('Y-m-d'), $today->format('Y-m-d'), $range];
+}
+
+function load_sales_report_rows(PDO $pdo, int $businessId, string $range): array
+{
+    [$from, $to, $range] = sales_report_dates($range);
+    $rows = [];
+
+    $inv = $pdo->prepare(
+        'SELECT s.id, s.invoice_number, s.customer_name, s.total_amount, s.issue_date, s.created_at,
+                (SELECT COUNT(*) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_count
+         FROM tbl_sales s
+         WHERE s.business_id = :bid AND s.sale_type = "invoice" AND s.status NOT IN ("cancelled", "draft")
+           AND s.issue_date BETWEEN :from AND :to
+         ORDER BY s.issue_date DESC, s.id DESC'
+    );
+    $inv->execute([':bid' => $businessId, ':from' => $from, ':to' => $to]);
+    foreach ($inv->fetchAll() as $r) {
+        $rows[] = [
+            'type' => 'Invoice',
+            'number' => (string) $r['invoice_number'],
+            'customer' => (string) ($r['customer_name'] ?: 'Walk-in Customer'),
+            'amount' => (float) $r['total_amount'],
+            'items' => (float) ($r['items_count'] ?? 0),
+            'date' => (string) ($r['issue_date'] ?: $r['created_at']),
+        ];
+    }
+
+    $pos = $pdo->prepare(
+        'SELECT s.id, s.invoice_number, s.customer_name, s.total_amount, s.created_at,
+                (SELECT COALESCE(SUM(si.quantity), 0) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_count
+         FROM tbl_sales s
+         WHERE s.business_id = :bid AND s.sale_type = "pos" AND s.status != "cancelled"
+           AND DATE(s.created_at) BETWEEN :from AND :to
+         ORDER BY s.created_at DESC, s.id DESC'
+    );
+    $pos->execute([':bid' => $businessId, ':from' => $from, ':to' => $to]);
+    foreach ($pos->fetchAll() as $r) {
+        $rows[] = [
+            'type' => 'POS',
+            'number' => (string) $r['invoice_number'],
+            'customer' => (string) ($r['customer_name'] ?: 'Walk-in Customer'),
+            'amount' => (float) $r['total_amount'],
+            'items' => (float) ($r['items_count'] ?? 0),
+            'date' => (string) $r['created_at'],
+        ];
+    }
+
+    usort($rows, static fn($a, $b) => strcmp((string) $b['date'], (string) $a['date']));
+    return ['rows' => $rows, 'from' => $from, 'to' => $to, 'range' => $range];
+}
+
+function export_sales_report_excel(PDO $pdo, int $businessId, string $range): void
+{
+    $report = load_sales_report_rows($pdo, $businessId, $range);
+    $rows = $report['rows'];
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setTitle('Sales Report');
+    $sheet->fromArray(['Type', 'Number', 'Customer', 'Date', 'Items', 'Amount'], null, 'A1');
+    $sheet->getStyle('A1:F1')->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
+    $sheet->getStyle('A1:F1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('0D2B5B');
+    $r = 2;
+    foreach ($rows as $row) {
+        $sheet->fromArray([$row['type'], $row['number'], $row['customer'], $row['date'], $row['items'], $row['amount']], null, "A{$r}");
+        $r++;
+    }
+    $sheet->setCellValue("E{$r}", 'Total');
+    $sheet->setCellValue("F{$r}", array_sum(array_column($rows, 'amount')));
+    $sheet->getStyle("E{$r}:F{$r}")->getFont()->setBold(true);
+    foreach (range('A', 'F') as $col) { $sheet->getColumnDimension($col)->setAutoSize(true); }
+    $sheet->getStyle("A1:F{$r}")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN)->getColor()->setRGB('DBE3EF');
+    $filename = 'Sales_Report_' . $report['range'] . '_' . $report['to'] . '.xlsx';
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="' . $filename . '"');
+    header('Cache-Control: max-age=0');
+    (new Xlsx($spreadsheet))->save('php://output');
+    exit;
+}
+
+function export_sales_report_pdf(PDO $pdo, int $businessId, string $range): void
+{
+    $report = load_sales_report_rows($pdo, $businessId, $range);
+    $rows = $report['rows'];
+    $total = array_sum(array_column($rows, 'amount'));
+    $htmlRows = '';
+    foreach ($rows as $row) {
+        $htmlRows .= '<tr><td>' . htmlspecialchars($row['type']) . '</td><td>' . htmlspecialchars($row['number']) . '</td><td>' . htmlspecialchars($row['customer']) . '</td><td>' . htmlspecialchars($row['date']) . '</td><td style="text-align:right;">' . number_format((float) $row['items'], 0) . '</td><td style="text-align:right;">' . number_format((float) $row['amount'], 0) . '</td></tr>';
+    }
+    if ($htmlRows === '') {
+        $htmlRows = '<tr><td colspan="6" style="text-align:center;color:#64748b;">No sales in this period.</td></tr>';
+    }
+    $html = '<html><head><style>body{font-family:DejaVu Sans,sans-serif;color:#0d2b5b;}h1{font-size:20px;}small{color:#64748b;}table{width:100%;border-collapse:collapse;margin-top:16px;}th{background:#0d2b5b;color:#fff;text-align:left;}th,td{border:1px solid #dbe3ef;padding:8px;font-size:11px;}tfoot td{font-weight:bold;}</style></head><body><h1>Sales Report</h1><small>' . htmlspecialchars($report['from'] . ' to ' . $report['to']) . '</small><table><thead><tr><th>Type</th><th>Number</th><th>Customer</th><th>Date</th><th>Items</th><th>Amount</th></tr></thead><tbody>' . $htmlRows . '</tbody><tfoot><tr><td colspan="5" style="text-align:right;">Total</td><td style="text-align:right;">' . number_format($total, 0) . '</td></tr></tfoot></table></body></html>';
+    $options = new Options();
+    $options->set('isRemoteEnabled', true);
+    $dompdf = new Dompdf($options);
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+    $filename = 'Sales_Report_' . $report['range'] . '_' . $report['to'] . '.pdf';
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: inline; filename="' . $filename . '"');
+    echo $dompdf->output();
+    exit;
+}
+
 try {
     $pdo = db();
     $userId = require_user();
@@ -447,6 +570,14 @@ try {
                 ];
             }, $rows);
             respond(200, ['ok' => true, 'sales' => $sales, 'stats' => ['count' => count($sales), 'total' => round($total, 2)]]);
+        }
+
+        if (($_GET['action'] ?? '') === 'export_report_excel') {
+            export_sales_report_excel($pdo, $businessId, trim((string) ($_GET['range'] ?? 'today')));
+        }
+
+        if (($_GET['action'] ?? '') === 'export_report_pdf') {
+            export_sales_report_pdf($pdo, $businessId, trim((string) ($_GET['range'] ?? 'today')));
         }
 
         // List invoices

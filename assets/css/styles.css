@@ -4784,6 +4784,46 @@ button.settings-list-row:focus-visible {
   gap: 8px;
 }
 
+.report-list-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(96px, auto);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.report-list-info {
+  min-width: 0;
+}
+
+.report-list-title {
+  color: var(--color-navy);
+  font-size: 0.9rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.report-list-meta {
+  color: var(--color-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.report-list-amount {
+  color: var(--color-navy);
+  text-align: right;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
 /* Stock hub — tap-to-open section rows */
 .stock-hub {
   display: grid;

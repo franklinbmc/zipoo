@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=114">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=115">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -566,6 +566,10 @@
           <button type="button" class="filter-pill" data-filter-range="month">This Month</button>
           <button type="button" class="filter-pill" data-filter-range="year">This Year</button>
         </div>
+        <div class="filter-bar" style="justify-content:flex-end;">
+          <button type="button" class="filter-pill" data-report-export="excel">Excel</button>
+          <button type="button" class="filter-pill" data-report-export="pdf">PDF</button>
+        </div>
 
         <!-- Summary cards -->
         <section class="stock-kpi-grid" style="margin-top: 4px;">
@@ -744,6 +748,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=130" defer></script>
+  <script src="/assets/js/app.js?v=131" defer></script>
 </body>
 </html>
