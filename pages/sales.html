@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=116">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=117">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -558,17 +558,19 @@
         <h2 id="reports-workspace-title">Sales Reports</h2>
         <span class="topbar-spacer" aria-hidden="true"></span>
       </header>
-      <div class="fullscreen-body stock-workspace-body">
+      <div class="fullscreen-body stock-workspace-body reports-workspace-body">
         <!-- Range Pills -->
-        <div class="filter-bar" data-report-range-filters>
-          <button type="button" class="filter-pill active" data-filter-range="today">Today</button>
-          <button type="button" class="filter-pill" data-filter-range="week">This Week</button>
-          <button type="button" class="filter-pill" data-filter-range="month">This Month</button>
-          <button type="button" class="filter-pill" data-filter-range="year">This Year</button>
-        </div>
-        <div class="filter-bar" style="justify-content:flex-end;">
-          <button type="button" class="filter-pill" data-report-export="excel">Excel</button>
-          <button type="button" class="filter-pill" data-report-export="pdf">PDF</button>
+        <div class="report-controls">
+          <div class="filter-bar report-range-filters" data-report-range-filters>
+            <button type="button" class="filter-pill active" data-filter-range="today">Today</button>
+            <button type="button" class="filter-pill" data-filter-range="week">This Week</button>
+            <button type="button" class="filter-pill" data-filter-range="month">This Month</button>
+            <button type="button" class="filter-pill" data-filter-range="year">This Year</button>
+          </div>
+          <div class="filter-bar report-export-actions">
+            <button type="button" class="filter-pill" data-report-export="excel">Excel</button>
+            <button type="button" class="filter-pill" data-report-export="pdf">PDF</button>
+          </div>
         </div>
 
         <!-- Summary cards -->

@@ -4715,6 +4715,49 @@ button.settings-list-row:focus-visible {
   color: #fff;
 }
 
+.reports-workspace-body {
+  overflow: auto;
+}
+
+.report-controls {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: start;
+  margin: -16px 0 0;
+  padding: 12px 0 8px;
+  background: var(--color-bg);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.report-controls .filter-bar {
+  flex-wrap: wrap;
+  overflow: visible;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.report-range-filters {
+  min-width: 0;
+}
+
+.report-export-actions {
+  justify-content: flex-end;
+}
+
+@media (max-width: 520px) {
+  .report-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .report-export-actions {
+    justify-content: flex-start;
+  }
+}
+
 .badge-stock {
   display: inline-flex;
   align-items: center;
