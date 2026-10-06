@@ -1119,7 +1119,7 @@ try {
                 respond(422, ['ok' => false, 'message' => 'Invalid status.']);
             }
 
-            $chk = $pdo->prepare('SELECT id, status, total_amount FROM tbl_sales WHERE id = :id AND business_id = :bid LIMIT 1');
+            $chk = $pdo->prepare('SELECT id, status, total_amount, amount_paid FROM tbl_sales WHERE id = :id AND business_id = :bid LIMIT 1');
             $chk->execute([':id' => $saleId, ':bid' => $businessId]);
             $sale = $chk->fetch();
             if (!$sale) {
@@ -1130,27 +1130,51 @@ try {
             }
 
             if ($newStatus === 'paid') {
-                $pdo->prepare('UPDATE tbl_sales SET status = "paid", amount_paid = total_amount WHERE id = :id')
-                    ->execute([':id' => $saleId]);
+                $currentPaid = (float) ($sale['amount_paid'] ?? 0);
+                $totalAmount = (float) $sale['total_amount'];
+                $paymentAmount = isset($_POST['amount_paid']) ? round((float) $_POST['amount_paid'], 2) : round($totalAmount - $currentPaid, 2);
+                if ($paymentAmount <= 0) {
+                    respond(422, ['ok' => false, 'message' => 'Enter a payment amount.']);
+                }
+                $balanceDue = round($totalAmount - $currentPaid, 2);
+                if ($paymentAmount > $balanceDue) {
+                    respond(422, ['ok' => false, 'message' => 'Payment cannot exceed the invoice balance.']);
+                }
 
-                // Auto-post the invoice payment into the default account (once).
-                if ($sale['status'] !== 'paid'
-                    && !account_txn_exists($pdo, $businessId, 'INVOICE', (string) $saleId, 'invoice_payment')) {
+                $postAccountId = (int) ($_POST['account_id'] ?? 0);
+                if ($postAccountId <= 0) {
                     $postAccountId = ensure_default_account($pdo, $businessId);
-                    if ($postAccountId > 0) {
-                        post_account_txn(
-                            $pdo,
-                            $businessId,
-                            $postAccountId,
-                            'in',
-                            'invoice_payment',
-                            (float) $sale['total_amount'],
-                            'INVOICE',
-                            (string) $saleId,
-                            'Invoice payment (#' . $saleId . ')',
-                            $userId
-                        );
+                } else {
+                    $accChk = $pdo->prepare('SELECT id FROM tbl_accounts WHERE id = :id AND business_id = :bid AND status = "active" AND type IN ("cash", "mobile", "bank") LIMIT 1');
+                    $accChk->execute([':id' => $postAccountId, ':bid' => $businessId]);
+                    $postAccountId = (int) ($accChk->fetchColumn() ?: 0);
+                    if ($postAccountId <= 0) {
+                        respond(422, ['ok' => false, 'message' => 'Choose an active Cash, Lipa kwa simu or Bank account.']);
                     }
+                }
+
+                $newPaid = round($currentPaid + $paymentAmount, 2);
+                $finalStatus = $newPaid >= $totalAmount ? 'paid' : 'sent';
+                $pdo->beginTransaction();
+                try {
+                    $pdo->prepare('UPDATE tbl_sales SET status = :status, amount_paid = :paid WHERE id = :id')
+                        ->execute([':status' => $finalStatus, ':paid' => min($newPaid, $totalAmount), ':id' => $saleId]);
+                    post_account_txn(
+                        $pdo,
+                        $businessId,
+                        $postAccountId,
+                        'in',
+                        'invoice_payment',
+                        $paymentAmount,
+                        'INVOICE',
+                        (string) $saleId,
+                        'Invoice payment (#' . $saleId . ')',
+                        $userId
+                    );
+                    $pdo->commit();
+                } catch (Throwable $e) {
+                    $pdo->rollBack();
+                    throw $e;
                 }
             } else {
                 $pdo->prepare('UPDATE tbl_sales SET status = :st WHERE id = :id')

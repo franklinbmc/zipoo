@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=124">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=126">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -813,6 +813,27 @@
     </section>
   </div>
 
+  <!-- Invoice Payment Modal -->
+  <div class="modal-backdrop" hidden data-invoice-payment-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="invoice-payment-title">
+      <h2 id="invoice-payment-title">Receive Payment</h2>
+      <p data-invoice-payment-balance style="margin:0 0 12px;color:var(--color-muted);font-size:0.86rem;font-weight:700;">Balance: TZS 0</p>
+      <label>
+        <span>Amount</span>
+        <input type="text" inputmode="numeric" data-invoice-payment-amount placeholder="0">
+      </label>
+      <label>
+        <span>Payment Goes To</span>
+        <select class="css-formatted-select" data-invoice-payment-account></select>
+      </label>
+      <p class="inline-error" hidden data-invoice-payment-error></p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" type="button" data-invoice-payment-cancel>Cancel</button>
+        <button class="btn btn-primary" type="button" data-invoice-payment-save>Save Payment</button>
+      </div>
+    </section>
+  </div>
+
   <!-- App Notice / Confirm Modal -->
   <div class="modal-backdrop" hidden data-app-modal>
     <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
@@ -822,6 +843,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=136" defer></script>
+  <script src="/assets/js/app.js?v=138" defer></script>
 </body>
 </html>

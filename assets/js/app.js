@@ -5764,11 +5764,19 @@ const setupSalesPage = () => {
   const invoiceCancelBtn = document.querySelector("[data-invoice-cancel-btn]");
   const invoiceUncancelBtn = document.querySelector("[data-invoice-uncancel-btn]");
   const invoiceDeleteBtn = document.querySelector("[data-invoice-delete-btn]");
+  const invoicePaymentModal = document.querySelector("[data-invoice-payment-modal]");
+  const invoicePaymentBalance = document.querySelector("[data-invoice-payment-balance]");
+  const invoicePaymentAmount = document.querySelector("[data-invoice-payment-amount]");
+  const invoicePaymentAccount = document.querySelector("[data-invoice-payment-account]");
+  const invoicePaymentError = document.querySelector("[data-invoice-payment-error]");
+  const invoicePaymentCancel = document.querySelector("[data-invoice-payment-cancel]");
+  const invoicePaymentSave = document.querySelector("[data-invoice-payment-save]");
 
   // ---- State ----
   let cachedProducts = [];
   let invVatConfig = { enabled: false, rate: 0 };
   let cachedCustomers = [];
+  let cachedAccounts = [];
   let activeInvoiceStatus = "all";
   let currentInvoice = null;
 
@@ -5798,6 +5806,44 @@ const setupSalesPage = () => {
         setSearchSelectOptions(invoiceCustomerSelect, options, "Walk-in Customer", invoiceCustomerValue?.value || "");
       }
     } catch { /* offline */ }
+  };
+
+  const loadInvoicePaymentAccounts = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/accounts.php`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) return [];
+      cachedAccounts = (data.accounts || []).filter((account) => account.status !== "inactive" && ["cash", "mobile", "bank"].includes(account.type));
+      return cachedAccounts;
+    } catch {
+      return cachedAccounts;
+    }
+  };
+
+  const renderInvoicePaymentAccounts = (accounts = []) => {
+    if (!invoicePaymentAccount) return;
+    const labels = { cash: "CASH", mobile: "LIPA KWA SIMU", bank: "BANK" };
+    const activeAccounts = accounts.filter((account) => account.status !== "inactive");
+    invoicePaymentAccount.innerHTML = activeAccounts.length
+      ? activeAccounts.map((account) => `<option value="${account.id}">${labels[account.type] || account.type} - ${escH(account.name || "Account")}</option>`).join("")
+      : `<option value="">No Cash, Lipa or Bank account found</option>`;
+  };
+
+  const invoiceBalanceDue = () => Math.max(0, (Number(currentInvoice?.total_amount || 0) || 0) - (Number(currentInvoice?.amount_paid || 0) || 0));
+
+  const openInvoicePaymentModal = async () => {
+    if (!currentInvoice) return;
+    const due = invoiceBalanceDue();
+    if (invoicePaymentBalance) invoicePaymentBalance.textContent = `Balance: ${formatCurrency(due)}`;
+    if (invoicePaymentAmount) {
+      invoicePaymentAmount.value = groupAmount(Math.round(due));
+      invoicePaymentAmount.focus();
+    }
+    if (invoicePaymentError) invoicePaymentError.hidden = true;
+    renderInvoicePaymentAccounts(cachedAccounts);
+    const accounts = await loadInvoicePaymentAccounts();
+    renderInvoicePaymentAccounts(accounts);
+    if (invoicePaymentModal) invoicePaymentModal.hidden = false;
   };
 
   const applyInvoiceStats = (stats = {}) => {
@@ -6220,8 +6266,10 @@ const setupSalesPage = () => {
       await loadInvoices(invoicesSearch?.value.trim() || "");
       if (reopen && currentInvoice) await loadSingleInvoiceAndOpen(currentInvoice.id);
       await showAppModal(successTitle, successMsg || data.message);
+      return true;
     } catch (err) {
       await showAppModal("Error", err.message || "Action failed.");
+      return false;
     }
   };
 
@@ -6231,9 +6279,43 @@ const setupSalesPage = () => {
   });
   invoiceMarkPaidBtn?.addEventListener("click", async () => {
     if (!currentInvoice) return;
-    const ok = await showConfirmModal({ title: "Mark as Paid", message: `Mark ${currentInvoice.invoice_number} as fully paid?`, confirmLabel: "Mark Paid", cancelLabel: "Cancel" });
-    if (!ok) return;
-    postInvoiceAction({ action: "update_status", invoice_id: currentInvoice.id, status: "paid" }, "Invoice Paid", "Invoice marked as paid.");
+    openInvoicePaymentModal();
+  });
+  invoicePaymentCancel?.addEventListener("click", () => { if (invoicePaymentModal) invoicePaymentModal.hidden = true; });
+  invoicePaymentAmount?.addEventListener("input", () => {
+    invoicePaymentAmount.value = groupAmount(invoicePaymentAmount.value);
+  });
+  invoicePaymentSave?.addEventListener("click", async () => {
+    if (!currentInvoice) return;
+    if (invoicePaymentError) invoicePaymentError.hidden = true;
+    const amount = num(invoicePaymentAmount?.value);
+    const due = invoiceBalanceDue();
+    const accountId = invoicePaymentAccount?.value || "";
+    if (amount <= 0) {
+      if (invoicePaymentError) { invoicePaymentError.textContent = "Enter a payment amount."; invoicePaymentError.hidden = false; }
+      return;
+    }
+    if (amount > due) {
+      if (invoicePaymentError) { invoicePaymentError.textContent = `Amount cannot exceed ${formatCurrency(due)}.`; invoicePaymentError.hidden = false; }
+      return;
+    }
+    if (!accountId) {
+      if (invoicePaymentError) { invoicePaymentError.textContent = "Choose where the payment goes."; invoicePaymentError.hidden = false; }
+      return;
+    }
+    invoicePaymentSave.disabled = true;
+    try {
+      const saved = await postInvoiceAction({
+        action: "update_status",
+        invoice_id: currentInvoice.id,
+        status: "paid",
+        amount_paid: amount,
+        account_id: accountId,
+      }, amount >= due ? "Invoice Paid" : "Payment Saved", amount >= due ? "Invoice marked as paid." : "Installment payment recorded.");
+      if (saved && invoicePaymentModal) invoicePaymentModal.hidden = true;
+    } finally {
+      invoicePaymentSave.disabled = false;
+    }
   });
   invoiceCancelBtn?.addEventListener("click", async () => {
     if (!currentInvoice) return;
