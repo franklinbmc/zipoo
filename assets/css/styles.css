@@ -6678,3 +6678,126 @@ button.report-list-row:focus-visible {
     grid-column: 2;
   }
 }
+
+/* ======================= Final mobile workspace polish ======================= */
+@media (max-width: 640px) {
+  .fullscreen-panel {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .fullscreen-header h2,
+  .workspace-header-title h2 {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .fullscreen-body,
+  .fullscreen-body.stock-workspace-body {
+    padding: 12px;
+  }
+
+  .stock-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .stock-kpi-card {
+    min-width: 0;
+    padding: 10px;
+  }
+
+  .stock-kpi-card .kpi-label {
+    font-size: 0.68rem;
+    letter-spacing: 0;
+  }
+
+  .stock-kpi-card .kpi-val,
+  .stock-kpi-card .amount-fit,
+  .dashboard-kpi-value.amount-fit {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    font-size: min(calc(1.08rem * var(--amount-scale, 1)), 1.08rem);
+    line-height: 1.18;
+  }
+
+  .stock-hub-row,
+  .settings-list-row,
+  .report-list-row,
+  .expense-group-row,
+  .payroll-row {
+    min-width: 0;
+  }
+
+  .stock-hub-label,
+  .report-list-info,
+  .payroll-row-info,
+  .expense-item-main {
+    min-width: 0;
+  }
+
+  .stock-summary-meta,
+  .expense-group-meta {
+    flex-shrink: 0;
+    max-width: 48%;
+  }
+
+  .stock-count-badge,
+  .expense-right-total,
+  .report-list-amount,
+  .expense-item-amount,
+  .payroll-row-display-amount {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    text-align: right;
+    line-height: 1.2;
+  }
+
+  .segmented-control {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .segmented-control > button,
+  .filter-pill,
+  .export-btn,
+  .btn-sm {
+    min-height: 36px;
+  }
+
+  .workspace-export-bar,
+  .workspace-export-email-form,
+  .payroll-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-export-actions,
+  .report-export-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .payroll-controls input[type="month"],
+  .payroll-controls select,
+  .payroll-controls [data-payroll-account],
+  .css-formatted-select {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .stock-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stock-summary-meta,
+  .expense-group-meta {
+    max-width: 56%;
+  }
+}
