@@ -4877,6 +4877,117 @@ button.report-list-row:focus-visible {
   overflow-wrap: anywhere;
 }
 
+.shift-list-card {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+}
+
+.shift-list-main {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shift-list-main:hover .shift-list-title,
+.shift-list-main:focus-visible .shift-list-title {
+  color: var(--color-blue);
+}
+
+.shift-list-main:focus-visible {
+  outline: 2px solid rgba(20, 119, 255, 0.22);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.shift-list-head,
+.shift-list-meta,
+.shift-list-actions,
+.shift-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shift-list-head,
+.shift-detail-row {
+  justify-content: space-between;
+}
+
+.shift-list-title {
+  color: var(--color-navy);
+  font-size: 0.88rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.shift-list-meta {
+  flex-wrap: wrap;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.shift-list-actions {
+  flex-wrap: wrap;
+}
+
+.shift-detail-panel {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-line);
+}
+
+.shift-detail-grid {
+  display: grid;
+  gap: 6px;
+}
+
+.shift-detail-row {
+  padding: 8px 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  min-width: 0;
+}
+
+.shift-detail-row span,
+.shift-detail-row strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.shift-detail-row span {
+  color: var(--color-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.shift-detail-row strong {
+  color: var(--color-navy);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-align: right;
+}
+
+.shift-detail-empty {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 /* Stock hub — tap-to-open section rows */
 .stock-hub {
   display: grid;

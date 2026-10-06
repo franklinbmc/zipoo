@@ -6754,28 +6754,89 @@ const setupSalesPage = () => {
           const badge = open ? `<span class="badge-stock in-stock">Open</span>` : `<span class="badge-stock out-of-stock">Closed</span>`;
           const extra = (!open && s.variance != null) ? ` · var ${formatCurrency(s.variance)}` : "";
           const reportActions = !open ? `
-            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+            <div class="shift-list-actions">
               <a href="${getBasePath()}api/shifts.php?action=export_pdf&id=${s.id}" target="_blank" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:3px 8px;" title="Download PDF Report">📄 PDF</a>
               <a href="${getBasePath()}api/shifts.php?action=export_excel&id=${s.id}" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:3px 8px;" title="Download Excel Report">📊 Excel</a>
               <button type="button" class="btn btn-outline btn-sm" data-shift-row-email="${s.id}" style="font-size:0.75rem;padding:3px 8px;" title="Send PDF via Email">✉️ Email</button>
             </div>
           ` : "";
-          return `<div class="settings-list-row" style="display:flex;flex-direction:column;gap:6px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
-              <div style="font-weight:800;color:var(--color-navy);font-size:0.88rem;">Shift #${s.id} · ${escH(s.cashier || "Cashier")}</div>
-              <div>${badge}</div>
-            </div>
-            <div style="font-size:0.75rem;color:var(--color-muted);">${when} · open ${formatCurrency(s.opening_balance)}${s.sales_total != null ? " · sales " + formatCurrency(s.sales_total) : ""}${extra}</div>
+          return `<div class="shift-list-card" data-shift-card="${s.id}">
+            <button type="button" class="shift-list-main" data-shift-detail-id="${s.id}" aria-expanded="false">
+              <div class="shift-list-head">
+                <div class="shift-list-title">Shift #${s.id} · ${escH(s.cashier || "Cashier")}</div>
+                <div>${badge}</div>
+              </div>
+              <div class="shift-list-meta">${when} · open ${formatCurrency(s.opening_balance)}${s.sales_total != null ? " · sales " + formatCurrency(s.sales_total) : ""}${extra}</div>
+            </button>
             ${reportActions}
+            <div class="shift-detail-panel" data-shift-detail-panel="${s.id}" hidden></div>
           </div>`;
         }).join("");
       }
     } catch { /* offline */ }
   };
 
+  const renderShiftDetailPanel = (panel, report) => {
+    const summary = report?.sales_summary || {};
+    const items = Array.isArray(report?.sold_items) ? report.sold_items : [];
+    const transactions = Array.isArray(report?.transactions) ? report.transactions : [];
+    const itemRows = items.length ? items.map((item) => {
+      const qty = Number(item.quantity || 0);
+      return `<div class="shift-detail-row">
+        <span>${escH(item.item_name || "Item")} · ${qty.toLocaleString()} sold</span>
+        <strong>${formatCurrency(item.line_total || 0)}</strong>
+      </div>`;
+    }).join("") : `<p class="shift-detail-empty">No items sold under this shift.</p>`;
+    const txRows = transactions.length ? transactions.slice(0, 6).map((tx) => {
+      const whenRaw = tx.created_at || tx.issue_date || "";
+      const whenDate = new Date(String(whenRaw).replace(" ", "T"));
+      const when = isNaN(whenDate.getTime()) ? whenRaw : whenDate.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+      return `<div class="shift-detail-row">
+        <span>${escH(tx.invoice_number || ("Sale #" + tx.id))} · ${escH(tx.customer_name || "Walk-in Customer")} · ${escH(when || "-")}</span>
+        <strong>${formatCurrency(tx.total_amount || 0)}</strong>
+      </div>`;
+    }).join("") : "";
+    const moreTx = transactions.length > 6 ? `<p class="shift-detail-empty">${transactions.length - 6} more sales included in this shift total.</p>` : "";
+    panel.innerHTML = `
+      <div class="shift-detail-row">
+        <span>${Number(summary.tx_count || 0).toLocaleString()} sales · cash ${formatCurrency(summary.cash_sales || 0)} · bank ${formatCurrency(summary.bank_sales || 0)} · mobile ${formatCurrency(summary.mobile_sales || 0)}</span>
+        <strong>${formatCurrency(summary.total_sales || 0)}</strong>
+      </div>
+      <div class="shift-detail-grid">${itemRows}</div>
+      ${txRows ? `<div class="shift-detail-grid">${txRows}${moreTx}</div>` : ""}
+    `;
+  };
+
+  const toggleShiftDetails = async (button) => {
+    const id = Number(button?.dataset.shiftDetailId || 0);
+    if (!id) return;
+    const panel = shiftListEl?.querySelector(`[data-shift-detail-panel="${id}"]`);
+    if (!panel) return;
+    const isOpen = !panel.hidden;
+    if (isOpen) {
+      panel.hidden = true;
+      button.setAttribute("aria-expanded", "false");
+      return;
+    }
+    panel.hidden = false;
+    button.setAttribute("aria-expanded", "true");
+    if (panel.dataset.loaded === "1") return;
+    panel.innerHTML = `<p class="shift-detail-empty">Loading sold items...</p>`;
+    try {
+      const res = await fetch(`${getBasePath()}api/shifts.php?action=report_details&id=${id}`);
+      const d = await res.json();
+      if (!res.ok || !d.ok) throw new Error(d.message || "Could not load shift sold items.");
+      renderShiftDetailPanel(panel, d.report);
+      panel.dataset.loaded = "1";
+    } catch (err) {
+      panel.innerHTML = `<p class="shift-detail-empty">${escH(err.message || "Could not load shift sold items.")}</p>`;
+    }
+  };
+
   shiftListEl?.addEventListener("click", (e) => {
     const emailBtn = e.target.closest("[data-shift-row-email]");
     if (emailBtn) {
+      e.stopPropagation();
       const id = Number(emailBtn.dataset.shiftRowEmail);
       if (id) {
         activeReportShiftId = id;
@@ -6783,7 +6844,11 @@ const setupSalesPage = () => {
         if (shiftEmailStatus) { shiftEmailStatus.hidden = true; shiftEmailStatus.textContent = ""; }
         if (shiftSummaryModal) shiftSummaryModal.hidden = false;
       }
+      return;
     }
+    if (e.target.closest("a")) return;
+    const detailBtn = e.target.closest("[data-shift-detail-id]");
+    if (detailBtn) toggleShiftDetails(detailBtn);
   });
   document.querySelectorAll("[data-open-shift-workspace]").forEach((b) => b.addEventListener("click", () => { openWorkspace(shiftWorkspace); refreshShift(); loadShiftsList(); }));
   document.querySelector("[data-shift-close]")?.addEventListener("click", () => closeWorkspace(shiftWorkspace));
