@@ -538,11 +538,13 @@ try {
             $from = trim((string) ($_GET['from'] ?? ''));
             $to = trim((string) ($_GET['to'] ?? ''));
             $hq = trim((string) ($_GET['q'] ?? ''));
+            $debtOnly = trim((string) ($_GET['debt'] ?? '')) === 'pay_later';
             $conds = ['s.business_id = :bid', 's.sale_type = "pos"'];
             $hp = [':bid' => $businessId];
             if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $conds[] = 'DATE(s.created_at) >= :from'; $hp[':from'] = $from; }
             if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) { $conds[] = 'DATE(s.created_at) <= :to'; $hp[':to'] = $to; }
             if ($hq !== '') { $conds[] = '(s.invoice_number LIKE :q OR s.customer_name LIKE :q)'; $hp[':q'] = '%' . $hq . '%'; }
+            if ($debtOnly) { $conds[] = 's.payment_method = "pay_later" AND s.status != "cancelled" AND s.amount_paid < s.total_amount'; }
             $hwhere = implode(' AND ', $conds);
             $stmt = $pdo->prepare(
                 "SELECT s.id, s.invoice_number, s.customer_name, s.total_amount, s.amount_paid, s.payment_method, s.status, s.created_at,
@@ -554,14 +556,16 @@ try {
             $stmt->execute($hp);
             $rows = $stmt->fetchAll();
             $total = 0.0;
-            $sales = array_map(static function ($r) use (&$total) {
-                if ($r['status'] !== 'cancelled') { $total += (float) $r['total_amount']; }
+            $sales = array_map(static function ($r) use (&$total, $debtOnly) {
+                $amountDue = max(0, (float) $r['total_amount'] - (float) $r['amount_paid']);
+                if ($r['status'] !== 'cancelled') { $total += $debtOnly ? $amountDue : (float) $r['total_amount']; }
                 return [
                     'id' => (int) $r['id'],
                     'receipt_number' => (string) $r['invoice_number'],
                     'customer_name' => (string) ($r['customer_name'] ?? ''),
                     'total_amount' => (float) $r['total_amount'],
                     'amount_paid' => (float) $r['amount_paid'],
+                    'amount_due' => $amountDue,
                     'payment_method' => (string) ($r['payment_method'] ?? ''),
                     'status' => (string) $r['status'],
                     'cashier' => (string) ($r['cashier'] ?? ''),
@@ -629,6 +633,21 @@ try {
         );
         $statStmt->execute([':bid' => $businessId]);
         $stats = $statStmt->fetch() ?: [];
+        $posDebtStmt = $pdo->prepare(
+            'SELECT
+                COUNT(*) AS pay_later_count,
+                COUNT(DISTINCT COALESCE(NULLIF(customer_name, ""), invoice_number)) AS pay_later_customers,
+                COALESCE(SUM(total_amount - amount_paid), 0) AS pay_later_due
+             FROM tbl_sales
+             WHERE business_id = :bid AND sale_type = "pos" AND payment_method = "pay_later"
+               AND status != "cancelled" AND amount_paid < total_amount'
+        );
+        $posDebtStmt->execute([':bid' => $businessId]);
+        $posDebt = $posDebtStmt->fetch() ?: [];
+        $invoiceDue = (float) ($stats['amount_due'] ?? 0);
+        $payLaterDue = (float) ($posDebt['pay_later_due'] ?? 0);
+        $invoiceDueCount = (int) ($stats['overdue_count'] ?? 0);
+        $payLaterCustomers = (int) ($posDebt['pay_later_customers'] ?? 0);
 
         respond(200, [
             'ok' => true,
@@ -638,8 +657,10 @@ try {
                 'draft' => (int) ($stats['draft_count'] ?? 0),
                 'sent' => (int) ($stats['sent_count'] ?? 0),
                 'paid' => (int) ($stats['paid_count'] ?? 0),
-                'overdue' => (int) ($stats['overdue_count'] ?? 0),
-                'amount_due' => (float) ($stats['amount_due'] ?? 0),
+                'overdue' => $invoiceDueCount + $payLaterCustomers,
+                'amount_due' => $invoiceDue + $payLaterDue,
+                'pay_later_due' => $payLaterDue,
+                'pay_later_count' => (int) ($posDebt['pay_later_count'] ?? 0),
                 'sales_today' => (float) ($stats['sales_today'] ?? 0),
                 'txn_today' => (int) ($stats['txn_today'] ?? 0),
                 'sales_month' => (float) ($stats['sales_month'] ?? 0),

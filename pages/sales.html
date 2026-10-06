@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=121">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=122">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -77,6 +77,17 @@
             <small>Past POS sales by date</small>
           </span>
           <span class="stock-summary-meta">
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
+
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-debts-workspace>
+          <span class="stock-hub-label">
+            <strong>Debts</strong>
+            <small>Unpaid Pay Later POS sales</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-debts-count-badge>0 debts</strong>
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </span>
         </button>
@@ -512,6 +523,35 @@
     </section>
   </div>
 
+  <!-- Workspace: Debts -->
+  <div class="fullscreen-modal" hidden data-debts-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="debts-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-debts-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="debts-workspace-title">Debts</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <section class="stock-kpi-grid" style="margin-top: 4px;">
+          <div class="stock-kpi-card alert">
+            <span class="kpi-label">Outstanding</span>
+            <strong class="kpi-val" data-debts-total>TZS 0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Pay Later Sales</span>
+            <strong class="kpi-val" data-debts-count>0</strong>
+          </div>
+        </section>
+        <div class="stock-list" data-debts-list></div>
+        <div class="company-users-empty" hidden data-debts-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <p style="margin:0;font-size:0.84rem;color:var(--color-muted);">No unpaid Pay Later sales.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <!-- Workspace: Shift Sold Items -->
   <div class="fullscreen-modal" hidden data-shift-detail-workspace>
     <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="shift-detail-title">
@@ -782,6 +822,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=135" defer></script>
+  <script src="/assets/js/app.js?v=136" defer></script>
 </body>
 </html>

@@ -5707,6 +5707,7 @@ const setupSalesPage = () => {
   const kpiInvoicesDue = document.querySelector("[data-kpi-invoices-due]");
   const kpiSalesMonth = document.querySelector("[data-kpi-sales-month]");
   const invoicesCountBadge = document.querySelector("[data-invoices-count-badge]");
+  const debtsCountBadge = document.querySelector("[data-debts-count-badge]");
   const invoicesList = document.querySelector("[data-invoices-list]");
   const invoicesEmpty = document.querySelector("[data-invoices-empty]");
   const invoicesSearch = document.querySelector("[data-invoices-search]");
@@ -5805,6 +5806,7 @@ const setupSalesPage = () => {
     if (kpiInvoicesDue) kpiInvoicesDue.textContent = String(stats.overdue || 0);
     if (kpiSalesMonth) kpiSalesMonth.textContent = formatCurrency(stats.sales_month || 0);
     if (invoicesCountBadge) invoicesCountBadge.textContent = `${stats.total || 0} invoices`;
+    if (debtsCountBadge) debtsCountBadge.textContent = `${stats.pay_later_count || 0} debt${Number(stats.pay_later_count || 0) === 1 ? "" : "s"}`;
   };
 
   const renderInvoicesList = (invoices = []) => {
@@ -6864,6 +6866,46 @@ const setupSalesPage = () => {
   document.querySelectorAll("[data-open-shift-workspace]").forEach((b) => b.addEventListener("click", () => { openWorkspace(shiftWorkspace); refreshShift(); loadShiftsList(); }));
   document.querySelector("[data-shift-close]")?.addEventListener("click", () => closeWorkspace(shiftWorkspace));
   document.querySelector("[data-shift-detail-close]")?.addEventListener("click", () => closeWorkspace(shiftDetailWorkspace));
+
+  // ---- Debts workspace: unpaid Pay Later POS sales ----
+  const debtsWorkspace = document.querySelector("[data-debts-workspace]");
+  const debtsList = document.querySelector("[data-debts-list]");
+  const debtsEmpty = document.querySelector("[data-debts-empty]");
+  const debtsTotal = document.querySelector("[data-debts-total]");
+  const debtsCount = document.querySelector("[data-debts-count]");
+  const loadDebts = async () => {
+    try {
+      const params = new URLSearchParams({ history: "pos", debt: "pay_later" });
+      const res = await fetch(`${getBasePath()}api/sales.php?${params.toString()}`);
+      const d = await res.json();
+      if (!res.ok || !d.ok) return;
+      const list = d.sales || [];
+      if (debtsTotal) debtsTotal.textContent = formatCurrency(d.stats?.total || 0);
+      if (debtsCount) debtsCount.textContent = String(d.stats?.count || 0);
+      if (debtsCountBadge) debtsCountBadge.textContent = `${d.stats?.count || 0} debt${Number(d.stats?.count || 0) === 1 ? "" : "s"}`;
+      if (!list.length) { debtsList?.replaceChildren(); if (debtsEmpty) debtsEmpty.hidden = false; return; }
+      if (debtsEmpty) debtsEmpty.hidden = true;
+      if (debtsList) {
+        debtsList.innerHTML = list.map((s) => {
+          const dt = new Date(String(s.created_at).replace(" ", "T"));
+          const when = isNaN(dt.getTime()) ? s.created_at : dt.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+          return `<button type="button" class="settings-list-row" data-debt-open="${s.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
+            <div style="min-width:0;">
+              <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(s.receipt_number)} <span class="badge-stock out-of-stock">Pay Later</span></div>
+              <div style="font-size:0.76rem;color:var(--color-muted);">${escH(s.customer_name || "Walk-in Customer")} · ${when}${s.cashier ? " · " + escH(s.cashier) : ""}</div>
+            </div>
+            <strong style="color:var(--color-navy);white-space:nowrap;">${formatCurrency(s.amount_due || s.total_amount || 0)}</strong>
+          </button>`;
+        }).join("");
+      }
+    } catch { /* offline */ }
+  };
+  document.querySelectorAll("[data-open-debts-workspace]").forEach((b) => b.addEventListener("click", () => { openWorkspace(debtsWorkspace); loadDebts(); }));
+  document.querySelector("[data-debts-close]")?.addEventListener("click", () => closeWorkspace(debtsWorkspace));
+  debtsList?.addEventListener("click", (e) => {
+    const id = e.target.closest("[data-debt-open]")?.dataset.debtOpen;
+    if (id) loadSingleInvoiceAndOpen(id);
+  });
 
   // ---- Sales history workspace ----
   const salesHistoryWorkspace = document.querySelector("[data-sales-history-workspace]");
