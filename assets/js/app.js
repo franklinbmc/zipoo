@@ -9333,6 +9333,15 @@ const setupDashboardPage = () => {
     if (Number.isNaN(d.getTime())) return "";
     return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
   };
+  const isoDate = (date = new Date()) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+  const todayKey = isoDate();
+  const monthKey = todayKey.slice(0, 7);
+  const dateKey = (value) => String(value || "").slice(0, 10);
 
   const renderSales = (sales = []) => {
     const list = document.querySelector("[data-dashboard-sales-list]");
@@ -9362,29 +9371,51 @@ const setupDashboardPage = () => {
 
   const loadDashboard = async () => {
     try {
-      const [invoiceRes, posRes, stockRes] = await Promise.allSettled([
+      const [invoiceRes, posRes, stockRes, expensesRes] = await Promise.allSettled([
         fetch(`${getBasePath()}api/sales.php`),
-        fetch(`${getBasePath()}api/sales.php?history=pos`),
+        fetch(`${getBasePath()}api/sales.php?history=pos&from=${encodeURIComponent(todayKey)}&to=${encodeURIComponent(todayKey)}`),
         fetch(`${getBasePath()}api/items.php`),
+        fetch(`${getBasePath()}api/accounts.php?action=expenses`),
       ]);
 
+      let invoiceTodayTotal = 0;
+      let invoiceTodayCount = 0;
       if (invoiceRes.status === "fulfilled" && invoiceRes.value.ok) {
         const data = await invoiceRes.value.json();
         const stats = data.stats || {};
-        setText("[data-dashboard-sales-today]", fmt(stats.sales_today));
-        setText("[data-dashboard-sales-count]", `${stats.txn_today || 0} sales recorded`);
+        invoiceTodayTotal = Number(stats.sales_today || 0) || 0;
+        invoiceTodayCount = Number(stats.txn_today || 0) || 0;
         setText("[data-dashboard-amount-due]", fmt(stats.amount_due));
         setText("[data-dashboard-overdue]", `${stats.overdue || 0} customers due`);
       }
 
+      let posTodayTotal = 0;
+      let posTodayCount = 0;
       if (posRes.status === "fulfilled" && posRes.value.ok) {
         const data = await posRes.value.json();
-        renderSales(data.sales || []);
+        const sales = (data.sales || []).filter((sale) => String(sale.status || "") !== "cancelled");
+        posTodayTotal = sales.reduce((sum, sale) => sum + (Number(sale.total_amount || 0) || 0), 0);
+        posTodayCount = sales.length;
+        renderSales(sales);
       }
+      const totalSalesToday = invoiceTodayTotal + posTodayTotal;
+      const totalSalesCount = invoiceTodayCount + posTodayCount;
+      setText("[data-dashboard-sales-today]", fmt(totalSalesToday));
+      setText("[data-dashboard-sales-count]", `${totalSalesCount} sale${totalSalesCount === 1 ? "" : "s"} recorded today`);
 
       if (stockRes.status === "fulfilled" && stockRes.value.ok) {
         const data = await stockRes.value.json();
         setText("[data-dashboard-low-stock]", String(data.stats?.low_stock || 0));
+      }
+
+      if (expensesRes.status === "fulfilled" && expensesRes.value.ok) {
+        const data = await expensesRes.value.json();
+        const expenses = Array.isArray(data.expenses) ? data.expenses : [];
+        const monthExpenses = expenses.filter((expense) => dateKey(expense.created_at).slice(0, 7) === monthKey);
+        const monthTotal = monthExpenses.reduce((sum, expense) => sum + (Number(expense.amount || 0) || 0), 0);
+        const todayExpenses = expenses.filter((expense) => dateKey(expense.created_at) === todayKey);
+        setText("[data-dashboard-expenses]", fmt(monthTotal));
+        setText("[data-dashboard-expenses-count]", `${todayExpenses.length} today • ${monthExpenses.length} this month`);
       }
 
       fitAmounts(document);
