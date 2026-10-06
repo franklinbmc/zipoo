@@ -70,6 +70,17 @@
             <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
           </span>
         </button>
+
+        <button class="settings-accordion-link stock-hub-row" type="button" data-open-reconciliation-workspace>
+          <span class="stock-hub-label">
+            <strong>Reconciliation</strong>
+            <small>Sales, debts, accounts &amp; expenses checks</small>
+          </span>
+          <span class="stock-summary-meta">
+            <strong class="stock-count-badge" data-reconciliation-status>Review</strong>
+            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
+          </span>
+        </button>
       </nav>
     </main>
   </div>
@@ -115,6 +126,46 @@
           <strong style="display: block; color: var(--color-navy); font-size: 1rem; margin-bottom: 4px;">No activity yet</strong>
           <p style="margin: 0; font-size: 0.84rem; color: var(--color-muted);">Sales, deposits, withdrawals and transfers will appear here.</p>
         </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Reconciliation -->
+  <div class="fullscreen-modal" hidden data-reconciliation-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="reconciliation-workspace-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-reconciliation-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2 id="reconciliation-workspace-title">Reconciliation</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body stock-workspace-body">
+        <div class="segmented-control" style="margin-bottom: 12px;" data-reconciliation-periods>
+          <button type="button" data-period="today">Today</button>
+          <button type="button" class="active" data-period="month">This Month</button>
+          <button type="button" data-period="year">This Year</button>
+          <button type="button" data-period="all">All</button>
+        </div>
+        <div class="stock-kpi-grid" style="margin-bottom: 12px;">
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Sales Billed</span>
+            <strong class="kpi-val" data-recon-sales>0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Collected</span>
+            <strong class="kpi-val" data-recon-collected>0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Outstanding</span>
+            <strong class="kpi-val" data-recon-debts>0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Expenses</span>
+            <strong class="kpi-val" data-recon-expenses>0</strong>
+          </div>
+        </div>
+        <div class="stock-list" data-reconciliation-list></div>
       </div>
     </section>
   </div>
@@ -297,6 +348,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=94" defer></script>
+  <script src="/assets/js/app.js?v=142" defer></script>
 </body>
 </html>

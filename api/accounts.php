@@ -140,6 +140,127 @@ function category_payload(array $row): array
     ];
 }
 
+function reconciliation_period(string $period): array
+{
+    $today = new DateTimeImmutable('today');
+    if ($period === 'today') {
+        return [$today->format('Y-m-d'), $today->format('Y-m-d'), 'Today'];
+    }
+    if ($period === 'year') {
+        return [$today->setDate((int) $today->format('Y'), 1, 1)->format('Y-m-d'), $today->format('Y-m-d'), 'This Year'];
+    }
+    if ($period === 'all') {
+        return ['', '', 'All Time'];
+    }
+    return [$today->modify('first day of this month')->format('Y-m-d'), $today->format('Y-m-d'), 'This Month'];
+}
+
+function sum_one(PDO $pdo, string $sql, array $params): float
+{
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    return round((float) ($stmt->fetchColumn() ?: 0), 2);
+}
+
+function reconciliation_report(PDO $pdo, int $businessId, string $period): array
+{
+    [$from, $to, $label] = reconciliation_period($period);
+    $salesDate = $from !== '' ? ' AND s.issue_date BETWEEN :from AND :to' : '';
+    $txnDate = $from !== '' ? ' AND DATE(t.created_at) BETWEEN :from AND :to' : '';
+    $salesParams = [':bid' => $businessId];
+    $txnParams = [':bid' => $businessId];
+    if ($from !== '') {
+        $salesParams[':from'] = $from;
+        $salesParams[':to'] = $to;
+        $txnParams[':from'] = $from;
+        $txnParams[':to'] = $to;
+    }
+
+    $salesBilled = sum_one(
+        $pdo,
+        'SELECT COALESCE(SUM(s.total_amount), 0)
+         FROM tbl_sales s
+         WHERE s.business_id = :bid AND s.status NOT IN ("cancelled", "draft")' . $salesDate,
+        $salesParams
+    );
+    $salesCollected = sum_one(
+        $pdo,
+        'SELECT COALESCE(SUM(s.amount_paid), 0)
+         FROM tbl_sales s
+         WHERE s.business_id = :bid AND s.status NOT IN ("cancelled", "draft")' . $salesDate,
+        $salesParams
+    );
+    $outstanding = sum_one(
+        $pdo,
+        'SELECT COALESCE(SUM(GREATEST(s.total_amount - s.amount_paid, 0)), 0)
+         FROM tbl_sales s
+         WHERE s.business_id = :bid AND s.status NOT IN ("cancelled", "draft")' . $salesDate,
+        $salesParams
+    );
+    $postedCollections = sum_one(
+        $pdo,
+        'SELECT COALESCE(SUM(t.amount), 0)
+         FROM tbl_account_transactions t
+         WHERE t.business_id = :bid AND t.direction = "in" AND t.type IN ("sale", "invoice_payment")' . $txnDate,
+        $txnParams
+    );
+    $expensesPaid = sum_one(
+        $pdo,
+        'SELECT COALESCE(SUM(t.amount), 0)
+         FROM tbl_account_transactions t
+         WHERE t.business_id = :bid AND t.direction = "out" AND t.type = "expense"' . $txnDate,
+        $txnParams
+    );
+    $manualDeposits = sum_one(
+        $pdo,
+        'SELECT COALESCE(SUM(t.amount), 0)
+         FROM tbl_account_transactions t
+         WHERE t.business_id = :bid AND t.direction = "in" AND t.type = "deposit"' . $txnDate,
+        $txnParams
+    );
+    $manualWithdrawals = sum_one(
+        $pdo,
+        'SELECT COALESCE(SUM(t.amount), 0)
+         FROM tbl_account_transactions t
+         WHERE t.business_id = :bid AND t.direction = "out" AND t.type = "withdrawal"' . $txnDate,
+        $txnParams
+    );
+
+    $accounts = load_accounts($pdo, $businessId);
+    $summary = account_summary($accounts);
+    $collectionDifference = round($salesCollected - $postedCollections, 2);
+    $checks = [
+        [
+            'label' => 'Sales collected vs account postings',
+            'status' => abs($collectionDifference) <= 1 ? 'ok' : 'review',
+            'difference' => $collectionDifference,
+        ],
+        [
+            'label' => 'Outstanding debts',
+            'status' => $outstanding > 0 ? 'review' : 'ok',
+            'difference' => $outstanding,
+        ],
+    ];
+
+    return [
+        'period' => $period,
+        'label' => $label,
+        'from' => $from,
+        'to' => $to,
+        'sales_billed' => $salesBilled,
+        'sales_collected' => $salesCollected,
+        'account_posted_collections' => $postedCollections,
+        'collection_difference' => $collectionDifference,
+        'outstanding_debts' => $outstanding,
+        'expenses_paid' => $expensesPaid,
+        'manual_deposits' => $manualDeposits,
+        'manual_withdrawals' => $manualWithdrawals,
+        'account_balance' => (float) $summary['net'],
+        'account_summary' => $summary,
+        'checks' => $checks,
+    ];
+}
+
 function load_expense_categories(PDO $pdo, int $businessId): array
 {
     $stmt = $pdo->prepare(
@@ -347,6 +468,14 @@ try {
                 ];
             }, $stmt->fetchAll());
             respond(200, ['ok' => true, 'activity' => $activity]);
+        }
+
+        if (($_GET['action'] ?? '') === 'reconciliation') {
+            $period = strtolower(trim((string) ($_GET['period'] ?? 'month')));
+            if (!in_array($period, ['today', 'month', 'year', 'all'], true)) {
+                $period = 'month';
+            }
+            respond(200, ['ok' => true, 'report' => reconciliation_report($pdo, $businessId, $period)]);
         }
 
         if (($_GET['action'] ?? '') === 'expenses') {

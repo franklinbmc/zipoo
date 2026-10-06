@@ -7392,6 +7392,7 @@ const setupBankPage = () => {
   // Workspaces
   const accountsWorkspace = document.querySelector("[data-accounts-workspace]");
   const activityWorkspace = document.querySelector("[data-activity-workspace]");
+  const reconciliationWorkspace = document.querySelector("[data-reconciliation-workspace]");
   const detailWorkspace = document.querySelector("[data-account-detail-workspace]");
   const openWorkspace = (el, refresh) => { if (el) { el.hidden = false; if (typeof refresh === "function") refresh(); } };
   const closeWorkspace = (el) => { if (el) el.hidden = true; };
@@ -7401,6 +7402,13 @@ const setupBankPage = () => {
   const accountsEmpty = document.querySelector("[data-accounts-empty]");
   const activityList = document.querySelector("[data-activity-list]");
   const activityEmpty = document.querySelector("[data-activity-empty]");
+  const reconciliationStatus = document.querySelector("[data-reconciliation-status]");
+  const reconciliationPeriods = document.querySelector("[data-reconciliation-periods]");
+  const reconciliationList = document.querySelector("[data-reconciliation-list]");
+  const reconSales = document.querySelector("[data-recon-sales]");
+  const reconCollected = document.querySelector("[data-recon-collected]");
+  const reconDebts = document.querySelector("[data-recon-debts]");
+  const reconExpenses = document.querySelector("[data-recon-expenses]");
 
   // Detail refs
   const detailName = document.querySelector("[data-account-detail-name]");
@@ -7442,6 +7450,7 @@ const setupBankPage = () => {
 
   let accountsCache = [];
   let currentAccount = null;
+  let reconciliationPeriod = "month";
 
   const renderAccounts = (accounts = [], summary = null) => {
     accountsCache = accounts;
@@ -7623,11 +7632,73 @@ const setupBankPage = () => {
     } catch { /* offline */ }
   };
 
+  const renderReconciliation = (report = {}) => {
+    const checks = Array.isArray(report.checks) ? report.checks : [];
+    const needsReview = checks.some((check) => check.status === "review");
+    if (reconciliationStatus) {
+      reconciliationStatus.textContent = needsReview ? "Review" : "OK";
+      reconciliationStatus.className = `stock-count-badge ${needsReview ? "low-stock" : "in-stock"}`;
+    }
+    if (reconSales) reconSales.textContent = fmt(report.sales_billed);
+    if (reconCollected) reconCollected.textContent = fmt(report.sales_collected);
+    if (reconDebts) reconDebts.textContent = fmt(report.outstanding_debts);
+    if (reconExpenses) reconExpenses.textContent = fmt(report.expenses_paid);
+    if (!reconciliationList) return;
+    const rows = [
+      ["Account posted collections", report.account_posted_collections],
+      ["Collection difference", report.collection_difference],
+      ["Account balance", report.account_balance],
+      ["Manual deposits", report.manual_deposits],
+      ["Manual withdrawals", report.manual_withdrawals],
+    ];
+    reconciliationList.innerHTML = `
+      <div style="background:#fff;border:1px solid var(--color-line);border-radius:10px;padding:12px 14px;margin-bottom:10px;">
+        <div style="font-size:0.78rem;color:var(--color-muted);font-weight:800;text-transform:uppercase;margin-bottom:3px;">${esc(report.label || "This Month")}</div>
+        <strong style="display:block;color:var(--color-navy);font-size:0.94rem;">${needsReview ? "Needs review" : "Balanced"}</strong>
+      </div>
+      ${rows.map(([label, value]) => `
+        <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:10px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
+          <span style="font-size:0.86rem;color:var(--color-muted);">${esc(label)}</span>
+          <strong style="font-size:0.9rem;color:var(--color-navy);white-space:nowrap;">${fmt(value)}</strong>
+        </div>
+      `).join("")}
+      ${checks.map((check) => {
+        const review = check.status === "review";
+        return `
+          <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:10px 14px;background:${review ? "#fff7ed" : "#f0fdf4"};border:1px solid ${review ? "#fed7aa" : "#bbf7d0"};border-radius:10px;">
+            <span style="font-size:0.86rem;color:var(--color-navy);font-weight:800;">${esc(check.label)}</span>
+            <strong style="font-size:0.84rem;color:${review ? "#c2410c" : "#15803d"};white-space:nowrap;">${review ? fmt(check.difference) : "OK"}</strong>
+          </div>
+        `;
+      }).join("")}
+    `;
+  };
+
+  const loadReconciliation = async () => {
+    try {
+      const res = await fetch(`${getBasePath()}api/accounts.php?action=reconciliation&period=${encodeURIComponent(reconciliationPeriod)}`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Could not load reconciliation.");
+      renderReconciliation(data.report || {});
+    } catch (err) {
+      await showAppModal("Reconciliation", err.message || "Please try again.");
+    }
+  };
+
   // ---- Wiring ----
   document.querySelectorAll("[data-open-accounts-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(accountsWorkspace, loadAccounts)));
   document.querySelector("[data-accounts-workspace-close]")?.addEventListener("click", () => closeWorkspace(accountsWorkspace));
   document.querySelectorAll("[data-open-activity-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(activityWorkspace, loadActivity)));
   document.querySelector("[data-activity-workspace-close]")?.addEventListener("click", () => closeWorkspace(activityWorkspace));
+  document.querySelectorAll("[data-open-reconciliation-workspace]").forEach((btn) => btn.addEventListener("click", () => openWorkspace(reconciliationWorkspace, loadReconciliation)));
+  document.querySelector("[data-reconciliation-workspace-close]")?.addEventListener("click", () => closeWorkspace(reconciliationWorkspace));
+  reconciliationPeriods?.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-period]");
+    if (!btn) return;
+    reconciliationPeriod = btn.dataset.period || "month";
+    reconciliationPeriods.querySelectorAll("[data-period]").forEach((b) => b.classList.toggle("active", b === btn));
+    loadReconciliation();
+  });
   document.querySelector("[data-account-detail-close]")?.addEventListener("click", () => closeWorkspace(detailWorkspace));
   document.querySelectorAll("[data-open-create-account]").forEach((btn) => btn.addEventListener("click", () => openAccountForm(null)));
   document.querySelector("[data-account-form-close]")?.addEventListener("click", () => { if (accountFormModal) accountFormModal.hidden = true; });
