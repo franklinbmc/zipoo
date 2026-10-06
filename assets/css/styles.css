@@ -2479,6 +2479,20 @@ body.offline .status-dot {
   box-shadow: 0 1px 3px rgba(13, 43, 91, 0.03);
 }
 
+.payroll-controls .form-field {
+  min-width: 0;
+}
+
+.payroll-controls input[type="month"] {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.payroll-controls .btn {
+  white-space: nowrap;
+}
+
 /* Payroll Summary KPI Cards */
 .payroll-summary {
   display: grid;
