@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=126">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=128">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -589,6 +589,26 @@
         </button>
       </header>
       <div class="fullscreen-body stock-workspace-body">
+        <!-- Summary cards -->
+        <section class="stock-kpi-grid invoices-summary-grid" style="margin-top: 4px;">
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Total Invoices</span>
+            <strong class="kpi-val" data-invoices-summary-total>0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Sent / Due</span>
+            <strong class="kpi-val" data-invoices-summary-sent>0</strong>
+          </div>
+          <div class="stock-kpi-card alert">
+            <span class="kpi-label">Outstanding</span>
+            <strong class="kpi-val" data-invoices-summary-due>TZS 0</strong>
+          </div>
+          <div class="stock-kpi-card">
+            <span class="kpi-label">Paid</span>
+            <strong class="kpi-val" data-invoices-summary-paid>0</strong>
+          </div>
+        </section>
+
         <!-- Filter Pills -->
         <div class="filter-bar" data-invoice-status-filters>
           <button type="button" class="filter-pill active" data-filter-invoice="all">All</button>
@@ -843,6 +863,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=138" defer></script>
+  <script src="/assets/js/app.js?v=140" defer></script>
 </body>
 </html>

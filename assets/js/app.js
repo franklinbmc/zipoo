@@ -5708,6 +5708,10 @@ const setupSalesPage = () => {
   const kpiSalesMonth = document.querySelector("[data-kpi-sales-month]");
   const invoicesCountBadge = document.querySelector("[data-invoices-count-badge]");
   const debtsCountBadge = document.querySelector("[data-debts-count-badge]");
+  const invoicesSummaryTotal = document.querySelector("[data-invoices-summary-total]");
+  const invoicesSummarySent = document.querySelector("[data-invoices-summary-sent]");
+  const invoicesSummaryDue = document.querySelector("[data-invoices-summary-due]");
+  const invoicesSummaryPaid = document.querySelector("[data-invoices-summary-paid]");
   const invoicesList = document.querySelector("[data-invoices-list]");
   const invoicesEmpty = document.querySelector("[data-invoices-empty]");
   const invoicesSearch = document.querySelector("[data-invoices-search]");
@@ -5853,6 +5857,10 @@ const setupSalesPage = () => {
     if (kpiSalesMonth) kpiSalesMonth.textContent = formatCurrency(stats.sales_month || 0);
     if (invoicesCountBadge) invoicesCountBadge.textContent = `${stats.total || 0} invoices`;
     if (debtsCountBadge) debtsCountBadge.textContent = `${stats.pay_later_count || 0} debt${Number(stats.pay_later_count || 0) === 1 ? "" : "s"}`;
+    if (invoicesSummaryTotal) invoicesSummaryTotal.textContent = String(stats.total || 0);
+    if (invoicesSummarySent) invoicesSummarySent.textContent = String(stats.sent || 0);
+    if (invoicesSummaryDue) invoicesSummaryDue.textContent = formatCurrency(stats.amount_due || 0);
+    if (invoicesSummaryPaid) invoicesSummaryPaid.textContent = String(stats.paid || 0);
   };
 
   const renderInvoicesList = (invoices = []) => {
