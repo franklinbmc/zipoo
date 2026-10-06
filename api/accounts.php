@@ -75,6 +75,15 @@ const TXN_TYPE_LABELS = [
     'adjustment' => 'Adjustment',
 ];
 
+function money_value($value): float
+{
+    $clean = preg_replace('/[^0-9.\-]/', '', (string) $value);
+    if ($clean === '' || $clean === '-' || $clean === '.') {
+        return 0.0;
+    }
+    return round((float) $clean, 2);
+}
+
 function account_payload(array $row): array
 {
     $type = (string) ($row['type'] ?? 'cash');
@@ -585,7 +594,7 @@ try {
         }
         $bankName = trim((string) ($_POST['bank_name'] ?? ''));
         $accountNumber = trim((string) ($_POST['account_number'] ?? ''));
-        $openingBalance = (float) ($_POST['opening_balance'] ?? 0);
+        $openingBalance = money_value($_POST['opening_balance'] ?? 0);
         $makeDefault = (int) ($_POST['is_default'] ?? 0) === 1;
 
         if ($name === '') {
@@ -696,7 +705,7 @@ try {
 
     if ($action === 'deposit' || $action === 'withdraw' || $action === 'expense') {
         $accountId = (int) ($_POST['account_id'] ?? 0);
-        $amount = round((float) ($_POST['amount'] ?? 0), 2);
+        $amount = money_value($_POST['amount'] ?? 0);
         $notes = trim((string) ($_POST['notes'] ?? ''));
         $categoryId = (int) ($_POST['category_id'] ?? 0);
         fetch_account_or_404($pdo, $businessId, $accountId);
@@ -846,7 +855,7 @@ try {
     if ($action === 'update_payroll_item') {
         require_permission($pdo, $businessId, $userId, 'payroll.manage');
         $itemId = (int) ($_POST['item_id'] ?? 0);
-        $amount = round((float) ($_POST['salary_amount'] ?? 0), 2);
+        $amount = money_value($_POST['salary_amount'] ?? 0);
         if ($amount < 0) {
             respond(422, ['ok' => false, 'message' => 'Salary cannot be negative.']);
         }
@@ -947,7 +956,7 @@ try {
         require_permission($pdo, $businessId, $userId, 'accounts.transfer');
         $fromId = (int) ($_POST['account_id'] ?? 0);
         $toId = (int) ($_POST['to_account_id'] ?? 0);
-        $amount = round((float) ($_POST['amount'] ?? 0), 2);
+        $amount = money_value($_POST['amount'] ?? 0);
         $notes = trim((string) ($_POST['notes'] ?? ''));
 
         if ($fromId <= 0 || $toId <= 0 || $fromId === $toId) {

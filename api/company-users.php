@@ -115,6 +115,24 @@ function money_value($value): float
     return round((float) $clean, 2);
 }
 
+function validate_user_fields(string $phone, string $email, float $monthlySalary, string $tin, string $nida, string $nssf): void
+{
+    if (!preg_match('/^[0-9+()\-\s]{7,24}$/', $phone)) {
+        respond(422, ['ok' => false, 'message' => 'Please enter a valid phone number.']);
+    }
+    if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        respond(422, ['ok' => false, 'message' => 'Please provide a valid email address.']);
+    }
+    if ($monthlySalary < 0 || $monthlySalary > 999999999) {
+        respond(422, ['ok' => false, 'message' => 'Please enter a valid salary amount.']);
+    }
+    foreach (['TIN' => $tin, 'NIDA' => $nida, 'NSSF' => $nssf] as $label => $value) {
+        if ($value !== '' && strlen($value) > 50) {
+            respond(422, ['ok' => false, 'message' => $label . ' is too long.']);
+        }
+    }
+}
+
 function upload_user_photo(string $field): ?string
 {
     if (empty($_FILES[$field]) || ($_FILES[$field]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
@@ -265,9 +283,7 @@ try {
             respond(422, ['ok' => false, 'message' => 'Password must be at least 4 characters long.']);
         }
 
-        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            respond(422, ['ok' => false, 'message' => 'Please provide a valid email address.']);
-        }
+        validate_user_fields($phone, $email, $monthlySalary, $tin, $nida, $nssf);
 
         // Check if phone already exists
         $check = $pdo->prepare('SELECT id FROM tbl_users WHERE phone = :phone LIMIT 1');
@@ -355,9 +371,7 @@ try {
             respond(422, ['ok' => false, 'message' => 'Phone number is required.']);
         }
 
-        if ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            respond(422, ['ok' => false, 'message' => 'Please provide a valid email address.']);
-        }
+        validate_user_fields($phone, $email, $monthlySalary, $tin, $nida, $nssf);
 
         // Verify target belongs to this business
         $stmt = $pdo->prepare('SELECT id FROM tbl_users WHERE id = :id AND business_id = :bid LIMIT 1');

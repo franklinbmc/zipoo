@@ -36,6 +36,15 @@ function require_user(): int
     return $userId;
 }
 
+function money_value($value): float
+{
+    $clean = preg_replace('/[^0-9.\-]/', '', (string) $value);
+    if ($clean === '' || $clean === '-' || $clean === '.') {
+        return 0.0;
+    }
+    return round((float) $clean, 2);
+}
+
 function get_active_business(PDO $pdo, int $userId): array
 {
     $businessId = isset($_SESSION['zipoo_business_id']) ? (int) $_SESSION['zipoo_business_id'] : 0;
@@ -705,7 +714,7 @@ try {
             // VAT is automatic: rate comes from business settings, applied only to VAT-applicable items.
             $vatEnabled = (int) ($biz['vat_enabled'] ?? 0) === 1;
             $taxRate = $vatEnabled ? (float) ($biz['tax_rate'] ?? 0) : 0.0;
-            $discount = (float) ($_POST['discount'] ?? 0);
+            $discount = money_value($_POST['discount'] ?? 0);
             $itemsRaw = $_POST['items'] ?? '[]';
             $items = is_string($itemsRaw) ? json_decode($itemsRaw, true) : $itemsRaw;
 
@@ -737,8 +746,8 @@ try {
             $validatedItems = [];
             foreach ($items as $item) {
                 $itemId = (int) ($item['item_id'] ?? 0);
-                $qty = (float) ($item['quantity'] ?? 1);
-                $price = (float) ($item['unit_price'] ?? 0);
+                $qty = money_value($item['quantity'] ?? 1);
+                $price = money_value($item['unit_price'] ?? 0);
                 $nameFallback = trim((string) ($item['item_name'] ?? ''));
 
                 if ($qty <= 0) {
@@ -908,7 +917,7 @@ try {
             if ($isPayLater) {
                 $paymentMethod = 'pay_later';
             }
-            $amountPaidInput = isset($_POST['amount_paid']) ? (float) $_POST['amount_paid'] : null;
+            $amountPaidInput = isset($_POST['amount_paid']) ? money_value($_POST['amount_paid']) : null;
             $itemsRaw = $_POST['items'] ?? '[]';
             $items = is_string($itemsRaw) ? json_decode($itemsRaw, true) : $itemsRaw;
 
@@ -944,8 +953,8 @@ try {
             $validatedItems = [];
             foreach ($items as $item) {
                 $itemId = (int) ($item['item_id'] ?? 0);
-                $qty = (float) ($item['quantity'] ?? 0);
-                $price = (float) ($item['unit_price'] ?? 0);
+                $qty = money_value($item['quantity'] ?? 0);
+                $price = money_value($item['unit_price'] ?? 0);
                 if ($itemId <= 0 || $qty <= 0) {
                     continue;
                 }
@@ -1155,7 +1164,7 @@ try {
             if ($newStatus === 'paid') {
                 $currentPaid = (float) ($sale['amount_paid'] ?? 0);
                 $totalAmount = (float) $sale['total_amount'];
-                $paymentAmount = isset($_POST['amount_paid']) ? round((float) $_POST['amount_paid'], 2) : round($totalAmount - $currentPaid, 2);
+                $paymentAmount = isset($_POST['amount_paid']) ? money_value($_POST['amount_paid']) : round($totalAmount - $currentPaid, 2);
                 if ($paymentAmount <= 0) {
                     respond(422, ['ok' => false, 'message' => 'Enter a payment amount.']);
                 }
