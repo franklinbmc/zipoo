@@ -529,6 +529,25 @@ try {
                 'tin' => (string) ($customer['tin'] ?? ''),
                 'vrn' => (string) ($customer['vrn'] ?? ''),
             ] : null;
+            $pStmt = $pdo->prepare(
+                'SELECT t.id, t.amount, t.created_at, t.notes, a.name AS account_name, a.type AS account_type
+                 FROM tbl_account_transactions t
+                 LEFT JOIN tbl_accounts a ON a.id = t.account_id
+                 WHERE t.business_id = :bid AND t.type = "invoice_payment"
+                   AND t.reference_type = "INVOICE" AND t.reference_id = :rid
+                 ORDER BY t.id DESC'
+            );
+            $pStmt->execute([':bid' => $businessId, ':rid' => (string) $id]);
+            $out['payments'] = array_map(static function ($p) {
+                return [
+                    'id' => (int) $p['id'],
+                    'amount' => (float) $p['amount'],
+                    'account_name' => (string) ($p['account_name'] ?? ''),
+                    'account_type' => (string) ($p['account_type'] ?? ''),
+                    'notes' => (string) ($p['notes'] ?? ''),
+                    'created_at' => (string) ($p['created_at'] ?? ''),
+                ];
+            }, $pStmt->fetchAll());
 
             respond(200, ['ok' => true, 'invoice' => $out]);
         }

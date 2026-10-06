@@ -5761,6 +5761,8 @@ const setupSalesPage = () => {
   const invoiceDetailTotal = document.querySelector("[data-invoice-detail-total]");
   const invoiceDetailNotesWrap = document.querySelector("[data-invoice-detail-notes-wrap]");
   const invoiceDetailNotes = document.querySelector("[data-invoice-detail-notes]");
+  const invoicePaymentsWrap = document.querySelector("[data-invoice-payments-wrap]");
+  const invoicePaymentsList = document.querySelector("[data-invoice-payments-list]");
   const invoiceMarkSentBtn = document.querySelector("[data-invoice-mark-sent-btn]");
   const invoiceMarkPaidBtn = document.querySelector("[data-invoice-mark-paid-btn]");
   const invoiceEditBtn = document.querySelector("[data-invoice-edit-btn]");
@@ -6233,6 +6235,23 @@ const setupSalesPage = () => {
     if (invoiceDetailNotesWrap && invoiceDetailNotes) {
       if (inv.notes) { invoiceDetailNotes.textContent = inv.notes; invoiceDetailNotesWrap.hidden = false; }
       else { invoiceDetailNotesWrap.hidden = true; }
+    }
+    if (invoicePaymentsWrap && invoicePaymentsList) {
+      const payments = Array.isArray(inv.payments) ? inv.payments : [];
+      invoicePaymentsWrap.hidden = !payments.length;
+      invoicePaymentsList.innerHTML = payments.map((payment) => {
+        const accountType = String(payment.account_type || "").toUpperCase();
+        const account = [accountType, payment.account_name].filter(Boolean).join(" - ") || "Account";
+        return `
+          <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--color-line);">
+            <div style="min-width: 0;">
+              <div style="font-size: 0.85rem; font-weight: 800; color: var(--color-navy);">${escH(account)}</div>
+              <div style="font-size: 0.78rem; color: var(--color-muted); margin-top: 2px;">${formatDate(payment.created_at)}</div>
+            </div>
+            <strong style="font-size: 0.88rem; color: var(--color-navy); white-space: nowrap;">${formatCurrency(payment.amount || 0)}</strong>
+          </div>
+        `;
+      }).join("");
     }
 
     const isCancelled = inv.status === "cancelled";
