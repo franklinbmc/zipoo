@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/accounts_lib.php';
+require_once __DIR__ . '/audit_lib.php';
 require_once __DIR__ . '/expenses_export_lib.php';
 
 session_start();
@@ -270,6 +271,7 @@ try {
     $pdo = db();
     $userId = require_user();
     ensure_accounts_tables($pdo);
+    ensure_audit_logs_table($pdo);
     ensure_payroll_tables($pdo);
 
     $businessId = active_business_id($pdo, $userId);
@@ -548,6 +550,7 @@ try {
                 ->execute([':id' => $accountId, ':bid' => $businessId]);
             $pdo->prepare('DELETE FROM tbl_accounts WHERE id = :id AND business_id = :bid')
                 ->execute([':id' => $accountId, ':bid' => $businessId]);
+            audit_log($pdo, $businessId, $userId, 'account_deleted', 'account', (string) $accountId, $row, null);
             $pdo->commit();
         } catch (Throwable $e) {
             $pdo->rollBack();
@@ -595,6 +598,14 @@ try {
         }
 
         post_account_txn($pdo, $businessId, $accountId, $direction, $type, $amount, 'manual', null, $notes !== '' ? $notes : null, $userId, null, $type === 'expense' ? $categoryId : null);
+        audit_log($pdo, $businessId, $userId, $type . '_recorded', 'account_transaction', null, null, [
+            'account_id' => $accountId,
+            'direction' => $direction,
+            'type' => $type,
+            'amount' => $amount,
+            'notes' => $notes,
+            'expense_category_id' => $type === 'expense' ? $categoryId : null,
+        ]);
 
         $accounts = load_accounts($pdo, $businessId);
         respond(200, ['ok' => true, 'message' => 'Transaction recorded.', 'accounts' => $accounts, 'summary' => account_summary($accounts)]);
@@ -623,15 +634,20 @@ try {
         if (!in_array($status, ['active', 'inactive'], true)) {
             respond(422, ['ok' => false, 'message' => 'Invalid category status.']);
         }
-        fetch_category_or_404($pdo, $businessId, $categoryId);
+        $category = fetch_category_or_404($pdo, $businessId, $categoryId);
         $stmt = $pdo->prepare('UPDATE tbl_expense_categories SET status = :status WHERE id = :id AND business_id = :bid');
         $stmt->execute([':status' => $status, ':id' => $categoryId, ':bid' => $businessId]);
+        audit_log($pdo, $businessId, $userId, 'expense_category_status_changed', 'expense_category', (string) $categoryId, [
+            'status' => $category['status'] ?? null,
+        ], [
+            'status' => $status,
+        ]);
         respond(200, ['ok' => true, 'message' => 'Category updated.', 'categories' => load_expense_categories($pdo, $businessId)]);
     }
 
     if ($action === 'delete_expense_category') {
         $categoryId = (int) ($_POST['category_id'] ?? 0);
-        fetch_category_or_404($pdo, $businessId, $categoryId);
+        $category = fetch_category_or_404($pdo, $businessId, $categoryId);
         $stmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_account_transactions WHERE business_id = :bid AND expense_category_id = :id AND type = "expense"');
         $stmt->execute([':bid' => $businessId, ':id' => $categoryId]);
         if ((int) $stmt->fetchColumn() > 0) {
@@ -639,6 +655,7 @@ try {
         }
         $del = $pdo->prepare('DELETE FROM tbl_expense_categories WHERE id = :id AND business_id = :bid');
         $del->execute([':id' => $categoryId, ':bid' => $businessId]);
+        audit_log($pdo, $businessId, $userId, 'expense_category_deleted', 'expense_category', (string) $categoryId, $category, null);
         respond(200, ['ok' => true, 'message' => 'Category deleted.', 'categories' => load_expense_categories($pdo, $businessId)]);
     }
 
@@ -710,6 +727,12 @@ try {
         }
         $pdo->prepare('UPDATE tbl_payroll_items SET salary_amount = :amount WHERE id = :id AND business_id = :bid')
             ->execute([':amount' => $amount, ':id' => $itemId, ':bid' => $businessId]);
+        audit_log($pdo, $businessId, $userId, 'payroll_salary_updated', 'payroll_item', (string) $itemId, [
+            'salary_amount' => (float) $item['salary_amount'],
+        ], [
+            'salary_amount' => $amount,
+            'payroll_month' => $item['payroll_month'],
+        ]);
         respond(200, ['ok' => true, 'message' => 'Salary updated.'] + payroll_payload($pdo, $businessId, (string) $item['payroll_month']));
     }
 
@@ -763,6 +786,15 @@ try {
             $status = (int) $remainingStmt->fetchColumn() > 0 ? 'partial' : 'paid';
             $pdo->prepare('UPDATE tbl_payroll_runs SET status = :status, expense_category_id = :cat WHERE id = :id AND business_id = :bid')
                 ->execute([':status' => $status, ':cat' => $salaryCategoryId, ':id' => $runId, ':bid' => $businessId]);
+            audit_log($pdo, $businessId, $userId, 'payroll_paid', 'payroll_run', (string) $runId, [
+                'status' => $run['status'],
+            ], [
+                'status' => $status,
+                'payroll_month' => $run['payroll_month'],
+                'account_id' => $accountId,
+                'total_amount' => $total,
+                'paid_items' => count($payable),
+            ]);
             $pdo->commit();
         } catch (Throwable $e) {
             $pdo->rollBack();

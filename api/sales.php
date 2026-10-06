@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/accounts_lib.php';
+require_once __DIR__ . '/audit_lib.php';
 require_once __DIR__ . '/vat_lib.php';
 require_once __DIR__ . '/pos_lib.php';
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -470,6 +471,7 @@ try {
 
     ensure_sales_tables($pdo);
     ensure_accounts_tables($pdo);
+    ensure_audit_logs_table($pdo);
     ensure_vat_columns($pdo);
     ensure_party_tax_ids($pdo);
     ensure_sales_pos_columns($pdo);
@@ -1191,6 +1193,15 @@ try {
                         'Invoice payment (#' . $saleId . ')',
                         $userId
                     );
+                    audit_log($pdo, $businessId, $userId, 'invoice_payment_received', 'invoice', (string) $saleId, [
+                        'status' => $sale['status'],
+                        'amount_paid' => $currentPaid,
+                    ], [
+                        'status' => $finalStatus,
+                        'amount_paid' => min($newPaid, $totalAmount),
+                        'payment_amount' => $paymentAmount,
+                        'account_id' => $postAccountId,
+                    ]);
                     $pdo->commit();
                 } catch (Throwable $e) {
                     $pdo->rollBack();
@@ -1199,6 +1210,11 @@ try {
             } else {
                 $pdo->prepare('UPDATE tbl_sales SET status = :st WHERE id = :id')
                     ->execute([':st' => $newStatus, ':id' => $saleId]);
+                audit_log($pdo, $businessId, $userId, 'invoice_status_changed', 'invoice', (string) $saleId, [
+                    'status' => $sale['status'],
+                ], [
+                    'status' => $newStatus,
+                ]);
             }
 
             respond(200, ['ok' => true, 'message' => 'Invoice status updated.']);
@@ -1218,6 +1234,11 @@ try {
                     respond(422, ['ok' => false, 'message' => 'A paid invoice cannot be cancelled.']);
                 }
                 $pdo->prepare('UPDATE tbl_sales SET status = "cancelled" WHERE id = :id')->execute([':id' => $saleId]);
+                audit_log($pdo, $businessId, $userId, 'invoice_cancelled', 'invoice', (string) $saleId, [
+                    'status' => $sale['status'],
+                ], [
+                    'status' => 'cancelled',
+                ]);
                 respond(200, ['ok' => true, 'message' => 'Invoice cancelled.']);
             }
 
@@ -1225,20 +1246,27 @@ try {
                 respond(422, ['ok' => false, 'message' => 'Only a cancelled invoice can be reactivated.']);
             }
             $pdo->prepare('UPDATE tbl_sales SET status = "draft" WHERE id = :id')->execute([':id' => $saleId]);
+            audit_log($pdo, $businessId, $userId, 'invoice_reactivated', 'invoice', (string) $saleId, [
+                'status' => $sale['status'],
+            ], [
+                'status' => 'draft',
+            ]);
             respond(200, ['ok' => true, 'message' => 'Invoice reactivated.']);
         }
 
         if ($action === 'delete_invoice') {
             $saleId = (int) ($_POST['invoice_id'] ?? 0);
-            $chk = $pdo->prepare('SELECT id FROM tbl_sales WHERE id = :id AND business_id = :bid LIMIT 1');
+            $chk = $pdo->prepare('SELECT * FROM tbl_sales WHERE id = :id AND business_id = :bid LIMIT 1');
             $chk->execute([':id' => $saleId, ':bid' => $businessId]);
-            if (!$chk->fetch()) {
+            $sale = $chk->fetch();
+            if (!$sale) {
                 respond(404, ['ok' => false, 'message' => 'Invoice not found.']);
             }
             $pdo->beginTransaction();
             try {
                 $pdo->prepare('DELETE FROM tbl_sale_items WHERE sale_id = :sid')->execute([':sid' => $saleId]);
                 $pdo->prepare('DELETE FROM tbl_sales WHERE id = :id AND business_id = :bid')->execute([':id' => $saleId, ':bid' => $businessId]);
+                audit_log($pdo, $businessId, $userId, 'invoice_deleted', 'invoice', (string) $saleId, $sale, null);
                 $pdo->commit();
             } catch (Throwable $e) {
                 $pdo->rollBack();
