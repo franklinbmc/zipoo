@@ -14,6 +14,21 @@ function respond(int $status, array $payload): void
     exit;
 }
 
+function column_exists(PDO $pdo, string $table, string $column): bool
+{
+    $stmt = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE :column_name");
+    $stmt->execute([':column_name' => $column]);
+    return (bool) $stmt->fetch();
+}
+
+function saas_admin_active_sql(PDO $pdo): string
+{
+    if (column_exists($pdo, 'tbl_saas_admins', 'is_active')) {
+        return 'is_active = 1';
+    }
+    return 'status = "active"';
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(405, ['ok' => false, 'message' => 'Method not allowed.']);
 }
@@ -27,7 +42,7 @@ if ($email === '' || $password === '') {
 
 try {
     $pdo = db();
-    $stmt = $pdo->prepare('SELECT id, full_name, email, password_hash FROM tbl_saas_admins WHERE email = :email AND is_active = 1 LIMIT 1');
+    $stmt = $pdo->prepare('SELECT id, full_name, email, password_hash FROM tbl_saas_admins WHERE email = :email AND ' . saas_admin_active_sql($pdo) . ' LIMIT 1');
     $stmt->execute([':email' => $email]);
     $admin = $stmt->fetch();
 

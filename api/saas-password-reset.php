@@ -37,6 +37,9 @@ function ensure_reset_table(PDO $pdo): void
 
 function load_settings(PDO $pdo, string $group): array
 {
+    if (!table_exists($pdo, 'tbl_saas_settings')) {
+        return [];
+    }
     $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = :grp');
     $stmt->execute([':grp' => $group]);
     $out = [];
@@ -44,6 +47,32 @@ function load_settings(PDO $pdo, string $group): array
         $out[(string) $row['setting_key']] = (string) $row['setting_value'];
     }
     return $out;
+}
+
+function table_exists(PDO $pdo, string $table): bool
+{
+    $stmt = $pdo->prepare('SHOW TABLES LIKE :table_name');
+    $stmt->execute([':table_name' => $table]);
+    return (bool) $stmt->fetchColumn();
+}
+
+function column_exists(PDO $pdo, string $table, string $column): bool
+{
+    if (!table_exists($pdo, $table)) {
+        return false;
+    }
+    $stmt = $pdo->prepare("SHOW COLUMNS FROM {$table} LIKE :column_name");
+    $stmt->execute([':column_name' => $column]);
+    return (bool) $stmt->fetch();
+}
+
+function saas_admin_active_sql(PDO $pdo, string $alias = ''): string
+{
+    $prefix = $alias !== '' ? $alias . '.' : '';
+    if (column_exists($pdo, 'tbl_saas_admins', 'is_active')) {
+        return $prefix . 'is_active = 1';
+    }
+    return $prefix . 'status = "active"';
 }
 
 function app_origin(): string
@@ -107,7 +136,7 @@ try {
             respond(422, ['ok' => false, 'message' => 'Enter a valid admin email.']);
         }
 
-        $stmt = $pdo->prepare('SELECT id, full_name, email FROM tbl_saas_admins WHERE email = :email AND is_active = 1 LIMIT 1');
+        $stmt = $pdo->prepare('SELECT id, full_name, email FROM tbl_saas_admins WHERE email = :email AND ' . saas_admin_active_sql($pdo) . ' LIMIT 1');
         $stmt->execute([':email' => $email]);
         $admin = $stmt->fetch();
         if ($admin) {
@@ -144,7 +173,7 @@ try {
         $stmt = $pdo->prepare(
             'SELECT r.id, r.admin_id
              FROM tbl_saas_password_resets r
-             JOIN tbl_saas_admins a ON a.id = r.admin_id AND a.is_active = 1
+             JOIN tbl_saas_admins a ON a.id = r.admin_id AND ' . saas_admin_active_sql($pdo, 'a') . '
              WHERE r.token_hash = :hash AND r.used_at IS NULL AND r.expires_at > NOW()
              ORDER BY r.id DESC LIMIT 1'
         );
