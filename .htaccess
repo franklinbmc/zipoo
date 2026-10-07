@@ -32,6 +32,7 @@ DirectoryIndex index.html
   RewriteRule ^saas/dashboard/?$ saas/dashboard.html [L]
   RewriteRule ^saas/businesses/?$ saas/businesses.html [L]
   RewriteRule ^saas/users/?$ saas/users.html [L]
+  RewriteRule ^saas/plans/?$ saas/plans.html [L]
   RewriteRule ^saas/settings/?$ saas/settings.html [L]
 
   # PWA fallback for client-side navigation.

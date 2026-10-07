@@ -173,6 +173,10 @@ const renderBusinesses = (businesses) => {
   }));
 };
 
+const money = (value) => new Intl.NumberFormat("en-TZ", {
+  maximumFractionDigits: 0,
+}).format(Number(value || 0));
+
 const applyPlatformBrand = (platform = {}) => {
   if (platform.platform_icon) {
     document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach((link) => {
@@ -250,12 +254,18 @@ const renderAdminRows = (items, type) => {
     const row = document.createElement("article");
     row.className = "admin-data-row";
     if (type === "businesses") {
+      row.dataset.businessRow = item.id;
       row.innerHTML = `
         <div><strong>${item.business_name}</strong><span>${item.business_type || "Business"} · ${item.region_name || ""} ${item.district_name || ""}</span></div>
         <div><strong>${item.owner_name || "No owner"}</strong><span>${item.phone || ""} ${item.email || ""}</span></div>
-        <span>${item.plan_name}</span>
-        <b>${item.account_status}</b>
+        <label><span>Plan</span><input name="plan_name" value="${item.plan_name || "Starter"}"></label>
+        <label><span>Status</span><select name="account_status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+        <div class="admin-row-actions">
+          <button type="button" data-business-view="${item.id}">View</button>
+          <button type="button" data-business-save="${item.id}">Save</button>
+        </div>
       `;
+      row.querySelector('[name="account_status"]').value = item.account_status || "active";
     } else {
       row.innerHTML = `
         <div><strong>${item.full_name}</strong><span>${item.phone || ""} ${item.email || ""}</span></div>
@@ -276,6 +286,7 @@ const setupAdminListPage = async () => {
 
   const type = businessesList ? "businesses" : "users";
   const endpoint = `${getBasePath()}api/saas-${type}.php`;
+  const status = document.querySelector("[data-admin-list-status]");
   const load = async (query = "") => {
     const response = await fetch(`${endpoint}?q=${encodeURIComponent(query)}`);
     if (response.status === 401) {
@@ -291,6 +302,155 @@ const setupAdminListPage = async () => {
   await load();
   document.querySelector("[data-admin-search]")?.addEventListener("input", (event) => {
     load(event.target.value.trim());
+  });
+
+  businessesList?.addEventListener("click", async (event) => {
+    const save = event.target.closest("[data-business-save]");
+    const view = event.target.closest("[data-business-view]");
+    const businessId = save?.dataset.businessSave || view?.dataset.businessView;
+    if (!businessId) return;
+
+    if (save) {
+      const row = save.closest("[data-business-row]");
+      const form = new FormData();
+      form.set("action", "update_business");
+      form.set("business_id", businessId);
+      form.set("plan_name", row.querySelector('[name="plan_name"]').value);
+      form.set("account_status", row.querySelector('[name="account_status"]').value);
+      const response = await fetch(endpoint, { method: "POST", body: form });
+      const payload = await response.json();
+      if (status) {
+        status.hidden = false;
+        status.classList.toggle("error", !response.ok || !payload.ok);
+        status.textContent = payload.message || (response.ok ? "Saved." : "Unable to save.");
+      }
+      if (response.ok && payload.ok) await load(document.querySelector("[data-admin-search]")?.value.trim() || "");
+      return;
+    }
+
+    const response = await fetch(`${endpoint}?id=${encodeURIComponent(businessId)}`);
+    const payload = await response.json();
+    if (response.ok && payload.ok) {
+      openBusinessSnapshot(payload);
+    }
+  });
+};
+
+const openBusinessSnapshot = (payload) => {
+  const modal = document.querySelector("[data-business-modal]");
+  if (!modal) return;
+  const business = payload.business || {};
+  const stats = payload.stats || {};
+  modal.querySelector("[data-business-modal-title]").textContent = business.business_name || "Business";
+  modal.querySelector("[data-business-modal-body]").innerHTML = `
+    <div class="business-snapshot-grid">
+      <article><span>Owner</span><strong>${business.owner_name || "No owner"}</strong><small>${business.phone || ""} ${business.email || ""}</small></article>
+      <article><span>Plan</span><strong>${business.plan_name || "Starter"}</strong><small>${business.account_status || "active"}</small></article>
+      <article><span>Users</span><strong>${stats.users || 0}</strong><small>Registered staff</small></article>
+      <article><span>Items</span><strong>${stats.items || 0}</strong><small>Stock and services</small></article>
+      <article><span>Sales</span><strong>TZS ${money(stats.sales)}</strong><small>Recorded total</small></article>
+      <article><span>Location</span><strong>${business.region_name || "Unknown"}</strong><small>${business.district_name || ""}</small></article>
+    </div>
+  `;
+  modal.hidden = false;
+};
+
+const setupSaasModals = () => {
+  document.querySelectorAll("[data-modal-close]").forEach((button) => {
+    button.addEventListener("click", () => {
+      button.closest("[data-business-modal]")?.setAttribute("hidden", "");
+    });
+  });
+};
+
+const renderPlans = (plans) => {
+  const list = document.querySelector("[data-plans-list]");
+  if (!list) return;
+  list.replaceChildren(...plans.map((plan) => {
+    const row = document.createElement("article");
+    row.className = "plan-row";
+    row.dataset.planId = plan.id;
+    row.innerHTML = `
+      <div><strong>${plan.plan_name}</strong><span>${plan.notes || "No notes"} · ${plan.business_count || 0} businesses</span></div>
+      <b>TZS ${money(plan.monthly_price)}</b>
+      <span>${plan.user_limit} users</span>
+      <span>${plan.business_limit} businesses</span>
+      <em>${plan.status}</em>
+      <div class="admin-row-actions">
+        <button type="button" data-plan-edit="${plan.id}">Edit</button>
+        <button type="button" data-plan-delete="${plan.id}">Delete</button>
+      </div>
+    `;
+    row.querySelector("[data-plan-edit]").addEventListener("click", () => {
+      const form = document.querySelector("[data-plan-form]");
+      form.plan_id.value = plan.id;
+      form.plan_name.value = plan.plan_name || "";
+      form.monthly_price.value = plan.monthly_price || "0";
+      form.user_limit.value = plan.user_limit || "1";
+      form.business_limit.value = plan.business_limit || "1";
+      form.status.value = plan.status || "active";
+      form.notes.value = plan.notes || "";
+      form.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    return row;
+  }));
+};
+
+const setupPlansPage = async () => {
+  const form = document.querySelector("[data-plan-form]");
+  const list = document.querySelector("[data-plans-list]");
+  if (!form || !list) return;
+  const status = form.querySelector("[data-plan-status]");
+  const endpoint = `${getBasePath()}api/saas-plans.php`;
+
+  const load = async () => {
+    const response = await fetch(endpoint);
+    if (response.status === 401) {
+      window.location.href = `${getBasePath()}saas/login`;
+      return;
+    }
+    const payload = await response.json();
+    if (response.ok && payload.ok) renderPlans(payload.plans || []);
+  };
+
+  await load();
+
+  document.querySelector("[data-new-plan]")?.addEventListener("click", () => {
+    form.reset();
+    form.plan_id.value = "";
+  });
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const response = await fetch(endpoint, { method: "POST", body: new FormData(form) });
+    const payload = await response.json();
+    if (status) {
+      status.hidden = false;
+      status.classList.toggle("error", !response.ok || !payload.ok);
+      status.textContent = payload.message || (response.ok ? "Saved." : "Unable to save.");
+    }
+    if (response.ok && payload.ok) {
+      form.reset();
+      form.plan_id.value = "";
+      renderPlans(payload.plans || []);
+    }
+  });
+
+  list.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-plan-delete]");
+    if (!button) return;
+    if (!window.confirm("Delete this plan? Used plans cannot be deleted.")) return;
+    const body = new FormData();
+    body.set("action", "delete");
+    body.set("plan_id", button.dataset.planDelete);
+    const response = await fetch(endpoint, { method: "POST", body });
+    const payload = await response.json();
+    if (status) {
+      status.hidden = false;
+      status.classList.toggle("error", !response.ok || !payload.ok);
+      status.textContent = payload.message || (response.ok ? "Deleted." : "Unable to delete.");
+    }
+    if (response.ok && payload.ok) renderPlans(payload.plans || []);
   });
 };
 
@@ -573,6 +733,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSaasPasswordReset();
   setupSaasDashboard();
   setupAdminListPage();
+  setupSaasModals();
+  setupPlansPage();
   setupSaasLogout();
   setupAdminMenu();
   setupNotifications();
