@@ -3,6 +3,169 @@ const LOCALE_VERSION = "17";
 const SUPPORTED_LANGUAGES = ["en", "sw"];
 const TRANSLATION_CACHE = {};
 const REGISTER_DRAFT_COOKIE = "zipoo_register_draft";
+const AUTO_SW_TRANSLATIONS = {
+  "Back to dashboard": "Rudi kwenye dashibodi",
+  "Back to settings": "Rudi kwenye mipangilio",
+  "Close": "Funga",
+  "Notice": "Taarifa",
+  "OK": "Sawa",
+  "Cancel": "Ghairi",
+  "Confirm": "Thibitisha",
+  "Save": "Hifadhi",
+  "Saved.": "Imehifadhiwa.",
+  "Saving...": "Inahifadhi...",
+  "Delete": "Futa",
+  "Edit": "Hariri",
+  "View": "Tazama",
+  "Remove": "Ondoa",
+  "Update": "Sasisha",
+  "Add": "Ongeza",
+  "Search": "Tafuta",
+  "Loading...": "Inapakia...",
+  "No records yet.": "Hakuna taarifa bado.",
+  "No items found.": "Hakuna bidhaa zilizopatikana.",
+  "No notes": "Hakuna maelezo",
+  "No owner": "Hakuna mmiliki",
+  "Business": "Biashara",
+  "Owner": "Mmiliki",
+  "Plan": "Mpango",
+  "Users": "Watumiaji",
+  "Items": "Bidhaa",
+  "Sales": "Mauzo",
+  "Location": "Eneo",
+  "Stock": "Stoku",
+  "Cash": "Taslimu",
+  "Credit": "Mkopo",
+  "Today": "Leo",
+  "This month": "Mwezi huu",
+  "Email": "Barua pepe",
+  "Phone": "Simu",
+  "Address": "Anwani",
+  "Notes": "Maelezo",
+  "Status": "Hali",
+  "Active": "Hai",
+  "Inactive": "Haifanyi kazi",
+  "Settings": "Mipangilio",
+  "Dashboard": "Dashibodi",
+  "Business overview": "Muhtasari wa biashara",
+  "Today's Sales": "Mauzo ya Leo",
+  "Customers": "Wateja",
+  "Suppliers": "Wasambazaji",
+  "Stock Items": "Bidhaa za stoku",
+  "Sales": "Mauzo",
+  "Expenses": "Matumizi",
+  "Outstanding Credit": "Madeni ya Wateja",
+  "Low Stock": "Stoku Ndogo",
+  "Products": "Bidhaa",
+  "Re-order recommended": "Inashauriwa kuagiza tena",
+  "POS Sales Stream": "Mtiririko wa Mauzo ya POS",
+  "Live": "Moja kwa moja",
+  "Yesterday": "Jana",
+  "This Week": "Wiki Hii",
+  "This Month": "Mwezi Huu",
+  "0 sales recorded": "Mauzo 0 yamerekodiwa",
+  "0 expenses this month": "Matumizi 0 mwezi huu",
+  "0 customers due": "Wateja 0 wanadaiwa",
+  "Home": "Nyumbani",
+  "Invoice": "Ankara",
+  "Services": "Huduma",
+  "Support": "Msaada",
+  "Main Navigation": "Urambazaji Mkuu",
+  "Open shortcuts": "Fungua njia za mkato",
+  "Shortcuts": "Njia za mkato",
+  "Zipoo Areas": "Maeneo ya Zipoo",
+  "Close shortcuts": "Funga njia za mkato",
+  "Current serving business:": "Biashara inayohudumiwa sasa:",
+  "Bank & Cash": "Benki na Taslimu",
+  "Reports": "Ripoti",
+  "Logout": "Toka",
+  "Zipoo Support": "Msaada wa Zipoo",
+  "We are here to help you run your business smoothly.": "Tupo hapa kukusaidia kuendesha biashara yako vizuri.",
+  "Chat on WhatsApp": "Ongea WhatsApp",
+  "Call Support": "Piga Simu kwa Msaada",
+  "Email Us": "Tutumie Barua Pepe",
+  "Total": "Jumla",
+  "Bank": "Benki",
+  "Real Estate": "Majengo",
+  "System Users": "Watumiaji wa Mfumo",
+  "Supplier Details": "Taarifa za Msambazaji",
+  "Add Supplier": "Ongeza Msambazaji",
+  "Edit Supplier": "Hariri Msambazaji",
+  "Save Supplier": "Hifadhi Msambazaji",
+  "Update Supplier": "Sasisha Msambazaji",
+  "Edit supplier": "Hariri msambazaji",
+  "Delete supplier": "Futa msambazaji",
+  "No suppliers found": "Hakuna wasambazaji waliopatikana",
+  "Add your first supplier to start tracking their details and purchases.": "Ongeza msambazaji wa kwanza ili uanze kufuatilia taarifa na manunuzi yake.",
+  "User Details": "Taarifa za Mtumiaji",
+  "Add System User": "Ongeza Mtumiaji wa Mfumo",
+  "Edit System User": "Hariri Mtumiaji wa Mfumo",
+  "Add User": "Ongeza Mtumiaji",
+  "Create User": "Tengeneza Mtumiaji",
+  "Update User": "Sasisha Mtumiaji",
+  "Edit user": "Hariri mtumiaji",
+  "Delete user": "Futa mtumiaji",
+  "No team users yet": "Hakuna watumiaji wa timu bado",
+  "Add cashiers, managers, or staff members to give them access to this business.": "Ongeza wahudumu, mameneja, au wafanyakazi ili uwape ruhusa ya kufikia biashara hii.",
+  "Show advanced": "Onyesha ya ziada",
+  "Hide advanced": "Ficha ya ziada",
+  "Customer Details": "Taarifa za Mteja",
+  "Add Customer": "Ongeza Mteja",
+  "Edit Customer": "Hariri Mteja",
+  "Save Customer": "Hifadhi Mteja",
+  "Update Customer": "Sasisha Mteja",
+  "No customers found": "Hakuna wateja waliopatikana",
+  "Language Change": "Badilisha Lugha",
+  "Language change": "Badilisha lugha",
+  "Business Preferences": "Mapendeleo ya Biashara",
+  "Save Preferences": "Hifadhi Mapendeleo",
+  "SMTP Settings": "Mipangilio ya SMTP",
+  "Save SMTP Settings": "Hifadhi Mipangilio ya SMTP",
+  "Test SMTP Connection": "Jaribu Muunganisho wa SMTP",
+  "Send Test Email": "Tuma Barua Pepe ya Jaribio",
+  "SMS Settings (MegaSMS)": "Mipangilio ya SMS (MegaSMS)",
+  "Save SMS Settings": "Hifadhi Mipangilio ya SMS",
+  "Test MegaSMS Gateway": "Jaribu Lango la MegaSMS",
+  "Send Test SMS": "Tuma SMS ya Jaribio",
+  "Request Sender ID to MegaSMS": "Omba Sender ID kwa MegaSMS",
+  "Your Sender ID Requests": "Maombi Yako ya Sender ID",
+  "Submit to MegaSMS": "Wasilisha kwa MegaSMS",
+  "English": "Kiingereza",
+  "Kiswahili": "Kiswahili",
+  "Language Changed": "Lugha Imebadilishwa",
+  "Application language updated to English.": "Lugha ya mfumo imebadilishwa kuwa Kiingereza.",
+  "System now uses Kiswahili.": "Mfumo sasa unatumia Kiswahili.",
+  "Hide password": "Ficha nenosiri",
+  "Show password": "Onyesha nenosiri",
+  "Select...": "Chagua...",
+  "Select region": "Chagua mkoa",
+  "Select district": "Chagua wilaya",
+  "Select product...": "Chagua bidhaa...",
+  "Search suppliers by name, phone...": "Tafuta wasambazaji kwa jina, simu...",
+  "Search users by name, phone, email, role...": "Tafuta watumiaji kwa jina, simu, barua pepe, cheo...",
+  "Optional notes...": "Maelezo ya hiari...",
+  "Taxpayer ID": "Namba ya mlipa kodi",
+  "VAT Reg. No.": "Namba ya usajili VAT",
+  "Minimum 4 characters": "Angalau herufi 4",
+  "Enter new password if changing": "Weka nenosiri jipya kama unabadilisha",
+  "Qty": "Idadi",
+  "Cost": "Gharama",
+  "Price": "Bei",
+  "Set default": "Weka chaguo-msingi",
+  "Transfer": "Hamisha",
+  "Close Shift": "Funga zamu",
+  "Start Shift": "Anza zamu",
+  "New sale": "Mauzo mapya",
+  "No recent POS sales yet.": "Hakuna mauzo ya POS ya hivi karibuni.",
+  "Loading sale items...": "Inapakia bidhaa za mauzo...",
+  "Could not load sale.": "Imeshindikana kupakia mauzo.",
+  "No items found for this sale.": "Hakuna bidhaa kwenye mauzo haya.",
+  "Walk-in Customer": "Mteja wa papo hapo",
+  "POS Sale": "Mauzo ya POS",
+  "Pay Later": "Lipa baadaye",
+  "Bank/Card": "Benki/Kadi",
+  "Lipa kwa simu": "Lipa kwa simu"
+};
 
 const getBasePath = () => {
   const script = document.currentScript || document.querySelector('script[src*="assets/js/app.js"]');
@@ -127,6 +290,42 @@ const loadTranslations = async (language) => {
   return translations;
 };
 
+const translateAutoText = (value, language) => {
+  const text = String(value ?? "");
+  if (language !== "sw") return text;
+  const trimmed = text.trim();
+  if (!trimmed) return text;
+  const translated = AUTO_SW_TRANSLATIONS[trimmed];
+  if (!translated) return text;
+  return text.replace(trimmed, translated);
+};
+
+const applyAutoTranslations = (language, root = document.body) => {
+  if (!root) return;
+  const elementRoot = root.nodeType === Node.ELEMENT_NODE ? root : root.parentElement;
+  if (!elementRoot) return;
+
+  const translateElement = (element) => {
+    if (!element || element.closest?.("script, style, textarea, [contenteditable='true']")) return;
+    if (element.childNodes.length === 1 && element.firstChild?.nodeType === Node.TEXT_NODE) {
+      if (!element.dataset.i18nAutoText) element.dataset.i18nAutoText = element.textContent;
+      element.textContent = translateAutoText(element.dataset.i18nAutoText, language);
+    }
+
+    ["placeholder", "aria-label", "title", "value"].forEach((attr) => {
+      if (!element.hasAttribute?.(attr)) return;
+      if (attr === "value" && !["BUTTON", "INPUT"].includes(element.tagName)) return;
+      const dataKey = `i18nAuto${attr.replace(/(^|-)([a-z])/g, (_, __, c) => c.toUpperCase())}`;
+      if (!element.dataset[dataKey]) element.dataset[dataKey] = element.getAttribute(attr) || "";
+      const translated = translateAutoText(element.dataset[dataKey], language);
+      if (element.getAttribute(attr) !== translated) element.setAttribute(attr, translated);
+    });
+  };
+
+  translateElement(elementRoot);
+  elementRoot.querySelectorAll("*").forEach(translateElement);
+};
+
 const applyTranslations = (translations, language) => {
   document.documentElement.lang = language;
 
@@ -157,6 +356,8 @@ const applyTranslations = (translations, language) => {
       label.textContent = translations[option.dataset.labelKey] || option.textContent.trim();
     }
   });
+
+  applyAutoTranslations(language);
 };
 
 const setLanguage = async (language) => {
@@ -164,6 +365,32 @@ const setLanguage = async (language) => {
   const translations = await loadTranslations(nextLanguage);
   localStorage.setItem("zipoo.language", nextLanguage);
   applyTranslations(translations, nextLanguage);
+};
+
+const initAutoTranslationObserver = () => {
+  try {
+    const observer = new MutationObserver((mutations) => {
+      const language = getSavedLanguage();
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            applyAutoTranslations(language, node);
+          }
+        });
+        if (mutation.type === "attributes" && mutation.target?.nodeType === Node.ELEMENT_NODE) {
+          applyAutoTranslations(language, mutation.target);
+        }
+      });
+    });
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["placeholder", "aria-label", "title", "value"],
+    });
+  } catch {
+    /* MutationObserver is best-effort for older browsers. */
+  }
 };
 
 const updateConnectionStatus = () => {
@@ -9780,6 +10007,25 @@ const setupDashboardPage = () => {
   const page = document.querySelector("[data-dashboard-page]");
   if (!page) return;
 
+  const isSw = () => getSavedLanguage() === "sw";
+  const plural = (count, singular, pluralText = `${singular}s`) => Number(count) === 1 ? singular : pluralText;
+  const dashboardText = {
+    customersDue: (count) => isSw() ? `Wateja ${count} wanadaiwa` : `${count} customers due`,
+    salesRecordedToday: (count) => isSw()
+      ? `Mauzo ${count} yamerekodiwa leo`
+      : `${count} ${plural(count, "sale")} recorded today`,
+    expensesCount: (today, month) => isSw()
+      ? `${today} leo • ${month} mwezi huu`
+      : `${today} today • ${month} this month`,
+    noRecentSales: () => isSw() ? "Hakuna mauzo ya POS ya hivi karibuni." : "No recent POS sales yet.",
+    loadingSaleItems: () => isSw() ? "Inapakia bidhaa za mauzo..." : "Loading sale items...",
+    couldNotLoadSale: () => isSw() ? "Imeshindikana kupakia mauzo." : "Could not load sale.",
+    noItemsForSale: () => isSw() ? "Hakuna bidhaa kwenye mauzo haya." : "No items found for this sale.",
+    posSale: () => isSw() ? "Mauzo ya POS" : "POS Sale",
+    walkInCustomer: () => isSw() ? "Mteja wa papo hapo" : "Walk-in Customer",
+    sold: () => isSw() ? "zimeuzwa" : "sold",
+  };
+
   const fmt = (amount, cur = "TZS") => {
     const val = Number(amount) || 0;
     return `${cur} ${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -9798,10 +10044,10 @@ const setupDashboardPage = () => {
   const methodLabel = (method) => {
     const key = String(method || "").toLowerCase();
     if (key === "mobile" || key === "mobile_money") return "Lipa kwa simu";
-    if (key === "bank" || key === "card") return "Bank/Card";
-    if (key === "pay_later" || key === "paylater") return "Pay Later";
-    if (key === "credit") return "Credit";
-    return "Cash";
+    if (key === "bank" || key === "card") return isSw() ? "Benki/Kadi" : "Bank/Card";
+    if (key === "pay_later" || key === "paylater") return isSw() ? "Lipa baadaye" : "Pay Later";
+    if (key === "credit") return isSw() ? "Mkopo" : "Credit";
+    return isSw() ? "Taslimu" : "Cash";
   };
   const shortTime = (value) => {
     if (!value) return "";
@@ -9843,7 +10089,7 @@ const setupDashboardPage = () => {
     if (!list) return;
     const recent = sales.slice(0, 20);
     if (!recent.length) {
-      list.innerHTML = '<p class="dashboard-empty">No recent POS sales yet.</p>';
+      list.innerHTML = `<p class="dashboard-empty">${dashboardText.noRecentSales()}</p>`;
       return;
     }
     list.innerHTML = recent.map((sale) => {
@@ -9855,8 +10101,8 @@ const setupDashboardPage = () => {
       <button type="button" class="dashboard-list-row" data-dashboard-sale-id="${sale.id}">
         <span class="dashboard-sale-icon${isMobile ? " mobile" : ""}">${icon}</span>
         <div>
-          <strong>${escText(sale.receipt_number || "POS Sale")}</strong>
-          <span>${escText(sale.customer_name || "Walk-in Customer")} &bull; ${methodLabel(sale.payment_method)}${shortTime(sale.created_at) ? ` &bull; ${shortTime(sale.created_at)}` : ""}</span>
+          <strong>${escText(sale.receipt_number || dashboardText.posSale())}</strong>
+          <span>${escText(sale.customer_name || dashboardText.walkInCustomer())} &bull; ${methodLabel(sale.payment_method)}${shortTime(sale.created_at) ? ` &bull; ${shortTime(sale.created_at)}` : ""}</span>
         </div>
         <b>${fmt(sale.total_amount)}</b>
       </button>
@@ -9871,27 +10117,27 @@ const setupDashboardPage = () => {
     const itemsEl = document.querySelector("[data-dashboard-sale-items]");
     const totalEl = document.querySelector("[data-dashboard-sale-total]");
     if (!modal || !id) return;
-    if (itemsEl) itemsEl.innerHTML = '<p class="dashboard-empty">Loading sale items...</p>';
+    if (itemsEl) itemsEl.innerHTML = `<p class="dashboard-empty">${dashboardText.loadingSaleItems()}</p>`;
     modal.hidden = false;
     try {
       const res = await fetch(`${getBasePath()}api/sales.php?id=${encodeURIComponent(id)}`);
       const data = await res.json();
-      if (!res.ok || !data.ok) throw new Error(data.message || "Could not load sale.");
+      if (!res.ok || !data.ok) throw new Error(data.message || dashboardText.couldNotLoadSale());
       const sale = data.invoice || {};
-      if (title) title.textContent = sale.invoice_number || "POS Sale";
-      if (meta) meta.textContent = `${sale.customer_name || "Walk-in Customer"} • ${methodLabel(sale.payment_method)} • ${sale.created_at || sale.issue_date || ""}`;
+      if (title) title.textContent = sale.invoice_number || dashboardText.posSale();
+      if (meta) meta.textContent = `${sale.customer_name || dashboardText.walkInCustomer()} • ${methodLabel(sale.payment_method)} • ${sale.created_at || sale.issue_date || ""}`;
       if (totalEl) totalEl.textContent = fmt(sale.total_amount || 0);
       const items = Array.isArray(sale.items) ? sale.items : [];
       if (itemsEl) {
         itemsEl.innerHTML = items.length ? items.map((item) => `
           <div class="shift-detail-row">
-            <span>${escText(item.item_name || "Item")} • ${Number(item.quantity || 0).toLocaleString()} sold</span>
+            <span>${escText(item.item_name || "Item")} • ${Number(item.quantity || 0).toLocaleString()} ${dashboardText.sold()}</span>
             <strong>${fmt(item.line_total || 0)}</strong>
           </div>
-        `).join("") : '<p class="dashboard-empty">No items found for this sale.</p>';
+        `).join("") : `<p class="dashboard-empty">${dashboardText.noItemsForSale()}</p>`;
       }
     } catch (err) {
-      if (itemsEl) itemsEl.innerHTML = `<p class="dashboard-empty">${escText(err.message || "Could not load sale.")}</p>`;
+      if (itemsEl) itemsEl.innerHTML = `<p class="dashboard-empty">${escText(err.message || dashboardText.couldNotLoadSale())}</p>`;
     }
   };
 
@@ -9922,7 +10168,7 @@ const setupDashboardPage = () => {
         invoiceTodayTotal = Number(stats.sales_today || 0) || 0;
         invoiceTodayCount = Number(stats.txn_today || 0) || 0;
         setText("[data-dashboard-amount-due]", fmt(stats.amount_due));
-        setText("[data-dashboard-overdue]", `${stats.overdue || 0} customers due`);
+        setText("[data-dashboard-overdue]", dashboardText.customersDue(stats.overdue || 0));
       }
 
       let posTodayTotal = 0;
@@ -9937,7 +10183,7 @@ const setupDashboardPage = () => {
       const totalSalesToday = invoiceTodayTotal + posTodayTotal;
       const totalSalesCount = invoiceTodayCount + posTodayCount;
       setText("[data-dashboard-sales-today]", fmt(totalSalesToday));
-      setText("[data-dashboard-sales-count]", `${totalSalesCount} sale${totalSalesCount === 1 ? "" : "s"} recorded today`);
+      setText("[data-dashboard-sales-count]", dashboardText.salesRecordedToday(totalSalesCount));
 
       if (stockRes.status === "fulfilled" && stockRes.value.ok) {
         const data = await stockRes.value.json();
@@ -9951,7 +10197,7 @@ const setupDashboardPage = () => {
         const monthTotal = monthExpenses.reduce((sum, expense) => sum + (Number(expense.amount || 0) || 0), 0);
         const todayExpenses = expenses.filter((expense) => dateKey(expense.created_at) === todayKey);
         setText("[data-dashboard-expenses]", fmt(monthTotal));
-        setText("[data-dashboard-expenses-count]", `${todayExpenses.length} today • ${monthExpenses.length} this month`);
+        setText("[data-dashboard-expenses-count]", dashboardText.expensesCount(todayExpenses.length, monthExpenses.length));
       }
 
       fitAmounts(document);
@@ -9978,6 +10224,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   setLanguage(getSavedLanguage()).catch(() => setLanguage(DEFAULT_LANGUAGE));
+  initAutoTranslationObserver();
   setupBottomSheet();
   setupQuickPanel();
   setupSupportModal();

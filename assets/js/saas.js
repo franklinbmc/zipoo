@@ -1,4 +1,114 @@
 const getBasePath = () => "/";
+const SAAS_SW_TRANSLATIONS = {
+  "Hide password": "Ficha nenosiri",
+  "Show password": "Onyesha nenosiri",
+  "Unable to login.": "Imeshindikana kuingia.",
+  "Unable to reach the reset service. Please check the connection and try again.": "Imeshindikana kufikia huduma ya kuweka upya. Tafadhali angalia muunganisho kisha ujaribu tena.",
+  "Please try again.": "Tafadhali jaribu tena.",
+  "Done.": "Imekamilika.",
+  "Reset link is missing its token.": "Kiungo cha kuweka upya hakina tokeni.",
+  "The reset service was routed to the app page. Please refresh and try again.": "Huduma ya kuweka upya imeelekezwa kwenye ukurasa wa programu. Tafadhali sasisha kisha ujaribu tena.",
+  "Reset service returned an unreadable response.": "Huduma ya kuweka upya imerudisha majibu yasiyosomeka.",
+  "No owner": "Hakuna mmiliki",
+  "Business": "Biashara",
+  "Starter": "Mwanzo",
+  "Active": "Hai",
+  "Inactive": "Haifanyi kazi",
+  "Plan": "Mpango",
+  "Status": "Hali",
+  "View": "Tazama",
+  "Save": "Hifadhi",
+  "Enter": "Ingia",
+  "Owner": "Mmiliki",
+  "Users": "Watumiaji",
+  "Items": "Bidhaa",
+  "Sales": "Mauzo",
+  "Location": "Eneo",
+  "Registered staff": "Wafanyakazi waliosajiliwa",
+  "Stock and services": "Stoku na huduma",
+  "Recorded total": "Jumla iliyorekodiwa",
+  "Unknown": "Haijulikani",
+  "No notes": "Hakuna maelezo",
+  "businesses": "biashara",
+  "users": "watumiaji",
+  "Edit": "Hariri",
+  "Delete": "Futa",
+  "Delete this plan? Used plans cannot be deleted.": "Futa mpango huu? Mipango inayotumika haiwezi kufutwa.",
+  "Saved.": "Imehifadhiwa.",
+  "Unable to save.": "Imeshindikana kuhifadhi.",
+  "Deleted.": "Imefutwa.",
+  "Unable to delete.": "Imeshindikana kufuta.",
+  "Saving...": "Inahifadhi...",
+  "Settings saved.": "Mipangilio imehifadhiwa.",
+  "Unable to save settings.": "Imeshindikana kuhifadhi mipangilio.",
+  "Expand sidebar": "Panua menyu ya pembeni",
+  "Collapse sidebar": "Kunja menyu ya pembeni",
+  "Opening Zipoo": "Inafungua Zipoo",
+  "Go to login": "Nenda kuingia",
+  "JavaScript is required to open Zipoo.": "JavaScript inahitajika kufungua Zipoo."
+};
+
+const getSavedLanguage = () => {
+  const saved = localStorage.getItem("zipoo.language");
+  return ["en", "sw"].includes(saved) ? saved : "en";
+};
+
+const translateAutoText = (value, language) => {
+  const text = String(value ?? "");
+  if (language !== "sw") return text;
+  const trimmed = text.trim();
+  if (!trimmed) return text;
+  const translated = SAAS_SW_TRANSLATIONS[trimmed];
+  return translated ? text.replace(trimmed, translated) : text;
+};
+
+const applyAutoTranslations = (language = getSavedLanguage(), root = document.body) => {
+  if (!root) return;
+  const elementRoot = root.nodeType === Node.ELEMENT_NODE ? root : root.parentElement;
+  if (!elementRoot) return;
+  const translateElement = (element) => {
+    if (!element || element.closest?.("script, style, textarea, [contenteditable='true']")) return;
+    if (element.childNodes.length === 1 && element.firstChild?.nodeType === Node.TEXT_NODE) {
+      if (!element.dataset.i18nAutoText) element.dataset.i18nAutoText = element.textContent;
+      element.textContent = translateAutoText(element.dataset.i18nAutoText, language);
+    }
+    ["placeholder", "aria-label", "title", "value"].forEach((attr) => {
+      if (!element.hasAttribute?.(attr)) return;
+      if (attr === "value" && !["BUTTON", "INPUT"].includes(element.tagName)) return;
+      const dataKey = `i18nAuto${attr.replace(/(^|-)([a-z])/g, (_, __, c) => c.toUpperCase())}`;
+      if (!element.dataset[dataKey]) element.dataset[dataKey] = element.getAttribute(attr) || "";
+      const translated = translateAutoText(element.dataset[dataKey], language);
+      if (element.getAttribute(attr) !== translated) element.setAttribute(attr, translated);
+    });
+  };
+  document.documentElement.lang = language;
+  translateElement(elementRoot);
+  elementRoot.querySelectorAll("*").forEach(translateElement);
+};
+
+const initAutoTranslationObserver = () => {
+  try {
+    const observer = new MutationObserver((mutations) => {
+      const language = getSavedLanguage();
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) applyAutoTranslations(language, node);
+        });
+        if (mutation.type === "attributes" && mutation.target?.nodeType === Node.ELEMENT_NODE) {
+          applyAutoTranslations(language, mutation.target);
+        }
+      });
+    });
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["placeholder", "aria-label", "title", "value"],
+    });
+  } catch {
+    /* Best-effort translation for older browsers. */
+  }
+};
 
 const applyTheme = (theme) => {
   const nextTheme = theme === "dark" ? "dark" : "light";
@@ -764,6 +874,8 @@ const setupSaasSettingsForms = () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+  applyAutoTranslations();
+  initAutoTranslationObserver();
   setupThemeToggle();
   setupPasswordToggles();
   setupSaasLogin();
