@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=140">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=141">
 </head>
 <body>
   <div class="app-shell settings-page-shell">
@@ -278,7 +278,7 @@
             </label>
             <label class="form-field">
               <span>Encryption</span>
-              <select name="smtp_encryption">
+              <select class="css-formatted-select" name="smtp_encryption">
                 <option value="tls">TLS (STARTTLS)</option>
                 <option value="ssl">SSL</option>
                 <option value="none">None</option>
@@ -391,7 +391,7 @@
           </label>
           <label class="form-field">
             <span>Purpose of Messaging <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-            <select name="purpose" required>
+            <select class="css-formatted-select" name="purpose" required>
               <option value="Customer Sales Receipts & Invoices">Customer Sales Receipts & Invoices</option>
               <option value="Account Security & Login OTPs">Account Security & Login OTPs</option>
               <option value="Order & Delivery Tracking Alerts">Order & Delivery Tracking Alerts</option>
@@ -457,7 +457,7 @@
         <input type="hidden" name="business_id" data-business-pref-id>
         <label class="form-field">
           <span>Operating Currency</span>
-          <select name="currency">
+          <select class="css-formatted-select" name="currency">
             <option value="TZS">TZS - Tanzanian Shilling</option>
             <option value="USD">USD - US Dollar</option>
             <option value="KES">KES - Kenyan Shilling</option>
@@ -466,7 +466,7 @@
         </label>
         <label class="form-field">
           <span>Timezone</span>
-          <select name="timezone">
+          <select class="css-formatted-select" name="timezone">
             <option value="Africa/Dar_es_Salaam">Africa/Dar es Salaam (EAT, GMT+3)</option>
             <option value="Africa/Nairobi">Africa/Nairobi (EAT, GMT+3)</option>
             <option value="UTC">UTC (Universal Coordinated Time)</option>

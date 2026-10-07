@@ -2,3 +2,5 @@
 composer.phar
 composer-setup.php
 api/config.php
+output/
+tmp/
