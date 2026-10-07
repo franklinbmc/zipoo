@@ -70,6 +70,20 @@ const setupSaasLogin = () => {
 const setupSaasPasswordReset = () => {
   const forgotForm = document.querySelector("[data-saas-forgot]");
   const resetForm = document.querySelector("[data-saas-reset]");
+  const resetEndpoint = `${getBasePath()}api/saas-password-reset.php`;
+
+  const parseResetResponse = async (response) => {
+    const text = await response.text();
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      const normalized = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+      if (/Opening Zipoo|JavaScript is required to open Zipoo/i.test(normalized)) {
+        return { ok: false, message: "The reset service was routed to the app page. Please refresh and try again." };
+      }
+      return { ok: false, message: normalized || "Reset service returned an unreadable response." };
+    }
+  };
 
   const wireForm = (form, onSuccess) => {
     if (!form) return;
@@ -82,9 +96,14 @@ const setupSaasPasswordReset = () => {
 
       let response;
       try {
-        response = await fetch(form.action, {
+        response = await fetch(`${resetEndpoint}?_=${Date.now()}`, {
           method: "POST",
+          headers: {
+            "Accept": "application/json",
+          },
           body: new FormData(form),
+          cache: "no-store",
+          credentials: "same-origin",
         });
       } catch (networkError) {
         if (error) {
@@ -94,13 +113,7 @@ const setupSaasPasswordReset = () => {
         return;
       }
 
-      const text = await response.text();
-      let payload;
-      try {
-        payload = text ? JSON.parse(text) : {};
-      } catch {
-        payload = { ok: false, message: text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() || "Reset service returned an unreadable response." };
-      }
+      const payload = await parseResetResponse(response);
 
       if (!response.ok || !payload.ok) {
         if (error) {
