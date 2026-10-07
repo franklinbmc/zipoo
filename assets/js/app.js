@@ -172,6 +172,7 @@ const AUTO_SW_TRANSLATIONS = {
   "Save Payment": "Hifadhi Malipo",
   "Expenses": "Matumizi",
   "Outstanding Credit": "Madeni ya Wateja",
+  "Pay Later Debts": "Madeni ya Lipa Baadaye",
   "Low Stock": "Stoku Ndogo",
   "Products": "Bidhaa",
   "Re-order recommended": "Inashauriwa kuagiza tena",
@@ -10203,6 +10204,9 @@ const setupDashboardPage = () => {
   const plural = (count, singular, pluralText = `${singular}s`) => Number(count) === 1 ? singular : pluralText;
   const dashboardText = {
     customersDue: (count) => isSw() ? `Wateja ${count} wanadaiwa` : `${count} customers due`,
+    payLaterDebts: (count) => isSw()
+      ? `Madeni ${count} ya lipa baadaye`
+      : `${count} pay later debt${Number(count) === 1 ? "" : "s"}`,
     salesRecordedToday: (count) => isSw()
       ? `Mauzo ${count} yamerekodiwa leo`
       : `${count} ${plural(count, "sale")} recorded today`,
@@ -10359,8 +10363,8 @@ const setupDashboardPage = () => {
         const stats = data.stats || {};
         invoiceTodayTotal = Number(stats.sales_today || 0) || 0;
         invoiceTodayCount = Number(stats.txn_today || 0) || 0;
-        setText("[data-dashboard-amount-due]", fmt(stats.amount_due));
-        setText("[data-dashboard-overdue]", dashboardText.customersDue(stats.overdue || 0));
+        setText("[data-dashboard-amount-due]", fmt(stats.pay_later_due || 0));
+        setText("[data-dashboard-overdue]", dashboardText.payLaterDebts(stats.pay_later_count || 0));
       }
 
       let posTodayTotal = 0;
