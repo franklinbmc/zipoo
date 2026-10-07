@@ -1102,8 +1102,9 @@
 
   /* ---------------------------------------------------------------------- UI */
   const STYLE = `
-  .zc-badge{position:fixed;top:calc(env(safe-area-inset-top,0px) + 3px);left:50%;transform:translateX(-50%);z-index:100000;display:inline-flex;align-items:center;gap:6px;height:20px;padding:0 9px;border:0;border-radius:999px;font:800 10.5px/1 "SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.06em;color:#fff;cursor:pointer;box-shadow:0 2px 10px rgba(13,43,91,.22);transition:background .25s ease,box-shadow .25s ease,transform .25s ease;-webkit-tap-highlight-color:transparent}
-  .zc-badge:active{transform:translateX(-50%) scale(.96)}
+  .zc-badge{position:fixed;right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 72px);z-index:100000;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border:0;border-radius:999px;font:800 10.5px/1 "SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.06em;color:#fff;cursor:pointer;box-shadow:0 2px 10px rgba(13,43,91,.22);transition:background .25s ease,box-shadow .25s ease,transform .25s ease;-webkit-tap-highlight-color:transparent}
+  .zc-badge[hidden]{display:none}
+  .zc-badge:active{transform:scale(.96)}
   .zc-badge[data-state="live"]{background:#0BBF9A;box-shadow:0 2px 10px rgba(11,191,154,.4)}
   .zc-badge[data-state="offline"]{background:#DC2626;box-shadow:0 2px 12px rgba(220,38,38,.45)}
   .zc-badge[data-state="syncing"]{background:#1477FF;box-shadow:0 2px 12px rgba(20,119,255,.4)}
@@ -1114,7 +1115,7 @@
   @keyframes zc-pulse{0%{transform:scale(.5);opacity:.8}100%{transform:scale(1.5);opacity:0}}
   @keyframes zc-spin{to{transform:rotate(360deg)}}
   .zc-count{display:inline-grid;place-items:center;min-width:15px;height:15px;padding:0 4px;border-radius:999px;background:rgba(255,255,255,.28);font-size:9.5px}
-  .zc-panel{position:fixed;top:calc(env(safe-area-inset-top,0px) + 30px);left:50%;transform:translateX(-50%);z-index:100000;width:min(360px,calc(100vw - 20px));max-height:min(70vh,520px);overflow:auto;background:#fff;color:#12233F;border-radius:16px;box-shadow:0 18px 50px rgba(13,43,91,.28);border:1px solid #DBE3EF;font:500 13px/1.4 "SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .zc-panel{position:fixed;right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 104px);z-index:100000;width:min(360px,calc(100vw - 20px));max-height:min(70vh,520px);overflow:auto;background:#fff;color:#12233F;border-radius:16px;box-shadow:0 18px 50px rgba(13,43,91,.28);border:1px solid #DBE3EF;font:500 13px/1.4 "SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
   .zc-panel[hidden]{display:none}
   .zc-panel header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #EEF2F8}
   .zc-panel header strong{font-size:14px;color:#0D2B5B}
@@ -1186,6 +1187,8 @@
     else if (state.syncing) { mode = "syncing"; label = "SYNCING"; }
     badge.dataset.state = mode;
     const count = pending + failed;
+    badge.hidden = mode === "live" && count === 0;
+    if (badge.hidden && panel) panel.hidden = true;
     badge.innerHTML = `<span class="zc-dot"></span><span>${label}</span>${count ? `<span class="zc-count">${count}</span>` : ""}`;
     badge.setAttribute("aria-label", `${label}${count ? `, ${count} change${count > 1 ? "s" : ""} waiting` : ""}`);
     if (panel && !panel.hidden) renderPanel();
