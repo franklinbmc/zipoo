@@ -586,6 +586,13 @@ const refreshStoredAccount = async () => {
     if (response.ok && payload.ok && payload.user) {
       const savedUser = readStoredJson("zipoo.user", {});
       localStorage.setItem("zipoo.user", JSON.stringify({ ...savedUser, ...payload.user }));
+      if (payload.user.impersonation?.active) {
+        localStorage.setItem("zipoo.impersonation", JSON.stringify(payload.user.impersonation));
+        renderImpersonationBanner(payload.user.impersonation);
+      } else {
+        localStorage.removeItem("zipoo.impersonation");
+        renderImpersonationBanner(null);
+      }
       return payload.user;
     }
   } catch {
@@ -593,6 +600,41 @@ const refreshStoredAccount = async () => {
   }
   return null;
 };
+
+const renderImpersonationBanner = (impersonation) => {
+  const existing = document.querySelector("[data-impersonation-banner]");
+  if (!impersonation?.active) {
+    existing?.remove();
+    document.body.classList.remove("is-impersonating");
+    return;
+  }
+  const banner = existing || document.createElement("div");
+  banner.dataset.impersonationBanner = "true";
+  banner.className = "impersonation-banner";
+  banner.innerHTML = `
+    <strong>Impersonating ${impersonation.user_name || "client"}</strong>
+    <span>${impersonation.business_name || "Client business"} · ${impersonation.admin_name || "SaaS Admin"}</span>
+    <button type="button" data-stop-impersonation>Exit</button>
+  `;
+  if (!existing) {
+    document.body.prepend(banner);
+  }
+  document.body.classList.add("is-impersonating");
+  banner.querySelector("[data-stop-impersonation]")?.addEventListener("click", async () => {
+    const body = new FormData();
+    body.set("action", "stop");
+    const response = await fetch(`${getBasePath()}api/saas-impersonate.php`, { method: "POST", body });
+    const payload = await response.json().catch(() => ({}));
+    localStorage.removeItem("zipoo.isLoggedIn");
+    localStorage.removeItem("zipoo.user");
+    localStorage.removeItem("zipoo.businesses");
+    localStorage.removeItem("zipoo.currentBusinessId");
+    localStorage.removeItem("zipoo.impersonation");
+    window.location.href = payload.redirect || `${getBasePath()}saas/users`;
+  });
+};
+
+renderImpersonationBanner(readStoredJson("zipoo.impersonation", null));
 const switchStoredBusiness = async (businessId) => {
   const body = new FormData();
   body.set("action", "switch");
@@ -752,8 +794,17 @@ const setupQuickPanel = () => {
     }
   });
 
-  logoutButton?.addEventListener("click", () => {
+  logoutButton?.addEventListener("click", async () => {
+    if (readStoredJson("zipoo.impersonation", null)?.active) {
+      const body = new FormData();
+      body.set("action", "stop");
+      await fetch(`${getBasePath()}api/saas-impersonate.php`, { method: "POST", body }).catch(() => null);
+    }
     localStorage.removeItem("zipoo.isLoggedIn");
+    localStorage.removeItem("zipoo.user");
+    localStorage.removeItem("zipoo.businesses");
+    localStorage.removeItem("zipoo.currentBusinessId");
+    localStorage.removeItem("zipoo.impersonation");
     window.location.href = `${getBasePath()}login`;
   });
 };

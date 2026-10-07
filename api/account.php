@@ -31,7 +31,7 @@ function input(string $key): string
 
 function user_payload(array $user): array
 {
-    return [
+    $payload = [
         'id' => (int) $user['id'],
         'business_id' => $user['business_id'] !== null ? (int) $user['business_id'] : null,
         'full_name' => $user['full_name'],
@@ -42,6 +42,17 @@ function user_payload(array $user): array
         'region_code' => $user['region_code'] ?? null,
         'district_code' => $user['district_code'] ?? null,
     ];
+
+    if (!empty($_SESSION['zipoo_impersonating'])) {
+        $payload['impersonation'] = [
+            'active' => true,
+            'admin_name' => $_SESSION['saas_admin_name'] ?? 'SaaS Admin',
+            'user_name' => $_SESSION['zipoo_impersonated_user_name'] ?? $user['full_name'],
+            'business_name' => $_SESSION['zipoo_impersonated_business_name'] ?? ($user['business_name'] ?? null),
+        ];
+    }
+
+    return $payload;
 }
 
 function notify_email(string $to, string $subject, string $message): void

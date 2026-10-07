@@ -271,6 +271,9 @@ const renderAdminRows = (items, type) => {
         <div><strong>${item.full_name}</strong><span>${item.phone || ""} ${item.email || ""}</span></div>
         <div><strong>${item.business_name || "No business"}</strong><span>${item.created_at || ""}</span></div>
         <b>${item.account_status || "active"}</b>
+        <div class="admin-row-actions">
+          <button type="button" data-impersonate-user="${item.id}">Enter</button>
+        </div>
       `;
     }
     return row;
@@ -333,6 +336,40 @@ const setupAdminListPage = async () => {
     if (response.ok && payload.ok) {
       openBusinessSnapshot(payload);
     }
+  });
+
+  usersList?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-impersonate-user]");
+    if (!button) return;
+    const body = new FormData();
+    body.set("action", "start");
+    body.set("user_id", button.dataset.impersonateUser);
+    button.disabled = true;
+    const response = await fetch(`${getBasePath()}api/saas-impersonate.php`, { method: "POST", body });
+    const payload = await response.json();
+    button.disabled = false;
+
+    if (!response.ok || !payload.ok) {
+      if (status) {
+        status.hidden = false;
+        status.classList.add("error");
+        status.textContent = payload.message || "Unable to enter client account.";
+      } else {
+        window.alert(payload.message || "Unable to enter client account.");
+      }
+      return;
+    }
+
+    localStorage.setItem("zipoo.isLoggedIn", "true");
+    localStorage.setItem("zipoo.user", JSON.stringify(payload.user || {}));
+    localStorage.setItem("zipoo.businesses", JSON.stringify(payload.businesses || []));
+    if (payload.user?.business_id) {
+      localStorage.setItem("zipoo.currentBusinessId", String(payload.user.business_id));
+    }
+    if (payload.impersonation) {
+      localStorage.setItem("zipoo.impersonation", JSON.stringify(payload.impersonation));
+    }
+    window.location.href = payload.redirect || `${getBasePath()}dashboard`;
   });
 };
 
