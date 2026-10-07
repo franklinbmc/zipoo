@@ -4,3 +4,11 @@ composer-setup.php
 api/config.php
 output/
 tmp/
+android/.gradle/
+android/local.properties
+android/build/
+android/app/build/
+*.apk
+*.aab
+!downloads/
+!downloads/*.apk

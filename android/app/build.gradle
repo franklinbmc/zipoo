@@ -1,0 +1,22 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "com.zipoo.app"
+    compileSdk 36
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    defaultConfig {
+        applicationId "com.zipoo.app"
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName "1.0.0"
+
+        buildConfigField "String", "WEB_URL", "\"https://app.zipoo.co.tz/\""
+    }
+}
