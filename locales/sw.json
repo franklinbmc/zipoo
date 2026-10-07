@@ -66,5 +66,7 @@
   "register.retail": "Rejareja",
   "register.service": "Huduma",
   "register.wholesale": "Jumla",
-  "register.hasAccount": "Tayari una akaunti?"
+  "register.hasAccount": "Tayari una akaunti?",
+  "sales.invoices": "Ankara",
+  "sales.invoice": "Ankara"
 }

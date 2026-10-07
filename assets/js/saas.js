@@ -45,7 +45,10 @@ const SAAS_SW_TRANSLATIONS = {
   "Collapse sidebar": "Kunja menyu ya pembeni",
   "Opening Zipoo": "Inafungua Zipoo",
   "Go to login": "Nenda kuingia",
-  "JavaScript is required to open Zipoo.": "JavaScript inahitajika kufungua Zipoo."
+  "JavaScript is required to open Zipoo.": "JavaScript inahitajika kufungua Zipoo.",
+  "Invoice": "Ankara",
+  "Invoices": "Ankara",
+  "invoices": "ankara"
 };
 
 const getSavedLanguage = () => {
@@ -59,7 +62,10 @@ const translateAutoText = (value, language) => {
   const trimmed = text.trim();
   if (!trimmed) return text;
   const translated = SAAS_SW_TRANSLATIONS[trimmed];
-  return translated ? text.replace(trimmed, translated) : text;
+  if (translated) return text.replace(trimmed, translated);
+  const invoicesMatch = trimmed.match(/^(\d+)\s+invoices?$/i);
+  if (invoicesMatch) return text.replace(trimmed, `Ankara ${invoicesMatch[1]}`);
+  return text;
 };
 
 const applyAutoTranslations = (language = getSavedLanguage(), root = document.body) => {

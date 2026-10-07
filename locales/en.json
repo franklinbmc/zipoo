@@ -66,5 +66,7 @@
   "register.retail": "Retail",
   "register.service": "Service",
   "register.wholesale": "Wholesale",
-  "register.hasAccount": "Already have an account?"
+  "register.hasAccount": "Already have an account?",
+  "sales.invoices": "Invoices",
+  "sales.invoice": "Invoice"
 }

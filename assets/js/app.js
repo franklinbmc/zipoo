@@ -1,5 +1,5 @@
 const DEFAULT_LANGUAGE = "en";
-const LOCALE_VERSION = "17";
+const LOCALE_VERSION = "18";
 const SUPPORTED_LANGUAGES = ["en", "sw"];
 const TRANSLATION_CACHE = {};
 const REGISTER_DRAFT_COOKIE = "zipoo_register_draft";
@@ -68,6 +68,51 @@ const AUTO_SW_TRANSLATIONS = {
   "0 customers due": "Wateja 0 wanadaiwa",
   "Home": "Nyumbani",
   "Invoice": "Ankara",
+  "Invoices": "Ankara",
+  "invoices": "ankara",
+  "Invoices Due": "Ankara Zinazodaiwa",
+  "Total Invoices": "Jumla ya Ankara",
+  "Sent / Due": "Zilizotumwa / Zinazodaiwa",
+  "Outstanding": "Deni Lililobaki",
+  "0 invoices": "Ankara 0",
+  "No invoices yet": "Hakuna ankara bado",
+  "No invoices yet.": "Hakuna ankara bado.",
+  "New invoice": "Ankara mpya",
+  "New Invoice": "Ankara Mpya",
+  "Invoice Items": "Bidhaa za Ankara",
+  "Create & track customer invoices": "Tengeneza na fuatilia ankara za wateja",
+  "Create an invoice to bill a customer and track payment.": "Tengeneza ankara kumtoza mteja na kufuatilia malipo.",
+  "Search by invoice number or customer...": "Tafuta kwa namba ya ankara au mteja...",
+  "Customer Sales Receipts & Invoices": "Risiti za Mauzo ya Wateja na Ankara",
+  "Receipt / Invoice Footer Note": "Ujumbe wa Chini wa Risiti / Ankara",
+  "Save Invoice": "Hifadhi Ankara",
+  "Edit Invoice": "Hariri Ankara",
+  "Download Invoice PDF": "Pakua PDF ya Ankara",
+  "Cancel Invoice": "Ghairi Ankara",
+  "Reactivate Invoice": "Washa Tena Ankara",
+  "Delete Invoice": "Futa Ankara",
+  "Mark as Sent": "Weka Imetumwa",
+  "Mark as Paid": "Weka Imelipwa",
+  "Receive Payment": "Pokea Malipo",
+  "Payment History": "Historia ya Malipo",
+  "Issue Date": "Tarehe ya Kutolewa",
+  "Due Date": "Tarehe ya Malipo",
+  "Invoice Saved": "Ankara Imehifadhiwa",
+  "Invoice saved successfully.": "Ankara imehifadhiwa vizuri.",
+  "Invoice Sent": "Ankara Imetumwa",
+  "Invoice marked as sent.": "Ankara imewekwa kuwa imetumwa.",
+  "Invoice Paid": "Ankara Imelipwa",
+  "Invoice marked as paid.": "Ankara imewekwa kuwa imelipwa.",
+  "Invoice Cancelled": "Ankara Imeghairiwa",
+  "Invoice has been cancelled.": "Ankara imeghairiwa.",
+  "Invoice Reactivated": "Ankara Imewashwa Tena",
+  "Invoice is back to Draft.": "Ankara imerudishwa kwenye Rasimu.",
+  "Could not load invoice.": "Imeshindikana kupakia ankara.",
+  "Failed to save invoice.": "Imeshindikana kuhifadhi ankara.",
+  "Failed to delete invoice.": "Imeshindikana kufuta ankara.",
+  "Please add at least one product with a quantity.": "Tafadhali ongeza angalau bidhaa moja yenye idadi.",
+  "Enter a payment amount.": "Weka kiasi cha malipo.",
+  "Choose where the payment goes.": "Chagua mahali malipo yanapoingia.",
   "Services": "Huduma",
   "Support": "Msaada",
   "Main Navigation": "Urambazaji Mkuu",
@@ -296,8 +341,12 @@ const translateAutoText = (value, language) => {
   const trimmed = text.trim();
   if (!trimmed) return text;
   const translated = AUTO_SW_TRANSLATIONS[trimmed];
-  if (!translated) return text;
-  return text.replace(trimmed, translated);
+  if (translated) return text.replace(trimmed, translated);
+  const invoicesMatch = trimmed.match(/^(\d+)\s+invoices?$/i);
+  if (invoicesMatch) return text.replace(trimmed, `Ankara ${invoicesMatch[1]}`);
+  const debtsMatch = trimmed.match(/^(\d+)\s+debts?$/i);
+  if (debtsMatch) return text.replace(trimmed, `Madeni ${debtsMatch[1]}`);
+  return text;
 };
 
 const applyAutoTranslations = (language, root = document.body) => {
