@@ -4898,6 +4898,25 @@ button.settings-list-row:focus-visible {
   width: min(1100px, 95%);
 }
 
+[data-items-workspace] .stock-workspace-body,
+[data-purchasing-workspace] .stock-workspace-body,
+[data-movements-workspace] .stock-workspace-body,
+[data-warehouses-workspace] .stock-workspace-body,
+[data-warehouse-stock-workspace] .stock-workspace-body {
+  width: min(1100px, 95%);
+}
+
+[data-item-detail-modal] .fullscreen-body,
+[data-item-form-modal] .fullscreen-body,
+[data-stock-adjust-modal] .fullscreen-body,
+[data-po-create-modal] .fullscreen-body,
+[data-po-detail-modal] .fullscreen-body,
+[data-grn-modal] .fullscreen-body,
+[data-warehouse-form-modal] .fullscreen-body,
+[data-stock-transfer-modal] .fullscreen-body {
+  width: min(1100px, 95%);
+}
+
 .report-controls {
   position: sticky;
   top: 0;
