@@ -6654,6 +6654,17 @@ button.report-list-row:focus-visible {
   min-height: 116px;
   padding: 18px;
   background: #f1f5f9;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.16s ease, transform 0.16s ease;
+}
+
+.dashboard-kpi-card:hover,
+.dashboard-kpi-card:focus-visible {
+  border-color: rgba(24, 118, 210, 0.38);
+  transform: translateY(-1px);
+  outline: none;
 }
 
 .dashboard-kpi-label {

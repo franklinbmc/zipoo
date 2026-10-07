@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=131">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=132">
 </head>
 <body>
   <div class="app-shell login-entry dashboard-entry" data-dashboard-page>
@@ -26,26 +26,26 @@
     </header>
     <main class="entry-main dashboard-main">
       <section class="dashboard-kpi-grid" aria-label="Business overview">
-        <article class="dashboard-kpi-card">
+        <a class="dashboard-kpi-card" href="/sales?workspace=history" aria-label="Open sales history">
           <span class="dashboard-kpi-label">Today's Sales</span>
           <strong class="dashboard-kpi-value amount-fit" data-dashboard-sales-today>TZS 0</strong>
           <small data-dashboard-sales-count>0 sales recorded</small>
-        </article>
-        <article class="dashboard-kpi-card">
+        </a>
+        <a class="dashboard-kpi-card" href="/expenses?workspace=expenses" aria-label="Open expenses">
           <span class="dashboard-kpi-label">Expenses</span>
           <strong class="dashboard-kpi-value muted amount-fit" data-dashboard-expenses>TZS 0</strong>
           <small data-dashboard-expenses-count>0 expenses this month</small>
-        </article>
-        <article class="dashboard-kpi-card">
+        </a>
+        <a class="dashboard-kpi-card" href="/sales?workspace=debts" aria-label="Open unpaid credit sales">
           <span class="dashboard-kpi-label">Outstanding Credit</span>
           <strong class="dashboard-kpi-value danger amount-fit" data-dashboard-amount-due>TZS 0</strong>
           <small class="danger" data-dashboard-overdue>0 customers due</small>
-        </article>
-        <article class="dashboard-kpi-card">
+        </a>
+        <a class="dashboard-kpi-card" href="/stock?workspace=items&filter=low_stock" aria-label="Open low stock products">
           <span class="dashboard-kpi-label">Low Stock</span>
           <strong class="dashboard-kpi-value warning"><span data-dashboard-low-stock>0</span> Products</strong>
           <small class="warning">Re-order recommended</small>
-        </article>
+        </a>
       </section>
 
       <section class="dashboard-stream-section">
@@ -298,6 +298,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=146" defer></script>
+  <script src="/assets/js/app.js?v=147" defer></script>
 </body>
 </html>

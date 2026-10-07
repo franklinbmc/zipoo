@@ -6031,11 +6031,13 @@ const setupStockPage = () => {
 
   const stockParams = new URLSearchParams(window.location.search);
   const stockWs = stockParams.get("workspace") || stockParams.get("view");
-  if (stockWs === "items" || stockParams.get("filter") === "service") {
+  if (stockWs === "items" || stockParams.get("filter") === "service" || stockParams.get("filter") === "low_stock") {
     openWorkspace(itemsWorkspace, () => {
       loadItems(itemsSearch?.value.trim() || "");
       if (stockParams.get("filter") === "service") {
         document.querySelector("[data-filter-type='service']")?.click();
+      } else if (stockParams.get("filter") === "low_stock") {
+        document.querySelector("[data-filter-type='low_stock']")?.click();
       }
     });
   }
@@ -7817,6 +7819,12 @@ const setupSalesPage = () => {
   } else if (targetWorkspace === "reports") {
     openWorkspace(reportsWorkspace);
     loadSalesReports();
+  } else if (targetWorkspace === "history") {
+    openWorkspace(salesHistoryWorkspace);
+    loadSalesHistory();
+  } else if (targetWorkspace === "debts") {
+    openWorkspace(debtsWorkspace);
+    loadDebts();
   }
 };
 
@@ -9363,7 +9371,15 @@ const setupExpensesPage = () => {
     }
   });
 
-  loadExpenses();
+  loadExpenses().then(() => {
+    const params = new URLSearchParams(window.location.search);
+    const targetWorkspace = params.get("workspace") || params.get("view");
+    if (targetWorkspace === "expenses") {
+      expenseView = { level: "years", year: "", month: "", date: "" };
+      renderExpenseDrilldown();
+      if (workspace) workspace.hidden = false;
+    }
+  });
 };
 
 const setupRealEstatePage = () => {
