@@ -1,3 +1,7 @@
+Options -Indexes
+DirectoryIndex index.html
+AddType application/vnd.android.package-archive .apk
+
 <IfModule mod_headers.c>
   # Ensure index.html is never served stale
   <FilesMatch "\.(html|htm)$">
