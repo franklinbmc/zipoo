@@ -375,7 +375,7 @@ const renderAdminRows = (items, type) => {
         <div><strong>${item.business_name}</strong><span>${item.business_type || "Business"} · ${item.region_name || ""} ${item.district_name || ""}</span></div>
         <div><strong>${item.owner_name || "No owner"}</strong><span>${item.phone || ""} ${item.email || ""}</span></div>
         <label><span>Plan</span><input name="plan_name" value="${item.plan_name || "Starter"}"></label>
-        <label><span>Status</span><select name="account_status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+        <label><span>Status</span><select class="css-formatted-select" name="account_status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
         <div class="admin-row-actions">
           <button type="button" data-business-view="${item.id}">View</button>
           <button type="button" data-business-save="${item.id}">Save</button>

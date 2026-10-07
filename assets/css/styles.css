@@ -1814,6 +1814,23 @@ body.offline .status-dot {
 [data-smtp-modal] select,
 [data-sender-id-modal] select,
 [data-general-settings-modal] select,
+[data-account-edit-modal] select,
+[data-business-manager-modal] select,
+[data-business-create-modal] select,
+.settings-accordion select,
+.settings-list select,
+.settings-panel select,
+.settings-subpanel select,
+.settings-form select,
+.settings-test-form select,
+.definition-form select,
+.saas-content select,
+.saas-admin-layout select,
+[data-company-users-page] select,
+[data-user-create-modal] select,
+[data-user-edit-modal] select,
+.admin-data-row select,
+.plan-form select,
 .payroll-controls select,
 .payroll-controls [data-payroll-account],
 .customers-page-shell select {
@@ -1849,6 +1866,23 @@ body.offline .status-dot {
 [data-smtp-modal] select:hover,
 [data-sender-id-modal] select:hover,
 [data-general-settings-modal] select:hover,
+[data-account-edit-modal] select:hover,
+[data-business-manager-modal] select:hover,
+[data-business-create-modal] select:hover,
+.settings-accordion select:hover,
+.settings-list select:hover,
+.settings-panel select:hover,
+.settings-subpanel select:hover,
+.settings-form select:hover,
+.settings-test-form select:hover,
+.definition-form select:hover,
+.saas-content select:hover,
+.saas-admin-layout select:hover,
+[data-company-users-page] select:hover,
+[data-user-create-modal] select:hover,
+[data-user-edit-modal] select:hover,
+.admin-data-row select:hover,
+.plan-form select:hover,
 .payroll-controls select:hover,
 .payroll-controls [data-payroll-account]:hover,
 .customers-page-shell select:hover {
@@ -1873,6 +1907,40 @@ body.offline .status-dot {
 [data-sender-id-modal] select:focus-visible,
 [data-general-settings-modal] select:focus,
 [data-general-settings-modal] select:focus-visible,
+[data-account-edit-modal] select:focus,
+[data-account-edit-modal] select:focus-visible,
+[data-business-manager-modal] select:focus,
+[data-business-manager-modal] select:focus-visible,
+[data-business-create-modal] select:focus,
+[data-business-create-modal] select:focus-visible,
+.settings-accordion select:focus,
+.settings-accordion select:focus-visible,
+.settings-list select:focus,
+.settings-list select:focus-visible,
+.settings-panel select:focus,
+.settings-panel select:focus-visible,
+.settings-subpanel select:focus,
+.settings-subpanel select:focus-visible,
+.settings-form select:focus,
+.settings-form select:focus-visible,
+.settings-test-form select:focus,
+.settings-test-form select:focus-visible,
+.definition-form select:focus,
+.definition-form select:focus-visible,
+.saas-content select:focus,
+.saas-content select:focus-visible,
+.saas-admin-layout select:focus,
+.saas-admin-layout select:focus-visible,
+[data-company-users-page] select:focus,
+[data-company-users-page] select:focus-visible,
+[data-user-create-modal] select:focus,
+[data-user-create-modal] select:focus-visible,
+[data-user-edit-modal] select:focus,
+[data-user-edit-modal] select:focus-visible,
+.admin-data-row select:focus,
+.admin-data-row select:focus-visible,
+.plan-form select:focus,
+.plan-form select:focus-visible,
 .payroll-controls select:focus,
 .payroll-controls select:focus-visible,
 .payroll-controls [data-payroll-account]:focus,
@@ -1893,6 +1961,23 @@ body.offline .status-dot {
 [data-smtp-modal] select:disabled,
 [data-sender-id-modal] select:disabled,
 [data-general-settings-modal] select:disabled,
+[data-account-edit-modal] select:disabled,
+[data-business-manager-modal] select:disabled,
+[data-business-create-modal] select:disabled,
+.settings-accordion select:disabled,
+.settings-list select:disabled,
+.settings-panel select:disabled,
+.settings-subpanel select:disabled,
+.settings-form select:disabled,
+.settings-test-form select:disabled,
+.definition-form select:disabled,
+.saas-content select:disabled,
+.saas-admin-layout select:disabled,
+[data-company-users-page] select:disabled,
+[data-user-create-modal] select:disabled,
+[data-user-edit-modal] select:disabled,
+.admin-data-row select:disabled,
+.plan-form select:disabled,
 .payroll-controls select:disabled,
 .payroll-controls [data-payroll-account]:disabled,
 .customers-page-shell select:disabled {
@@ -1911,6 +1996,23 @@ body.offline .status-dot {
 [data-smtp-modal] select option,
 [data-sender-id-modal] select option,
 [data-general-settings-modal] select option,
+[data-account-edit-modal] select option,
+[data-business-manager-modal] select option,
+[data-business-create-modal] select option,
+.settings-accordion select option,
+.settings-list select option,
+.settings-panel select option,
+.settings-subpanel select option,
+.settings-form select option,
+.settings-test-form select option,
+.definition-form select option,
+.saas-content select option,
+.saas-admin-layout select option,
+[data-company-users-page] select option,
+[data-user-create-modal] select option,
+[data-user-edit-modal] select option,
+.admin-data-row select option,
+.plan-form select option,
 .payroll-controls select option,
 .payroll-controls [data-payroll-account] option,
 .customers-page-shell select option {
@@ -3273,9 +3375,7 @@ body.offline .status-dot {
 }
 
 .admin-data-row input,
-.admin-data-row select,
-.plan-form input,
-.plan-form select {
+.plan-form input {
   width: 100%;
   border: 1px solid var(--color-line);
   border-radius: 8px;
@@ -3284,16 +3384,6 @@ body.offline .status-dot {
   font: inherit;
   font-weight: 800;
   padding: 9px 10px;
-}
-
-.admin-data-row select,
-.plan-form select {
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, var(--color-muted) 50%), linear-gradient(135deg, var(--color-muted) 50%, transparent 50%);
-  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
-  background-repeat: no-repeat;
-  background-size: 5px 5px, 5px 5px;
-  padding-right: 30px;
 }
 
 .admin-row-actions {
@@ -3929,7 +4019,7 @@ textarea {
 
 .settings-list-row strong,
 .settings-list-row input,
-.settings-list-row select {
+.settings-list-row select:not(.css-formatted-select) {
   min-width: 0;
   color: var(--color-muted);
   font-size: 0.9rem;
@@ -3946,7 +4036,7 @@ textarea {
 }
 
 .settings-list-row.field-row input,
-.settings-list-row.field-row select {
+.settings-list-row.field-row select:not(.css-formatted-select) {
   min-height: 40px;
   border: 0;
   padding: 0;
@@ -7106,6 +7196,10 @@ button.report-list-row:focus-visible {
   .payroll-controls input[type="month"],
   .payroll-controls select,
   .payroll-controls [data-payroll-account],
+  .settings-form select,
+  .definition-form select,
+  .plan-form select,
+  .admin-data-row select,
   .css-formatted-select {
     width: 100%;
     max-width: 100%;

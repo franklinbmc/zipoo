@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=141">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=142">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -469,7 +469,7 @@
 
         <label class="form-field" data-status-field>
           <span>Status</span>
-          <select name="status">
+          <select class="css-formatted-select" name="status">
             <option value="active" selected>Active</option>
             <option value="inactive">Inactive</option>
           </select>
@@ -806,7 +806,7 @@
         </div>
         <label class="form-field">
           <span>To Warehouse <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
-          <select data-stock-transfer-to required></select>
+          <select class="css-formatted-select" data-stock-transfer-to required></select>
         </label>
         <label class="form-field">
           <span>Quantity <strong style="color:var(--color-danger,#ef4444);">*</strong></span>

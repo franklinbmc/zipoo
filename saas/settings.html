@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#F6F8FC">
   <title>System Settings - Zipoo Admin</title>
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=130">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=142">
 </head>
 <body>
   <div class="saas-admin-layout">
@@ -132,7 +132,7 @@
               <label><span>SMTP Username</span><input type="text" name="smtp_username" placeholder="mailer@example.com" data-setting="smtp.smtp_username"></label>
               <label><span>SMTP Password</span><input type="password" name="smtp_password" placeholder="••••••••" data-setting="smtp.smtp_password"></label>
               <label><span>From Email</span><input type="email" name="from_email" placeholder="no-reply@zipoo.local" data-setting="smtp.from_email"></label>
-              <label><span>Encryption</span><select name="smtp_encryption" data-setting="smtp.smtp_encryption"><option value="tls">TLS</option><option value="ssl">SSL</option><option value="none">None</option></select></label>
+              <label><span>Encryption</span><select class="css-formatted-select" name="smtp_encryption" data-setting="smtp.smtp_encryption"><option value="tls">TLS</option><option value="ssl">SSL</option><option value="none">None</option></select></label>
               <p class="inline-status" hidden data-settings-status></p>
               <button class="btn btn-primary" type="submit">Save SMTP Setup</button>
             </form>
@@ -191,7 +191,7 @@
               <input type="hidden" name="type" value="district">
               <input type="hidden" name="mode" value="add" data-district-mode>
               <input type="hidden" name="original_district_code" data-original-district-code>
-              <label><span>Region</span><select name="region_code" required data-definition-region-options></select></label>
+              <label><span>Region</span><select class="css-formatted-select" name="region_code" required data-definition-region-options></select></label>
               <label><span>District Code</span><input type="text" name="district_code" placeholder="TZ9901" required></label>
               <label><span>District Name</span><input type="text" name="district_name" placeholder="District name" required></label>
               <button class="btn btn-primary" type="submit">Save District</button>

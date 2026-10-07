@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#F6F8FC">
   <title>Plans - Zipoo Admin</title>
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=130">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=142">
 </head>
 <body>
   <div class="saas-admin-layout">
@@ -40,7 +40,7 @@
           <label><span>Monthly Price</span><input type="text" inputmode="decimal" name="monthly_price" value="0"></label>
           <label><span>User Limit</span><input type="number" min="1" name="user_limit" value="1"></label>
           <label><span>Business Limit</span><input type="number" min="1" name="business_limit" value="1"></label>
-          <label><span>Status</span><select name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+          <label><span>Status</span><select class="css-formatted-select" name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
           <label class="full-span"><span>Notes</span><input type="text" name="notes" placeholder="Short internal note"></label>
           <p class="inline-status" hidden data-plan-status></p>
           <button class="btn btn-primary" type="submit">Save Plan</button>

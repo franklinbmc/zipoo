@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=141">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=142">
 </head>
 <body>
   <div class="app-shell customers-page-shell">
@@ -143,7 +143,7 @@
         </label>
         <label class="form-field">
           <span>User Role <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select name="role" required>
+          <select class="css-formatted-select" name="role" required>
             <option value="cashier">Cashier / Sales</option>
             <option value="manager">Manager</option>
             <option value="staff" selected>General Staff</option>
@@ -183,7 +183,7 @@
         </label>
         <label class="form-field">
           <span>Status</span>
-          <select name="status">
+          <select class="css-formatted-select" name="status">
             <option value="active" selected>Active</option>
             <option value="inactive">Inactive</option>
           </select>
@@ -224,7 +224,7 @@
         </label>
         <label class="form-field">
           <span>User Role <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select name="role" data-edit-user-role required>
+          <select class="css-formatted-select" name="role" data-edit-user-role required>
             <option value="cashier">Cashier / Sales</option>
             <option value="manager">Manager</option>
             <option value="staff">General Staff</option>
@@ -260,7 +260,7 @@
         </div>
         <label class="form-field">
           <span>Status</span>
-          <select name="status" data-edit-user-status>
+          <select class="css-formatted-select" name="status" data-edit-user-status>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
