@@ -4890,6 +4890,12 @@ button.settings-list-row:focus-visible {
 
 .reports-workspace-body {
   overflow: auto;
+  width: min(1100px, 95%);
+}
+
+[data-shift-workspace] .stock-workspace-body,
+[data-shift-detail-workspace] .stock-workspace-body {
+  width: min(1100px, 95%);
 }
 
 .report-controls {
