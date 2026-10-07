@@ -63,14 +63,16 @@ function get_active_business_id(PDO $pdo, int $userId): int
 function ensure_settings_tables(PDO $pdo): void
 {
     $pdo->exec(
-        'CREATE TABLE IF NOT EXISTS tbl_saas_settings (
+        'CREATE TABLE IF NOT EXISTS tbl_business_settings (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            business_id BIGINT UNSIGNED NOT NULL,
             setting_group VARCHAR(50) NOT NULL,
             setting_key VARCHAR(100) NOT NULL,
             setting_value LONGTEXT NULL,
             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            UNIQUE KEY unique_group_key (setting_group, setting_key)
+            UNIQUE KEY unique_business_group_key (business_id, setting_group, setting_key),
+            KEY idx_business_group (business_id, setting_group)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
 
@@ -94,10 +96,18 @@ function ensure_settings_tables(PDO $pdo): void
     );
 }
 
-function load_group_settings(PDO $pdo, string $group): array
+function load_group_settings(PDO $pdo, int $businessId, string $group): array
 {
-    $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = :group');
-    $stmt->execute([':group' => $group]);
+    if ($businessId <= 0) {
+        return [];
+    }
+
+    $stmt = $pdo->prepare(
+        'SELECT setting_key, setting_value
+         FROM tbl_business_settings
+         WHERE business_id = :business_id AND setting_group = :setting_group'
+    );
+    $stmt->execute([':business_id' => $businessId, ':setting_group' => $group]);
     $result = [];
     foreach ($stmt->fetchAll() as $row) {
         $result[$row['setting_key']] = $row['setting_value'];
@@ -105,16 +115,21 @@ function load_group_settings(PDO $pdo, string $group): array
     return $result;
 }
 
-function save_group_settings(PDO $pdo, string $group, array $settings): void
+function save_group_settings(PDO $pdo, int $businessId, string $group, array $settings): void
 {
+    if ($businessId <= 0) {
+        respond(422, ['ok' => false, 'message' => 'Please select a business first.']);
+    }
+
     $stmt = $pdo->prepare(
-        'INSERT INTO tbl_saas_settings (setting_group, setting_key, setting_value)
-         VALUES (:setting_group, :setting_key, :setting_value)
+        'INSERT INTO tbl_business_settings (business_id, setting_group, setting_key, setting_value)
+         VALUES (:business_id, :setting_group, :setting_key, :setting_value)
          ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)'
     );
 
     foreach ($settings as $key => $value) {
         $stmt->execute([
+            ':business_id' => $businessId,
             ':setting_group' => $group,
             ':setting_key' => $key,
             ':setting_value' => $value,
@@ -129,9 +144,9 @@ try {
     $businessId = get_active_business_id($pdo, $userId);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $smtp = load_group_settings($pdo, 'smtp');
-        $sms = load_group_settings($pdo, 'sms');
-        $general = load_group_settings($pdo, 'general');
+        $smtp = load_group_settings($pdo, $businessId, 'smtp');
+        $sms = load_group_settings($pdo, $businessId, 'sms');
+        $general = load_group_settings($pdo, $businessId, 'general');
 
         // Fetch user's sender id requests
         $stmt = $pdo->prepare(
@@ -155,7 +170,7 @@ try {
             ],
             'sms' => [
                 'provider_name' => $sms['provider_name'] ?? 'MegaSMS',
-                'api_url' => $sms['api_url'] ?? 'https://megasms.co.tz/api/v1',
+                'api_url' => 'https://megasms.co.tz/api/v1',
                 'has_api_key' => !empty($sms['api_key']),
                 'sender_id' => $sms['sender_id'] ?? 'MEGASMS',
             ],
@@ -199,13 +214,13 @@ try {
             $settings['smtp_password'] = $password;
         }
 
-        save_group_settings($pdo, 'smtp', $settings);
+        save_group_settings($pdo, $businessId, 'smtp', $settings);
 
         respond(200, ['ok' => true, 'message' => 'SMTP settings saved successfully.']);
     }
 
     if ($action === 'test_smtp') {
-        $settings = load_group_settings($pdo, 'smtp');
+        $settings = load_group_settings($pdo, $businessId, 'smtp');
         $testEmail = trim((string) ($_POST['test_email'] ?? ''));
         if (!filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
             respond(422, ['ok' => false, 'message' => 'Please enter a valid email address to receive the test.']);
@@ -251,7 +266,7 @@ try {
     }
 
     if ($action === 'save_sms') {
-        $apiUrl = trim((string) ($_POST['api_url'] ?? 'https://megasms.co.tz/api/v1'));
+        $apiUrl = 'https://megasms.co.tz/api/v1';
         $apiKey = (string) ($_POST['api_key'] ?? '');
         $senderId = strtoupper(trim((string) ($_POST['sender_id'] ?? 'MEGASMS')));
 
@@ -269,25 +284,25 @@ try {
             $settings['api_key'] = $apiKey;
         }
 
-        save_group_settings($pdo, 'sms', $settings);
+        save_group_settings($pdo, $businessId, 'sms', $settings);
 
         respond(200, ['ok' => true, 'message' => 'SMS settings saved successfully.']);
     }
 
     if ($action === 'test_sms') {
-        $settings = load_group_settings($pdo, 'sms');
+        $settings = load_group_settings($pdo, $businessId, 'sms');
         $phone = trim((string) ($_POST['test_phone'] ?? ''));
         if ($phone === '') {
             respond(422, ['ok' => false, 'message' => 'Please enter a test phone number (e.g. 255712345678).']);
         }
 
-        if (empty($settings['api_url']) || empty($settings['api_key'])) {
-            respond(422, ['ok' => false, 'message' => 'Please save MegaSMS API URL and API Key first.']);
+        if (empty($settings['api_key'])) {
+            respond(422, ['ok' => false, 'message' => 'Please save the MegaSMS API Key first.']);
         }
 
         $senderId = $settings['sender_id'] ?? 'MEGASMS';
         $message = 'Zipoo test SMS. Your MegaSMS gateway integration is active and working!';
-        $baseUrl = rtrim($settings['api_url'], '/');
+        $baseUrl = 'https://megasms.co.tz/api/v1';
         $url = $baseUrl . '/messages';
 
         $payload = json_encode([
@@ -385,7 +400,7 @@ try {
         $taxRate = trim((string) ($_POST['tax_rate'] ?? '18'));
         $receiptFooter = trim((string) ($_POST['receipt_footer'] ?? ''));
 
-        save_group_settings($pdo, 'general', [
+        save_group_settings($pdo, $businessId, 'general', [
             'currency' => $currency,
             'timezone' => $timezone,
             'tax_rate' => $taxRate,

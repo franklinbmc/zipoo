@@ -67,12 +67,19 @@ function get_active_business(PDO $pdo, int $userId): array
     return [];
 }
 
-function load_group_settings(PDO $pdo, string $group): array
+function load_group_settings(PDO $pdo, int $businessId, string $group): array
 {
-    // System settings (SMTP, SMS, etc.) are stored in tbl_saas_settings by api/settings.php.
+    if ($businessId <= 0) {
+        return [];
+    }
+
     try {
-        $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = :grp');
-        $stmt->execute([':grp' => $group]);
+        $stmt = $pdo->prepare(
+            'SELECT setting_key, setting_value
+             FROM tbl_business_settings
+             WHERE business_id = :bid AND setting_group = :grp'
+        );
+        $stmt->execute([':bid' => $businessId, ':grp' => $group]);
         $rows = $stmt->fetchAll();
     } catch (Throwable $e) {
         // Table not created yet (settings never saved) — treat as unconfigured.
@@ -576,7 +583,7 @@ try {
             $pdfFilename = 'Purchase_Order_' . $po['po_number'] . '.pdf';
 
             // Send via PHPMailer
-            $smtpSettings = load_group_settings($pdo, 'smtp');
+            $smtpSettings = load_group_settings($pdo, $businessId, 'smtp');
             if (empty($smtpSettings['smtp_host']) || empty($smtpSettings['from_email'])) {
                 respond(422, ['ok' => false, 'message' => 'SMTP is not configured yet. Please configure SMTP in Settings > System Settings.']);
             }

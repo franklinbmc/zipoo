@@ -331,10 +331,7 @@
         </div>
 
         <form data-sms-form novalidate>
-          <label class="form-field">
-            <span>MegaSMS API Base URL</span>
-            <input type="url" name="api_url" value="https://megasms.co.tz/api/v1" required>
-          </label>
+          <input type="hidden" name="api_url" value="https://megasms.co.tz/api/v1">
           <label class="form-field">
             <span>MegaSMS Bearer API Key / Token</span>
             <input type="password" name="api_key" placeholder="Enter API Token (Leave blank to keep current)">

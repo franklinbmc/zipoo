@@ -14,6 +14,30 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
+function load_shift_business_group_settings(PDO $pdo, int $businessId, string $group): array
+{
+    if ($businessId <= 0) {
+        return [];
+    }
+
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT setting_key, setting_value
+             FROM tbl_business_settings
+             WHERE business_id = :bid AND setting_group = :grp'
+        );
+        $stmt->execute([':bid' => $businessId, ':grp' => $group]);
+    } catch (Throwable $e) {
+        return [];
+    }
+
+    $settings = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $settings[(string) $row['setting_key']] = $row['setting_value'];
+    }
+    return $settings;
+}
+
 /**
  * Retrieves comprehensive report data for a specific shift including
  * cash reconciliation, payment method totals, and all sold items.
@@ -576,13 +600,8 @@ function send_shift_email_report(PDO $pdo, array $data, string $recipientEmail):
         return ['ok' => false, 'message' => 'Please provide a valid recipient email address.'];
     }
 
-    // Load SMTP settings from tbl_saas_settings
-    $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = "smtp"');
-    $stmt->execute();
-    $smtp = [];
-    foreach ($stmt->fetchAll() as $row) {
-        $smtp[$row['setting_key']] = $row['setting_value'];
-    }
+    $businessId = (int) ($data['shift']['business_id'] ?? $data['business_id'] ?? 0);
+    $smtp = load_shift_business_group_settings($pdo, $businessId, 'smtp');
 
     if (empty($smtp['smtp_host']) || empty($smtp['from_email'])) {
         return [

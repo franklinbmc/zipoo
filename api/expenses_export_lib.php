@@ -14,6 +14,30 @@ use Dompdf\Options;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as MailException;
 
+function load_business_group_settings(PDO $pdo, int $businessId, string $group): array
+{
+    if ($businessId <= 0) {
+        return [];
+    }
+
+    try {
+        $stmt = $pdo->prepare(
+            'SELECT setting_key, setting_value
+             FROM tbl_business_settings
+             WHERE business_id = :bid AND setting_group = :grp'
+        );
+        $stmt->execute([':bid' => $businessId, ':grp' => $group]);
+    } catch (Throwable $e) {
+        return [];
+    }
+
+    $settings = [];
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $settings[(string) $row['setting_key']] = $row['setting_value'];
+    }
+    return $settings;
+}
+
 function get_expenses_export_data(PDO $pdo, int $businessId, string $level, string $year, string $month, string $date): array
 {
     // Fetch business info
@@ -491,13 +515,7 @@ function send_expenses_email(PDO $pdo, int $businessId, string $level, string $y
         return ['ok' => false, 'message' => 'Please provide a valid recipient email address.'];
     }
 
-    // Load SMTP settings from tbl_saas_settings
-    $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = "smtp"');
-    $stmt->execute();
-    $smtp = [];
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $smtp[$row['setting_key']] = $row['setting_value'];
-    }
+    $smtp = load_business_group_settings($pdo, $businessId, 'smtp');
 
     if (empty($smtp['smtp_host']) || empty($smtp['from_email'])) {
         return [
@@ -865,12 +883,7 @@ function send_payroll_email(PDO $pdo, int $businessId, string $month, string $re
         return ['ok' => false, 'message' => 'Please provide a valid recipient email address.'];
     }
 
-    $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = "smtp"');
-    $stmt->execute();
-    $smtp = [];
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $smtp[$row['setting_key']] = $row['setting_value'];
-    }
+    $smtp = load_business_group_settings($pdo, $businessId, 'smtp');
 
     if (empty($smtp['smtp_host']) || empty($smtp['from_email'])) {
         return ['ok' => false, 'message' => 'SMTP is not configured in Settings yet.'];
@@ -1183,12 +1196,7 @@ function send_categories_email(PDO $pdo, int $businessId, string $recipientEmail
         return ['ok' => false, 'message' => 'Please provide a valid recipient email address.'];
     }
 
-    $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = "smtp"');
-    $stmt->execute();
-    $smtp = [];
-    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $smtp[$row['setting_key']] = $row['setting_value'];
-    }
+    $smtp = load_business_group_settings($pdo, $businessId, 'smtp');
 
     if (empty($smtp['smtp_host']) || empty($smtp['from_email'])) {
         return ['ok' => false, 'message' => 'SMTP is not configured in Settings yet.'];
