@@ -3733,8 +3733,8 @@ textarea {
   display: grid;
   align-content: start;
   gap: 12px;
-  width: min(640px, 95%);
-  max-width: 95%;
+  width: min(1100px, 95%);
+  max-width: 1100px;
   margin: 0 auto;
   padding: 16px 0 32px;
 }
@@ -3990,8 +3990,8 @@ button.settings-list-row:focus-visible {
   display: grid;
   align-content: start;
   gap: 14px;
-  width: min(640px, 95%);
-  max-width: 95%;
+  width: min(1100px, 95%);
+  max-width: 1100px;
   margin: 0 auto;
   padding: 16px 0 max(28px, env(safe-area-inset-bottom));
   overflow: auto;
@@ -4565,8 +4565,8 @@ button.settings-list-row:focus-visible {
   display: grid;
   align-content: start;
   gap: 12px;
-  width: min(640px, 95%);
-  max-width: 95%;
+  width: min(1100px, 95%);
+  max-width: 1100px;
   margin: 0 auto;
   padding: 16px 0 32px;
 }
@@ -4915,6 +4915,59 @@ button.settings-list-row:focus-visible {
 [data-warehouse-form-modal] .fullscreen-body,
 [data-stock-transfer-modal] .fullscreen-body {
   width: min(1100px, 95%);
+}
+
+.customers-page,
+[data-bank-page],
+[data-expenses-page],
+[data-realestate-page],
+[data-settings-page] {
+  width: min(1100px, 95%);
+  max-width: 1100px;
+}
+
+[data-accounts-workspace] .stock-workspace-body,
+[data-activity-workspace] .stock-workspace-body,
+[data-reconciliation-workspace] .stock-workspace-body,
+[data-expenses-workspace] .stock-workspace-body,
+[data-payroll-workspace] .stock-workspace-body,
+[data-categories-workspace] .stock-workspace-body,
+[data-properties-workspace] .stock-workspace-body,
+[data-tenancies-workspace] .stock-workspace-body,
+[data-rent-workspace] .stock-workspace-body,
+[data-staff-workspace] .stock-workspace-body {
+  width: min(1100px, 95%);
+  max-width: 1100px;
+}
+
+[data-customer-detail-modal] .fullscreen-body,
+[data-customer-create-modal] .fullscreen-body,
+[data-customer-edit-modal] .fullscreen-body,
+[data-supplier-detail-modal] .fullscreen-body,
+[data-supplier-create-modal] .fullscreen-body,
+[data-supplier-edit-modal] .fullscreen-body,
+[data-account-detail-workspace] .fullscreen-body,
+[data-account-form-modal] .fullscreen-body,
+[data-money-modal] .fullscreen-body,
+[data-transfer-modal] .fullscreen-body,
+[data-expense-modal] .fullscreen-body,
+[data-property-detail-workspace] .fullscreen-body,
+[data-property-form-modal] .fullscreen-body,
+[data-unit-form-modal] .fullscreen-body,
+[data-tenancy-form-modal] .fullscreen-body,
+[data-rent-form-modal] .fullscreen-body,
+[data-staff-form-modal] .fullscreen-body,
+[data-tenancy-detail-workspace] .fullscreen-body,
+[data-account-edit-modal] .fullscreen-body,
+[data-business-manager-modal] .fullscreen-body,
+[data-business-create-modal] .fullscreen-body,
+[data-smtp-modal] .fullscreen-body,
+[data-sms-modal] .fullscreen-body,
+[data-sender-id-modal] .fullscreen-body,
+[data-language-modal] .fullscreen-body,
+[data-general-settings-modal] .fullscreen-body {
+  width: min(1100px, 95%);
+  max-width: 1100px;
 }
 
 .report-controls {
@@ -6159,8 +6212,8 @@ button.report-list-row:focus-visible {
 /* ======================= Desktop / big-screen layout (>= 1024px) ======================= */
 @media (min-width: 1024px) {
   /* Wider, centered content */
-  .app-topbar { width: min(1100px, 94%); }
-  .settings-page { width: min(1100px, 94%); max-width: 94%; }
+  .app-topbar { width: min(1100px, 95%); }
+  .settings-page { width: min(1100px, 95%); max-width: 1100px; }
 
   /* Hub rows in two columns (KPI tiles are already 4-up above 600px) */
   .stock-hub { grid-template-columns: repeat(2, 1fr); align-items: start; }
@@ -6171,14 +6224,14 @@ button.report-list-row:focus-visible {
 
   [data-invoices-workspace] .fullscreen-body.stock-workspace-body,
   [data-debts-workspace] .fullscreen-body.stock-workspace-body {
-    width: min(1100px, 94%);
-    max-width: 94%;
+    width: min(1100px, 95%);
+    max-width: 1100px;
   }
 
   [data-invoice-form-modal] .fullscreen-body,
   [data-invoice-detail-modal] .fullscreen-body {
-    width: min(1100px, 94%);
-    max-width: 94%;
+    width: min(1100px, 95%);
+    max-width: 1100px;
   }
 }
 
@@ -6667,12 +6720,13 @@ button.report-list-row:focus-visible {
 
 /* ======================= Owner Dashboard ======================= */
 .dashboard-entry > .app-topbar {
-  width: min(1100px, 94%);
+  width: min(1100px, 95%);
 }
 
 .dashboard-entry > .dashboard-main {
   display: block;
-  width: min(1100px, 94%);
+  width: min(1100px, 95%);
+  max-width: 1100px;
   justify-self: stretch;
   margin: 0 auto;
   padding: 12px 0 92px;
