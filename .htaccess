@@ -27,6 +27,8 @@ DirectoryIndex index.html
   # SaaS admin routes.
   RewriteRule ^saas/?$ saas/index.html [L]
   RewriteRule ^saas/login/?$ saas/login.html [L]
+  RewriteRule ^saas/forgot-password/?$ saas/forgot-password.html [L]
+  RewriteRule ^saas/reset-password/?$ saas/reset-password.html [L]
   RewriteRule ^saas/dashboard/?$ saas/dashboard.html [L]
   RewriteRule ^saas/businesses/?$ saas/businesses.html [L]
   RewriteRule ^saas/users/?$ saas/users.html [L]

@@ -67,6 +67,62 @@ const setupSaasLogin = () => {
   });
 };
 
+const setupSaasPasswordReset = () => {
+  const forgotForm = document.querySelector("[data-saas-forgot]");
+  const resetForm = document.querySelector("[data-saas-reset]");
+
+  const wireForm = (form, onSuccess) => {
+    if (!form) return;
+    const error = form.querySelector("[data-saas-error]");
+    const success = form.querySelector("[data-saas-success]");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (error) error.hidden = true;
+      if (success) success.hidden = true;
+
+      const response = await fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+      });
+      const payload = await response.json().catch(() => ({ ok: false, message: "Request failed." }));
+
+      if (!response.ok || !payload.ok) {
+        if (error) {
+          error.textContent = payload.message || "Please try again.";
+          error.hidden = false;
+        }
+        return;
+      }
+
+      if (success) {
+        success.textContent = payload.message || "Done.";
+        success.hidden = false;
+      }
+      if (typeof onSuccess === "function") onSuccess(payload);
+    });
+  };
+
+  wireForm(forgotForm);
+
+  if (resetForm) {
+    const tokenInput = resetForm.querySelector("[data-reset-token]");
+    const token = new URLSearchParams(window.location.search).get("token") || "";
+    if (tokenInput) tokenInput.value = token;
+    if (!token) {
+      const error = resetForm.querySelector("[data-saas-error]");
+      if (error) {
+        error.textContent = "Reset link is missing its token.";
+        error.hidden = false;
+      }
+    }
+    wireForm(resetForm, () => {
+      window.setTimeout(() => {
+        window.location.href = `${getBasePath()}saas/login`;
+      }, 1200);
+    });
+  }
+};
+
 const renderBusinesses = (businesses) => {
   const list = document.querySelector("[data-business-list]");
   if (!list) {
@@ -485,6 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupThemeToggle();
   setupPasswordToggles();
   setupSaasLogin();
+  setupSaasPasswordReset();
   setupSaasDashboard();
   setupAdminListPage();
   setupSaasLogout();
