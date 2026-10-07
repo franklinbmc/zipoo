@@ -23,7 +23,6 @@
       'nav.startFree': 'Start Free',
 
       // Hero
-      'hero.badge': 'Modern Business Software • Tanzania',
       'hero.title': 'Run your business.<br><span class="highlight">Know your numbers.</span>',
       'hero.subtitle': 'Manage sales, stock, customers, expenses and debts from your phone or computer — simply and in one place.',
       'hero.primaryCta': 'Start Free Today',
@@ -239,7 +238,6 @@
       'nav.startFree': 'Anza Bure',
 
       // Hero
-      'hero.badge': 'Mfumo wa Kisasa wa Biashara • Tanzania',
       'hero.title': 'Simamia biashara yako.<br><span class="highlight">Zijue namba zako.</span>',
       'hero.subtitle': 'Simamia mauzo, stock, wateja, matumizi na madeni kupitia simu au kompyuta yako — kwa urahisi, sehemu moja.',
       'hero.primaryCta': 'Anza Bure Sasa',
