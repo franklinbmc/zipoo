@@ -80,11 +80,27 @@ const setupSaasPasswordReset = () => {
       if (error) error.hidden = true;
       if (success) success.hidden = true;
 
-      const response = await fetch(form.action, {
-        method: "POST",
-        body: new FormData(form),
-      });
-      const payload = await response.json().catch(() => ({ ok: false, message: "Request failed." }));
+      let response;
+      try {
+        response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+        });
+      } catch (networkError) {
+        if (error) {
+          error.textContent = "Unable to reach the reset service. Please check the connection and try again.";
+          error.hidden = false;
+        }
+        return;
+      }
+
+      const text = await response.text();
+      let payload;
+      try {
+        payload = text ? JSON.parse(text) : {};
+      } catch {
+        payload = { ok: false, message: text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim() || "Reset service returned an unreadable response." };
+      }
 
       if (!response.ok || !payload.ok) {
         if (error) {

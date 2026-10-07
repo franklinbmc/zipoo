@@ -115,7 +115,7 @@ function send_reset_email(PDO $pdo, string $email, string $name, string $resetUr
         $mail->Subject = 'Reset your Zipoo SaaS admin password';
         $mail->Body = "Hi {$name},\n\nUse this link to reset your SaaS admin password. It expires in 30 minutes:\n\n{$resetUrl}\n\nIf you did not request this, ignore this email.\n\nZipoo";
         $mail->send();
-    } catch (MailException $error) {
+    } catch (Throwable $error) {
         // Keep reset requests non-enumerating. Operators can verify SMTP from SaaS settings.
         return;
     }
