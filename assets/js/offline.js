@@ -1102,7 +1102,7 @@
 
   /* ---------------------------------------------------------------------- UI */
   const STYLE = `
-  .zc-badge{position:fixed;right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 72px);z-index:100000;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border:0;border-radius:999px;font:800 10.5px/1 "SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.06em;color:#fff;cursor:pointer;box-shadow:0 2px 10px rgba(13,43,91,.22);transition:background .25s ease,box-shadow .25s ease,transform .25s ease;-webkit-tap-highlight-color:transparent}
+  .zc-badge{position:fixed;right:calc(env(safe-area-inset-right,0px) + 12px);bottom:calc(env(safe-area-inset-bottom,0px) + 72px);z-index:100000;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border:0;border-radius:999px;font:800 10.5px/1 "SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:.06em;color:#fff;cursor:pointer;box-shadow:0 2px 10px rgba(13,43,91,.22);transition:opacity .18s ease,visibility .18s ease,background .25s ease,box-shadow .25s ease,transform .25s ease;-webkit-tap-highlight-color:transparent}
   .zc-badge[hidden]{display:none}
   .zc-badge:active{transform:scale(.96)}
   .zc-badge[data-state="live"]{background:#0BBF9A;box-shadow:0 2px 10px rgba(11,191,154,.4)}
@@ -1140,6 +1140,7 @@
   .zc-toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;color:#fff;font:600 12.5px/1.35 "SF Pro Display",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;box-shadow:0 10px 30px rgba(13,43,91,.3);animation:zc-in .25s ease both;max-width:100%}
   .zc-toast.ok{background:#0B8F75}.zc-toast.offline{background:#B91C1C}.zc-toast.error{background:#92400E}
   .zc-toast a,.zc-toast button{color:#fff;font-weight:800;text-decoration:underline;background:none;border:0;padding:0;font:inherit;cursor:pointer;white-space:nowrap}
+  .zipoo-user-busy .zc-badge:not([hidden]),.zipoo-user-busy .zc-toasts{opacity:0;visibility:hidden;pointer-events:none}
   @keyframes zc-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   @media (prefers-reduced-motion:reduce){.zc-badge *,.zc-toast{animation:none!important}}
   `;
@@ -1254,7 +1255,31 @@
   /* After a sync, refresh the visible screen — but never yank it away from
      someone who is in the middle of typing or tapping. */
   let lastInteraction = Date.now();
-  ["pointerdown", "keydown", "touchstart"].forEach((evt) => window.addEventListener(evt, () => { lastInteraction = Date.now(); }, { passive: true, capture: true }));
+  let userBusyTimer = 0;
+  const isEditingControl = (el = document.activeElement) => {
+    if (!el) return false;
+    return /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable;
+  };
+  const markUserBusy = () => {
+    lastInteraction = Date.now();
+    document.documentElement.classList.add("zipoo-user-busy");
+    window.clearTimeout(userBusyTimer);
+    if (isEditingControl()) return;
+    userBusyTimer = window.setTimeout(() => {
+      if (!isEditingControl()) document.documentElement.classList.remove("zipoo-user-busy");
+    }, 1600);
+  };
+  const clearUserBusy = () => {
+    window.clearTimeout(userBusyTimer);
+    userBusyTimer = window.setTimeout(() => {
+      if (!isEditingControl()) document.documentElement.classList.remove("zipoo-user-busy");
+    }, 450);
+  };
+  ["pointerdown", "touchstart", "wheel", "scroll", "keydown", "input"].forEach((evt) => {
+    window.addEventListener(evt, markUserBusy, { passive: true, capture: true });
+  });
+  document.addEventListener("focusin", markUserBusy, true);
+  document.addEventListener("focusout", clearUserBusy, true);
   function offerRefresh() {
     if (!document.body) return;
     const el = document.createElement("div");
