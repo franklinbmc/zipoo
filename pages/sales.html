@@ -9,7 +9,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/icons/icon-192.svg">
-  <link rel="stylesheet" href="/assets/css/styles.css?v=129">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=134">
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -483,16 +483,18 @@
         <h2>Sales History</h2>
         <span class="topbar-spacer" aria-hidden="true"></span>
       </header>
-      <div class="fullscreen-body stock-workspace-body">
-        <div class="filter-bar" data-history-range>
-          <button type="button" class="filter-pill active" data-range="today">Today</button>
-          <button type="button" class="filter-pill" data-range="7">7 days</button>
-          <button type="button" class="filter-pill" data-range="30">30 days</button>
-          <button type="button" class="filter-pill" data-range="all">All</button>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;color:var(--color-muted);margin-bottom:10px;">
-          <span data-history-count>0 sales</span>
-          <strong class="amount-fit" data-history-total style="--amount-fit-base:1.05rem;color:var(--color-navy);">TZS 0</strong>
+      <div class="fullscreen-body stock-workspace-body sales-history-body">
+        <div class="sales-history-sticky">
+          <div class="filter-bar" data-history-range>
+            <button type="button" class="filter-pill active" data-range="today">Today</button>
+            <button type="button" class="filter-pill" data-range="7">7 days</button>
+            <button type="button" class="filter-pill" data-range="30">30 days</button>
+            <button type="button" class="filter-pill" data-range="all">All</button>
+          </div>
+          <div class="sales-history-summary">
+            <span data-history-count>0 sales</span>
+            <strong class="amount-fit" data-history-total style="--amount-fit-base:1.05rem;color:var(--color-navy);">TZS 0</strong>
+          </div>
         </div>
         <div class="stock-list" data-history-list></div>
         <div class="company-users-empty" hidden data-history-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">

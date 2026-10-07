@@ -4921,6 +4921,34 @@ button.settings-list-row:focus-visible {
   justify-content: flex-end;
 }
 
+.sales-history-body {
+  overflow: auto;
+  width: min(1100px, 95%);
+}
+
+.sales-history-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  margin: -16px 0 0;
+  padding: 12px 0 10px;
+  background: var(--color-bg);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+}
+
+.sales-history-sticky .filter-bar {
+  margin-bottom: 8px;
+}
+
+.sales-history-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
 @media (max-width: 520px) {
   .report-controls {
     grid-template-columns: minmax(0, 1fr);
