@@ -53,6 +53,123 @@ const AUTO_SW_TRANSLATIONS = {
   "Suppliers": "Wasambazaji",
   "Stock Items": "Bidhaa za stoku",
   "Sales": "Mauzo",
+  "Open point of sale": "Fungua sehemu ya mauzo",
+  "Sales Today": "Mauzo ya Leo",
+  "Transactions": "Miamala",
+  "Invoices Due": "Ankara Zinazodaiwa",
+  "Sales This Month": "Mauzo ya Mwezi Huu",
+  "Ring up a sale at the counter": "Rekodi mauzo ya dukani",
+  "Invoices": "Ankara",
+  "Create & track customer invoices": "Tengeneza na fuatilia ankara za wateja",
+  "0 invoices": "Ankara 0",
+  "Sales History": "Historia ya Mauzo",
+  "Past POS sales by date": "Mauzo ya POS yaliyopita kwa tarehe",
+  "Debts": "Madeni",
+  "Unpaid Pay Later POS sales": "Mauzo ya POS ya lipa baadaye yasiyolipwa",
+  "0 debts": "Madeni 0",
+  "Shift": "Zamu",
+  "Open & close the till": "Fungua na funga droo ya fedha",
+  "Closed": "Imefungwa",
+  "Sales performance & insights": "Takwimu na mwenendo wa mauzo",
+  "Point of Sale": "Sehemu ya Mauzo",
+  "Exit full screen": "Ondoka skrini nzima",
+  "Back": "Rudi",
+  "Change": "Badilisha",
+  "Search products by name, SKU or barcode...": "Tafuta bidhaa kwa jina, SKU au barcode...",
+  "Item": "Bidhaa",
+  "Action": "Kitendo",
+  "Cart is empty": "Kikapu hakina bidhaa",
+  "Tap products below to add them to this sale.": "Gusa bidhaa hapa chini kuziongeza kwenye mauzo haya.",
+  "No products match your search.": "Hakuna bidhaa zinazolingana na utafutaji wako.",
+  "Grand Total": "Jumla Kuu",
+  "Clear": "Futa",
+  "Checkout": "Malipo",
+  "Select Customer": "Chagua Mteja",
+  "Customer": "Mteja",
+  "Search customer": "Tafuta mteja",
+  "Use Customer": "Tumia Mteja",
+  "COMPLETE SALE": "KAMILISHA MAUZO",
+  "Payment": "Malipo",
+  "TOTAL DUE": "JUMLA YA KULIPA",
+  "Change": "Chenji",
+  "CASH": "TASLIMU",
+  "BANK": "BENKI",
+  "PAY LATER": "LIPA BAADAYE",
+  "RECEIVED": "IMEPOKELEWA",
+  "Backspace": "Futa nyuma",
+  "Sale Completed": "Mauzo Yamekamilika",
+  "Paid": "Imelipwa",
+  "Print Receipt": "Chapisha Risiti",
+  "New Sale": "Mauzo Mapya",
+  "Start Shift": "Anza Zamu",
+  "Count the cash in the drawer to open the till.": "Hesabu fedha kwenye droo ili kufungua zamu.",
+  "Opening Cash Balance": "Salio la Mwanzo la Taslimu",
+  "Close Shift": "Funga Zamu",
+  "Available funds": "Fedha zilizopo",
+  "Cash sales": "Mauzo ya taslimu",
+  "Counted Cash in Drawer": "Taslimu Iliyohesabiwa kwenye Droo",
+  "Shift Closed Successfully": "Zamu Imefungwa Kikamilifu",
+  "Total Shift Sales": "Jumla ya Mauzo ya Zamu",
+  "Cash Sales": "Mauzo ya Taslimu",
+  "Send PDF Report via Email": "Tuma Ripoti ya PDF kwa Barua Pepe",
+  "Enter recipient email...": "Weka barua pepe ya mpokeaji...",
+  "Send": "Tuma",
+  "Done": "Imekamilika",
+  "0 sales": "Mauzo 0",
+  "No sales in this period.": "Hakuna mauzo kwenye kipindi hiki.",
+  "Recent Shifts": "Zamu za Karibuni",
+  "No shifts recorded yet.": "Hakuna zamu zilizorekodiwa bado.",
+  "Pay Later Sales": "Mauzo ya Lipa Baadaye",
+  "No unpaid Pay Later sales.": "Hakuna mauzo ya lipa baadaye yasiyolipwa.",
+  "Shift Sales": "Mauzo ya Zamu",
+  "Sold Items": "Bidhaa Zilizouzwa",
+  "New invoice": "Ankara mpya",
+  "Total Invoices": "Jumla ya Ankara",
+  "Sent / Due": "Zilizotumwa / Zinazodaiwa",
+  "Outstanding": "Deni Lililobaki",
+  "All": "Zote",
+  "Draft": "Rasimu",
+  "Sent": "Imetumwa",
+  "Overdue": "Imechelewa",
+  "Search by invoice number or customer...": "Tafuta kwa namba ya ankara au mteja...",
+  "No invoices yet": "Hakuna ankara bado",
+  "Create an invoice to bill a customer and track payment.": "Tengeneza ankara kumdai mteja na kufuatilia malipo.",
+  "New Invoice": "Ankara Mpya",
+  "Sales Reports": "Ripoti za Mauzo",
+  "This Year": "Mwaka Huu",
+  "Total Sales": "Jumla ya Mauzo",
+  "Avg. Sale": "Wastani wa Mauzo",
+  "Items Sold": "Bidhaa Zilizouzwa",
+  "No sales data yet": "Hakuna data ya mauzo bado",
+  "Reports will populate here once you start recording sales.": "Ripoti zitaonekana hapa ukianza kurekodi mauzo.",
+  "Invoice Items": "Bidhaa za Ankara",
+  "Add Item": "Ongeza Bidhaa",
+  "Subtotal:": "Jumla ndogo:",
+  "Discount:": "Punguzo:",
+  "Total:": "Jumla:",
+  "Optional notes for the customer...": "Maelezo ya hiari kwa mteja...",
+  "Save Invoice": "Hifadhi Ankara",
+  "Invoice": "Ankara",
+  "Issue Date": "Tarehe ya Kutoa",
+  "Due Date": "Tarehe ya Mwisho",
+  "Phone:": "Simu:",
+  "Email:": "Barua pepe:",
+  "Subtotal": "Jumla ndogo",
+  "Discount": "Punguzo",
+  "Tax": "Kodi",
+  "Payment History": "Historia ya Malipo",
+  "Mark as Sent": "Weka kama Imetumwa",
+  "Mark as Paid": "Weka kama Imelipwa",
+  "Download Invoice PDF": "Pakua Ankara PDF",
+  "Edit Invoice": "Hariri Ankara",
+  "Cancel Invoice": "Ghairi Ankara",
+  "Reactivate Invoice": "Rejesha Ankara",
+  "Delete Invoice": "Futa Ankara",
+  "Receive Payment": "Pokea Malipo",
+  "Balance: TZS 0": "Salio: TZS 0",
+  "Amount": "Kiasi",
+  "Payment Goes To": "Malipo Yaende Kwenye",
+  "Save Payment": "Hifadhi Malipo",
   "Expenses": "Matumizi",
   "Outstanding Credit": "Madeni ya Wateja",
   "Low Stock": "Stoku Ndogo",
@@ -5959,6 +6076,14 @@ const setupSalesPage = () => {
     if (eff === "overdue" || eff === "cancelled") return "rejected";
     return "pending";
   };
+  const salesSw = () => getSavedLanguage() === "sw";
+  const salesLabel = (en, sw) => salesSw() ? sw : en;
+  const invoiceCountLabel = (count) => salesSw() ? `Ankara ${count}` : `${count} invoice${Number(count) === 1 ? "" : "s"}`;
+  const debtCountLabel = (count) => salesSw() ? `Madeni ${count}` : `${count} debt${Number(count) === 1 ? "" : "s"}`;
+  const saleCountLabel = (count) => salesSw() ? `Mauzo ${count}` : `${count} sale${Number(count) === 1 ? "" : "s"}`;
+  const soldQtyLabel = (qty) => salesSw() ? `${qty.toLocaleString()} zimeuzwa` : `${qty.toLocaleString()} sold`;
+  const shiftSalesTitle = (id) => salesSw() ? `Mauzo ya Zamu #${id || ""}` : `Shift #${id || ""} Sales`;
+  const shiftReportsTitle = (id) => salesSw() ? `Ripoti za Zamu #${id}` : `Shift #${id} Reports`;
 
   // ---- Workspaces ----
   const posWorkspace = document.querySelector("[data-pos-workspace]");
@@ -6184,8 +6309,8 @@ const setupSalesPage = () => {
     if (kpiSalesCount) kpiSalesCount.textContent = String(stats.txn_today || 0);
     if (kpiInvoicesDue) kpiInvoicesDue.textContent = String(stats.overdue || 0);
     if (kpiSalesMonth) kpiSalesMonth.textContent = formatCurrency(stats.sales_month || 0);
-    if (invoicesCountBadge) invoicesCountBadge.textContent = `${stats.total || 0} invoices`;
-    if (debtsCountBadge) debtsCountBadge.textContent = `${stats.pay_later_count || 0} debt${Number(stats.pay_later_count || 0) === 1 ? "" : "s"}`;
+    if (invoicesCountBadge) invoicesCountBadge.textContent = invoiceCountLabel(stats.total || 0);
+    if (debtsCountBadge) debtsCountBadge.textContent = debtCountLabel(stats.pay_later_count || 0);
     if (invoicesSummaryTotal) invoicesSummaryTotal.textContent = String(stats.total || 0);
     if (invoicesSummarySent) invoicesSummarySent.textContent = String(stats.sent || 0);
     if (invoicesSummaryDue) invoicesSummaryDue.textContent = formatCurrency(stats.amount_due || 0);
@@ -7084,7 +7209,9 @@ const setupSalesPage = () => {
   const openShiftSummaryModal = (s, shiftObj) => {
     activeReportShiftId = s.shift_id || (shiftObj ? shiftObj.id : 0);
     if (shiftSummaryMeta) {
-      shiftSummaryMeta.textContent = `Shift #${activeReportShiftId} · Cashier: ${shiftObj?.cashier || "Cashier"}`;
+      shiftSummaryMeta.textContent = salesSw()
+        ? `Zamu #${activeReportShiftId} · Mhudumu: ${shiftObj?.cashier || "Mhudumu"}`
+        : `Shift #${activeReportShiftId} · Cashier: ${shiftObj?.cashier || "Cashier"}`;
     }
     if (sumTotalSales) sumTotalSales.textContent = formatCurrency(s.sales_total || 0);
     if (sumCashSales) sumCashSales.textContent = formatCurrency(s.cash_sales || 0);
@@ -7115,14 +7242,14 @@ const setupSalesPage = () => {
     const email = shiftEmailInput?.value?.trim();
     if (!email || !email.includes("@")) {
       if (shiftEmailStatus) {
-        shiftEmailStatus.textContent = "Please enter a valid email address.";
+        shiftEmailStatus.textContent = salesLabel("Please enter a valid email address.", "Tafadhali weka barua pepe sahihi.");
         shiftEmailStatus.style.color = "#dc2626";
         shiftEmailStatus.hidden = false;
       }
       return;
     }
     if (shiftEmailStatus) {
-      shiftEmailStatus.textContent = "Sending PDF report via email...";
+      shiftEmailStatus.textContent = salesLabel("Sending PDF report via email...", "Inatuma ripoti ya PDF kwa barua pepe...");
       shiftEmailStatus.style.color = "var(--color-blue)";
       shiftEmailStatus.hidden = false;
     }
@@ -7134,14 +7261,14 @@ const setupSalesPage = () => {
       b.set("email", email);
       const res = await fetch(`${getBasePath()}api/shifts.php`, { method: "POST", body: b });
       const d = await res.json();
-      if (!res.ok || !d.ok) throw new Error(d.message || "Failed to send email.");
+      if (!res.ok || !d.ok) throw new Error(d.message || salesLabel("Failed to send email.", "Imeshindikana kutuma barua pepe."));
       if (shiftEmailStatus) {
-        shiftEmailStatus.textContent = d.message || "Report emailed successfully!";
+        shiftEmailStatus.textContent = d.message || salesLabel("Report emailed successfully!", "Ripoti imetumwa kwa barua pepe kikamilifu!");
         shiftEmailStatus.style.color = "#16a34a";
       }
     } catch (err) {
       if (shiftEmailStatus) {
-        shiftEmailStatus.textContent = err.message || "Failed to send email.";
+        shiftEmailStatus.textContent = err.message || salesLabel("Failed to send email.", "Imeshindikana kutuma barua pepe.");
         shiftEmailStatus.style.color = "#dc2626";
       }
     } finally {
@@ -7194,8 +7321,8 @@ const setupSalesPage = () => {
           const open = s.status === "open";
           const o = new Date(String(s.opened_at).replace(" ", "T"));
           const when = isNaN(o.getTime()) ? s.opened_at : o.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-          const badge = open ? `<span class="badge-stock in-stock">Open</span>` : `<span class="badge-stock out-of-stock">Closed</span>`;
-          const extra = (!open && s.variance != null) ? ` · var ${formatCurrency(s.variance)}` : "";
+          const badge = open ? `<span class="badge-stock in-stock">${salesLabel("Open", "Imefunguliwa")}</span>` : `<span class="badge-stock out-of-stock">${salesLabel("Closed", "Imefungwa")}</span>`;
+          const extra = (!open && s.variance != null) ? ` · ${salesLabel("var", "tofauti")} ${formatCurrency(s.variance)}` : "";
           const reportActions = !open ? `
             <div class="shift-list-actions">
               <a href="${getBasePath()}api/shifts.php?action=export_pdf&id=${s.id}" target="_blank" class="btn btn-outline btn-sm" style="font-size:0.75rem;padding:3px 8px;" title="Download PDF Report">📄 PDF</a>
@@ -7206,10 +7333,10 @@ const setupSalesPage = () => {
           return `<div class="shift-list-card" data-shift-card="${s.id}">
             <button type="button" class="shift-list-main" data-shift-detail-id="${s.id}">
               <div class="shift-list-head">
-                <div class="shift-list-title">Shift #${s.id} · ${escH(s.cashier || "Cashier")}</div>
+                <div class="shift-list-title">${salesLabel("Shift", "Zamu")} #${s.id} · ${escH(s.cashier || salesLabel("Cashier", "Mhudumu"))}</div>
                 <div>${badge}</div>
               </div>
-              <div class="shift-list-meta">${when} · open ${formatCurrency(s.opening_balance)}${s.sales_total != null ? " · sales " + formatCurrency(s.sales_total) : ""}${extra}</div>
+              <div class="shift-list-meta">${when} · ${salesLabel("open", "mwanzo")} ${formatCurrency(s.opening_balance)}${s.sales_total != null ? ` · ${salesLabel("sales", "mauzo")} ` + formatCurrency(s.sales_total) : ""}${extra}</div>
             </button>
             ${reportActions}
           </div>`;
@@ -7223,23 +7350,23 @@ const setupSalesPage = () => {
     const shift = report?.shift || {};
     const items = Array.isArray(report?.sold_items) ? report.sold_items : [];
     const transactions = Array.isArray(report?.transactions) ? report.transactions : [];
-    if (shiftDetailTitle) shiftDetailTitle.textContent = `Shift #${shift.id || ""} Sales`;
+    if (shiftDetailTitle) shiftDetailTitle.textContent = shiftSalesTitle(shift.id);
     if (shiftDetailSummary) {
       shiftDetailSummary.innerHTML = `
         <div class="stock-kpi-card">
-          <span class="kpi-label">Total Sales</span>
+          <span class="kpi-label">${salesLabel("Total Sales", "Jumla ya Mauzo")}</span>
           <strong class="kpi-val">${formatCurrency(summary.total_sales || 0)}</strong>
         </div>
         <div class="stock-kpi-card">
-          <span class="kpi-label">Transactions</span>
+          <span class="kpi-label">${salesLabel("Transactions", "Miamala")}</span>
           <strong class="kpi-val">${Number(summary.tx_count || 0).toLocaleString()}</strong>
         </div>
         <div class="stock-kpi-card">
-          <span class="kpi-label">Cash</span>
+          <span class="kpi-label">${salesLabel("Cash", "Taslimu")}</span>
           <strong class="kpi-val">${formatCurrency(summary.cash_sales || 0)}</strong>
         </div>
         <div class="stock-kpi-card">
-          <span class="kpi-label">Mobile / Bank</span>
+          <span class="kpi-label">${salesLabel("Mobile / Bank", "Simu / Benki")}</span>
           <strong class="kpi-val">${formatCurrency((Number(summary.mobile_sales || 0) || 0) + (Number(summary.bank_sales || 0) || 0))}</strong>
         </div>
       `;
@@ -7247,20 +7374,20 @@ const setupSalesPage = () => {
     const itemRows = items.length ? items.map((item) => {
       const qty = Number(item.quantity || 0);
       return `<div class="shift-detail-row">
-        <span>${escH(item.item_name || "Item")} · ${qty.toLocaleString()} sold</span>
+        <span>${escH(item.item_name || salesLabel("Item", "Bidhaa"))} · ${soldQtyLabel(qty)}</span>
         <strong>${formatCurrency(item.line_total || 0)}</strong>
       </div>`;
-    }).join("") : `<p class="shift-detail-empty">No items sold under this shift.</p>`;
+    }).join("") : `<p class="shift-detail-empty">${salesLabel("No items sold under this shift.", "Hakuna bidhaa zilizouzwa kwenye zamu hii.")}</p>`;
     if (shiftDetailItems) shiftDetailItems.innerHTML = itemRows;
     const txRows = transactions.length ? transactions.map((tx) => {
       const whenRaw = tx.created_at || tx.issue_date || "";
       const whenDate = new Date(String(whenRaw).replace(" ", "T"));
       const when = isNaN(whenDate.getTime()) ? whenRaw : whenDate.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
       return `<div class="shift-detail-row">
-        <span>${escH(tx.invoice_number || ("Sale #" + tx.id))} · ${escH(tx.customer_name || "Walk-in Customer")} · ${escH(when || "-")}</span>
+        <span>${escH(tx.invoice_number || (salesLabel("Sale #", "Mauzo #") + tx.id))} · ${escH(tx.customer_name || salesLabel("Walk-in Customer", "Mteja wa papo hapo"))} · ${escH(when || "-")}</span>
         <strong>${formatCurrency(tx.total_amount || 0)}</strong>
       </div>`;
-    }).join("") : `<p class="shift-detail-empty">No sales recorded under this shift.</p>`;
+    }).join("") : `<p class="shift-detail-empty">${salesLabel("No sales recorded under this shift.", "Hakuna mauzo yaliyorekodiwa kwenye zamu hii.")}</p>`;
     if (shiftDetailTransactions) shiftDetailTransactions.innerHTML = txRows;
   };
 
@@ -7268,17 +7395,17 @@ const setupSalesPage = () => {
     const id = Number(button?.dataset.shiftDetailId || 0);
     if (!id) return;
     openWorkspace(shiftDetailWorkspace);
-    if (shiftDetailTitle) shiftDetailTitle.textContent = `Shift #${id} Sales`;
+    if (shiftDetailTitle) shiftDetailTitle.textContent = shiftSalesTitle(id);
     if (shiftDetailSummary) shiftDetailSummary.innerHTML = "";
-    if (shiftDetailItems) shiftDetailItems.innerHTML = `<p class="shift-detail-empty">Loading sold items...</p>`;
+    if (shiftDetailItems) shiftDetailItems.innerHTML = `<p class="shift-detail-empty">${salesLabel("Loading sold items...", "Inapakia bidhaa zilizouzwa...")}</p>`;
     if (shiftDetailTransactions) shiftDetailTransactions.innerHTML = "";
     try {
       const res = await fetch(`${getBasePath()}api/shifts.php?action=report_details&id=${id}`);
       const d = await res.json();
-      if (!res.ok || !d.ok) throw new Error(d.message || "Could not load shift sold items.");
+      if (!res.ok || !d.ok) throw new Error(d.message || salesLabel("Could not load shift sold items.", "Imeshindikana kupakia bidhaa za zamu."));
       renderShiftDetailWorkspace(d.report);
     } catch (err) {
-      if (shiftDetailItems) shiftDetailItems.innerHTML = `<p class="shift-detail-empty">${escH(err.message || "Could not load shift sold items.")}</p>`;
+      if (shiftDetailItems) shiftDetailItems.innerHTML = `<p class="shift-detail-empty">${escH(err.message || salesLabel("Could not load shift sold items.", "Imeshindikana kupakia bidhaa za zamu."))}</p>`;
     }
   };
 
@@ -7289,7 +7416,7 @@ const setupSalesPage = () => {
       const id = Number(emailBtn.dataset.shiftRowEmail);
       if (id) {
         activeReportShiftId = id;
-        if (shiftSummaryMeta) shiftSummaryMeta.textContent = `Shift #${id} Reports`;
+        if (shiftSummaryMeta) shiftSummaryMeta.textContent = shiftReportsTitle(id);
         if (shiftEmailStatus) { shiftEmailStatus.hidden = true; shiftEmailStatus.textContent = ""; }
         if (shiftSummaryModal) shiftSummaryModal.hidden = false;
       }
@@ -7318,7 +7445,7 @@ const setupSalesPage = () => {
       const list = d.sales || [];
       if (debtsTotal) debtsTotal.textContent = formatCurrency(d.stats?.total || 0);
       if (debtsCount) debtsCount.textContent = String(d.stats?.count || 0);
-      if (debtsCountBadge) debtsCountBadge.textContent = `${d.stats?.count || 0} debt${Number(d.stats?.count || 0) === 1 ? "" : "s"}`;
+      if (debtsCountBadge) debtsCountBadge.textContent = debtCountLabel(d.stats?.count || 0);
       if (!list.length) { debtsList?.replaceChildren(); if (debtsEmpty) debtsEmpty.hidden = false; return; }
       if (debtsEmpty) debtsEmpty.hidden = true;
       if (debtsList) {
@@ -7327,8 +7454,8 @@ const setupSalesPage = () => {
           const when = isNaN(dt.getTime()) ? s.created_at : dt.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
           return `<button type="button" class="settings-list-row" data-debt-open="${s.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
             <div style="min-width:0;">
-              <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(s.receipt_number)} <span class="badge-stock out-of-stock">Pay Later</span></div>
-              <div style="font-size:0.76rem;color:var(--color-muted);">${escH(s.customer_name || "Walk-in Customer")} · ${when}${s.cashier ? " · " + escH(s.cashier) : ""}</div>
+              <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(s.receipt_number)} <span class="badge-stock out-of-stock">${salesLabel("Pay Later", "Lipa Baadaye")}</span></div>
+              <div style="font-size:0.76rem;color:var(--color-muted);">${escH(s.customer_name || salesLabel("Walk-in Customer", "Mteja wa papo hapo"))} · ${when}${s.cashier ? " · " + escH(s.cashier) : ""}</div>
             </div>
             <strong style="color:var(--color-navy);white-space:nowrap;">${formatCurrency(s.amount_due || s.total_amount || 0)}</strong>
           </button>`;
@@ -7369,7 +7496,7 @@ const setupSalesPage = () => {
       const d = await res.json();
       if (!res.ok || !d.ok) return;
       const list = d.sales || [];
-      if (historyCountEl) historyCountEl.textContent = `${d.stats.count} sale${d.stats.count !== 1 ? "s" : ""}`;
+      if (historyCountEl) historyCountEl.textContent = saleCountLabel(d.stats.count);
       if (historyTotalEl) historyTotalEl.textContent = formatCurrency(d.stats.total);
       if (!list.length) { historyList?.replaceChildren(); if (historyEmpty) historyEmpty.hidden = false; return; }
       if (historyEmpty) historyEmpty.hidden = true;
@@ -7380,7 +7507,7 @@ const setupSalesPage = () => {
           const cancelled = s.status === "cancelled";
           return `<button type="button" class="settings-list-row" data-history-open="${s.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
             <div style="min-width:0;">
-              <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(s.receipt_number)}${cancelled ? ' <span class="badge-stock out-of-stock">Cancelled</span>' : ""}</div>
+              <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(s.receipt_number)}${cancelled ? ` <span class="badge-stock out-of-stock">${salesLabel("Cancelled", "Imeghairiwa")}</span>` : ""}</div>
               <div style="font-size:0.76rem;color:var(--color-muted);">${when} · ${escH(s.payment_method || "-")}${s.cashier ? " · " + escH(s.cashier) : ""}</div>
             </div>
             <strong style="color:var(--color-navy);white-space:nowrap;">${formatCurrency(s.total_amount)}</strong>
@@ -7407,7 +7534,7 @@ const setupSalesPage = () => {
   const renderPosCategories = () => {
     if (!posCategoryFilters) return;
     const cats = Array.from(new Set(cachedProducts.map((p) => p.category || "General"))).sort();
-    const all = [{ key: "all", label: "All Category" }].concat(cats.map((c) => ({ key: c, label: c })));
+    const all = [{ key: "all", label: salesLabel("All Category", "Kategoria Zote") }].concat(cats.map((c) => ({ key: c, label: c })));
     posCategoryFilters.replaceChildren(...all.map((c) => {
       const btn = document.createElement("button");
       btn.type = "button";
@@ -7442,7 +7569,7 @@ const setupSalesPage = () => {
       row.type = "button";
       row.className = "pos-product-row" + (out ? " is-out" : "");
       const meta = isProduct ? `${stock} ${p.unit || "pcs"}` : "";
-      const metaHtml = meta ? `<span class="pos-product-meta">${meta}${out ? " — Out of stock" : ""}</span>` : "";
+      const metaHtml = meta ? `<span class="pos-product-meta">${meta}${out ? ` — ${salesLabel("Out of stock", "Stoku imeisha")}` : ""}</span>` : "";
       row.innerHTML = `<span><span class="pos-product-name">${p.name}</span>${metaHtml}</span><span class="pos-product-price">${formatCurrency(p.selling_price)}</span>`;
       if (!out) row.addEventListener("click", () => addToPosCart(p));
       return row;
