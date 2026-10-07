@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/idempotency_lib.php';
 require_once __DIR__ . '/vat_lib.php';
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 

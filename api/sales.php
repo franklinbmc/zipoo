@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/idempotency_lib.php';
 require_once __DIR__ . '/accounts_lib.php';
 require_once __DIR__ . '/audit_lib.php';
 require_once __DIR__ . '/permissions_lib.php';
@@ -1045,14 +1046,24 @@ try {
                 $seq = ((int) $countStmt->fetchColumn()) + 1;
                 $receiptNumber = 'POS-' . date('Ym') . '-' . str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
                 $today = date('Y-m-d');
+                // Offline-synced sales carry the time they were actually rung up.
+                $clientCreatedAt = null;
+                $clientTs = trim((string) ($_POST['client_created_at'] ?? ''));
+                if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $clientTs)) {
+                    $clientUnix = strtotime($clientTs);
+                    if ($clientUnix !== false && $clientUnix <= time() + 300 && $clientUnix >= time() - 30 * 86400) {
+                        $clientCreatedAt = $clientTs;
+                        $today = date('Y-m-d', $clientUnix);
+                    }
+                }
                 $saleStatus = $isPayLater ? 'sent' : 'paid';
 
                 $ins = $pdo->prepare(
                     'INSERT INTO tbl_sales
                         (business_id, sale_type, invoice_number, customer_id, customer_name, status, issue_date, due_date,
-                         subtotal, discount, tax_rate, tax_amount, total_amount, amount_paid, notes, created_by, shift_id, payment_method)
+                         subtotal, discount, tax_rate, tax_amount, total_amount, amount_paid, notes, created_by, shift_id, payment_method, created_at)
                      VALUES (:bid, "pos", :inv, :cid, :cname, :status, :idate, NULL,
-                         :sub, 0.00, :trate, :tamt, :tot, :paid, :notes, :uid, :shift, :pm)'
+                         :sub, 0.00, :trate, :tamt, :tot, :paid, :notes, :uid, :shift, :pm, COALESCE(:cat, CURRENT_TIMESTAMP))'
                 );
                 $ins->execute([
                     ':bid' => $businessId,
@@ -1070,6 +1081,7 @@ try {
                     ':uid' => $userId,
                     ':shift' => $shiftId,
                     ':pm' => $paymentMethod,
+                    ':cat' => $clientCreatedAt,
                 ]);
                 $saleId = (int) $pdo->lastInsertId();
 

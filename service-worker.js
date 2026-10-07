@@ -1,6 +1,16 @@
-const CACHE_NAME = "zipoo-phase-1-v215";
-const APP_SHELL = [
-  "./",
+/* Zipoo service worker — app shell for full offline use.
+ *
+ *  - Pages (navigations): network first (3.5s), then the cached copy, so the app
+ *    always opens, online or not, and always gets updates when online.
+ *  - Static assets (css/js/fonts/icons/locales): cache first, filled the first
+ *    time they are used; version query strings (?v=) are honoured online and
+ *    ignored as a last resort offline.
+ *  - /api/ requests are NOT handled here: assets/js/offline.js caches API data
+ *    in IndexedDB and queues offline writes.
+ */
+const CACHE_NAME = "zipoo-offline-v1";
+
+const PAGES = [
   "./index.html",
   "./pages/dashboard.html",
   "./pages/settings.html",
@@ -23,268 +33,13 @@ const APP_SHELL = [
   "./saas/users.html",
   "./saas/plans.html",
   "./saas/settings.html",
+];
+
+const ASSETS = [
   "./assets/css/styles.css",
-  "./assets/css/styles.css?v=3",
-  "./assets/css/styles.css?v=4",
-  "./assets/css/styles.css?v=5",
-  "./assets/css/styles.css?v=6",
-  "./assets/css/styles.css?v=7",
-  "./assets/css/styles.css?v=8",
-  "./assets/css/styles.css?v=9",
-  "./assets/css/styles.css?v=10",
-  "./assets/css/styles.css?v=11",
-  "./assets/css/styles.css?v=12",
-  "./assets/css/styles.css?v=13",
-  "./assets/css/styles.css?v=15",
-  "./assets/css/styles.css?v=16",
-  "./assets/css/styles.css?v=17",
-  "./assets/css/styles.css?v=18",
-  "./assets/css/styles.css?v=19",
-  "./assets/css/styles.css?v=20",
-  "./assets/css/styles.css?v=21",
-  "./assets/css/styles.css?v=29",
-  "./assets/css/styles.css?v=30",
-  "./assets/css/styles.css?v=31",
-  "./assets/css/styles.css?v=32",
-  "./assets/css/styles.css?v=34",
-  "./assets/css/styles.css?v=35",
-  "./assets/css/styles.css?v=36",
-  "./assets/css/styles.css?v=37",
-  "./assets/css/styles.css?v=38",
-  "./assets/css/styles.css?v=39",
-  "./assets/css/styles.css?v=40",
-  "./assets/css/styles.css?v=41",
-  "./assets/css/styles.css?v=42",
-  "./assets/css/styles.css?v=43",
-  "./assets/css/styles.css?v=44",
-  "./assets/css/styles.css?v=45",
-  "./assets/css/styles.css?v=46",
-  "./assets/css/styles.css?v=47",
-  "./assets/css/styles.css?v=48",
-  "./assets/css/styles.css?v=49",
-  "./assets/css/styles.css?v=50",
-  "./assets/css/styles.css?v=51",
-  "./assets/css/styles.css?v=52",
-  "./assets/css/styles.css?v=53",
-  "./assets/css/styles.css?v=54",
-  "./assets/css/styles.css?v=55",
-  "./assets/css/styles.css?v=56",
-  "./assets/css/styles.css?v=57",
-  "./assets/css/styles.css?v=58",
-  "./assets/css/styles.css?v=59",
-  "./assets/css/styles.css?v=60",
-  "./assets/css/styles.css?v=61",
-  "./assets/css/styles.css?v=62",
-  "./assets/css/styles.css?v=63",
-  "./assets/css/styles.css?v=64",
-  "./assets/css/styles.css?v=65",
-  "./assets/css/styles.css?v=66",
-  "./assets/css/styles.css?v=67",
-  "./assets/css/styles.css?v=68",
-  "./assets/css/styles.css?v=69",
-  "./assets/css/styles.css?v=70",
-  "./assets/css/styles.css?v=73",
-  "./assets/css/styles.css?v=74",
-  "./assets/css/styles.css?v=75",
-  "./assets/css/styles.css?v=94",
-  "./assets/css/styles.css?v=95",
-  "./assets/css/styles.css?v=96",
-  "./assets/css/styles.css?v=97",
-  "./assets/css/styles.css?v=98",
-  "./assets/css/styles.css?v=99",
-  "./assets/css/styles.css?v=100",
-  "./assets/css/styles.css?v=101",
-  "./assets/css/styles.css?v=102",
-  "./assets/css/styles.css?v=103",
-  "./assets/css/styles.css?v=104",
-  "./assets/css/styles.css?v=105",
-  "./assets/css/styles.css?v=106",
-  "./assets/css/styles.css?v=107",
-  "./assets/css/styles.css?v=108",
-  "./assets/css/styles.css?v=109",
-  "./assets/css/styles.css?v=110",
-  "./assets/css/styles.css?v=111",
-  "./assets/css/styles.css?v=112",
-  "./assets/css/styles.css?v=113",
-  "./assets/css/styles.css?v=114",
-  "./assets/css/styles.css?v=115",
-  "./assets/css/styles.css?v=116",
-  "./assets/css/styles.css?v=117",
-  "./assets/css/styles.css?v=118",
-  "./assets/css/styles.css?v=119",
-  "./assets/css/styles.css?v=120",
-  "./assets/css/styles.css?v=121",
-  "./assets/css/styles.css?v=122",
-  "./assets/css/styles.css?v=123",
-  "./assets/css/styles.css?v=124",
-  "./assets/css/styles.css?v=126",
-  "./assets/css/styles.css?v=127",
-  "./assets/css/styles.css?v=128",
-  "./assets/css/styles.css?v=129",
-  "./assets/css/styles.css?v=130",
-  "./assets/css/styles.css?v=131",
-  "./assets/css/styles.css?v=132",
-  "./assets/css/styles.css?v=133",
-  "./assets/css/styles.css?v=134",
-  "./assets/css/styles.css?v=135",
-  "./assets/css/styles.css?v=136",
-  "./assets/css/styles.css?v=137",
-  "./assets/css/styles.css?v=138",
-  "./assets/css/styles.css?v=139",
-  "./assets/css/styles.css?v=140",
-  "./assets/css/styles.css?v=141",
-  "./assets/css/styles.css?v=142",
-  "./assets/css/styles.css?v=143",
   "./assets/js/app.js",
-  "./assets/js/app.js?v=3",
-  "./assets/js/app.js?v=4",
-  "./assets/js/app.js?v=5",
-  "./assets/js/app.js?v=6",
-  "./assets/js/app.js?v=7",
-  "./assets/js/app.js?v=8",
-  "./assets/js/app.js?v=9",
-  "./assets/js/app.js?v=10",
-  "./assets/js/app.js?v=11",
-  "./assets/js/app.js?v=12",
-  "./assets/js/app.js?v=13",
-  "./assets/js/app.js?v=15",
-  "./assets/js/app.js?v=16",
-  "./assets/js/app.js?v=17",
-  "./assets/js/app.js?v=18",
-  "./assets/js/app.js?v=19",
-  "./assets/js/app.js?v=20",
-  "./assets/js/app.js?v=21",
-  "./assets/js/app.js?v=22",
-  "./assets/js/app.js?v=23",
-  "./assets/js/app.js?v=24",
-  "./assets/js/app.js?v=25",
-  "./assets/js/app.js?v=26",
-  "./assets/js/app.js?v=27",
-  "./assets/js/app.js?v=28",
-  "./assets/js/app.js?v=31",
-  "./assets/js/app.js?v=32",
-  "./assets/js/app.js?v=33",
-  "./assets/js/app.js?v=34",
-  "./assets/js/app.js?v=35",
-  "./assets/js/app.js?v=36",
-  "./assets/js/app.js?v=37",
-  "./assets/js/app.js?v=38",
-  "./assets/js/app.js?v=39",
-  "./assets/js/app.js?v=40",
-  "./assets/js/app.js?v=45",
-  "./assets/js/app.js?v=46",
-  "./assets/js/app.js?v=47",
-  "./assets/js/app.js?v=48",
-  "./assets/js/app.js?v=49",
-  "./assets/js/app.js?v=50",
-  "./assets/js/app.js?v=51",
-  "./assets/js/app.js?v=52",
-  "./assets/js/app.js?v=53",
-  "./assets/js/app.js?v=54",
-  "./assets/js/app.js?v=55",
-  "./assets/js/app.js?v=56",
-  "./assets/js/app.js?v=57",
-  "./assets/js/app.js?v=58",
-  "./assets/js/app.js?v=59",
-  "./assets/js/app.js?v=60",
-  "./assets/js/app.js?v=61",
-  "./assets/js/app.js?v=62",
-  "./assets/js/app.js?v=63",
-  "./assets/js/app.js?v=64",
-  "./assets/js/app.js?v=65",
-  "./assets/js/app.js?v=66",
-  "./assets/js/app.js?v=67",
-  "./assets/js/app.js?v=68",
-  "./assets/js/app.js?v=69",
-  "./assets/js/app.js?v=70",
-  "./assets/js/app.js?v=71",
-  "./assets/js/app.js?v=72",
-  "./assets/js/app.js?v=73",
-  "./assets/js/app.js?v=74",
-  "./assets/js/app.js?v=75",
-  "./assets/js/app.js?v=76",
-  "./assets/js/app.js?v=77",
-  "./assets/js/app.js?v=78",
-  "./assets/js/app.js?v=79",
-  "./assets/js/app.js?v=80",
-  "./assets/js/app.js?v=81",
-  "./assets/js/app.js?v=82",
-  "./assets/js/app.js?v=83",
-  "./assets/js/app.js?v=84",
-  "./assets/js/app.js?v=85",
-  "./assets/js/app.js?v=86",
-  "./assets/js/app.js?v=87",
-  "./assets/js/app.js?v=88",
-  "./assets/js/app.js?v=89",
-  "./assets/js/app.js?v=90",
-  "./assets/js/app.js?v=93",
-  "./assets/js/app.js?v=94",
-  "./assets/js/app.js?v=110",
-  "./assets/js/app.js?v=111",
-  "./assets/js/app.js?v=112",
-  "./assets/js/app.js?v=113",
-  "./assets/js/app.js?v=114",
-  "./assets/js/app.js?v=115",
-  "./assets/js/app.js?v=116",
-  "./assets/js/app.js?v=117",
-  "./assets/js/app.js?v=118",
-  "./assets/js/app.js?v=119",
-  "./assets/js/app.js?v=120",
-  "./assets/js/app.js?v=121",
-  "./assets/js/app.js?v=122",
-  "./assets/js/app.js?v=123",
-  "./assets/js/app.js?v=124",
-  "./assets/js/app.js?v=125",
-  "./assets/js/app.js?v=126",
-  "./assets/js/app.js?v=127",
-  "./assets/js/app.js?v=128",
-  "./assets/js/app.js?v=129",
-  "./assets/js/app.js?v=130",
-  "./assets/js/app.js?v=131",
-  "./assets/js/app.js?v=132",
-  "./assets/js/app.js?v=133",
-  "./assets/js/app.js?v=134",
-  "./assets/js/app.js?v=135",
-  "./assets/js/app.js?v=136",
-  "./assets/js/app.js?v=138",
-  "./assets/js/app.js?v=139",
-  "./assets/js/app.js?v=140",
-  "./assets/js/app.js?v=141",
-  "./assets/js/app.js?v=142",
-  "./assets/js/app.js?v=143",
-  "./assets/js/app.js?v=144",
-  "./assets/js/app.js?v=145",
-  "./assets/js/app.js?v=146",
-  "./assets/js/app.js?v=147",
-  "./assets/js/app.js?v=148",
-  "./assets/js/app.js?v=29",
-  "./assets/js/app.js?v=30",
+  "./assets/js/offline.js",
   "./assets/js/saas.js",
-  "./assets/js/saas.js?v=19",
-  "./assets/js/saas.js?v=20",
-  "./assets/js/saas.js?v=21",
-  "./assets/js/saas.js?v=22",
-  "./assets/js/saas.js?v=23",
-  "./assets/js/saas.js?v=24",
-  "./assets/js/saas.js?v=25",
-  "./assets/js/saas.js?v=1",
-  "./assets/js/saas.js?v=2",
-  "./assets/js/saas.js?v=3",
-  "./assets/js/saas.js?v=4",
-  "./assets/js/saas.js?v=5",
-  "./assets/js/saas.js?v=6",
-  "./assets/js/saas.js?v=7",
-  "./assets/js/saas.js?v=8",
-  "./assets/js/saas.js?v=9",
-  "./assets/js/saas.js?v=10",
-  "./assets/js/saas.js?v=11",
-  "./assets/js/saas.js?v=12",
-  "./assets/js/saas.js?v=13",
-  "./assets/js/saas.js?v=14",
-  "./assets/js/saas.js?v=15",
-  "./assets/js/saas.js?v=16",
-  "./assets/js/saas.js?v=17",
-  "./assets/js/saas.js?v=18",
   "./sf-pro-display/SFPRODISPLAYREGULAR.OTF",
   "./sf-pro-display/SFPRODISPLAYMEDIUM.OTF",
   "./sf-pro-display/SFPRODISPLAYBOLD.OTF",
@@ -292,100 +47,122 @@ const APP_SHELL = [
   "./assets/icons/icon-192.svg",
   "./assets/icons/icon-512.svg",
   "./locales/en.json",
-  "./locales/en.json?v=6",
-  "./locales/en.json?v=7",
-  "./locales/en.json?v=8",
-  "./locales/en.json?v=9",
-  "./locales/en.json?v=10",
-  "./locales/en.json?v=11",
-  "./locales/en.json?v=12",
-  "./locales/en.json?v=13",
-  "./locales/en.json?v=14",
-  "./locales/en.json?v=15",
-  "./locales/en.json?v=16",
-  "./locales/en.json?v=17",
   "./locales/sw.json",
-  "./locales/sw.json?v=6",
-  "./locales/sw.json?v=7",
-  "./locales/sw.json?v=8",
-  "./locales/sw.json?v=9",
-  "./locales/sw.json?v=10",
-  "./locales/sw.json?v=11",
-  "./locales/sw.json?v=12",
-  "./locales/sw.json?v=13",
-  "./locales/sw.json?v=14",
-  "./locales/sw.json?v=15",
-  "./locales/sw.json?v=16",
-  "./locales/sw.json?v=17",
-  "./manifest.json"
+  "./manifest.json",
 ];
 
+// Clean URL -> page file (mirrors .htaccess).
+const ROUTES = [
+  [/\/saas\/forgot-password\/?$/, "./saas/forgot-password.html"],
+  [/\/saas\/reset-password\/?$/, "./saas/reset-password.html"],
+  [/\/saas\/dashboard\/?$/, "./saas/dashboard.html"],
+  [/\/saas\/businesses\/?$/, "./saas/businesses.html"],
+  [/\/saas\/users\/?$/, "./saas/users.html"],
+  [/\/saas\/plans\/?$/, "./saas/plans.html"],
+  [/\/saas\/settings\/?$/, "./saas/settings.html"],
+  [/\/saas\/login\/?$/, "./saas/login.html"],
+  [/\/saas\/?$/, "./saas/index.html"],
+  [/\/dashboard(\.html)?\/?$/, "./pages/dashboard.html"],
+  [/\/settings(\.html)?\/?$/, "./pages/settings.html"],
+  [/\/customers(\.html)?\/?$/, "./pages/customers.html"],
+  [/\/suppliers(\.html)?\/?$/, "./pages/suppliers.html"],
+  [/\/users(\.html)?\/?$/, "./pages/users.html"],
+  [/\/stock(\.html)?\/?$/, "./pages/stock.html"],
+  [/\/sales(\.html)?\/?$/, "./pages/sales.html"],
+  [/\/bank(\.html)?\/?$/, "./pages/bank.html"],
+  [/\/expenses(\.html)?\/?$/, "./pages/expenses.html"],
+  [/\/real-?estate(\.html)?\/?$/, "./pages/realestate.html"],
+  [/\/register(\.html)?\/?$/, "./pages/register.html"],
+  [/\/login(\.html)?\/?$/, "./pages/login.html"],
+];
+
+const routeFor = (pathname) => {
+  for (const [re, file] of ROUTES) if (re.test(pathname)) return file;
+  return "./index.html";
+};
+
+const offlineApiPage = () => new Response(
+  "<!doctype html><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Offline</title>" +
+  "<body style='font-family:system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;margin:0;background:#F6F8FC;color:#12233F'>" +
+  "<div style='max-width:340px;padding:24px;text-align:center'><h2 style='color:#DC2626'>You are offline</h2>" +
+  "<p>Exports, PDFs and printouts need an internet connection. Everything else keeps working — go back and continue.</p>" +
+  "<button onclick='history.back()' style='padding:10px 18px;border:0;border-radius:10px;background:#1477FF;color:#fff;font-weight:700'>Go back</button></div>",
+  { status: 503, headers: { "Content-Type": "text/html; charset=utf-8" } },
+);
+
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
-  );
-  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    // One missing file must not abort the whole install.
+    await Promise.allSettled([...PAGES, ...ASSETS].map((url) => cache.add(new Request(url, { cache: "reload" }))));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => Promise.all(
-      keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-    ))
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)));
+    await self.clients.claim();
+  })());
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data === "SKIP_WAITING") self.skipWaiting();
+});
+
+const fetchWithTimeout = (request, ms) => new Promise((resolve, reject) => {
+  const timer = setTimeout(() => reject(new Error("timeout")), ms);
+  fetch(request).then((res) => { clearTimeout(timer); resolve(res); }, (err) => { clearTimeout(timer); reject(err); });
 });
 
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") {
+  const request = event.request;
+  if (request.method !== "GET") return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  // API data is handled by assets/js/offline.js. Only give offline downloads a friendly page.
+  if (url.pathname.includes("/api/")) {
+    if (request.mode === "navigate") {
+      event.respondWith(fetch(request).catch(() => offlineApiPage()));
+    }
     return;
   }
 
-  if (new URL(event.request.url).pathname.includes("/api/")) {
-    event.respondWith(fetch(event.request));
+  if (request.mode === "navigate") {
+    event.respondWith((async () => {
+      const page = routeFor(url.pathname);
+      try {
+        const res = await fetchWithTimeout(request, 3500);
+        if (res.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(new Request(page), res.clone());
+        }
+        return res;
+      } catch {
+        return (await caches.match(page, { ignoreSearch: true }))
+          || (await caches.match("./index.html", { ignoreSearch: true }))
+          || new Response("Offline", { status: 503 });
+      }
+    })());
     return;
   }
 
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request).catch(async () => {
-        const url = new URL(event.request.url);
-        const fallback = url.pathname.includes("dashboard")
-          ? "./pages/dashboard.html"
-          : url.pathname.includes("settings")
-            ? "./pages/settings.html"
-            : url.pathname.includes("sales")
-            ? "./pages/sales.html"
-            : url.pathname.includes("stock")
-            ? "./pages/stock.html"
-            : url.pathname.includes("bank")
-            ? "./pages/bank.html"
-            : url.pathname.includes("expenses")
-            ? "./pages/expenses.html"
-            : url.pathname.includes("realestate") || url.pathname.includes("real-estate")
-            ? "./pages/realestate.html"
-            : url.pathname.includes("register")
-            ? "./pages/register.html"
-            : url.pathname.includes("login")
-              ? "./pages/login.html"
-              : url.pathname.includes("saas/plans")
-              ? "./saas/plans.html"
-              : "./index.html";
-
-        return (await caches.match(event.request)) || caches.match(fallback) || caches.match("./index.html");
-      })
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => cachedResponse || fetch(event.request).catch(() => (
-      new Response("", { status: 503, statusText: "Offline" })
-    )))
-  );
+  event.respondWith((async () => {
+    const exact = await caches.match(request);
+    if (exact) return exact;
+    try {
+      const res = await fetch(request);
+      if (res.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, res.clone());
+      }
+      return res;
+    } catch {
+      const loose = await caches.match(request, { ignoreSearch: true });
+      return loose || new Response("", { status: 503, statusText: "Offline" });
+    }
+  })());
 });
-
-
-
-
-
