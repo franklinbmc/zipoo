@@ -3364,6 +3364,13 @@ const setupBillingPage = () => {
   const submitBtn = document.querySelector("[data-billing-reference-submit]");
 
   const money = (value) => `TZS ${Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  }[char]));
   const badgeClass = (status) => status === "paid" ? "approved" : (status === "pending_review" ? "pending" : "rejected");
 
   const openReferenceModal = (invoiceId) => {
