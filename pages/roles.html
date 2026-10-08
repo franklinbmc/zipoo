@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+  <meta name="msapplication-config" content="/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Manage Zipoo roles and permissions.">
+  <title>Roles & Permissions - Zipoo</title>
+  <link rel="stylesheet" href="/assets/css/styles.css?v=149">
+  <script src="/assets/js/offline.js?v=3"></script>
+</head>
+<body>
+  <div class="app-shell customers-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/settings" aria-label="Back to settings">
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
+      </a>
+      <h1>Roles & Permissions</h1>
+      <span class="topbar-spacer" aria-hidden="true"></span>
+    </header>
+
+    <main class="customers-page roles-page" data-roles-page>
+      <div class="settings-list flush-list roles-list" data-roles-list style="display:grid;gap:10px;"></div>
+      <div class="company-users-empty" hidden data-roles-empty style="text-align:center;padding:48px 16px;background:#fff;border:1px solid var(--color-line);border-radius:12px;">
+        <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M64 224h384M96 112h320M128 336h256M160 448h192" /></svg>
+        <h3 style="margin:0 0 6px;color:var(--color-navy);font-size:1.15rem;font-weight:800;">No roles available</h3>
+        <p style="margin:0;color:var(--color-muted);font-size:0.9rem;">Default roles will be created automatically for this business.</p>
+      </div>
+      <p class="inline-error" hidden data-roles-error></p>
+    </main>
+  </div>
+
+  <div class="fullscreen-modal" hidden data-role-edit-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="role-edit-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-role-edit-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="role-edit-title" data-role-edit-title>Edit Role</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-role-edit-form novalidate>
+        <input type="hidden" name="role_id" data-role-edit-id>
+        <label class="form-field">
+          <span>Role Name</span>
+          <input type="text" name="name" data-role-edit-name required>
+        </label>
+        <div data-role-permission-groups style="display:grid;gap:12px;"></div>
+        <p class="inline-error" hidden data-role-edit-error></p>
+        <button class="btn btn-primary full" type="submit" data-role-edit-submit>Save Role</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="fullscreen-modal" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <button class="app-modal-close" type="button" data-app-modal-close aria-label="Close">
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+      </button>
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-ok>OK</button>
+    </section>
+  </div>
+  <script src="/assets/js/app.js?v=151" defer></script>
+</body>
+</html>

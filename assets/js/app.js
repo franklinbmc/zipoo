@@ -1052,6 +1052,16 @@ const switchStoredBusiness = async (businessId) => {
     ));
     localStorage.setItem("zipoo.businesses", JSON.stringify(nextBusinesses));
   }
+  if (payload.role || Array.isArray(payload.permissions)) {
+    const user = readStoredJson("zipoo.user", null) || {};
+    localStorage.setItem("zipoo.user", JSON.stringify({
+      ...user,
+      business_id: Number(businessId),
+      business_name: payload.business?.business_name || user.business_name,
+      role: payload.role || user.role,
+      permissions: Array.isArray(payload.permissions) ? payload.permissions : (user.permissions || []),
+    }));
+  }
 
   return payload.business;
 };
@@ -2739,6 +2749,7 @@ const setupCompanyUsersPage = () => {
   const createError = document.querySelector("[data-user-create-error]");
   const createSubmit = document.querySelector("[data-user-create-submit]");
   const createSalary = document.querySelector("[data-user-create-salary]");
+  const createRole = document.querySelector("[data-create-user-role]");
   const createAdvancedToggle = document.querySelector("[data-user-create-advanced-toggle]");
   const createAdvancedPanel = document.querySelector("[data-user-create-advanced]");
 
@@ -2765,6 +2776,7 @@ const setupCompanyUsersPage = () => {
   const editAdvancedPanel = document.querySelector("[data-user-edit-advanced]");
 
   let cachedUsers = [];
+  let availableRoles = [];
   let currentUser = null;
   const currency = getStoredBusinessState().selectedBusiness?.currency || "TZS";
 
@@ -2814,6 +2826,25 @@ const setupCompanyUsersPage = () => {
 
   const valueOrDash = (value) => String(value || "").trim() || "-";
   const isCheckedValue = (value) => ["1", "yes", "true", "on"].includes(String(value || "").trim().toLowerCase());
+  const roleLabel = (slug) => {
+    const role = availableRoles.find((item) => item.slug === slug);
+    return role?.name || String(slug || "viewer").replace(/_/g, " ").replace(/\b\w/g, (ch) => ch.toUpperCase());
+  };
+
+  const renderRoleOptions = () => {
+    const roles = availableRoles.filter((role) => role.slug !== "superAdmin");
+    [createRole, editRole].forEach((select) => {
+      if (!select || !roles.length) return;
+      const current = select.value || "viewer";
+      select.replaceChildren(...roles.map((role) => {
+        const option = document.createElement("option");
+        option.value = role.slug;
+        option.textContent = role.name;
+        return option;
+      }));
+      select.value = roles.some((role) => role.slug === current) ? current : "viewer";
+    });
+  };
 
   const renderUsersList = (users = []) => {
     if (usersCountLabel) {
@@ -2866,8 +2897,7 @@ const setupCompanyUsersPage = () => {
       const sub = document.createElement("div");
       sub.style.fontSize = "0.78rem";
       sub.style.color = "var(--color-muted)";
-      const roleCapitalized = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-      sub.textContent = `${user.phone} • ${roleCapitalized}`;
+      sub.textContent = `${user.phone} • ${roleLabel(user.role)}`;
 
       info.append(name, sub);
       left.append(avatar, info);
@@ -2910,6 +2940,8 @@ const setupCompanyUsersPage = () => {
       if (!data || !data.ok) return;
 
       cachedUsers = Array.isArray(data.users) ? data.users : [];
+      availableRoles = Array.isArray(data.roles) ? data.roles : availableRoles;
+      renderRoleOptions();
       renderUsersList(cachedUsers);
     } catch {
       // Quiet fail if network/api is offline
@@ -2921,10 +2953,9 @@ const setupCompanyUsersPage = () => {
     setUserAvatar(detailAvatar, user);
     if (detailName) detailName.textContent = user.full_name || "-";
     if (detailMeta) {
-      const roleCap = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-      detailMeta.textContent = `${roleCap} • ${user.status.toUpperCase()}`;
+      detailMeta.textContent = `${roleLabel(user.role)} • ${user.status.toUpperCase()}`;
     }
-    if (detailRole) detailRole.textContent = user.role;
+    if (detailRole) detailRole.textContent = roleLabel(user.role);
     if (detailStatus) {
       detailStatus.innerHTML = `<span class="badge-status ${user.status === "active" ? "approved" : "rejected"}">${user.status}</span>`;
     }
@@ -2967,7 +2998,8 @@ const setupCompanyUsersPage = () => {
     if (editPhone) editPhone.value = user.phone || "";
     if (editEmail) editEmail.value = user.email || "";
     if (editPhoto) editPhoto.value = "";
-    if (editRole) editRole.value = user.role || "staff";
+    renderRoleOptions();
+    if (editRole) editRole.value = user.role || "viewer";
     if (editStatus) editStatus.value = user.status || "active";
     if (editSalary) editSalary.value = user.monthly_salary ? groupThousands(String(user.monthly_salary)) : "";
     if (editTin) editTin.value = user.tin || "";
@@ -3120,6 +3152,197 @@ const setupCompanyUsersPage = () => {
 
   // Initial load
   loadUsers();
+};
+
+const setupRolesPage = () => {
+  const page = document.querySelector("[data-roles-page]");
+  if (!page) return;
+
+  const list = document.querySelector("[data-roles-list]");
+  const empty = document.querySelector("[data-roles-empty]");
+  const pageError = document.querySelector("[data-roles-error]");
+  const modal = document.querySelector("[data-role-edit-modal]");
+  const closeBtn = document.querySelector("[data-role-edit-close]");
+  const form = document.querySelector("[data-role-edit-form]");
+  const title = document.querySelector("[data-role-edit-title]");
+  const roleIdInput = document.querySelector("[data-role-edit-id]");
+  const roleNameInput = document.querySelector("[data-role-edit-name]");
+  const groupsWrap = document.querySelector("[data-role-permission-groups]");
+  const editError = document.querySelector("[data-role-edit-error]");
+  const submitBtn = document.querySelector("[data-role-edit-submit]");
+
+  let roles = [];
+  let permissions = {};
+  let currentRole = null;
+
+  const groupedPermissions = () => {
+    const groups = new Map();
+    Object.entries(permissions || {}).forEach(([key, meta]) => {
+      const groupName = Array.isArray(meta) ? meta[0] : "Other";
+      const label = Array.isArray(meta) ? meta[1] : key;
+      if (!groups.has(groupName)) groups.set(groupName, []);
+      groups.get(groupName).push({ key, label });
+    });
+    return [...groups.entries()];
+  };
+
+  const rolePermissionText = (role) => {
+    if (role.slug === "superAdmin") return "Full owner access";
+    const count = Array.isArray(role.permissions) ? role.permissions.length : 0;
+    return `${count} ${count === 1 ? "permission" : "permissions"}`;
+  };
+
+  const renderRoles = () => {
+    if (!roles.length) {
+      list?.replaceChildren();
+      if (empty) empty.hidden = false;
+      return;
+    }
+    if (empty) empty.hidden = true;
+
+    list?.replaceChildren(...roles.map((role) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "settings-list-row user-row";
+      row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;";
+      row.disabled = role.slug === "superAdmin";
+
+      const left = document.createElement("div");
+      left.style.minWidth = "0";
+      const name = document.createElement("div");
+      name.style.cssText = "font-weight:800;color:var(--color-navy);font-size:0.94rem;";
+      name.textContent = role.name;
+      const meta = document.createElement("div");
+      meta.style.cssText = "margin-top:4px;color:var(--color-muted);font-size:0.78rem;font-weight:700;";
+      meta.textContent = role.description || rolePermissionText(role);
+      left.append(name, meta);
+
+      const right = document.createElement("div");
+      right.style.cssText = "display:flex;align-items:center;gap:8px;flex:0 0 auto;";
+      const badge = document.createElement("span");
+      badge.className = `badge-status ${role.slug === "superAdmin" ? "approved" : "pending"}`;
+      badge.textContent = rolePermissionText(role);
+      right.append(badge);
+      if (role.slug !== "superAdmin") {
+        const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        chevron.setAttribute("viewBox", "0 0 512 512");
+        chevron.setAttribute("aria-hidden", "true");
+        chevron.style.cssText = "width:16px;height:16px;stroke:var(--color-muted);fill:none;stroke-width:32;";
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", "M184 112l144 144-144 144");
+        chevron.append(path);
+        right.append(chevron);
+      }
+
+      row.append(left, right);
+      if (role.slug !== "superAdmin") {
+        row.addEventListener("click", () => openRoleModal(role));
+      }
+      return row;
+    }));
+  };
+
+  const openRoleModal = (role) => {
+    currentRole = role;
+    if (editError) editError.hidden = true;
+    if (title) title.textContent = `Edit ${role.name}`;
+    if (roleIdInput) roleIdInput.value = String(role.id);
+    if (roleNameInput) roleNameInput.value = role.name || "";
+    const selected = new Set(role.permissions || []);
+
+    groupsWrap?.replaceChildren(...groupedPermissions().map(([groupName, items]) => {
+      const section = document.createElement("section");
+      section.className = "settings-subcard";
+      const heading = document.createElement("h4");
+      heading.className = "settings-subcard-title";
+      heading.textContent = groupName;
+      const controls = document.createElement("div");
+      controls.style.cssText = "display:grid;gap:8px;margin-top:10px;";
+      controls.append(...items.map((item) => {
+        const label = document.createElement("label");
+        label.className = "switch-row";
+        const text = document.createElement("span");
+        text.className = "switch-label";
+        text.textContent = item.label;
+        const shell = document.createElement("span");
+        shell.className = "switch";
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.name = "permissions[]";
+        input.value = item.key;
+        input.checked = selected.has(item.key);
+        const track = document.createElement("span");
+        track.className = "switch-track";
+        const thumb = document.createElement("span");
+        thumb.className = "switch-thumb";
+        track.append(thumb);
+        shell.append(input, track);
+        label.append(text, shell);
+        return label;
+      }));
+      section.append(heading, controls);
+      return section;
+    }));
+
+    if (modal) modal.hidden = false;
+    roleNameInput?.focus();
+  };
+
+  const closeRoleModal = () => {
+    if (modal) modal.hidden = true;
+    if (editError) editError.hidden = true;
+    currentRole = null;
+  };
+
+  const loadRoles = async () => {
+    try {
+      if (pageError) pageError.hidden = true;
+      const res = await fetch(`${getBasePath()}api/roles.php`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Unable to load roles.");
+      }
+      roles = Array.isArray(data.roles) ? data.roles : [];
+      permissions = data.permissions || {};
+      renderRoles();
+    } catch (err) {
+      if (pageError) {
+        pageError.textContent = err.message || "Unable to load roles.";
+        pageError.hidden = false;
+      }
+    }
+  };
+
+  closeBtn?.addEventListener("click", closeRoleModal);
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!currentRole) return;
+    if (editError) editError.hidden = true;
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const body = new FormData(form);
+      body.set("action", "save");
+      const res = await fetch(`${getBasePath()}api/roles.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Unable to save role.");
+      }
+      roles = Array.isArray(data.roles) ? data.roles : roles;
+      renderRoles();
+      closeRoleModal();
+      await showAppModal("Role Updated", "Role permissions have been updated.");
+    } catch (err) {
+      if (editError) {
+        editError.textContent = err.message || "Unable to save role.";
+        editError.hidden = false;
+      }
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  loadRoles();
 };
 
 const setupLocationSelects = async () => {
@@ -10432,6 +10655,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCustomersPage();
   setupSuppliersPage();
   setupCompanyUsersPage();
+  setupRolesPage();
   setupStockPage();
   setupSalesPage();
   setupBankPage();

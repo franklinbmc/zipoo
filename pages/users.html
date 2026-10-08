@@ -24,7 +24,7 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Manage Zipoo system users and team members.">
   <title>System Users - Zipoo</title>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=148">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=149">
   <script src="/assets/js/offline.js?v=3"></script>
 </head>
 <body>
@@ -159,11 +159,11 @@
         </label>
         <label class="form-field">
           <span>User Role <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
-          <select class="css-formatted-select" name="role" required>
+          <select class="css-formatted-select" name="role" data-create-user-role required>
+            <option value="viewer" selected>Viewer</option>
             <option value="cashier">Cashier / Sales</option>
             <option value="manager">Manager</option>
-            <option value="staff" selected>General Staff</option>
-            <option value="storekeeper">Storekeeper / Inventory</option>
+            <option value="stock_keeper">Stock Keeper</option>
             <option value="accountant">Accountant</option>
           </select>
         </label>
@@ -241,10 +241,10 @@
         <label class="form-field">
           <span>User Role <strong style="color: var(--color-danger, #ef4444);">*</strong></span>
           <select class="css-formatted-select" name="role" data-edit-user-role required>
+            <option value="viewer">Viewer</option>
             <option value="cashier">Cashier / Sales</option>
             <option value="manager">Manager</option>
-            <option value="staff">General Staff</option>
-            <option value="storekeeper">Storekeeper / Inventory</option>
+            <option value="stock_keeper">Stock Keeper</option>
             <option value="accountant">Accountant</option>
           </select>
         </label>
@@ -300,6 +300,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=150" defer></script>
+  <script src="/assets/js/app.js?v=151" defer></script>
 </body>
 </html>

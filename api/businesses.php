@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/warehouses_lib.php';
 require_once __DIR__ . '/accounts_lib.php';
+require_once __DIR__ . '/permissions_lib.php';
 
 session_start();
 
@@ -188,9 +189,16 @@ try {
         $_SESSION['zipoo_business_id'] = (int) $business['id'];
         $pdo->prepare('UPDATE tbl_users SET business_id = :business_id WHERE id = :user_id')
             ->execute([':business_id' => (int) $business['id'], ':user_id' => $userId]);
+        $role = user_role_for_business($pdo, (int) $business['id'], $userId);
+        $permissions = user_permissions_for_business($pdo, (int) $business['id'], $userId);
 
         notify_user($pdo, $userId, 'Zipoo serving business changed', 'Your current serving business was changed.');
-        respond(200, ['ok' => true, 'business' => business_payload($business)]);
+        respond(200, [
+            'ok' => true,
+            'business' => business_payload($business),
+            'role' => $role,
+            'permissions' => $permissions,
+        ]);
     }
 
     if ($action === 'create') {
@@ -244,6 +252,7 @@ try {
         // Every new business starts with a Main Warehouse and a default Cash account.
         ensure_default_warehouse($pdo, $businessId);
         ensure_default_account($pdo, $businessId);
+        ensure_business_rbac($pdo, $businessId);
         $pdo->prepare(
             'UPDATE tbl_users
              SET business_id = :business_id,
@@ -274,6 +283,8 @@ try {
         respond(201, [
             'ok' => true,
             'business' => $business,
+            'role' => user_role_for_business($pdo, $businessId, $userId),
+            'permissions' => user_permissions_for_business($pdo, $businessId, $userId),
             'businesses' => load_businesses($pdo, $userId, $businessId),
         ]);
     }

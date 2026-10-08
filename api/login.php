@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/permissions_lib.php';
 
 session_start();
 
@@ -78,6 +79,9 @@ try {
     session_regenerate_id(true);
     $_SESSION['zipoo_user_id'] = (int) $user['id'];
     $_SESSION['zipoo_business_id'] = $currentBusiness !== null ? (int) $currentBusiness['id'] : null;
+    $currentBusinessId = $currentBusiness !== null ? (int) $currentBusiness['id'] : 0;
+    $role = $currentBusinessId > 0 ? user_role_for_business($pdo, $currentBusinessId, (int) $user['id']) : 'viewer';
+    $permissions = $currentBusinessId > 0 ? user_permissions_for_business($pdo, $currentBusinessId, (int) $user['id']) : [];
 
     respond(200, [
         'ok' => true,
@@ -89,6 +93,8 @@ try {
             'full_name' => $user['full_name'],
             'phone' => $user['phone'],
             'email' => $user['email'],
+            'role' => $role,
+            'permissions' => $permissions,
         ],
         'businesses' => $businesses,
     ]);

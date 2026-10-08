@@ -180,6 +180,8 @@ function user_payload(array $row, int $ownerId): array
         'phone' => (string) $row['phone'],
         'email' => (string) ($row['email'] ?? ''),
         'role' => (string) ($row['role'] ?? 'staff'),
+        'role_id' => (int) ($row['role_id'] ?? 0),
+        'role_name' => (string) ($row['role_name'] ?? ($row['role'] ?? 'staff')),
         'status' => (string) ($row['status'] ?? 'active'),
         'monthly_salary' => (float) ($row['monthly_salary'] ?? 0),
         'tin' => (string) ($row['tin'] ?? ''),
@@ -205,11 +207,20 @@ try {
 
     $businessId = (int) $biz['id'];
     $ownerId = (int) ($biz['owner_user_id'] ?? 0);
+    ensure_business_rbac($pdo, $businessId);
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        require_permission($pdo, $businessId, $currentUserId, 'settings.users.manage');
         $userId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
         if ($userId > 0) {
-            $stmt = $pdo->prepare('SELECT * FROM tbl_users WHERE id = :id AND business_id = :bid LIMIT 1');
+            $stmt = $pdo->prepare(
+                'SELECT u.*, ur.role_id, r.name AS role_name, COALESCE(r.slug, u.role) AS role
+                 FROM tbl_users u
+                 LEFT JOIN tbl_user_roles ur ON ur.user_id = u.id AND ur.business_id = :bid
+                 LEFT JOIN tbl_roles r ON r.id = ur.role_id
+                 WHERE u.id = :id AND u.business_id = :bid
+                 LIMIT 1'
+            );
             $stmt->execute([':id' => $userId, ':bid' => $businessId]);
             $row = $stmt->fetch();
             if (!$row) {
@@ -246,6 +257,8 @@ try {
             'business_id' => $businessId,
             'business_name' => $biz['business_name'],
             'users' => $users,
+            'roles' => rbac_roles_payload($pdo, $businessId),
+            'permissions' => rbac_permission_catalog(),
             'total' => count($users),
         ]);
     }
@@ -257,11 +270,14 @@ try {
     $action = trim((string) ($_POST['action'] ?? 'create'));
 
     if ($action === 'create') {
-        require_permission($pdo, $businessId, $currentUserId, 'users.manage');
+        require_permission($pdo, $businessId, $currentUserId, 'settings.users.manage');
         $fullName = trim((string) ($_POST['full_name'] ?? ''));
         $phone = trim((string) ($_POST['phone'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
-        $role = trim((string) ($_POST['role'] ?? 'staff'));
+        $role = trim((string) ($_POST['role'] ?? 'viewer'));
+        if ($role === 'superAdmin') {
+            respond(403, ['ok' => false, 'message' => 'Super Admin is reserved for the business owner.']);
+        }
         $status = trim((string) ($_POST['status'] ?? 'active'));
         $monthlySalary = money_value($_POST['monthly_salary'] ?? 0);
         $tin = trim((string) ($_POST['tin'] ?? ''));
@@ -309,7 +325,7 @@ try {
         );
         $stmt->execute([
             ':bid' => $businessId,
-            ':role' => $role !== '' ? $role : 'staff',
+            ':role' => $role !== '' ? $role : 'viewer',
             ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
             ':monthly_salary' => $monthlySalary,
             ':tin' => $tin !== '' ? $tin : null,
@@ -328,6 +344,7 @@ try {
         ]);
 
         $newId = (int) $pdo->lastInsertId();
+        assign_user_role($pdo, $businessId, $newId, $role !== '' ? $role : 'viewer');
         $stmt = $pdo->prepare('SELECT * FROM tbl_users WHERE id = :id LIMIT 1');
         $stmt->execute([':id' => $newId]);
         $user = $stmt->fetch();
@@ -340,12 +357,15 @@ try {
     }
 
     if ($action === 'update') {
-        require_permission($pdo, $businessId, $currentUserId, 'users.manage');
+        require_permission($pdo, $businessId, $currentUserId, 'settings.users.manage');
         $targetUserId = (int) ($_POST['user_id'] ?? 0);
         $fullName = trim((string) ($_POST['full_name'] ?? ''));
         $phone = trim((string) ($_POST['phone'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
-        $role = trim((string) ($_POST['role'] ?? 'staff'));
+        $role = trim((string) ($_POST['role'] ?? 'viewer'));
+        if ($role === 'superAdmin') {
+            respond(403, ['ok' => false, 'message' => 'Super Admin is reserved for the business owner.']);
+        }
         $status = trim((string) ($_POST['status'] ?? 'active'));
         $monthlySalary = money_value($_POST['monthly_salary'] ?? 0);
         $tin = trim((string) ($_POST['tin'] ?? ''));
@@ -411,7 +431,7 @@ try {
                 ':full_name' => $fullName,
                 ':phone' => $phone,
                 ':email' => $email !== '' ? $email : null,
-                ':role' => $role !== '' ? $role : 'staff',
+                ':role' => $role !== '' ? $role : 'viewer',
                 ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
                 ':monthly_salary' => $monthlySalary,
                 ':tin' => $tin !== '' ? $tin : null,
@@ -433,7 +453,7 @@ try {
                 ':full_name' => $fullName,
                 ':phone' => $phone,
                 ':email' => $email !== '' ? $email : null,
-                ':role' => $role !== '' ? $role : 'staff',
+                ':role' => $role !== '' ? $role : 'viewer',
                 ':status' => in_array($status, ['active', 'inactive'], true) ? $status : 'active',
                 ':monthly_salary' => $monthlySalary,
                 ':tin' => $tin !== '' ? $tin : null,
@@ -443,6 +463,8 @@ try {
                 ':photo_path' => $photoPath,
             ]);
         }
+
+        assign_user_role($pdo, $businessId, $targetUserId, $role !== '' ? $role : 'viewer');
 
         $stmt = $pdo->prepare('SELECT * FROM tbl_users WHERE id = :id LIMIT 1');
         $stmt->execute([':id' => $targetUserId]);
@@ -456,7 +478,7 @@ try {
     }
 
     if ($action === 'delete') {
-        require_permission($pdo, $businessId, $currentUserId, 'users.manage');
+        require_permission($pdo, $businessId, $currentUserId, 'settings.users.manage');
         $targetUserId = (int) ($_POST['user_id'] ?? 0);
         if ($targetUserId <= 0) {
             respond(422, ['ok' => false, 'message' => 'Invalid user ID.']);

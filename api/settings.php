@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/permissions_lib.php';
 
 session_start();
 
@@ -142,6 +143,9 @@ try {
     $pdo = db();
     ensure_settings_tables($pdo);
     $businessId = get_active_business_id($pdo, $userId);
+    if ($businessId > 0) {
+        ensure_business_rbac($pdo, $businessId);
+    }
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $smtp = load_group_settings($pdo, $businessId, 'smtp');
@@ -191,6 +195,7 @@ try {
     $action = trim((string) ($_POST['action'] ?? ''));
 
     if ($action === 'save_smtp') {
+        require_permission($pdo, $businessId, $userId, 'settings.smtp.manage');
         $host = trim((string) ($_POST['smtp_host'] ?? ''));
         $port = trim((string) ($_POST['smtp_port'] ?? '587'));
         $username = trim((string) ($_POST['smtp_username'] ?? ''));
@@ -220,6 +225,7 @@ try {
     }
 
     if ($action === 'test_smtp') {
+        require_permission($pdo, $businessId, $userId, 'settings.smtp.manage');
         $settings = load_group_settings($pdo, $businessId, 'smtp');
         $testEmail = trim((string) ($_POST['test_email'] ?? ''));
         if (!filter_var($testEmail, FILTER_VALIDATE_EMAIL)) {
@@ -266,6 +272,7 @@ try {
     }
 
     if ($action === 'save_sms') {
+        require_permission($pdo, $businessId, $userId, 'settings.sms.manage');
         $apiUrl = 'https://megasms.co.tz/api/v1';
         $apiKey = (string) ($_POST['api_key'] ?? '');
         $senderId = strtoupper(trim((string) ($_POST['sender_id'] ?? 'MEGASMS')));
@@ -290,6 +297,7 @@ try {
     }
 
     if ($action === 'test_sms') {
+        require_permission($pdo, $businessId, $userId, 'settings.sms.manage');
         $settings = load_group_settings($pdo, $businessId, 'sms');
         $phone = trim((string) ($_POST['test_phone'] ?? ''));
         if ($phone === '') {
@@ -350,6 +358,7 @@ try {
     }
 
     if ($action === 'request_sender_id') {
+        require_permission($pdo, $businessId, $userId, 'settings.sms.manage');
         $senderId = strtoupper(trim((string) ($_POST['sender_id'] ?? '')));
         $companyName = trim((string) ($_POST['company_name'] ?? ''));
         $purpose = trim((string) ($_POST['purpose'] ?? ''));
@@ -395,6 +404,7 @@ try {
     }
 
     if ($action === 'save_general') {
+        require_permission($pdo, $businessId, $userId, 'settings.business.manage');
         $currency = strtoupper(trim((string) ($_POST['currency'] ?? 'TZS')));
         $timezone = trim((string) ($_POST['timezone'] ?? 'Africa/Dar_es_Salaam'));
         $taxRate = trim((string) ($_POST['tax_rate'] ?? '18'));
