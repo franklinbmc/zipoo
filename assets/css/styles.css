@@ -5509,6 +5509,18 @@ button.report-list-row:focus-visible {
   font-weight: 700;
 }
 
+.warehouse-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.warehouse-action-btn .svg-ico {
+  flex: 0 0 auto;
+  stroke-width: 38px;
+}
+
 /* Section workspace body */
 .stock-workspace-body {
   padding-top: 16px;
@@ -7294,6 +7306,22 @@ button.report-list-row:focus-visible {
 
   .settings-list-row.sales-history-row > strong {
     display: none;
+  }
+
+  .warehouse-action-btn {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0;
+  }
+
+  .warehouse-action-label {
+    position: absolute;
+    overflow: hidden;
+    width: 1px;
+    height: 1px;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
   .stock-hub-label,

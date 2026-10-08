@@ -5759,7 +5759,7 @@ const setupStockPage = () => {
       warehousesList.innerHTML = list.map((w) => {
         const meta = [w.code, w.location].filter(Boolean).map(escWh).join(" • ") || "No code or location";
         const defBadge = w.is_default ? ` <span class="badge-stock in-stock">Default</span>` : "";
-        const setDefaultBtn = w.is_default ? "" : `<button type="button" class="btn btn-outline btn-sm" data-wh-set-default="${w.id}">Set default</button>`;
+        const setDefaultBtn = w.is_default ? "" : `<button type="button" class="btn btn-outline btn-sm warehouse-action-btn" data-wh-set-default="${w.id}" aria-label="Set default" title="Set default">${svgMarkup("check", { size: 15 })}<span class="warehouse-action-label">Set default</span></button>`;
         return `
           <div class="settings-list-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;">
             <div style="text-align:left;min-width:0;">
@@ -5767,10 +5767,10 @@ const setupStockPage = () => {
               <div style="font-size:0.78rem;color:var(--color-muted);">${meta}</div>
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto;">
-              <button type="button" class="btn btn-primary btn-sm" data-wh-stock="${w.id}">Stock</button>
+              <button type="button" class="btn btn-primary btn-sm warehouse-action-btn" data-wh-stock="${w.id}" aria-label="View stock" title="Stock">${svgMarkup("warehouse", { size: 15 })}<span class="warehouse-action-label">Stock</span></button>
               ${setDefaultBtn}
-              <button type="button" class="btn btn-outline btn-sm" data-wh-edit="${w.id}">Edit</button>
-              <button type="button" class="btn btn-danger-outline btn-sm" data-wh-delete="${w.id}">Delete</button>
+              <button type="button" class="btn btn-outline btn-sm warehouse-action-btn" data-wh-edit="${w.id}" aria-label="Edit warehouse" title="Edit">${svgMarkup("clipboard", { size: 15 })}<span class="warehouse-action-label">Edit</span></button>
+              <button type="button" class="btn btn-danger-outline btn-sm warehouse-action-btn" data-wh-delete="${w.id}" aria-label="Delete warehouse" title="Delete">${svgMarkup("close", { size: 15 })}<span class="warehouse-action-label">Delete</span></button>
             </div>
           </div>`;
       }).join("");
