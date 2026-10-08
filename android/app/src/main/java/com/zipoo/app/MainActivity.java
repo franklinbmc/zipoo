@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.webkit.ValueCallback;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
+import android.webkit.WebChromeClient.FileChooserParams;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -34,14 +36,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 public class MainActivity extends Activity {
     private static final String HOME_URL = BuildConfig.WEB_URL;
     private static final String HOST = Uri.parse(HOME_URL).getHost();
     private static final int ZIPOO_BLUE = Color.rgb(31, 47, 87);
+    private static final int FILE_CHOOSER_REQUEST_CODE = 72;
 
     private WebView webView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private View splashView;
     private ProgressBar progressBar;
+    private ValueCallback<Uri[]> fileChooserCallback;
     private boolean firstPageLoaded = false;
 
     @Override
@@ -55,11 +62,22 @@ public class MainActivity extends Activity {
         root.setBackgroundColor(ZIPOO_BLUE);
 
         webView = new WebView(this);
-        webView.setLayoutParams(new FrameLayout.LayoutParams(
+        webView.setLayoutParams(new SwipeRefreshLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
-        root.addView(webView);
+
+        swipeRefreshLayout = new SwipeRefreshLayout(this);
+        swipeRefreshLayout.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+        swipeRefreshLayout.setColorSchemeColors(Color.rgb(20, 119, 255), Color.rgb(11, 191, 154), ZIPOO_BLUE);
+        swipeRefreshLayout.setProgressBackgroundColorSchemeColor(Color.WHITE);
+        swipeRefreshLayout.setOnRefreshListener(() -> webView.reload());
+        swipeRefreshLayout.setOnChildScrollUpCallback((parent, child) -> webView.getScrollY() > 0);
+        swipeRefreshLayout.addView(webView);
+        root.addView(swipeRefreshLayout);
 
         progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
@@ -123,6 +141,30 @@ public class MainActivity extends Activity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != FILE_CHOOSER_REQUEST_CODE || fileChooserCallback == null) {
+            return;
+        }
+
+        Uri[] results = null;
+        if (resultCode == RESULT_OK && data != null) {
+            if (data.getClipData() != null) {
+                int itemCount = data.getClipData().getItemCount();
+                results = new Uri[itemCount];
+                for (int i = 0; i < itemCount; i++) {
+                    results[i] = data.getClipData().getItemAt(i).getUri();
+                }
+            } else if (data.getData() != null) {
+                results = new Uri[]{data.getData()};
+            }
+        }
+
+        fileChooserCallback.onReceiveValue(results);
+        fileChooserCallback = null;
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private void configureWebView() {
         WebSettings settings = webView.getSettings();
@@ -144,6 +186,33 @@ public class MainActivity extends Activity {
             public void onProgressChanged(WebView view, int newProgress) {
                 progressBar.setProgress(newProgress);
                 progressBar.setVisibility(newProgress >= 100 ? View.GONE : View.VISIBLE);
+            }
+
+            @Override
+            public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+                if (fileChooserCallback != null) {
+                    fileChooserCallback.onReceiveValue(null);
+                }
+                fileChooserCallback = filePathCallback;
+
+                Intent chooserIntent;
+                try {
+                    chooserIntent = fileChooserParams.createIntent();
+                } catch (Exception ex) {
+                    chooserIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                    chooserIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                    chooserIntent.setType("image/*");
+                    chooserIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                }
+
+                try {
+                    startActivityForResult(chooserIntent, FILE_CHOOSER_REQUEST_CODE);
+                    return true;
+                } catch (Exception ex) {
+                    fileChooserCallback = null;
+                    Toast.makeText(MainActivity.this, "No image picker available", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
             }
         });
 
@@ -173,11 +242,15 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) {
                 firstPageLoaded = true;
+                swipeRefreshLayout.setRefreshing(false);
                 hideSplash();
             }
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request.isForMainFrame()) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
                 if (request.isForMainFrame() && !firstPageLoaded && !isOnline()) {
                     view.loadDataWithBaseURL(
                             HOME_URL,

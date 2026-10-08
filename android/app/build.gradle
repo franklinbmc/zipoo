@@ -20,3 +20,7 @@ android {
         buildConfigField "String", "WEB_URL", "\"https://app.zipoo.co.tz/\""
     }
 }
+
+dependencies {
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+}
