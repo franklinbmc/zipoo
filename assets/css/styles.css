@@ -5509,17 +5509,6 @@ button.report-list-row:focus-visible {
   font-weight: 700;
 }
 
-.stock-hub-fa-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  background: var(--color-blue);
-  color: #fff;
-  font-size: 0.9rem;
-}
-
 /* Section workspace body */
 .stock-workspace-body {
   padding-top: 16px;
@@ -7271,12 +7260,12 @@ button.report-list-row:focus-visible {
 
   .stock-page .settings-accordion-link.stock-hub-row .stock-summary-meta {
     display: grid;
-    grid-template-columns: 30px;
+    grid-template-columns: 20px;
     place-items: center;
-    max-width: 30px;
+    max-width: 20px;
   }
 
-  .stock-page .settings-accordion-link.stock-hub-row .stock-summary-meta > :not(svg):not(.stock-hub-fa-icon) {
+  .stock-page .settings-accordion-link.stock-hub-row .stock-summary-meta > :not(svg) {
     display: none;
   }
 
