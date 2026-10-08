@@ -6303,6 +6303,12 @@ button.report-list-row:focus-visible {
   stroke-width: 34px;
 }
 
+[data-items-workspace] .stock-item-row .customer-avatar .svg-ico,
+[data-item-detail-modal] .customer-avatar .svg-ico {
+  color: #fff;
+  stroke: #fff;
+}
+
 /* Let the searchable customer dropdown inside the compact POS modal overflow
    instead of being clipped by .app-modal's overflow:hidden. */
 [data-pos-customer-modal] .app-modal {
