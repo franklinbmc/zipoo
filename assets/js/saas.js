@@ -712,7 +712,7 @@ const setupSaasBillingPage = async () => {
       row.querySelector("strong").textContent = item.reference || `Transaction #${item.id}`;
       row.querySelector("span").textContent = `${item.sender || ""} · ${item.received_at || ""}`;
       row.querySelectorAll("strong")[1].textContent = `TZS ${money(item.amount)}`;
-      row.querySelectorAll("span")[1].textContent = item.raw_message || item.notes || "";
+      row.querySelectorAll("span")[1].textContent = item.body || item.note || "";
       row.querySelector("b").textContent = item.status || "pending";
       if (!["matched", "ignored"].includes(item.status)) {
         const button = document.createElement("button");
@@ -750,17 +750,17 @@ const setupSaasBillingPage = async () => {
 
     const numbers = (() => {
       try {
-        return (JSON.parse(settings.numbers || "[]") || []).map((item) => [item.network, item.number, item.name].filter(Boolean).join(" | ")).join("\n");
+        return (JSON.parse(settings.lipa_numbers || "[]") || []).map((item) => [item.network, item.number, item.name].filter(Boolean).join(" | ")).join("\n");
       } catch {
-        return settings.numbers || "";
+        return settings.lipa_numbers || "";
       }
     })();
     const form = root.querySelector("[data-lipa-settings-form]");
     if (form) {
-      form.enabled.checked = settings.enabled === "1";
-      form.auto_approve.checked = settings.auto_approve === "1";
-      form.auto_approve_max.value = settings.auto_approve_max || "0";
-      form.allowed_senders.value = settings.allowed_senders || "";
+      form.enabled.checked = settings.lipa_payment_enabled === "1";
+      form.auto_approve.checked = settings.lipa_auto_approve === "1";
+      form.auto_approve_max.value = settings.lipa_auto_approve_max || "0";
+      form.allowed_senders.value = settings.lipa_allowed_senders || "";
       form.numbers.value = numbers;
     }
   };

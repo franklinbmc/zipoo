@@ -55,7 +55,7 @@ function load_billing_admin(PDO $pdo): array
     }
 
     $devices = $pdo->query(
-        'SELECT id, device_uuid, device_name, status, last_seen_at, created_at
+        'SELECT id, uuid AS device_uuid, name AS device_name, status, last_seen_at, created_at
          FROM tbl_lipa_devices
          ORDER BY id DESC'
     )->fetchAll(PDO::FETCH_ASSOC);
@@ -196,11 +196,11 @@ try {
     }
 
     if ($action === 'save_lipa_settings') {
-        save_lipa_setting($pdo, 'enabled', !empty($_POST['enabled']) ? '1' : '0');
-        save_lipa_setting($pdo, 'auto_approve', !empty($_POST['auto_approve']) ? '1' : '0');
-        save_lipa_setting($pdo, 'auto_approve_max', (string) max(0, (float) ($_POST['auto_approve_max'] ?? 0)));
-        save_lipa_setting($pdo, 'allowed_senders', trim((string) ($_POST['allowed_senders'] ?? '')));
-        save_lipa_setting($pdo, 'numbers', parse_lipa_numbers((string) ($_POST['numbers'] ?? '')));
+        save_lipa_setting($pdo, 'lipa_payment_enabled', !empty($_POST['enabled']) ? '1' : '0');
+        save_lipa_setting($pdo, 'lipa_auto_approve', !empty($_POST['auto_approve']) ? '1' : '0');
+        save_lipa_setting($pdo, 'lipa_auto_approve_max', (string) max(0, (float) ($_POST['auto_approve_max'] ?? 0)));
+        save_lipa_setting($pdo, 'lipa_allowed_senders', trim((string) ($_POST['allowed_senders'] ?? '')));
+        save_lipa_setting($pdo, 'lipa_numbers', parse_lipa_numbers((string) ($_POST['numbers'] ?? '')));
         respond(200, ['ok' => true, 'message' => 'Lipa settings saved.'] + load_billing_admin($pdo));
     }
 
@@ -209,7 +209,7 @@ try {
         $uuid = bin2hex(random_bytes(16));
         $token = bin2hex(random_bytes(32));
         $pdo->prepare(
-            'INSERT INTO tbl_lipa_devices (device_uuid, device_name, token_hash, status)
+            'INSERT INTO tbl_lipa_devices (uuid, name, token_hash, status)
              VALUES (:uuid, :name, :token_hash, "active")'
         )->execute([
             ':uuid' => $uuid,
