@@ -5509,6 +5509,17 @@ button.report-list-row:focus-visible {
   font-weight: 700;
 }
 
+.stock-hub-fa-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--color-blue);
+  color: #fff;
+  font-size: 0.9rem;
+}
+
 /* Section workspace body */
 .stock-workspace-body {
   padding-top: 16px;
@@ -7195,6 +7206,21 @@ button.report-list-row:focus-visible {
     border-radius: 0;
   }
 
+  [data-item-detail-modal] .fullscreen-panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    max-height: 100svh;
+    overflow: hidden;
+  }
+
+  [data-item-detail-modal] .customer-detail-body {
+    min-height: 0;
+    max-height: calc(100svh - 64px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
   .fullscreen-header h2,
   .workspace-header-title h2 {
     min-width: 0;
@@ -7245,12 +7271,12 @@ button.report-list-row:focus-visible {
 
   .stock-page .settings-accordion-link.stock-hub-row .stock-summary-meta {
     display: grid;
-    grid-template-columns: 20px;
+    grid-template-columns: 30px;
     place-items: center;
-    max-width: 20px;
+    max-width: 30px;
   }
 
-  .stock-page .settings-accordion-link.stock-hub-row .stock-summary-meta > :not(svg) {
+  .stock-page .settings-accordion-link.stock-hub-row .stock-summary-meta > :not(svg):not(.stock-hub-fa-icon) {
     display: none;
   }
 
