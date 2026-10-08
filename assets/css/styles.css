@@ -5309,6 +5309,17 @@ button.settings-list-row:focus-visible {
   cursor: pointer;
 }
 
+.has-row-chevron::after {
+  content: "";
+  display: none;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  background: currentColor;
+  color: var(--color-muted);
+  clip-path: polygon(35% 18%, 74% 50%, 35% 82%, 35% 66%, 55% 50%, 35% 34%);
+}
+
 button.report-list-row:hover,
 button.report-list-row:focus-visible {
   background: #f8fbff;
@@ -7158,6 +7169,26 @@ button.report-list-row:focus-visible {
 
 /* ======================= Final mobile workspace polish ======================= */
 @media (max-width: 640px) {
+  .app-topbar,
+  .settings-page,
+  .entry-login,
+  .auth-panel,
+  .register-panel,
+  .saas-login-card,
+  .password-field,
+  .form-field,
+  .fullscreen-body,
+  .fullscreen-body.stock-workspace-body,
+  .sales-history-body,
+  .reports-workspace-body,
+  .stock-workspace-body {
+    width: 98% !important;
+    max-width: 98% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box;
+  }
+
   .fullscreen-panel {
     width: 100%;
     max-width: 100%;
@@ -7206,6 +7237,42 @@ button.report-list-row:focus-visible {
   .expense-group-row,
   .payroll-row {
     min-width: 0;
+  }
+
+  .stock-page .settings-accordion-link.stock-hub-row {
+    grid-template-columns: minmax(0, 1fr) 20px;
+  }
+
+  .stock-page .settings-accordion-link.stock-hub-row .stock-summary-meta {
+    display: grid;
+    grid-template-columns: 20px;
+    place-items: center;
+    max-width: 20px;
+  }
+
+  .stock-page .settings-accordion-link.stock-hub-row .stock-summary-meta > :not(svg) {
+    display: none;
+  }
+
+  .has-row-chevron::after {
+    display: block;
+  }
+
+  .report-list-row.has-row-chevron {
+    grid-template-columns: minmax(0, 1fr) 18px;
+  }
+
+  .report-list-row.has-row-chevron .report-list-amount {
+    display: none;
+  }
+
+  .settings-list-row.sales-history-row {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 18px;
+  }
+
+  .settings-list-row.sales-history-row > strong {
+    display: none;
   }
 
   .stock-hub-label,

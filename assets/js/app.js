@@ -6415,7 +6415,7 @@ const setupSalesPage = () => {
     reportList.innerHTML = rows.slice(0, 20).map((row) => {
       const dt = new Date(String(row.date || "").replace(" ", "T"));
       const when = isNaN(dt.getTime()) ? row.date : dt.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-      return `<button type="button" class="report-list-row" data-report-sale-id="${row.id}">
+      return `<button type="button" class="report-list-row has-row-chevron" data-report-sale-id="${row.id}">
         <div class="report-list-info">
           <div class="report-list-title">${escH(row.number)} <span class="badge-stock in-stock">${escH(row.type)}</span></div>
           <div class="report-list-meta">${escH(row.customer || "Walk-in Customer")} · ${escH(when || "-")} · ${row.items} item${row.items === 1 ? "" : "s"}</div>
@@ -7508,7 +7508,7 @@ const setupSalesPage = () => {
           const dt = new Date(String(s.created_at).replace(" ", "T"));
           const when = isNaN(dt.getTime()) ? s.created_at : dt.toLocaleString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
           const cancelled = s.status === "cancelled";
-          return `<button type="button" class="settings-list-row" data-history-open="${s.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
+          return `<button type="button" class="settings-list-row sales-history-row has-row-chevron" data-history-open="${s.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;cursor:pointer;text-align:left;">
             <div style="min-width:0;">
               <div style="font-weight:800;color:var(--color-navy);font-size:0.9rem;">${escH(s.receipt_number)}${cancelled ? ` <span class="badge-stock out-of-stock">${salesLabel("Cancelled", "Imeghairiwa")}</span>` : ""}</div>
               <div style="font-size:0.76rem;color:var(--color-muted);">${when} · ${escH(s.payment_method || "-")}${s.cashier ? " · " + escH(s.cashier) : ""}</div>
