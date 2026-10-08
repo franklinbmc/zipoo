@@ -39,7 +39,62 @@ function load_billing_admin(PDO $pdo): array
         'SELECT * FROM tbl_lipa_transactions ORDER BY id DESC LIMIT 100'
     )->fetchAll(PDO::FETCH_ASSOC);
 
-    return ['accounts' => $accounts, 'lipa_transactions' => $transactions];
+    $invoices = $pdo->query(
+        'SELECT i.*, a.account_name, u.full_name AS owner_name, u.phone AS owner_phone
+         FROM tbl_account_subscription_invoices i
+         LEFT JOIN tbl_billing_accounts a ON a.id = i.account_id
+         LEFT JOIN tbl_users u ON u.id = a.owner_user_id
+         ORDER BY i.id DESC LIMIT 100'
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+    $settings = [];
+    $stmt = $pdo->prepare('SELECT setting_key, setting_value FROM tbl_saas_settings WHERE setting_group = "lipa"');
+    $stmt->execute();
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $settings[$row['setting_key']] = $row['setting_value'];
+    }
+
+    $devices = $pdo->query(
+        'SELECT id, device_uuid, device_name, status, last_seen_at, created_at
+         FROM tbl_lipa_devices
+         ORDER BY id DESC'
+    )->fetchAll(PDO::FETCH_ASSOC);
+
+    return [
+        'accounts' => $accounts,
+        'invoices' => $invoices,
+        'lipa_transactions' => $transactions,
+        'lipa_settings' => $settings,
+        'lipa_devices' => $devices,
+    ];
+}
+
+function save_lipa_setting(PDO $pdo, string $key, string $value): void
+{
+    $stmt = $pdo->prepare(
+        'INSERT INTO tbl_saas_settings (setting_group, setting_key, setting_value, updated_at)
+         VALUES ("lipa", :setting_key, :setting_value, NOW())
+         ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()'
+    );
+    $stmt->execute([':setting_key' => $key, ':setting_value' => $value]);
+}
+
+function parse_lipa_numbers(string $value): string
+{
+    $numbers = [];
+    foreach (preg_split('/\R/', $value) ?: [] as $line) {
+        $line = trim($line);
+        if ($line === '') {
+            continue;
+        }
+        $parts = array_map('trim', explode('|', $line));
+        $numbers[] = [
+            'network' => $parts[0] ?? '',
+            'number' => $parts[1] ?? ($parts[0] ?? ''),
+            'name' => $parts[2] ?? '',
+        ];
+    }
+    return json_encode($numbers, JSON_UNESCAPED_SLASHES);
 }
 
 try {
@@ -138,6 +193,50 @@ try {
         $pdo->prepare('INSERT INTO tbl_account_sms_transactions (account_id, type, sms_count, balance_after, reference) VALUES (:aid, "adjustment", :count, :balance, :ref)')
             ->execute([':aid' => $accountId, ':count' => $count, ':balance' => $balance, ':ref' => $reference]);
         respond(200, ['ok' => true, 'message' => 'SMS wallet adjusted.'] + load_billing_admin($pdo));
+    }
+
+    if ($action === 'save_lipa_settings') {
+        save_lipa_setting($pdo, 'enabled', !empty($_POST['enabled']) ? '1' : '0');
+        save_lipa_setting($pdo, 'auto_approve', !empty($_POST['auto_approve']) ? '1' : '0');
+        save_lipa_setting($pdo, 'auto_approve_max', (string) max(0, (float) ($_POST['auto_approve_max'] ?? 0)));
+        save_lipa_setting($pdo, 'allowed_senders', trim((string) ($_POST['allowed_senders'] ?? '')));
+        save_lipa_setting($pdo, 'numbers', parse_lipa_numbers((string) ($_POST['numbers'] ?? '')));
+        respond(200, ['ok' => true, 'message' => 'Lipa settings saved.'] + load_billing_admin($pdo));
+    }
+
+    if ($action === 'create_lipa_device') {
+        $name = trim((string) ($_POST['device_name'] ?? 'Lipa SMS device'));
+        $uuid = bin2hex(random_bytes(16));
+        $token = bin2hex(random_bytes(32));
+        $pdo->prepare(
+            'INSERT INTO tbl_lipa_devices (device_uuid, device_name, token_hash, status)
+             VALUES (:uuid, :name, :token_hash, "active")'
+        )->execute([
+            ':uuid' => $uuid,
+            ':name' => $name !== '' ? $name : 'Lipa SMS device',
+            ':token_hash' => password_hash($token, PASSWORD_DEFAULT),
+        ]);
+        respond(201, ['ok' => true, 'message' => 'Device created. Copy this token now; it will not be shown again.', 'device_token' => $token] + load_billing_admin($pdo));
+    }
+
+    if ($action === 'revoke_lipa_device') {
+        $deviceId = (int) ($_POST['device_id'] ?? 0);
+        if ($deviceId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Choose a device.']);
+        }
+        $pdo->prepare('UPDATE tbl_lipa_devices SET status = "revoked", updated_at = NOW() WHERE id = :id')
+            ->execute([':id' => $deviceId]);
+        respond(200, ['ok' => true, 'message' => 'Device revoked.'] + load_billing_admin($pdo));
+    }
+
+    if ($action === 'ignore_lipa_transaction') {
+        $transactionId = (int) ($_POST['transaction_id'] ?? 0);
+        if ($transactionId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Choose a transaction.']);
+        }
+        $pdo->prepare('UPDATE tbl_lipa_transactions SET status = "ignored", notes = COALESCE(NULLIF(notes, ""), "Ignored by SaaS admin"), updated_at = NOW() WHERE id = :id')
+            ->execute([':id' => $transactionId]);
+        respond(200, ['ok' => true, 'message' => 'Transaction ignored.'] + load_billing_admin($pdo));
     }
 
     respond(400, ['ok' => false, 'message' => 'Unsupported billing action.']);

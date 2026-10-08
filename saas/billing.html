@@ -22,11 +22,11 @@
   <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
   <meta name="msapplication-config" content="/browserconfig.xml">
   <meta name="theme-color" content="#ffffff">
-  <title>Plans - Zipoo Admin</title>
+  <title>Billing - Zipoo Admin</title>
   <link rel="stylesheet" href="/assets/css/styles.css?v=143">
 </head>
 <body>
-  <div class="saas-admin-layout">
+  <div class="saas-admin-layout" data-saas-billing-page>
     <aside class="saas-sidebar">
       <div class="saas-sidebar-head">
         <a class="brand" href="/saas/dashboard"><span class="brand-mark">Z</span><span class="brand-name">Zipoo Admin</span></a>
@@ -36,38 +36,62 @@
         <a href="/saas/dashboard"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M80 220l176-140 176 140v212H304V304h-96v128H80z" /></svg><span>Dashboard</span></a>
         <a href="/saas/businesses"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 144l160-64 160 64-160 64zM96 144v224l160 64 160-64V144M256 208v224" /></svg><span>Businesses</span></a>
         <a href="/saas/users"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M176 240a72 72 0 1 0 0-144 72 72 0 0 0 0 144ZM64 432c16-80 72-128 112-128s96 48 112 128M352 224a56 56 0 1 0 0-112M320 304c48 8 84 48 96 112" /></svg><span>Users</span></a>
-        <a class="active" href="/saas/plans"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 160h320M128 96h256M128 224h256M160 288h192M192 352h128" /></svg><span>Plans</span></a>
-        <a href="/saas/billing"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 144h320v224H96zM96 208h320M160 304h80M304 304h48" /></svg><span>Billing</span></a>
+        <a href="/saas/plans"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 160h320M128 96h256M128 224h256M160 288h192M192 352h128" /></svg><span>Plans</span></a>
+        <a class="active" href="/saas/billing"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 144h320v224H96zM96 208h320M160 304h80M304 304h48" /></svg><span>Billing</span></a>
         <a href="/saas/settings"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 176a80 80 0 1 0 0 160 80 80 0 0 0 0-160ZM96 256h48M368 256h48M256 96v48M256 368v48M143 143l34 34M335 335l34 34M369 143l-34 34M177 335l-34 34" /></svg><span>System Settings</span></a>
+        <a href="#"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M128 96h256v320H128zM176 160h160M176 224h160M176 288h112" /></svg><span>Audit Logs</span></a>
       </nav>
     </aside>
     <main class="saas-content">
       <header class="saas-content-header">
-        <div><span class="eyebrow">Platform</span><h1>Plans</h1></div>
+        <div><span class="eyebrow">Platform</span><h1>Billing & Lipa Namba</h1></div>
         <div class="admin-actions"><button class="admin-icon-action" type="button" aria-label="Toggle dark mode" data-theme-toggle><svg class="theme-sun" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112V48M256 464v-64M400 256h64M48 256h64M358 154l45-45M109 403l45-45M358 358l45 45M109 109l45 45" /><circle cx="256" cy="256" r="82" /></svg><svg class="theme-moon" viewBox="0 0 512 512" aria-hidden="true" hidden><path d="M336 448c-102 0-184-82-184-184 0-76 46-141 112-169-8 24-9 50-2 76 22 83 107 132 190 110-12 95-93 167-116 167Z" /></svg></button><div class="admin-user-menu" data-admin-menu><button class="admin-avatar" type="button" aria-label="Open admin menu" aria-expanded="false" data-admin-menu-toggle>ZA</button><div class="admin-menu-panel" hidden data-admin-menu-panel><a href="#">My Profile</a><a href="#">Change Password</a><a href="/saas/settings">Settings</a><button type="button" data-saas-logout>Logout</button></div></div></div>
       </header>
 
+      <section class="saas-metrics-grid">
+        <article class="saas-metric"><span>Accounts</span><strong data-billing-metric="accounts">0</strong></article>
+        <article class="saas-metric"><span>Open invoices</span><strong data-billing-metric="open_invoices">0</strong></article>
+        <article class="saas-metric"><span>Pending Lipa</span><strong data-billing-metric="pending_lipa">0</strong></article>
+        <article class="saas-metric"><span>SMS balance</span><strong data-billing-metric="sms_balance">0</strong></article>
+      </section>
+
+      <p class="inline-status" hidden data-saas-billing-status></p>
+
       <section class="saas-table-wrap">
-        <div class="saas-section-head">
-          <h2>Plan Setup</h2>
-          <button class="btn btn-primary" type="button" data-new-plan>New Plan</button>
-        </div>
-        <form class="settings-form two-col plan-form" action="/api/saas-plans.php" method="post" data-plan-form>
-          <input type="hidden" name="plan_id">
-          <label><span>Plan Name</span><input type="text" name="plan_name" required></label>
-          <label><span>Monthly Price</span><input type="text" inputmode="decimal" name="monthly_price" value="0"></label>
-          <label><span>User Limit</span><input type="number" min="1" name="user_limit" value="1"></label>
-          <label><span>Business Limit</span><input type="number" min="1" name="business_limit" value="1"></label>
-          <label><span>Status</span><select class="css-formatted-select" name="status"><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
-          <label class="full-span"><span>Notes</span><input type="text" name="notes" placeholder="Short internal note"></label>
-          <p class="inline-status" hidden data-plan-status></p>
-          <button class="btn btn-primary" type="submit">Save Plan</button>
+        <div class="saas-section-head"><h2>Billing Accounts</h2></div>
+        <div class="admin-data-list" data-billing-accounts-list></div>
+      </section>
+
+      <section class="saas-table-wrap">
+        <div class="saas-section-head"><h2>Invoices</h2></div>
+        <div class="admin-data-list" data-billing-invoices-list></div>
+      </section>
+
+      <section class="saas-table-wrap">
+        <div class="saas-section-head"><h2>Lipa Settings</h2></div>
+        <form class="settings-form" data-lipa-settings-form>
+          <label><span>Enable Lipa payments</span><input type="checkbox" name="enabled" value="1"></label>
+          <label><span>Auto approve matched references</span><input type="checkbox" name="auto_approve" value="1"></label>
+          <label><span>Auto approval max amount</span><input name="auto_approve_max" type="number" min="0" step="1000" placeholder="0"></label>
+          <label><span>Allowed SMS senders</span><input name="allowed_senders" placeholder="M-PESA, TigoPesa, AirtelMoney"></label>
+          <label><span>Lipa numbers</span><textarea name="numbers" rows="4" placeholder="M-PESA | 123456 | Zipoo SaaS"></textarea></label>
+          <button type="submit">Save Lipa Settings</button>
         </form>
       </section>
 
       <section class="saas-table-wrap">
-        <div class="saas-section-head"><h2>Available Plans</h2></div>
-        <div class="plans-list" data-plans-list></div>
+        <div class="saas-section-head"><h2>Lipa SMS Devices</h2></div>
+        <form class="settings-form compact-settings-form" data-lipa-device-form>
+          <label><span>Device name</span><input name="device_name" placeholder="Office Android SMS bridge"></label>
+          <button type="submit">Create Device Token</button>
+        </form>
+        <p class="inline-status" hidden data-lipa-device-token></p>
+        <div class="admin-data-list" data-lipa-devices-list></div>
+      </section>
+
+      <section class="saas-table-wrap">
+        <div class="saas-section-head"><h2>Lipa Transactions</h2></div>
+        <div class="admin-data-list" data-lipa-transactions-list></div>
       </section>
     </main>
   </div>

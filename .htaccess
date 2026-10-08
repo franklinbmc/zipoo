@@ -36,6 +36,7 @@ AddType application/vnd.android.package-archive .apk
   RewriteRule ^saas/businesses/?$ saas/businesses.html [L]
   RewriteRule ^saas/users/?$ saas/users.html [L]
   RewriteRule ^saas/plans/?$ saas/plans.html [L]
+  RewriteRule ^saas/billing/?$ saas/billing.html [L]
   RewriteRule ^saas/settings/?$ saas/settings.html [L]
 
   # PWA fallback for client-side navigation.

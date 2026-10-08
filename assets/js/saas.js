@@ -293,6 +293,11 @@ const money = (value) => new Intl.NumberFormat("en-TZ", {
   maximumFractionDigits: 0,
 }).format(Number(value || 0));
 
+const textOrDash = (value) => {
+  const text = String(value ?? "").trim();
+  return text || "-";
+};
+
 const applyPlatformBrand = (platform = {}) => {
   if (platform.platform_icon) {
     document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"]').forEach((link) => {
@@ -607,6 +612,231 @@ const setupPlansPage = async () => {
   });
 };
 
+const setupSaasBillingPage = async () => {
+  const root = document.querySelector("[data-saas-billing-page]");
+  if (!root) return;
+
+  const endpoint = `${getBasePath()}api/saas-billing.php`;
+  const status = root.querySelector("[data-saas-billing-status]");
+  const accountsList = root.querySelector("[data-billing-accounts-list]");
+  const invoicesList = root.querySelector("[data-billing-invoices-list]");
+  const transactionsList = root.querySelector("[data-lipa-transactions-list]");
+  const devicesList = root.querySelector("[data-lipa-devices-list]");
+  const tokenBox = root.querySelector("[data-lipa-device-token]");
+
+  const setStatus = (message, isError = false) => {
+    if (!status) return;
+    status.hidden = false;
+    status.classList.toggle("error", isError);
+    status.textContent = message;
+  };
+
+  const postAction = async (body) => {
+    const response = await fetch(endpoint, { method: "POST", body });
+    const payload = await response.json();
+    if (!response.ok || !payload.ok) {
+      setStatus(payload.message || "Unable to save.", true);
+      return null;
+    }
+    setStatus(payload.message || "Saved.");
+    render(payload);
+    return payload;
+  };
+
+  const render = (payload) => {
+    const accounts = payload.accounts || [];
+    const invoices = payload.invoices || [];
+    const transactions = payload.lipa_transactions || [];
+    const devices = payload.lipa_devices || [];
+    const settings = payload.lipa_settings || {};
+
+    root.querySelector("[data-billing-metric='accounts']").textContent = accounts.length;
+    root.querySelector("[data-billing-metric='open_invoices']").textContent = invoices.filter((invoice) => ["pending_payment", "pending_review"].includes(invoice.status)).length;
+    root.querySelector("[data-billing-metric='pending_lipa']").textContent = transactions.filter((item) => item.status === "pending").length;
+    root.querySelector("[data-billing-metric='sms_balance']").textContent = money(accounts.reduce((total, item) => total + Number(item.sms_balance || 0), 0));
+
+    accountsList.replaceChildren(...accounts.map((account) => {
+      const row = document.createElement("article");
+      row.className = "admin-data-row";
+      row.innerHTML = `
+        <div><strong></strong><span></span></div>
+        <div><strong></strong><span></span></div>
+        <b></b>
+        <div class="admin-row-actions">
+          <button type="button" data-create-invoice="${account.id}">Invoice</button>
+          <button type="button" data-adjust-sms="${account.id}">Add SMS</button>
+        </div>
+      `;
+      const blocks = row.querySelectorAll("div");
+      blocks[0].querySelector("strong").textContent = account.account_name || `Account #${account.id}`;
+      blocks[0].querySelector("span").textContent = `${account.business_count || 0} businesses · ${account.plan_name || "No plan"}`;
+      blocks[1].querySelector("strong").textContent = textOrDash(account.owner_name);
+      blocks[1].querySelector("span").textContent = `${textOrDash(account.owner_phone)} · SMS ${money(account.sms_balance)}`;
+      row.querySelector("b").textContent = `${account.open_invoices || 0} open`;
+      return row;
+    }));
+
+    invoicesList.replaceChildren(...invoices.map((invoice) => {
+      const row = document.createElement("article");
+      row.className = "admin-data-row";
+      row.innerHTML = `
+        <div><strong></strong><span></span></div>
+        <div><strong></strong><span></span></div>
+        <b></b>
+        <div class="admin-row-actions"></div>
+      `;
+      row.querySelector("strong").textContent = invoice.invoice_number || `Invoice #${invoice.id}`;
+      row.querySelector("span").textContent = `${invoice.owner_name || invoice.account_name || "Account"} · ${invoice.due_date || ""}`;
+      row.querySelectorAll("strong")[1].textContent = `TZS ${money(invoice.amount)}`;
+      row.querySelectorAll("span")[1].textContent = invoice.payment_reference || "No reference yet";
+      row.querySelector("b").textContent = invoice.status || "pending";
+      if (invoice.status !== "paid") {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.confirmInvoice = invoice.id;
+        button.textContent = "Confirm";
+        row.querySelector(".admin-row-actions").appendChild(button);
+      }
+      return row;
+    }));
+
+    transactionsList.replaceChildren(...transactions.map((item) => {
+      const row = document.createElement("article");
+      row.className = "admin-data-row";
+      row.innerHTML = `
+        <div><strong></strong><span></span></div>
+        <div><strong></strong><span></span></div>
+        <b></b>
+        <div class="admin-row-actions"></div>
+      `;
+      row.querySelector("strong").textContent = item.reference || `Transaction #${item.id}`;
+      row.querySelector("span").textContent = `${item.sender || ""} · ${item.received_at || ""}`;
+      row.querySelectorAll("strong")[1].textContent = `TZS ${money(item.amount)}`;
+      row.querySelectorAll("span")[1].textContent = item.raw_message || item.notes || "";
+      row.querySelector("b").textContent = item.status || "pending";
+      if (!["matched", "ignored"].includes(item.status)) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.ignoreLipaTransaction = item.id;
+        button.textContent = "Ignore";
+        row.querySelector(".admin-row-actions").appendChild(button);
+      }
+      return row;
+    }));
+
+    devicesList.replaceChildren(...devices.map((device) => {
+      const row = document.createElement("article");
+      row.className = "admin-data-row";
+      row.innerHTML = `
+        <div><strong></strong><span></span></div>
+        <div><strong></strong><span></span></div>
+        <b></b>
+        <div class="admin-row-actions"></div>
+      `;
+      row.querySelector("strong").textContent = device.device_name || "Lipa SMS device";
+      row.querySelector("span").textContent = device.device_uuid || "";
+      row.querySelectorAll("strong")[1].textContent = device.last_seen_at ? `Last seen ${device.last_seen_at}` : "Not seen yet";
+      row.querySelectorAll("span")[1].textContent = device.created_at || "";
+      row.querySelector("b").textContent = device.status || "active";
+      if (device.status !== "revoked") {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.dataset.revokeLipaDevice = device.id;
+        button.textContent = "Revoke";
+        row.querySelector(".admin-row-actions").appendChild(button);
+      }
+      return row;
+    }));
+
+    const numbers = (() => {
+      try {
+        return (JSON.parse(settings.numbers || "[]") || []).map((item) => [item.network, item.number, item.name].filter(Boolean).join(" | ")).join("\n");
+      } catch {
+        return settings.numbers || "";
+      }
+    })();
+    const form = root.querySelector("[data-lipa-settings-form]");
+    if (form) {
+      form.enabled.checked = settings.enabled === "1";
+      form.auto_approve.checked = settings.auto_approve === "1";
+      form.auto_approve_max.value = settings.auto_approve_max || "0";
+      form.allowed_senders.value = settings.allowed_senders || "";
+      form.numbers.value = numbers;
+    }
+  };
+
+  const response = await fetch(endpoint);
+  if (response.status === 401) {
+    window.location.href = `${getBasePath()}saas/login`;
+    return;
+  }
+  const payload = await response.json();
+  if (response.ok && payload.ok) render(payload);
+
+  root.addEventListener("click", async (event) => {
+    const invoice = event.target.closest("[data-create-invoice]");
+    const confirm = event.target.closest("[data-confirm-invoice]");
+    const adjust = event.target.closest("[data-adjust-sms]");
+    const revoke = event.target.closest("[data-revoke-lipa-device]");
+    const ignore = event.target.closest("[data-ignore-lipa-transaction]");
+    const body = new FormData();
+
+    if (invoice) {
+      body.set("action", "create_invoice");
+      body.set("account_id", invoice.dataset.createInvoice);
+      await postAction(body);
+      return;
+    }
+    if (confirm) {
+      body.set("action", "confirm_invoice");
+      body.set("invoice_id", confirm.dataset.confirmInvoice);
+      await postAction(body);
+      return;
+    }
+    if (adjust) {
+      const count = window.prompt("SMS count to add or subtract", "100");
+      if (!count) return;
+      const reference = window.prompt("Reference", "SaaS SMS allocation") || "SaaS SMS allocation";
+      body.set("action", "adjust_sms");
+      body.set("account_id", adjust.dataset.adjustSms);
+      body.set("sms_count", count);
+      body.set("reference", reference);
+      await postAction(body);
+      return;
+    }
+    if (revoke) {
+      body.set("action", "revoke_lipa_device");
+      body.set("device_id", revoke.dataset.revokeLipaDevice);
+      await postAction(body);
+      return;
+    }
+    if (ignore) {
+      body.set("action", "ignore_lipa_transaction");
+      body.set("transaction_id", ignore.dataset.ignoreLipaTransaction);
+      await postAction(body);
+    }
+  });
+
+  root.querySelector("[data-lipa-settings-form]")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const body = new FormData(event.currentTarget);
+    body.set("action", "save_lipa_settings");
+    await postAction(body);
+  });
+
+  root.querySelector("[data-lipa-device-form]")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const body = new FormData(event.currentTarget);
+    body.set("action", "create_lipa_device");
+    const payload = await postAction(body);
+    if (payload?.device_token && tokenBox) {
+      tokenBox.hidden = false;
+      tokenBox.textContent = `Bearer token: ${payload.device_token}`;
+    }
+    event.currentTarget.reset();
+  });
+};
+
 const setupSaasLogout = () => {
   document.querySelector("[data-saas-logout]")?.addEventListener("click", async () => {
     await fetch(`${getBasePath()}api/saas-logout.php`, { method: "POST" });
@@ -890,6 +1120,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAdminListPage();
   setupSaasModals();
   setupPlansPage();
+  setupSaasBillingPage();
   setupSaasLogout();
   setupAdminMenu();
   setupNotifications();
