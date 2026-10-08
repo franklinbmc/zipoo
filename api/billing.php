@@ -98,9 +98,16 @@ function billing_payload(PDO $pdo, int $accountId): array
     $smsBalance = (int) ($walletStmt->fetchColumn() ?: 0);
 
     $bundles = $pdo->query('SELECT id, name, sms_count, price FROM tbl_sms_bundles WHERE status = "active" ORDER BY price ASC, sms_count ASC')->fetchAll(PDO::FETCH_ASSOC);
+    $plans = $pdo->query(
+        'SELECT id, plan_name, monthly_price, user_limit, business_limit, extra_business_price, included_sms, notes
+         FROM tbl_saas_plans
+         WHERE status = "active"
+         ORDER BY monthly_price ASC, id ASC'
+    )->fetchAll(PDO::FETCH_ASSOC);
 
     return [
         'subscription' => $subscription,
+        'plans' => $plans,
         'business_count' => $businessCount,
         'included_businesses' => $includedBusinesses,
         'extra_businesses' => $extraBusinesses,
@@ -143,6 +150,59 @@ try {
     }
 
     $action = trim((string) ($_POST['action'] ?? ''));
+    if ($action === 'choose_plan') {
+        $planId = (int) ($_POST['plan_id'] ?? 0);
+        if ($planId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Choose a package plan.']);
+        }
+        $planStmt = $pdo->prepare('SELECT * FROM tbl_saas_plans WHERE id = :id AND status = "active" LIMIT 1');
+        $planStmt->execute([':id' => $planId]);
+        $plan = $planStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$plan) {
+            respond(404, ['ok' => false, 'message' => 'Package plan not found.']);
+        }
+
+        $subscriptionId = ensure_account_subscription($pdo, $accountId);
+        $countStmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_account_businesses WHERE account_id = :aid');
+        $countStmt->execute([':aid' => $accountId]);
+        $businessCount = (int) $countStmt->fetchColumn();
+        $included = max(1, (int) ($plan['business_limit'] ?? 1));
+        $extra = max(0, $businessCount - $included);
+        $amount = (float) ($plan['monthly_price'] ?? 0) + ($extra * (float) ($plan['extra_business_price'] ?? 0));
+
+        $pdo->beginTransaction();
+        try {
+            $pdo->prepare(
+                'UPDATE tbl_account_subscriptions
+                 SET plan_id = :plan_id, updated_at = NOW()
+                 WHERE account_id = :aid'
+            )->execute([':plan_id' => $planId, ':aid' => $accountId]);
+
+            $pdo->prepare(
+                'INSERT INTO tbl_account_subscription_invoices
+                    (account_id, subscription_id, invoice_number, amount, businesses_count, extra_businesses_count, status, due_date, notes)
+                 VALUES
+                    (:aid, :sid, :invoice_number, :amount, :businesses_count, :extra_businesses_count, "pending_payment", CURDATE(), :notes)'
+            )->execute([
+                ':aid' => $accountId,
+                ':sid' => $subscriptionId,
+                ':invoice_number' => billing_generate_invoice_number($accountId),
+                ':amount' => $amount,
+                ':businesses_count' => $businessCount,
+                ':extra_businesses_count' => $extra,
+                ':notes' => 'Plan selected: ' . (string) $plan['plan_name'],
+            ]);
+            $pdo->commit();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        respond(200, ['ok' => true, 'message' => 'Plan selected and invoice issued.'] + billing_payload($pdo, $accountId));
+    }
+
     if ($action === 'submit_lipa_reference') {
         $invoiceId = (int) ($_POST['invoice_id'] ?? 0);
         $reference = lipa_normalize_reference((string) ($_POST['reference'] ?? ''));

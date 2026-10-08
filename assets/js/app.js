@@ -3353,6 +3353,8 @@ const setupBillingPage = () => {
   const businessesEl = document.querySelector("[data-billing-businesses]");
   const totalEl = document.querySelector("[data-billing-total]");
   const smsEl = document.querySelector("[data-billing-sms]");
+  const plansEl = document.querySelector("[data-billing-plans]");
+  const planStatus = document.querySelector("[data-billing-plan-status]");
   const lipaNumbersEl = document.querySelector("[data-lipa-numbers]");
   const invoicesEl = document.querySelector("[data-billing-invoices]");
   const pageError = document.querySelector("[data-billing-error]");
@@ -3372,6 +3374,15 @@ const setupBillingPage = () => {
     "'": "&#39;",
   }[char]));
   const badgeClass = (status) => status === "paid" ? "approved" : (status === "pending_review" ? "pending" : "rejected");
+  const planTotal = (plan, businessCount) => {
+    const included = Math.max(1, Number(plan.business_limit || 1));
+    const extra = Math.max(0, Number(businessCount || 0) - included);
+    return {
+      included,
+      extra,
+      amount: Number(plan.monthly_price || 0) + (extra * Number(plan.extra_business_price || 0)),
+    };
+  };
 
   const openReferenceModal = (invoiceId) => {
     if (invoiceInput) invoiceInput.value = String(invoiceId);
@@ -3393,6 +3404,37 @@ const setupBillingPage = () => {
     if (businessesEl) businessesEl.textContent = `${data.business_count || 0} total • ${data.extra_businesses || 0} extra`;
     if (totalEl) totalEl.textContent = money(data.estimated_monthly_total);
     if (smsEl) smsEl.textContent = `${Number(data.sms_balance || 0).toLocaleString("en-US")} SMS`;
+
+    const plans = Array.isArray(data.plans) ? data.plans : [];
+    plansEl?.replaceChildren(...(plans.length ? plans.map((plan) => {
+      const current = String(plan.id) === String(sub.plan_id || "");
+      const calc = planTotal(plan, data.business_count);
+      const row = document.createElement("div");
+      row.className = "settings-list-row";
+      row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;";
+      const left = document.createElement("div");
+      left.style.minWidth = "0";
+      left.innerHTML = `<strong style="display:block;color:var(--color-navy);font-size:0.92rem;">${escapeHtml(plan.plan_name || "Plan")}</strong><small style="display:block;color:var(--color-muted);font-size:0.76rem;margin-top:3px;">Includes ${Number(plan.business_limit || 1)} businesses • ${calc.extra} extra • ${Number(plan.included_sms || 0).toLocaleString("en-US")} SMS</small>`;
+      const right = document.createElement("div");
+      right.style.cssText = "display:flex;align-items:center;gap:8px;flex:0 0 auto;";
+      const amount = document.createElement("strong");
+      amount.style.cssText = "color:var(--color-navy);white-space:nowrap;font-size:0.9rem;";
+      amount.textContent = money(calc.amount);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = current ? "btn btn-outline btn-sm" : "btn btn-primary btn-sm";
+      btn.dataset.billingChoosePlan = plan.id;
+      btn.disabled = current;
+      btn.textContent = current ? "Current" : "Choose";
+      right.append(amount, btn);
+      row.append(left, right);
+      return row;
+    }) : [(() => {
+      const empty = document.createElement("p");
+      empty.className = "settings-subcard-desc";
+      empty.textContent = "No active package plans have been configured yet.";
+      return empty;
+    })()]));
 
     const lipaNumbers = Array.isArray(data.lipa_numbers) ? data.lipa_numbers : [];
     lipaNumbersEl?.replaceChildren(...(lipaNumbers.length ? lipaNumbers.map((item) => {
@@ -3441,6 +3483,36 @@ const setupBillingPage = () => {
       return empty;
     })()]));
   };
+
+  plansEl?.addEventListener("click", async (event) => {
+    const button = event.target.closest("[data-billing-choose-plan]");
+    if (!button) return;
+    if (planStatus) {
+      planStatus.hidden = false;
+      planStatus.classList.remove("error");
+      planStatus.textContent = "Saving...";
+    }
+    button.disabled = true;
+    try {
+      const body = new FormData();
+      body.set("action", "choose_plan");
+      body.set("plan_id", button.dataset.billingChoosePlan);
+      const res = await fetch(`${getBasePath()}api/billing.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Unable to choose plan.");
+      render(data);
+      if (planStatus) {
+        planStatus.classList.remove("error");
+        planStatus.textContent = data.message || "Plan selected.";
+      }
+    } catch (err) {
+      button.disabled = false;
+      if (planStatus) {
+        planStatus.classList.add("error");
+        planStatus.textContent = err.message || "Unable to choose plan.";
+      }
+    }
+  });
 
   const load = async () => {
     try {
