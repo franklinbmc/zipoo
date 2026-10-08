@@ -3169,7 +3169,9 @@ body.offline .status-dot {
 .saas-admin-layout {
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
+  height: 100svh;
   min-height: 100svh;
+  overflow: hidden;
 }
 
 .saas-admin-layout.sidebar-collapsed {
@@ -3287,7 +3289,11 @@ body.offline .status-dot {
   align-content: start;
   gap: 20px;
   min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: 22px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .saas-content-header,
@@ -3306,6 +3312,23 @@ body.offline .status-dot {
 .saas-content-header h1 {
   margin: 0;
   font-size: 1.85rem;
+}
+
+.saas-billing-tabs {
+  display: grid;
+  gap: 14px;
+}
+
+.saas-billing-tabs .tab-list {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.saas-billing-tabs .tab-list button {
+  flex: 0 0 auto;
 }
 
 .saas-metrics {

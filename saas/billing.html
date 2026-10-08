@@ -23,7 +23,7 @@
   <meta name="msapplication-config" content="/browserconfig.xml">
   <meta name="theme-color" content="#ffffff">
   <title>Billing - Zipoo Admin</title>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=143">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=150">
 </head>
 <body>
   <div class="saas-admin-layout" data-saas-billing-page>
@@ -57,41 +57,51 @@
 
       <p class="inline-status" hidden data-saas-billing-status></p>
 
-      <section class="saas-table-wrap">
-        <div class="saas-section-head"><h2>Billing Accounts</h2></div>
-        <div class="admin-data-list" data-billing-accounts-list></div>
-      </section>
+      <section class="settings-tabs saas-billing-tabs" data-settings-tabs>
+        <div class="tab-list" role="tablist" aria-label="Billing sections">
+          <button class="active" type="button" data-tab-target="accounts">Accounts</button>
+          <button type="button" data-tab-target="invoices">Invoices</button>
+          <button type="button" data-tab-target="lipa">Lipa Settings</button>
+          <button type="button" data-tab-target="devices">Devices</button>
+          <button type="button" data-tab-target="transactions">Transactions</button>
+        </div>
 
-      <section class="saas-table-wrap">
-        <div class="saas-section-head"><h2>Invoices</h2></div>
-        <div class="admin-data-list" data-billing-invoices-list></div>
-      </section>
+        <section class="saas-table-wrap active" data-tab-panel="accounts">
+          <div class="saas-section-head"><h2>Billing Accounts</h2></div>
+          <div class="admin-data-list" data-billing-accounts-list></div>
+        </section>
 
-      <section class="saas-table-wrap">
-        <div class="saas-section-head"><h2>Lipa Settings</h2></div>
-        <form class="settings-form" data-lipa-settings-form>
-          <label><span>Enable Lipa payments</span><input type="checkbox" name="enabled" value="1"></label>
-          <label><span>Auto approve matched references</span><input type="checkbox" name="auto_approve" value="1"></label>
-          <label><span>Auto approval max amount</span><input name="auto_approve_max" type="number" min="0" step="1000" placeholder="0"></label>
-          <label><span>Allowed SMS senders</span><input name="allowed_senders" placeholder="M-PESA, TigoPesa, AirtelMoney"></label>
-          <label><span>Lipa numbers</span><textarea name="numbers" rows="4" placeholder="M-PESA | 123456 | Zipoo SaaS"></textarea></label>
-          <button type="submit">Save Lipa Settings</button>
-        </form>
-      </section>
+        <section class="saas-table-wrap" hidden data-tab-panel="invoices">
+          <div class="saas-section-head"><h2>Invoices</h2></div>
+          <div class="admin-data-list" data-billing-invoices-list></div>
+        </section>
 
-      <section class="saas-table-wrap">
-        <div class="saas-section-head"><h2>Lipa SMS Devices</h2></div>
-        <form class="settings-form compact-settings-form" data-lipa-device-form>
-          <label><span>Device name</span><input name="device_name" placeholder="Office Android SMS bridge"></label>
-          <button type="submit">Create Device Token</button>
-        </form>
-        <p class="inline-status" hidden data-lipa-device-token></p>
-        <div class="admin-data-list" data-lipa-devices-list></div>
-      </section>
+        <section class="saas-table-wrap" hidden data-tab-panel="lipa">
+          <div class="saas-section-head"><h2>Lipa Settings</h2></div>
+          <form class="settings-form" data-lipa-settings-form>
+            <label><span>Enable Lipa payments</span><input type="checkbox" name="enabled" value="1"></label>
+            <label><span>Auto approve matched references</span><input type="checkbox" name="auto_approve" value="1"></label>
+            <label><span>Auto approval max amount</span><input name="auto_approve_max" type="number" min="0" step="1000" placeholder="0"></label>
+            <label><span>Allowed SMS senders</span><input name="allowed_senders" placeholder="M-PESA, TigoPesa, AirtelMoney"></label>
+            <label><span>Lipa numbers</span><textarea name="numbers" rows="4" placeholder="M-PESA | 123456 | Zipoo SaaS"></textarea></label>
+            <button type="submit">Save Lipa Settings</button>
+          </form>
+        </section>
 
-      <section class="saas-table-wrap">
-        <div class="saas-section-head"><h2>Lipa Transactions</h2></div>
-        <div class="admin-data-list" data-lipa-transactions-list></div>
+        <section class="saas-table-wrap" hidden data-tab-panel="devices">
+          <div class="saas-section-head"><h2>Lipa SMS Devices</h2></div>
+          <form class="settings-form compact-settings-form" data-lipa-device-form>
+            <label><span>Device name</span><input name="device_name" placeholder="Office Android SMS bridge"></label>
+            <button type="submit">Create Device Token</button>
+          </form>
+          <p class="inline-status" hidden data-lipa-device-token></p>
+          <div class="admin-data-list" data-lipa-devices-list></div>
+        </section>
+
+        <section class="saas-table-wrap" hidden data-tab-panel="transactions">
+          <div class="saas-section-head"><h2>Lipa Transactions</h2></div>
+          <div class="admin-data-list" data-lipa-transactions-list></div>
+        </section>
       </section>
     </main>
   </div>
