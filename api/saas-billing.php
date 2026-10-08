@@ -117,7 +117,7 @@ try {
         }
         ensure_account_subscription($pdo, $accountId);
         $stmt = $pdo->prepare(
-            'SELECT s.id AS subscription_id, p.monthly_price, p.business_limit, p.extra_business_price
+            'SELECT s.id AS subscription_id, s.businesses_paid_count, p.monthly_price, p.business_limit, p.extra_business_price
              FROM tbl_account_subscriptions s
              LEFT JOIN tbl_saas_plans p ON p.id = s.plan_id
              WHERE s.account_id = :aid LIMIT 1'
@@ -127,8 +127,9 @@ try {
         $countStmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_account_businesses WHERE account_id = :aid');
         $countStmt->execute([':aid' => $accountId]);
         $businessCount = (int) $countStmt->fetchColumn();
+        $paidBusinesses = max(1, (int) ($sub['businesses_paid_count'] ?? $businessCount ?: 1));
         $included = max(1, (int) ($sub['business_limit'] ?? 1));
-        $extra = max(0, $businessCount - $included);
+        $extra = max(0, $paidBusinesses - $included);
         $amount = (float) ($sub['monthly_price'] ?? 0) + ($extra * (float) ($sub['extra_business_price'] ?? 0));
         $pdo->prepare(
             'INSERT INTO tbl_account_subscription_invoices
@@ -140,7 +141,7 @@ try {
             ':sid' => $sub['subscription_id'] ?? null,
             ':invoice_number' => billing_generate_invoice_number($accountId),
             ':amount' => $amount,
-            ':businesses_count' => $businessCount,
+            ':businesses_count' => $paidBusinesses,
             ':extra_businesses_count' => $extra,
         ]);
         respond(201, ['ok' => true, 'message' => 'Invoice created.'] + load_billing_admin($pdo));
@@ -174,6 +175,35 @@ try {
         $pdo->prepare('UPDATE tbl_account_subscriptions SET status = "active", current_period_start = CURDATE(), current_period_end = DATE_ADD(CURDATE(), INTERVAL 30 DAY), next_due_date = DATE_ADD(CURDATE(), INTERVAL 30 DAY), grace_until = DATE_ADD(CURDATE(), INTERVAL 37 DAY), updated_at = NOW() WHERE account_id = :aid')
             ->execute([':aid' => $invoice['account_id']]);
         respond(200, ['ok' => true, 'message' => 'Invoice confirmed.'] + load_billing_admin($pdo));
+    }
+
+    if ($action === 'delete_invoice') {
+        $invoiceId = (int) ($_POST['invoice_id'] ?? 0);
+        if ($invoiceId <= 0) {
+            respond(422, ['ok' => false, 'message' => 'Choose an invoice.']);
+        }
+        $stmt = $pdo->prepare('SELECT * FROM tbl_account_subscription_invoices WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $invoiceId]);
+        $invoice = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$invoice) {
+            respond(404, ['ok' => false, 'message' => 'Invoice not found.']);
+        }
+        $pdo->beginTransaction();
+        try {
+            $pdo->prepare('UPDATE tbl_lipa_transactions SET invoice_id = NULL, status = IF(status = "matched", "review", status), updated_at = NOW() WHERE invoice_id = :id')
+                ->execute([':id' => $invoiceId]);
+            $pdo->prepare('DELETE FROM tbl_account_payments WHERE invoice_id = :id')
+                ->execute([':id' => $invoiceId]);
+            $pdo->prepare('DELETE FROM tbl_account_subscription_invoices WHERE id = :id')
+                ->execute([':id' => $invoiceId]);
+            $pdo->commit();
+        } catch (Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+        respond(200, ['ok' => true, 'message' => 'Invoice deleted.'] + load_billing_admin($pdo));
     }
 
     if ($action === 'adjust_sms') {

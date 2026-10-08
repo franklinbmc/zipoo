@@ -697,6 +697,11 @@ const setupSaasBillingPage = async () => {
         button.textContent = "Confirm";
         row.querySelector(".admin-row-actions").appendChild(button);
       }
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.dataset.deleteInvoice = invoice.id;
+      deleteButton.textContent = "Delete";
+      row.querySelector(".admin-row-actions").appendChild(deleteButton);
       return row;
     }));
 
@@ -777,6 +782,7 @@ const setupSaasBillingPage = async () => {
     const invoice = event.target.closest("[data-create-invoice]");
     const confirm = event.target.closest("[data-confirm-invoice]");
     const adjust = event.target.closest("[data-adjust-sms]");
+    const deleteInvoice = event.target.closest("[data-delete-invoice]");
     const revoke = event.target.closest("[data-revoke-lipa-device]");
     const ignore = event.target.closest("[data-ignore-lipa-transaction]");
     const body = new FormData();
@@ -790,6 +796,13 @@ const setupSaasBillingPage = async () => {
     if (confirm) {
       body.set("action", "confirm_invoice");
       body.set("invoice_id", confirm.dataset.confirmInvoice);
+      await postAction(body);
+      return;
+    }
+    if (deleteInvoice) {
+      if (!window.confirm("Delete this invoice? Paid invoices and their payment record will also be removed.")) return;
+      body.set("action", "delete_invoice");
+      body.set("invoice_id", deleteInvoice.dataset.deleteInvoice);
       await postAction(body);
       return;
     }

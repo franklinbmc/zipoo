@@ -78,8 +78,9 @@ function billing_payload(PDO $pdo, int $accountId): array
     $businessCountStmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_account_businesses WHERE account_id = :aid');
     $businessCountStmt->execute([':aid' => $accountId]);
     $businessCount = (int) $businessCountStmt->fetchColumn();
+    $paidBusinesses = max(1, (int) ($subscription['businesses_paid_count'] ?? $businessCount ?: 1));
     $includedBusinesses = max(1, (int) ($subscription['business_limit'] ?? 1));
-    $extraBusinesses = max(0, $businessCount - $includedBusinesses);
+    $extraBusinesses = max(0, $paidBusinesses - $includedBusinesses);
     $monthlyPrice = (float) ($subscription['monthly_price'] ?? 0);
     $extraPrice = (float) ($subscription['extra_business_price'] ?? 0);
     $estimatedTotal = $monthlyPrice + ($extraBusinesses * $extraPrice);
@@ -109,6 +110,7 @@ function billing_payload(PDO $pdo, int $accountId): array
         'subscription' => $subscription,
         'plans' => $plans,
         'business_count' => $businessCount,
+        'paid_businesses_count' => $paidBusinesses,
         'included_businesses' => $includedBusinesses,
         'extra_businesses' => $extraBusinesses,
         'estimated_monthly_total' => $estimatedTotal,
@@ -152,6 +154,7 @@ try {
     $action = trim((string) ($_POST['action'] ?? ''));
     if ($action === 'choose_plan') {
         $planId = (int) ($_POST['plan_id'] ?? 0);
+        $paidBusinesses = max(1, (int) ($_POST['paid_businesses_count'] ?? 1));
         if ($planId <= 0) {
             respond(422, ['ok' => false, 'message' => 'Choose a package plan.']);
         }
@@ -166,17 +169,20 @@ try {
         $countStmt = $pdo->prepare('SELECT COUNT(*) FROM tbl_account_businesses WHERE account_id = :aid');
         $countStmt->execute([':aid' => $accountId]);
         $businessCount = (int) $countStmt->fetchColumn();
+        if ($businessCount > 0 && $paidBusinesses > $businessCount) {
+            respond(422, ['ok' => false, 'message' => 'Paid businesses cannot exceed the businesses associated with this account.']);
+        }
         $included = max(1, (int) ($plan['business_limit'] ?? 1));
-        $extra = max(0, $businessCount - $included);
+        $extra = max(0, $paidBusinesses - $included);
         $amount = (float) ($plan['monthly_price'] ?? 0) + ($extra * (float) ($plan['extra_business_price'] ?? 0));
 
         $pdo->beginTransaction();
         try {
             $pdo->prepare(
                 'UPDATE tbl_account_subscriptions
-                 SET plan_id = :plan_id, updated_at = NOW()
+                 SET plan_id = :plan_id, businesses_paid_count = :paid_businesses_count, updated_at = NOW()
                  WHERE account_id = :aid'
-            )->execute([':plan_id' => $planId, ':aid' => $accountId]);
+            )->execute([':plan_id' => $planId, ':paid_businesses_count' => $paidBusinesses, ':aid' => $accountId]);
 
             $pdo->prepare(
                 'INSERT INTO tbl_account_subscription_invoices
@@ -188,9 +194,9 @@ try {
                 ':sid' => $subscriptionId,
                 ':invoice_number' => billing_generate_invoice_number($accountId),
                 ':amount' => $amount,
-                ':businesses_count' => $businessCount,
+                ':businesses_count' => $paidBusinesses,
                 ':extra_businesses_count' => $extra,
-                ':notes' => 'Plan selected: ' . (string) $plan['plan_name'],
+                ':notes' => 'Plan selected: ' . (string) $plan['plan_name'] . '. Associated businesses: ' . $businessCount . '. Paid businesses: ' . $paidBusinesses . '.',
             ]);
             $pdo->commit();
         } catch (Throwable $e) {

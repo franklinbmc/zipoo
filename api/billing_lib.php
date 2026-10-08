@@ -110,6 +110,7 @@ function ensure_billing_tables(PDO $pdo): void
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             account_id BIGINT UNSIGNED NOT NULL UNIQUE,
             plan_id BIGINT UNSIGNED NULL,
+            businesses_paid_count INT UNSIGNED NULL,
             status ENUM("trial","active","grace","suspended","cancelled") NOT NULL DEFAULT "trial",
             current_period_start DATE NULL,
             current_period_end DATE NULL,
@@ -121,6 +122,10 @@ function ensure_billing_tables(PDO $pdo): void
             KEY idx_plan (plan_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci'
     );
+    $paidBusinesses = $pdo->query("SHOW COLUMNS FROM tbl_account_subscriptions LIKE 'businesses_paid_count'")->fetchAll();
+    if (empty($paidBusinesses)) {
+        $pdo->exec("ALTER TABLE tbl_account_subscriptions ADD COLUMN businesses_paid_count INT UNSIGNED NULL AFTER plan_id");
+    }
 
     $pdo->exec(
         'CREATE TABLE IF NOT EXISTS tbl_account_subscription_invoices (

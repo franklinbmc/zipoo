@@ -25,12 +25,16 @@
     <main class="customers-page" data-billing-page>
       <section class="settings-list flush-list" style="display:grid;gap:10px;">
         <div class="settings-list-row field-display-row">
-          <span>Plan</span>
+          <span>Current plan</span>
           <strong data-billing-plan>-</strong>
         </div>
         <div class="settings-list-row field-display-row">
-          <span>Businesses</span>
+          <span>Associated businesses</span>
           <strong data-billing-businesses>-</strong>
+        </div>
+        <div class="settings-list-row field-display-row">
+          <span>Businesses paid for</span>
+          <strong data-billing-paid-businesses>-</strong>
         </div>
         <div class="settings-list-row field-display-row">
           <span>Monthly estimate</span>
@@ -45,6 +49,10 @@
       <section class="settings-subcard" style="margin-top:14px;">
         <h2 class="settings-subcard-title">Choose Package Plan</h2>
         <p class="settings-subcard-desc">Zipoo detects all businesses under this account. If your businesses exceed the plan limit, the extra business price is added automatically.</p>
+        <label class="form-field" style="margin-top:12px;">
+          <span>Businesses to pay for</span>
+          <input type="number" min="1" step="1" data-billing-paid-business-input>
+        </label>
         <p class="inline-status" hidden data-billing-plan-status></p>
         <div data-billing-plans style="display:grid;gap:8px;margin-top:12px;"></div>
       </section>
@@ -93,6 +101,6 @@
       <button class="btn btn-primary full" type="button" data-app-modal-ok>OK</button>
     </section>
   </div>
-  <script src="/assets/js/app.js?v=154" defer></script>
+  <script src="/assets/js/app.js?v=155" defer></script>
 </body>
 </html>

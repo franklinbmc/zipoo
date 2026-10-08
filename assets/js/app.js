@@ -3351,9 +3351,11 @@ const setupBillingPage = () => {
 
   const planEl = document.querySelector("[data-billing-plan]");
   const businessesEl = document.querySelector("[data-billing-businesses]");
+  const paidBusinessesEl = document.querySelector("[data-billing-paid-businesses]");
   const totalEl = document.querySelector("[data-billing-total]");
   const smsEl = document.querySelector("[data-billing-sms]");
   const plansEl = document.querySelector("[data-billing-plans]");
+  const paidBusinessInput = document.querySelector("[data-billing-paid-business-input]");
   const planStatus = document.querySelector("[data-billing-plan-status]");
   const lipaNumbersEl = document.querySelector("[data-lipa-numbers]");
   const invoicesEl = document.querySelector("[data-billing-invoices]");
@@ -3374,9 +3376,15 @@ const setupBillingPage = () => {
     "'": "&#39;",
   }[char]));
   const badgeClass = (status) => status === "paid" ? "approved" : (status === "pending_review" ? "pending" : "rejected");
-  const planTotal = (plan, businessCount) => {
+  let billingState = {};
+  const getPaidBusinessCount = () => {
+    const associated = Math.max(1, Number(billingState.business_count || 1));
+    const value = Math.max(1, Number(paidBusinessInput?.value || billingState.paid_businesses_count || associated));
+    return Math.min(value, associated);
+  };
+  const planTotal = (plan, paidBusinessCount) => {
     const included = Math.max(1, Number(plan.business_limit || 1));
-    const extra = Math.max(0, Number(businessCount || 0) - included);
+    const extra = Math.max(0, Number(paidBusinessCount || 0) - included);
     return {
       included,
       extra,
@@ -3399,22 +3407,29 @@ const setupBillingPage = () => {
   };
 
   const render = (data) => {
+    billingState = data || {};
     const sub = data.subscription || {};
     if (planEl) planEl.textContent = sub.plan_name || "-";
-    if (businessesEl) businessesEl.textContent = `${data.business_count || 0} total • ${data.extra_businesses || 0} extra`;
+    if (businessesEl) businessesEl.textContent = `${data.business_count || 0} associated`;
+    if (paidBusinessesEl) paidBusinessesEl.textContent = `${data.paid_businesses_count || 1} paid • ${data.extra_businesses || 0} extra`;
     if (totalEl) totalEl.textContent = money(data.estimated_monthly_total);
     if (smsEl) smsEl.textContent = `${Number(data.sms_balance || 0).toLocaleString("en-US")} SMS`;
+    if (paidBusinessInput) {
+      paidBusinessInput.max = String(Math.max(1, Number(data.business_count || 1)));
+      paidBusinessInput.value = String(data.paid_businesses_count || data.business_count || 1);
+    }
 
     const plans = Array.isArray(data.plans) ? data.plans : [];
     plansEl?.replaceChildren(...(plans.length ? plans.map((plan) => {
       const current = String(plan.id) === String(sub.plan_id || "");
-      const calc = planTotal(plan, data.business_count);
+      const paidCount = getPaidBusinessCount();
+      const calc = planTotal(plan, paidCount);
       const row = document.createElement("div");
       row.className = "settings-list-row";
       row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;";
       const left = document.createElement("div");
       left.style.minWidth = "0";
-      left.innerHTML = `<strong style="display:block;color:var(--color-navy);font-size:0.92rem;">${escapeHtml(plan.plan_name || "Plan")}</strong><small style="display:block;color:var(--color-muted);font-size:0.76rem;margin-top:3px;">Includes ${Number(plan.business_limit || 1)} businesses • ${calc.extra} extra • ${Number(plan.included_sms || 0).toLocaleString("en-US")} SMS</small>`;
+      left.innerHTML = `<strong style="display:block;color:var(--color-navy);font-size:0.92rem;">${escapeHtml(plan.plan_name || "Plan")}</strong><small style="display:block;color:var(--color-muted);font-size:0.76rem;margin-top:3px;">Paying for ${paidCount} of ${Number(data.business_count || 0)} associated businesses • includes ${Number(plan.business_limit || 1)} • ${calc.extra} extra • ${Number(plan.included_sms || 0).toLocaleString("en-US")} SMS</small>`;
       const right = document.createElement("div");
       right.style.cssText = "display:flex;align-items:center;gap:8px;flex:0 0 auto;";
       const amount = document.createElement("strong");
@@ -3424,8 +3439,7 @@ const setupBillingPage = () => {
       btn.type = "button";
       btn.className = current ? "btn btn-outline btn-sm" : "btn btn-primary btn-sm";
       btn.dataset.billingChoosePlan = plan.id;
-      btn.disabled = current;
-      btn.textContent = current ? "Current" : "Choose";
+      btn.textContent = current ? "Update" : "Choose";
       right.append(amount, btn);
       row.append(left, right);
       return row;
@@ -3484,6 +3498,10 @@ const setupBillingPage = () => {
     })()]));
   };
 
+  paidBusinessInput?.addEventListener("input", () => {
+    if (billingState?.plans) render(billingState);
+  });
+
   plansEl?.addEventListener("click", async (event) => {
     const button = event.target.closest("[data-billing-choose-plan]");
     if (!button) return;
@@ -3497,6 +3515,7 @@ const setupBillingPage = () => {
       const body = new FormData();
       body.set("action", "choose_plan");
       body.set("plan_id", button.dataset.billingChoosePlan);
+      body.set("paid_businesses_count", String(getPaidBusinessCount()));
       const res = await fetch(`${getBasePath()}api/billing.php`, { method: "POST", body });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.message || "Unable to choose plan.");
