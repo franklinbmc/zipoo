@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/permissions_lib.php';
+require_once __DIR__ . '/uploaded_files_lib.php';
 
 session_start();
 
@@ -133,7 +134,7 @@ function validate_user_fields(string $phone, string $email, float $monthlySalary
     }
 }
 
-function upload_user_photo(string $field): ?string
+function upload_user_photo(PDO $pdo, int $businessId, int $userId, string $field): ?string
 {
     if (empty($_FILES[$field]) || ($_FILES[$field]['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
         return null;
@@ -168,7 +169,17 @@ function upload_user_photo(string $field): ?string
         respond(500, ['ok' => false, 'message' => 'Unable to save user photo.']);
     }
 
-    return '/uploads/users/' . $filename;
+    return save_uploaded_image_file(
+        $pdo,
+        $target,
+        (string) ($_FILES[$field]['name'] ?? ''),
+        $mime,
+        $allowed[$mime],
+        'users',
+        $businessId,
+        $userId,
+        '/uploads/users/' . $filename
+    );
 }
 
 function user_payload(array $row, int $ownerId): array
@@ -284,7 +295,7 @@ try {
         $nida = trim((string) ($_POST['nida'] ?? ''));
         $nssf = trim((string) ($_POST['nssf'] ?? ''));
         $heslb = trim((string) ($_POST['heslb'] ?? ''));
-        $photoPath = upload_user_photo('photo');
+        $photoPath = upload_user_photo($pdo, $businessId, $currentUserId, 'photo');
         $password = (string) ($_POST['password'] ?? '');
 
         if ($fullName === '') {
@@ -372,7 +383,7 @@ try {
         $nida = trim((string) ($_POST['nida'] ?? ''));
         $nssf = trim((string) ($_POST['nssf'] ?? ''));
         $heslb = trim((string) ($_POST['heslb'] ?? ''));
-        $photoPath = upload_user_photo('photo');
+        $photoPath = upload_user_photo($pdo, $businessId, $currentUserId, 'photo');
         $password = (string) ($_POST['password'] ?? '');
 
         if ($targetUserId <= 0) {
