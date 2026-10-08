@@ -4747,6 +4747,22 @@ button.settings-list-row:focus-visible {
   overflow: auto;
 }
 
+.billing-page-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.billing-page-shell .customers-page {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+}
+
 .customers-page {
   display: grid;
   align-content: start;
