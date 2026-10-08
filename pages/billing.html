@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <title>Billing & SMS Wallet - Zipoo</title>
+  <link rel="stylesheet" href="/assets/css/styles.css?v=149">
+  <script src="/assets/js/offline.js?v=3"></script>
+</head>
+<body>
+  <div class="app-shell customers-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/settings" aria-label="Back to settings">
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+      </a>
+      <h1>Billing & SMS Wallet</h1>
+      <span class="topbar-spacer" aria-hidden="true"></span>
+    </header>
+    <main class="customers-page" data-billing-page>
+      <section class="settings-list flush-list" style="display:grid;gap:10px;">
+        <div class="settings-list-row field-display-row">
+          <span>Plan</span>
+          <strong data-billing-plan>-</strong>
+        </div>
+        <div class="settings-list-row field-display-row">
+          <span>Businesses</span>
+          <strong data-billing-businesses>-</strong>
+        </div>
+        <div class="settings-list-row field-display-row">
+          <span>Monthly estimate</span>
+          <strong data-billing-total>-</strong>
+        </div>
+        <div class="settings-list-row field-display-row">
+          <span>SMS balance</span>
+          <strong data-billing-sms>-</strong>
+        </div>
+      </section>
+
+      <section class="settings-subcard" style="margin-top:14px;">
+        <h2 class="settings-subcard-title">Lipa Namba Pay</h2>
+        <p class="settings-subcard-desc">Pay to one of the Zipoo Lipa numbers, then enter the transaction reference from your mobile-money SMS.</p>
+        <div data-lipa-numbers style="display:grid;gap:8px;margin-top:12px;"></div>
+      </section>
+
+      <section class="settings-subcard" style="margin-top:14px;">
+        <h2 class="settings-subcard-title">Invoices</h2>
+        <div data-billing-invoices style="display:grid;gap:8px;margin-top:12px;"></div>
+      </section>
+
+      <p class="inline-error" hidden data-billing-error></p>
+    </main>
+  </div>
+
+  <div class="fullscreen-modal" hidden data-billing-reference-modal>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true" aria-labelledby="billing-reference-title">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-billing-reference-close aria-label="Close">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+        <h2 id="billing-reference-title">Submit Payment Reference</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <form class="fullscreen-body" data-billing-reference-form>
+        <input type="hidden" name="invoice_id" data-billing-reference-invoice>
+        <label class="form-field">
+          <span>Lipa Namba reference</span>
+          <input type="text" name="reference" placeholder="e.g. QJ12345ABC" autocomplete="off" required>
+        </label>
+        <p class="inline-error" hidden data-billing-reference-error></p>
+        <button class="btn btn-primary full" type="submit" data-billing-reference-submit>Submit Reference</button>
+      </form>
+    </section>
+  </div>
+
+  <div class="fullscreen-modal" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <button class="app-modal-close" type="button" data-app-modal-close aria-label="Close"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg></button>
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-ok>OK</button>
+    </section>
+  </div>
+  <script src="/assets/js/app.js?v=152" defer></script>
+</body>
+</html>

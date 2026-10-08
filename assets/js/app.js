@@ -3345,6 +3345,138 @@ const setupRolesPage = () => {
   loadRoles();
 };
 
+const setupBillingPage = () => {
+  const page = document.querySelector("[data-billing-page]");
+  if (!page) return;
+
+  const planEl = document.querySelector("[data-billing-plan]");
+  const businessesEl = document.querySelector("[data-billing-businesses]");
+  const totalEl = document.querySelector("[data-billing-total]");
+  const smsEl = document.querySelector("[data-billing-sms]");
+  const lipaNumbersEl = document.querySelector("[data-lipa-numbers]");
+  const invoicesEl = document.querySelector("[data-billing-invoices]");
+  const pageError = document.querySelector("[data-billing-error]");
+  const modal = document.querySelector("[data-billing-reference-modal]");
+  const closeBtn = document.querySelector("[data-billing-reference-close]");
+  const form = document.querySelector("[data-billing-reference-form]");
+  const invoiceInput = document.querySelector("[data-billing-reference-invoice]");
+  const refError = document.querySelector("[data-billing-reference-error]");
+  const submitBtn = document.querySelector("[data-billing-reference-submit]");
+
+  const money = (value) => `TZS ${Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+  const badgeClass = (status) => status === "paid" ? "approved" : (status === "pending_review" ? "pending" : "rejected");
+
+  const openReferenceModal = (invoiceId) => {
+    if (invoiceInput) invoiceInput.value = String(invoiceId);
+    if (refError) refError.hidden = true;
+    form?.reset();
+    if (invoiceInput) invoiceInput.value = String(invoiceId);
+    if (modal) modal.hidden = false;
+    form?.querySelector('input[name="reference"]')?.focus();
+  };
+
+  const closeReferenceModal = () => {
+    if (modal) modal.hidden = true;
+    if (refError) refError.hidden = true;
+  };
+
+  const render = (data) => {
+    const sub = data.subscription || {};
+    if (planEl) planEl.textContent = sub.plan_name || "-";
+    if (businessesEl) businessesEl.textContent = `${data.business_count || 0} total • ${data.extra_businesses || 0} extra`;
+    if (totalEl) totalEl.textContent = money(data.estimated_monthly_total);
+    if (smsEl) smsEl.textContent = `${Number(data.sms_balance || 0).toLocaleString("en-US")} SMS`;
+
+    const lipaNumbers = Array.isArray(data.lipa_numbers) ? data.lipa_numbers : [];
+    lipaNumbersEl?.replaceChildren(...(lipaNumbers.length ? lipaNumbers.map((item) => {
+      const row = document.createElement("div");
+      row.className = "settings-list-row field-display-row";
+      row.innerHTML = `<span>${escapeHtml(item.network || "Lipa Namba")}<small style="display:block;color:var(--color-muted);font-size:0.75rem;margin-top:3px;">${escapeHtml(item.name || "Zipoo")}</small></span><strong>${escapeHtml(item.number || "-")}</strong>`;
+      return row;
+    }) : [(() => {
+      const empty = document.createElement("p");
+      empty.className = "settings-subcard-desc";
+      empty.textContent = "No Lipa Namba has been configured by SaaS yet.";
+      return empty;
+    })()]));
+
+    const invoices = Array.isArray(data.invoices) ? data.invoices : [];
+    invoicesEl?.replaceChildren(...(invoices.length ? invoices.map((invoice) => {
+      const row = document.createElement("div");
+      row.className = "settings-list-row";
+      row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:12px 14px;background:#fff;border:1px solid var(--color-line);border-radius:10px;";
+      const left = document.createElement("div");
+      left.style.minWidth = "0";
+      left.innerHTML = `<strong style="display:block;color:var(--color-navy);font-size:0.92rem;">${escapeHtml(invoice.invoice_number || `Invoice #${invoice.id}`)}</strong><small style="display:block;color:var(--color-muted);font-size:0.76rem;margin-top:3px;">${escapeHtml(invoice.status || "pending_payment")} • Due ${escapeHtml(invoice.due_date || "-")}</small>`;
+      const right = document.createElement("div");
+      right.style.cssText = "display:flex;align-items:center;gap:8px;flex:0 0 auto;";
+      const amount = document.createElement("strong");
+      amount.style.cssText = "color:var(--color-navy);white-space:nowrap;font-size:0.9rem;";
+      amount.textContent = money(invoice.amount);
+      const badge = document.createElement("span");
+      badge.className = `badge-status ${badgeClass(invoice.status)}`;
+      badge.textContent = invoice.status || "pending";
+      right.append(amount, badge);
+      if (invoice.status !== "paid") {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-primary btn-sm";
+        btn.textContent = "Add Ref";
+        btn.addEventListener("click", () => openReferenceModal(invoice.id));
+        right.append(btn);
+      }
+      row.append(left, right);
+      return row;
+    }) : [(() => {
+      const empty = document.createElement("p");
+      empty.className = "settings-subcard-desc";
+      empty.textContent = "No subscription invoices yet.";
+      return empty;
+    })()]));
+  };
+
+  const load = async () => {
+    try {
+      if (pageError) pageError.hidden = true;
+      const res = await fetch(`${getBasePath()}api/billing.php`);
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Unable to load billing.");
+      render(data);
+    } catch (err) {
+      if (pageError) {
+        pageError.textContent = err.message || "Unable to load billing.";
+        pageError.hidden = false;
+      }
+    }
+  };
+
+  closeBtn?.addEventListener("click", closeReferenceModal);
+  form?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (refError) refError.hidden = true;
+    if (submitBtn) submitBtn.disabled = true;
+    try {
+      const body = new FormData(form);
+      body.set("action", "submit_lipa_reference");
+      const res = await fetch(`${getBasePath()}api/billing.php`, { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.message || "Unable to submit reference.");
+      render(data);
+      closeReferenceModal();
+      await showAppModal("Reference Submitted", data.message || "Payment reference submitted.");
+    } catch (err) {
+      if (refError) {
+        refError.textContent = err.message || "Unable to submit reference.";
+        refError.hidden = false;
+      }
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
+  load();
+};
+
 const setupLocationSelects = async () => {
   const regionSelect = document.querySelector('[data-location-select="region"]');
   const districtSelect = document.querySelector('[data-location-select="district"]');
@@ -10656,6 +10788,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSuppliersPage();
   setupCompanyUsersPage();
   setupRolesPage();
+  setupBillingPage();
   setupStockPage();
   setupSalesPage();
   setupBankPage();

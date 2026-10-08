@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/permissions_lib.php';
+require_once __DIR__ . '/billing_lib.php';
 
 session_start();
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -244,6 +245,7 @@ try {
     $pdo->prepare('UPDATE tbl_businesses SET owner_user_id = :owner_user_id WHERE id = :id')
         ->execute([':owner_user_id' => $userId, ':id' => $businessId]);
     ensure_business_rbac($pdo, $businessId);
+    ensure_business_account($pdo, $businessId);
 
     $otp = (string) random_int(100000, 999999);
     $otpStmt = $pdo->prepare(

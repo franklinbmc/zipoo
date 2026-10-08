@@ -5,6 +5,7 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/warehouses_lib.php';
 require_once __DIR__ . '/accounts_lib.php';
 require_once __DIR__ . '/permissions_lib.php';
+require_once __DIR__ . '/billing_lib.php';
 
 session_start();
 
@@ -253,6 +254,7 @@ try {
         ensure_default_warehouse($pdo, $businessId);
         ensure_default_account($pdo, $businessId);
         ensure_business_rbac($pdo, $businessId);
+        ensure_business_account($pdo, $businessId);
         $pdo->prepare(
             'UPDATE tbl_users
              SET business_id = :business_id,
