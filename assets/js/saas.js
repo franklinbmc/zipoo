@@ -1,3 +1,9 @@
+(() => {
+  if (/\bZipooAndroid\/\d+(?:\.\d+)?\b/.test(navigator.userAgent || "")) {
+    document.documentElement.classList.add("is-zipoo-android-webview");
+  }
+})();
+
 const getBasePath = () => "/";
 const SAAS_SW_TRANSLATIONS = {
   "Hide password": "Ficha nenosiri",

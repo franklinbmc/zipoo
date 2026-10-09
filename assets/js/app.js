@@ -1,3 +1,9 @@
+(() => {
+  if (/\bZipooAndroid\/\d+(?:\.\d+)?\b/.test(navigator.userAgent || "")) {
+    document.documentElement.classList.add("is-zipoo-android-webview");
+  }
+})();
+
 const DEFAULT_LANGUAGE = "en";
 const LOCALE_VERSION = "18";
 const SUPPORTED_LANGUAGES = ["en", "sw"];
