@@ -2350,7 +2350,16 @@ body.offline .status-dot {
 
 .expenses-page .stock-kpi-card .kpi-val[data-expenses-today],
 .expenses-page .stock-kpi-card .kpi-val[data-expenses-month] {
+  display: block;
+  max-width: 100%;
   color: var(--color-navy) !important;
+  font-size: calc(1.22rem * var(--amount-scale, 1)) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0;
+  line-height: 1.08 !important;
+  overflow: hidden;
+  text-overflow: clip;
+  white-space: nowrap !important;
 }
 
 /* Main Hub Card Total Amount Badge */
