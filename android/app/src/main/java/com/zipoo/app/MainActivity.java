@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkCapabilities;
@@ -36,20 +37,30 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-public class MainActivity extends Activity {
+import java.util.concurrent.Executor;
+
+public class MainActivity extends FragmentActivity {
     private static final String HOME_URL = BuildConfig.WEB_URL;
     private static final String HOST = Uri.parse(HOME_URL).getHost();
     private static final int ZIPOO_BLUE = Color.rgb(31, 47, 87);
     private static final int FILE_CHOOSER_REQUEST_CODE = 72;
+    private static final String PREFS_NAME = "zipoo_android";
+    private static final String PREF_HAS_AUTHENTICATED = "has_authenticated_session";
 
     private WebView webView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private View splashView;
+    private View lockView;
     private ProgressBar progressBar;
     private ValueCallback<Uri[]> fileChooserCallback;
     private boolean firstPageLoaded = false;
+    private boolean waitingForUnlock = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,12 +103,17 @@ public class MainActivity extends Activity {
 
         splashView = buildSplash();
         root.addView(splashView);
+        lockView = buildLockView();
+        lockView.setVisibility(View.GONE);
+        root.addView(lockView);
 
         setContentView(root);
         configureWebView();
         enterImmersiveMode();
 
-        if (savedInstanceState == null) {
+        if (shouldRequireUnlock(savedInstanceState)) {
+            showLockAndAuthenticate();
+        } else if (savedInstanceState == null) {
             webView.loadUrl(HOME_URL);
         } else {
             webView.restoreState(savedInstanceState);
@@ -243,6 +259,7 @@ public class MainActivity extends Activity {
             public void onPageFinished(WebView view, String url) {
                 firstPageLoaded = true;
                 swipeRefreshLayout.setRefreshing(false);
+                rememberAuthenticatedPage(url);
                 hideSplash();
             }
 
@@ -329,6 +346,61 @@ public class MainActivity extends Activity {
         return splash;
     }
 
+    private View buildLockView() {
+        FrameLayout lock = new FrameLayout(this);
+        lock.setBackgroundColor(ZIPOO_BLUE);
+        lock.setLayoutParams(new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+
+        LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setGravity(Gravity.CENTER);
+        content.setPadding(dp(28), dp(28), dp(28), dp(28));
+
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(R.drawable.zipoo_icon);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(82), dp(82));
+        icon.setLayoutParams(iconParams);
+        icon.setAdjustViewBounds(true);
+
+        TextView title = new TextView(this);
+        title.setText("Unlock Zipoo");
+        title.setTextColor(Color.WHITE);
+        title.setTextSize(22);
+        title.setGravity(Gravity.CENTER);
+        title.setPadding(0, dp(16), 0, dp(6));
+        title.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+
+        TextView text = new TextView(this);
+        text.setText("Use your phone security to continue.");
+        text.setTextColor(Color.argb(220, 255, 255, 255));
+        text.setTextSize(15);
+        text.setGravity(Gravity.CENTER);
+
+        TextView retry = new TextView(this);
+        retry.setText("Tap to unlock");
+        retry.setTextColor(Color.WHITE);
+        retry.setTextSize(15);
+        retry.setGravity(Gravity.CENTER);
+        retry.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+        retry.setPadding(dp(18), dp(18), dp(18), 0);
+        retry.setOnClickListener(v -> showBiometricPrompt());
+
+        content.addView(icon);
+        content.addView(title);
+        content.addView(text);
+        content.addView(retry);
+
+        lock.addView(content, new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.CENTER
+        ));
+        return lock;
+    }
+
     private void hideSplash() {
         if (splashView.getVisibility() == View.GONE) {
             return;
@@ -344,18 +416,86 @@ public class MainActivity extends Activity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             WindowInsetsController controller = getWindow().getInsetsController();
             if (controller != null) {
-                controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+                controller.show(WindowInsets.Type.statusBars());
+                controller.hide(WindowInsets.Type.navigationBars());
                 controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
         } else {
             getWindow().getDecorView().setSystemUiVisibility(
-                    View.SYSTEM_UI_FLAG_FULLSCREEN
-                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                             | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                             | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
             );
+        }
+    }
+
+    private boolean shouldRequireUnlock(Bundle savedInstanceState) {
+        return savedInstanceState == null
+                && getPreferences().getBoolean(PREF_HAS_AUTHENTICATED, false)
+                && canAuthenticate();
+    }
+
+    private SharedPreferences getPreferences() {
+        return getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    }
+
+    private boolean canAuthenticate() {
+        int authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK
+                | BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+        return BiometricManager.from(this).canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS;
+    }
+
+    private void showLockAndAuthenticate() {
+        waitingForUnlock = true;
+        hideSplash();
+        lockView.setAlpha(1f);
+        lockView.setVisibility(View.VISIBLE);
+        showBiometricPrompt();
+    }
+
+    private void showBiometricPrompt() {
+        if (!waitingForUnlock) {
+            waitingForUnlock = true;
+            lockView.setVisibility(View.VISIBLE);
+        }
+        int authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK
+                | BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+        Executor executor = ContextCompat.getMainExecutor(this);
+        BiometricPrompt prompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                waitingForUnlock = false;
+                lockView.setVisibility(View.GONE);
+                if (webView.getUrl() == null) {
+                    webView.loadUrl(HOME_URL);
+                }
+            }
+
+            @Override
+            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                if (errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON || errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
+                    Toast.makeText(MainActivity.this, "Zipoo is locked", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Unlock Zipoo")
+                .setSubtitle("Use face, fingerprint, PIN, pattern, or password")
+                .setAllowedAuthenticators(authenticators)
+                .build();
+        prompt.authenticate(promptInfo);
+    }
+
+    private void rememberAuthenticatedPage(String url) {
+        Uri uri = Uri.parse(url);
+        String path = uri.getPath() == null ? "" : uri.getPath().toLowerCase();
+        boolean isLoginPage = path.contains("/login") || path.contains("/register") || path.contains("/reset-password") || path.contains("/forgot-password");
+        if (!isLoginPage && uri.getHost() != null && uri.getHost().endsWith("zipoo.co.tz")) {
+            getPreferences().edit().putBoolean(PREF_HAS_AUTHENTICATED, true).apply();
         }
     }
 
