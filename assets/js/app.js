@@ -10626,6 +10626,89 @@ const setupRealEstatePage = () => {
   loadSummary();
 };
 
+const setupReportsPage = () => {
+  const page = document.querySelector("[data-reports-page]");
+  if (!page) return;
+
+  const fmt = (amount) => `TZS ${Number(amount || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const setText = (selector, value) => {
+    const el = document.querySelector(selector);
+    if (el) el.textContent = value;
+  };
+  const dateKey = (value) => String(value || "").slice(0, 10);
+  const today = new Date();
+  const monthKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+  const from = `${monthKey}-01`;
+  const to = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+  const load = async () => {
+    const error = document.querySelector("[data-reports-error]");
+    if (error) error.hidden = true;
+    try {
+      const [salesRes, posRes, itemsRes, expensesRes] = await Promise.allSettled([
+        fetch(`${getBasePath()}api/sales.php`),
+        fetch(`${getBasePath()}api/sales.php?history=pos&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`),
+        fetch(`${getBasePath()}api/items.php`),
+        fetch(`${getBasePath()}api/accounts.php?action=expenses`),
+      ]);
+
+      let salesMonth = 0;
+      let payLaterDue = 0;
+      let debtCount = 0;
+      if (salesRes.status === "fulfilled" && salesRes.value.ok) {
+        const data = await salesRes.value.json();
+        salesMonth += Number(data.stats?.sales_month || 0) || 0;
+        payLaterDue = Number(data.stats?.pay_later_due || 0) || 0;
+        debtCount = Number(data.stats?.pay_later_count || 0) || 0;
+      }
+
+      let txCount = 0;
+      if (posRes.status === "fulfilled" && posRes.value.ok) {
+        const data = await posRes.value.json();
+        const sales = (data.sales || []).filter((sale) => String(sale.status || "") !== "cancelled");
+        txCount = sales.length;
+        salesMonth += sales.reduce((sum, sale) => sum + (Number(sale.total_amount || 0) || 0), 0);
+      }
+
+      let lowStock = 0;
+      let itemCount = 0;
+      if (itemsRes.status === "fulfilled" && itemsRes.value.ok) {
+        const data = await itemsRes.value.json();
+        lowStock = Number(data.stats?.low_stock || 0) || 0;
+        itemCount = Array.isArray(data.items) ? data.items.length : Number(data.stats?.total_items || 0) || 0;
+      }
+
+      let expensesMonth = 0;
+      let expenseCount = 0;
+      if (expensesRes.status === "fulfilled" && expensesRes.value.ok) {
+        const data = await expensesRes.value.json();
+        const expenses = Array.isArray(data.expenses) ? data.expenses : [];
+        const monthExpenses = expenses.filter((expense) => dateKey(expense.created_at).slice(0, 7) === monthKey);
+        expenseCount = monthExpenses.length;
+        expensesMonth = monthExpenses.reduce((sum, expense) => sum + (Number(expense.amount || 0) || 0), 0);
+      }
+
+      setText("[data-report-hub-sales]", fmt(salesMonth));
+      setText("[data-report-hub-expenses]", fmt(expensesMonth));
+      setText("[data-report-hub-credit]", fmt(payLaterDue));
+      setText("[data-report-hub-low-stock]", String(lowStock));
+      setText("[data-report-hub-sales-count]", `${txCount.toLocaleString()} transactions`);
+      setText("[data-report-hub-profit]", fmt(salesMonth - expensesMonth));
+      setText("[data-report-hub-expense-count]", `${expenseCount.toLocaleString()} entries`);
+      setText("[data-report-hub-items]", `${itemCount.toLocaleString()} items`);
+      setText("[data-report-hub-debts]", `${debtCount.toLocaleString()} debts`);
+      fitAmounts(page);
+    } catch (err) {
+      if (error) {
+        error.textContent = err.message || "Unable to load reports.";
+        error.hidden = false;
+      }
+    }
+  };
+
+  load();
+};
+
 const setupSupportModal = () => {
   const modal = document.querySelector("[data-support-modal]");
   if (!modal) return;
@@ -10891,6 +10974,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSalesPage();
   setupBankPage();
   setupExpensesPage();
+  setupReportsPage();
   setupRealEstatePage();
   setupDashboardPage();
   initAmountAutosize();

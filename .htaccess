@@ -22,6 +22,7 @@ AddType application/vnd.android.package-archive .apk
   RewriteRule ^roles/?$ pages/roles.html [L]
   RewriteRule ^stock/?$ pages/stock.html [L]
   RewriteRule ^sales/?$ pages/sales.html [L]
+  RewriteRule ^reports/?$ pages/reports.html [L]
   RewriteRule ^bank/?$ pages/bank.html [L]
   RewriteRule ^billing/?$ pages/billing.html [L]
   RewriteRule ^expenses/?$ pages/expenses.html [L]

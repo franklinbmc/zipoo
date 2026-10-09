@@ -2362,6 +2362,110 @@ body.offline .status-dot {
   white-space: nowrap !important;
 }
 
+.reports-page {
+  display: grid;
+  gap: 14px;
+  width: min(1100px, 95%);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.reports-summary-grid,
+.reports-card-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.reports-summary-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.report-summary-card,
+.report-card {
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.report-summary-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px;
+}
+
+.report-summary-card span {
+  color: var(--color-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.report-summary-card strong {
+  color: var(--color-navy);
+  font-size: calc(1.32rem * var(--amount-scale, 1));
+  font-weight: 950;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.reports-card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.report-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  min-height: 172px;
+  padding: 16px;
+  color: inherit;
+}
+
+.report-card-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: var(--color-blue);
+  background: rgba(20, 119, 255, 0.1);
+}
+
+.report-card-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 38px;
+}
+
+.report-card strong {
+  color: var(--color-navy);
+  font-size: 1rem;
+}
+
+.report-card small {
+  color: var(--color-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.report-card b {
+  align-self: end;
+  color: var(--color-blue);
+  font-size: 0.84rem;
+}
+
+@media (max-width: 560px) {
+  .reports-card-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Main Hub Card Total Amount Badge */
 .expense-card-total-badge {
   display: inline-flex;

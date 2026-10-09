@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <title>Reports - Zipoo</title>
+  <link rel="stylesheet" href="/assets/css/styles.css?v=154">
+  <script src="/assets/js/offline.js?v=3"></script>
+</head>
+<body>
+  <div class="app-shell stock-page-shell">
+    <header class="topbar app-topbar inner-topbar">
+      <a class="icon-button" href="/dashboard" aria-label="Back to dashboard">
+        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+      </a>
+      <h1>Reports</h1>
+      <span class="topbar-spacer" aria-hidden="true"></span>
+    </header>
+
+    <main class="settings-page reports-page" data-reports-page>
+      <section class="reports-summary-grid">
+        <article class="report-summary-card">
+          <span>Sales this month</span>
+          <strong class="amount-fit" data-report-hub-sales>TZS 0</strong>
+        </article>
+        <article class="report-summary-card">
+          <span>Expenses this month</span>
+          <strong class="amount-fit" data-report-hub-expenses>TZS 0</strong>
+        </article>
+        <article class="report-summary-card">
+          <span>Outstanding credit</span>
+          <strong class="amount-fit" data-report-hub-credit>TZS 0</strong>
+        </article>
+        <article class="report-summary-card">
+          <span>Low stock</span>
+          <strong data-report-hub-low-stock>0</strong>
+        </article>
+      </section>
+
+      <section class="reports-card-grid" aria-label="Report areas">
+        <a class="report-card" href="/sales?workspace=reports">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M64 416h384M128 352V224M256 352V112M384 352V176" /></svg></span>
+          <strong>Sales Report</strong>
+          <small>Daily, weekly, monthly, yearly sales and transaction trends.</small>
+          <b data-report-hub-sales-count>0 transactions</b>
+        </a>
+        <a class="report-card" href="/sales?workspace=reports">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 384L224 256l80 80 112-176M96 416h320" /></svg></span>
+          <strong>Profit Report</strong>
+          <small>Sales less expenses, with stock cost support as product costs mature.</small>
+          <b data-report-hub-profit>TZS 0</b>
+        </a>
+        <a class="report-card" href="/expenses?workspace=expenses">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M144 64h224l48 48v336H96V64h48zM160 208h192M160 272h144M160 336h96" /></svg></span>
+          <strong>Expenses Report</strong>
+          <small>Expense totals by date, category, and account.</small>
+          <b data-report-hub-expense-count>0 entries</b>
+        </a>
+        <a class="report-card" href="/stock?workspace=items">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 144l160-64 160 64-160 64zM96 144v224l160 64 160-64V144M256 208v224" /></svg></span>
+          <strong>Stock Report</strong>
+          <small>Low stock, stock value, and product/service counts.</small>
+          <b data-report-hub-items>0 items</b>
+        </a>
+        <a class="report-card" href="/sales?workspace=debts">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M96 144h320v224H96zM144 208h224M144 272h160" /></svg></span>
+          <strong>Customer Credit</strong>
+          <small>Pay Later debts, overdue customers, and unpaid balances.</small>
+          <b data-report-hub-debts>0 debts</b>
+        </a>
+        <a class="report-card" href="/bank">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M64 192L256 80l192 112M96 192v160M416 192v160M56 416h400" /></svg></span>
+          <strong>Cash Flow</strong>
+          <small>Money in, money out, bank and cash movement.</small>
+          <b>Bank & Cash</b>
+        </a>
+        <a class="report-card" href="/stock?workspace=purchasing">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M48 160h256v160H48zM304 208h80l48 48v64h-128zM160 384a32 32 0 100 64 32 32 0 000-64m192 0a32 32 0 100 64 32 32 0 000-64" /></svg></span>
+          <strong>Purchasing Report</strong>
+          <small>Supplier purchases, received stock, and purchase history.</small>
+          <b>Purchasing</b>
+        </a>
+        <a class="report-card" href="/sales?workspace=shift">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M144 80h224v352H144zM192 160h128M192 240h128M192 320h80" /></svg></span>
+          <strong>Shift Report</strong>
+          <small>Cashier shifts, opening cash, closing cash, and variance.</small>
+          <b>Shifts</b>
+        </a>
+        <a class="report-card" href="/realestate">
+          <span class="report-card-icon"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M80 224L256 96l176 128M112 208v208h288V208M216 416V304h80v112" /></svg></span>
+          <strong>Real Estate Report</strong>
+          <small>Rent due, rent paid, tenant balances, and property income.</small>
+          <b>Real Estate</b>
+        </a>
+      </section>
+      <p class="inline-error" hidden data-reports-error></p>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" hidden data-app-modal>
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+      <button class="app-modal-close" type="button" data-app-modal-close aria-label="Close"><svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg></button>
+      <h2 id="app-modal-title" data-app-modal-title>Notice</h2>
+      <p data-app-modal-message></p>
+      <button class="btn btn-primary full" type="button" data-app-modal-ok>OK</button>
+    </section>
+  </div>
+  <script src="/assets/js/app.js?v=156" defer></script>
+</body>
+</html>
