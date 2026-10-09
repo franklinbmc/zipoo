@@ -2280,11 +2280,11 @@ body.offline .status-dot {
 }
 
 /* ==========================================================================
-   Expenses Page — Big Screen (1100px max-width) & 100% Full Width Cards
+   Expenses Page — 95% width with full-width inner cards
    ========================================================================== */
 .settings-page.expenses-page {
-  width: 100% !important;
-  max-width: 1100px !important; /* 100% of 1100px on big screen, 100% on mobile */
+  width: min(1100px, 95%) !important;
+  max-width: 1100px !important;
   margin: 0 auto !important;
   padding-left: clamp(14px, 3vw, 24px) !important;
   padding-right: clamp(14px, 3vw, 24px) !important;
