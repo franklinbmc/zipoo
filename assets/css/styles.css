@@ -3331,34 +3331,44 @@ body.offline .status-dot {
   flex: 0 0 auto;
 }
 
-.saas-metrics {
+.saas-metrics,
+.saas-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
 }
 
 .saas-metrics article,
+.saas-metrics-grid article,
 .saas-table-wrap {
   border: 1px solid var(--color-line);
   border-radius: var(--radius);
   background: var(--color-surface);
 }
 
-.saas-metrics article {
+.saas-metrics article,
+.saas-metrics-grid article {
   display: grid;
-  gap: 10px;
-  padding: 15px;
+  gap: 8px;
+  min-height: 104px;
+  padding: 16px;
+  box-shadow: 0 12px 28px rgba(31, 47, 87, 0.06);
 }
 
-.saas-metrics span {
+.saas-metrics span,
+.saas-metrics-grid span {
   color: var(--color-muted);
   font-size: 0.82rem;
   font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
-.saas-metrics strong {
+.saas-metrics strong,
+.saas-metrics-grid strong {
   color: var(--color-navy);
-  font-size: 1.75rem;
+  font-size: 1.85rem;
+  line-height: 1;
 }
 
 .saas-table-wrap {
