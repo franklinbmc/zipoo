@@ -2,11 +2,11 @@
     <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowActionBar">false</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:fontFamily">sans</item>
         <item name="android:colorAccent">@color/zipoo_splash_bg</item>
         <item name="android:navigationBarColor">@color/zipoo_splash_bg</item>
-        <item name="android:statusBarColor">@color/zipoo_splash_bg</item>
+        <item name="android:statusBarColor">#ffffff</item>
     </style>
 </resources>
