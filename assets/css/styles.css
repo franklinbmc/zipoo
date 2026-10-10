@@ -4084,8 +4084,29 @@ textarea {
 }
 
 .settings-page-shell {
-  grid-template-rows: auto 1fr;
-  overflow: auto;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  height: 100svh;
+  max-height: 100svh;
+  min-height: 100svh;
+  overflow: hidden;
+  padding: 0 !important;
+}
+
+.settings-page-shell > .topbar {
+  padding: calc(10px + var(--safe-area-top)) calc(16px + var(--safe-area-right)) 10px calc(16px + var(--safe-area-left));
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.settings-page-shell > .settings-page {
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px calc(16px + var(--safe-area-right)) calc(48px + var(--safe-area-bottom)) calc(16px + var(--safe-area-left));
+  box-sizing: border-box;
 }
 
 .inner-topbar h1 {
@@ -7677,6 +7698,32 @@ button.report-list-row:focus-visible {
 .legal-separator {
   color: var(--color-line);
   user-select: none;
+}
+
+.legal-page-shell {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  height: 100svh !important;
+  max-height: 100svh !important;
+  min-height: 100svh !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.legal-page-shell > .topbar {
+  padding: calc(10px + var(--safe-area-top)) calc(16px + var(--safe-area-right)) 10px calc(16px + var(--safe-area-left));
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.legal-page-shell > .settings-page {
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding: 16px calc(16px + var(--safe-area-right)) calc(64px + var(--safe-area-bottom)) calc(16px + var(--safe-area-left)) !important;
+  box-sizing: border-box !important;
 }
 
 .legal-nav-tabs {
