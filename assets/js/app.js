@@ -3756,6 +3756,13 @@ const setupForgotPasswordFlow = () => {
     inp.addEventListener("input", clearMessages);
   });
 
+  loginInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      requestBtn?.click();
+    }
+  });
+
   requestBtn?.addEventListener("click", async () => {
     clearMessages();
     const login = loginInput?.value.trim() || "";
@@ -3765,7 +3772,9 @@ const setupForgotPasswordFlow = () => {
       return;
     }
 
+    const originalBtnText = requestBtn.textContent;
     requestBtn.disabled = true;
+    requestBtn.textContent = "Sending...";
     if (stat1) {
       stat1.textContent = "Sending verification code...";
       stat1.hidden = false;
@@ -3807,12 +3816,18 @@ const setupForgotPasswordFlow = () => {
       showStep1Err(err.message || "Unable to send verification code.");
     } finally {
       requestBtn.disabled = false;
+      requestBtn.textContent = originalBtnText;
     }
   });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     clearMessages();
+
+    if (step1 && !step1.hidden) {
+      requestBtn?.click();
+      return;
+    }
 
     const login = loginInput?.value.trim() || "";
     const otp = otpInput?.value.trim() || "";
@@ -3938,7 +3953,7 @@ const setupResetPasswordFlow = () => {
       const body = new FormData(form);
       body.set("action", "reset");
 
-      const res = await fetch(form.action, {
+      const res = await fetch(`${getBasePath()}api/password-reset.php`, {
         method: "POST",
         body,
       });
