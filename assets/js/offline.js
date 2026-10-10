@@ -157,6 +157,7 @@
   /* Never touched by the offline layer (auth, registration, SaaS admin). */
   const PASSTHROUGH = new Set([
     "login", "register", "check-registration", "verify-registration-otp", "ping",
+    "password-reset",
     "saas-login", "saas-logout", "saas-password-reset", "saas-impersonate", "saas-businesses",
     "saas-locations", "saas-plans", "saas-settings", "saas-summary", "saas-users",
   ]);

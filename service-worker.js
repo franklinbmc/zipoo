@@ -8,7 +8,7 @@
  *  - /api/ requests are NOT handled here: assets/js/offline.js caches API data
  *    in IndexedDB and queues offline writes.
  */
-const CACHE_NAME = "zipoo-offline-v3";
+const CACHE_NAME = "zipoo-offline-v4";
 
 const PAGES = [
   "./index.html",
@@ -24,6 +24,10 @@ const PAGES = [
   "./pages/users.html",
   "./pages/login.html",
   "./pages/register.html",
+  "./pages/forgot-password.html",
+  "./pages/reset-password.html",
+  "./pages/privacy.html",
+  "./pages/terms.html",
   "./saas/index.html",
   "./saas/login.html",
   "./saas/forgot-password.html",

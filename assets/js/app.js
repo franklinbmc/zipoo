@@ -3720,6 +3720,247 @@ const setupLoginFlow = () => {
   });
 };
 
+const setupForgotPasswordFlow = () => {
+  const form = document.querySelector("[data-forgot-flow]");
+  if (!form) return;
+
+  const step1 = form.querySelector('[data-forgot-step="1"]');
+  const step2 = form.querySelector('[data-forgot-step="2"]');
+  const loginInput = form.querySelector("[data-forgot-login-input]");
+  const requestBtn = form.querySelector("[data-forgot-request-btn]");
+  const err1 = form.querySelector("[data-forgot-error]");
+  const stat1 = form.querySelector("[data-forgot-status]");
+  const err2 = form.querySelector("[data-forgot-step2-error]");
+  const stat2 = form.querySelector("[data-forgot-step2-status]");
+  const otpInput = form.querySelector("[data-forgot-otp-input]");
+  const pwdInput = form.querySelector("[data-forgot-pwd-input]");
+  const confirmInput = form.querySelector("[data-forgot-confirm-input]");
+  const submitBtn = step2?.querySelector('button[type="submit"]');
+
+  const showStep1Err = (msg) => {
+    if (err1) { err1.textContent = msg; err1.hidden = false; }
+    if (stat1) stat1.hidden = true;
+  };
+  const showStep2Err = (msg) => {
+    if (err2) { err2.textContent = msg; err2.hidden = false; }
+    if (stat2) stat2.hidden = true;
+  };
+  const clearMessages = () => {
+    if (err1) err1.hidden = true;
+    if (stat1) stat1.hidden = true;
+    if (err2) err2.hidden = true;
+    if (stat2) stat2.hidden = true;
+  };
+
+  form.querySelectorAll("input").forEach((inp) => {
+    inp.addEventListener("input", clearMessages);
+  });
+
+  requestBtn?.addEventListener("click", async () => {
+    clearMessages();
+    const login = loginInput?.value.trim() || "";
+    if (!login) {
+      showStep1Err("Please enter your phone number or email.");
+      loginInput?.focus();
+      return;
+    }
+
+    requestBtn.disabled = true;
+    if (stat1) {
+      stat1.textContent = "Sending verification code...";
+      stat1.hidden = false;
+    }
+
+    try {
+      const body = new FormData();
+      body.set("action", "request");
+      body.set("login", login);
+
+      const res = await fetch(`${getBasePath()}api/password-reset.php`, {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Unable to send verification code.");
+      }
+
+      if (stat1) {
+        stat1.textContent = data.message || "Verification code sent.";
+        stat1.hidden = false;
+      }
+
+      if (data.dev_otp && otpInput) {
+        otpInput.value = data.dev_otp;
+      }
+
+      if (step1 && step2) {
+        step1.hidden = true;
+        step2.hidden = false;
+        if (stat2) {
+          stat2.textContent = data.message || "Verification code sent.";
+          stat2.hidden = false;
+        }
+        otpInput?.focus();
+      }
+    } catch (err) {
+      showStep1Err(err.message || "Unable to send verification code.");
+    } finally {
+      requestBtn.disabled = false;
+    }
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    const login = loginInput?.value.trim() || "";
+    const otp = otpInput?.value.trim() || "";
+    const pwd = pwdInput?.value || "";
+    const confirm = confirmInput?.value || "";
+
+    if (!otp || otp.length !== 6) {
+      showStep2Err("Please enter the 6-digit verification code.");
+      otpInput?.focus();
+      return;
+    }
+    if (!pwd || pwd.length < 8) {
+      showStep2Err("Password must be at least 8 characters.");
+      pwdInput?.focus();
+      return;
+    }
+    if (pwd !== confirm) {
+      showStep2Err("Passwords must match.");
+      confirmInput?.focus();
+      return;
+    }
+    if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(pwd)) {
+      showStep2Err("Password must include uppercase letter, number, and symbol.");
+      pwdInput?.focus();
+      return;
+    }
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (stat2) {
+      stat2.textContent = "Updating password...";
+      stat2.hidden = false;
+    }
+
+    try {
+      const body = new FormData();
+      body.set("action", "reset");
+      body.set("login", login);
+      body.set("otp", otp);
+      body.set("password", pwd);
+      body.set("confirm_password", confirm);
+
+      const res = await fetch(`${getBasePath()}api/password-reset.php`, {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Unable to reset password.");
+      }
+
+      if (stat2) {
+        stat2.textContent = data.message || "Password updated. Redirecting to login...";
+        stat2.hidden = false;
+      }
+      setTimeout(() => {
+        window.location.href = `${getBasePath()}login`;
+      }, 1500);
+    } catch (err) {
+      if (submitBtn) submitBtn.disabled = false;
+      showStep2Err(err.message || "Unable to reset password.");
+    }
+  });
+};
+
+const setupResetPasswordFlow = () => {
+  const form = document.querySelector("[data-reset-flow]");
+  if (!form) return;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token") || "";
+  const tokenInput = form.querySelector("[data-reset-token-input]");
+  const credsGroup = form.querySelector("[data-reset-credentials-group]");
+  const error = form.querySelector("[data-reset-error]");
+  const status = form.querySelector("[data-reset-status]");
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  if (tokenInput && token) {
+    tokenInput.value = token;
+  } else if (credsGroup) {
+    credsGroup.hidden = false;
+  }
+
+  const showError = (msg) => {
+    if (error) { error.textContent = msg; error.hidden = false; }
+    if (status) status.hidden = true;
+  };
+  const clearMessages = () => {
+    if (error) error.hidden = true;
+    if (status) status.hidden = true;
+  };
+
+  form.querySelectorAll("input").forEach((inp) => {
+    inp.addEventListener("input", clearMessages);
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearMessages();
+
+    const pwd = form.querySelector('input[name="password"]')?.value || "";
+    const confirm = form.querySelector('input[name="confirm_password"]')?.value || "";
+
+    if (!pwd || pwd.length < 8) {
+      showError("Password must be at least 8 characters.");
+      return;
+    }
+    if (pwd !== confirm) {
+      showError("Passwords must match.");
+      return;
+    }
+    if (!/^(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(pwd)) {
+      showError("Password must include uppercase letter, number, and symbol.");
+      return;
+    }
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (status) {
+      status.textContent = "Updating password...";
+      status.hidden = false;
+    }
+
+    try {
+      const body = new FormData(form);
+      body.set("action", "reset");
+
+      const res = await fetch(form.action, {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || "Unable to reset password.");
+      }
+
+      if (status) {
+        status.textContent = data.message || "Password updated. Redirecting to login...";
+        status.hidden = false;
+      }
+      setTimeout(() => {
+        window.location.href = `${getBasePath()}login`;
+      }, 1500);
+    } catch (err) {
+      if (submitBtn) submitBtn.disabled = false;
+      showError(err.message || "Unable to reset password.");
+    }
+  });
+};
+
 const setupRegisterFlow = () => {
   const form = document.querySelector("[data-register-flow]");
   if (!form) {
@@ -10969,6 +11210,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupSearchSelects();
   setupPasswordTools();
   setupLoginFlow();
+  setupForgotPasswordFlow();
+  setupResetPasswordFlow();
   setupLocationSelects().finally(setupRegisterFlow);
   setupSettingsPage();
   setupCustomersPage();

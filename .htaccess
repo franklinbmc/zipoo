@@ -14,6 +14,10 @@ AddType application/vnd.android.package-archive .apk
   # Public app routes.
   RewriteRule ^login/?$ pages/login.html [L]
   RewriteRule ^register/?$ pages/register.html [L]
+  RewriteRule ^forgot-password/?$ pages/forgot-password.html [L]
+  RewriteRule ^reset-password/?$ pages/reset-password.html [L]
+  RewriteRule ^privacy/?$ pages/privacy.html [L]
+  RewriteRule ^terms/?$ pages/terms.html [L]
   RewriteRule ^dashboard/?$ pages/dashboard.html [L]
   RewriteRule ^settings/?$ pages/settings.html [L]
   RewriteRule ^customers/?$ pages/customers.html [L]
