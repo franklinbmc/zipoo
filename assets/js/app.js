@@ -3670,16 +3670,29 @@ const setupLoginFlow = () => {
     }
   };
 
+  const loginInput = form.querySelector('input[name="login"]');
+  const passwordInput = form.querySelector('input[name="password"]');
+  const rememberCheckbox = form.querySelector('input[name="remember"]');
+
+  // Restore remembered phone/email if previously saved
+  const rememberedLogin = localStorage.getItem("zipoo.rememberedLogin");
+  if (rememberedLogin && loginInput) {
+    loginInput.value = rememberedLogin;
+    if (rememberCheckbox) {
+      rememberCheckbox.checked = true;
+    }
+  }
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     clearMessages();
 
-    const login = form.querySelector('input[name="login"]');
-    const password = form.querySelector('input[name="password"]');
+    const loginVal = loginInput?.value.trim() || "";
+    const passwordVal = passwordInput?.value || "";
 
-    if (!login?.value.trim() || !password?.value) {
+    if (!loginVal || !passwordVal) {
       showError("Phone/email and password are required.");
-      (!login?.value.trim() ? login : password)?.focus();
+      (!loginVal ? loginInput : passwordInput)?.focus();
       return;
     }
 
@@ -3698,6 +3711,12 @@ const setupLoginFlow = () => {
 
       if (!response.ok || !payload.ok) {
         throw new Error(payload.message || "Unable to login.");
+      }
+
+      if (rememberCheckbox?.checked) {
+        localStorage.setItem("zipoo.rememberedLogin", loginVal);
+      } else {
+        localStorage.removeItem("zipoo.rememberedLogin");
       }
 
       localStorage.setItem("zipoo.isLoggedIn", "true");
