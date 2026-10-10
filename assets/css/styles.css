@@ -7624,10 +7624,31 @@ button.report-list-row:focus-visible {
   justify-content: space-between;
   gap: 12px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .login-row-between .compact-row {
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.forgot-password-link {
+  margin-left: auto;
+  text-align: right;
+  float: right;
+  justify-self: end;
+  align-self: center;
+  white-space: nowrap;
+  font-size: 0.88rem;
+  color: var(--color-muted);
+  text-decoration: none;
+}
+
+.forgot-password-link:hover {
+  color: var(--color-blue);
+  text-decoration: underline;
 }
 
 .legal-links {
