@@ -1209,6 +1209,8 @@ const setupQuickPanel = () => {
       const body = new FormData();
       body.set("action", "stop");
       await fetch(`${getBasePath()}api/saas-impersonate.php`, { method: "POST", body }).catch(() => null);
+    } else {
+      await fetch(`${getBasePath()}api/logout.php`, { method: "POST" }).catch(() => null);
     }
     localStorage.removeItem("zipoo.isLoggedIn");
     localStorage.removeItem("zipoo.user");
