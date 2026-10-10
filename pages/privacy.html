@@ -3,22 +3,37 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-icon-152x152.png">
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-icon-180x180.png">
   <link rel="icon" type="image/png" sizes="192x192" href="/android-icon-192x192.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="shortcut icon" href="/favicon.ico">
   <link rel="manifest" href="/manifest.json">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+  <meta name="msapplication-config" content="/browserconfig.xml">
   <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Zipoo Privacy Policy — How we protect and manage your business and personal data.">
   <title>Privacy Policy - Zipoo</title>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=155">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=156">
   <script src="/assets/js/offline.js?v=3"></script>
 </head>
 <body>
-  <div class="legal-page-shell">
+  <div class="app-shell settings-page-shell">
     <header class="topbar app-topbar inner-topbar">
       <a class="icon-button" href="javascript:if(history.length>1){history.back();}else{location.href='/';}" aria-label="Back">
-        <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        <svg viewBox="0 0 512 512" aria-hidden="true">
+          <path d="M328 112L184 256l144 144" />
+        </svg>
       </a>
       <h1 data-i18n="legal.privacyTitle">Privacy Policy</h1>
       <button class="icon-button menu-button" type="button" aria-label="Open menu" aria-controls="app-menu" aria-expanded="false" data-menu-open>
@@ -28,92 +43,118 @@
       </button>
     </header>
 
-    <main class="legal-main">
-      <div class="legal-header">
-        <h1 data-i18n="legal.privacyTitle">Privacy Policy</h1>
-        <div class="legal-meta"><span data-i18n="legal.lastUpdated">Last updated</span>: October 2026 &bull; Zipoo Business Platform</div>
-      </div>
+    <main class="settings-page" style="padding-bottom: 40px;">
+      <!-- Toggle Tabs -->
+      <nav class="legal-nav-tabs" aria-label="Legal document switcher">
+        <a class="legal-nav-tab active" href="/privacy" data-i18n="legal.privacy">Privacy Policy</a>
+        <a class="legal-nav-tab" href="/terms" data-i18n="legal.terms">Terms of Use</a>
+      </nav>
 
-      <article class="legal-content">
-        <div class="legal-callout">
-          <strong>Summary:</strong> Zipoo values your privacy. We store and manage your business records solely to operate your POS, inventory, accounting, and sales operations. We never sell your personal or financial data to advertisers.
+      <!-- Document Header Card -->
+      <section class="legal-hero-card">
+        <div class="legal-hero-header">
+          <span class="eyebrow" style="margin:0;color:var(--color-blue);">Data & Protection</span>
+          <span class="legal-badge">Active</span>
         </div>
+        <h2 data-i18n="legal.privacyTitle">Privacy Policy</h2>
+        <p>Zipoo values your privacy. We store and manage your business records strictly to operate your POS, inventory, accounting, and sales operations. We never sell your personal or financial data to advertisers.</p>
+        <span style="font-size:0.78rem;color:var(--color-muted);"><span data-i18n="legal.lastUpdated">Last updated</span>: October 2026 &bull; United Republic of Tanzania</span>
+      </section>
 
-        <h2>1. Introduction</h2>
-        <p>
-          This Privacy Policy explains how Zipoo ("we", "us", or "our") collects, uses, stores, and protects information when you use our business management applications, websites, APIs, and progressive web apps (collectively, the "Services").
-        </p>
-        <p>
-          By creating an account or using Zipoo, you agree to the collection and use of information in accordance with this Policy and the relevant data protection regulations of Tanzania.
-        </p>
+      <!-- Section 1 -->
+      <article class="legal-card">
+        <h2>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><circle cx="256" cy="256" r="192"/><path d="M256 176v160M176 256h160"/></svg>
+          1. Introduction
+        </h2>
+        <p>This Privacy Policy explains how Zipoo ("we", "us", or "our") collects, uses, stores, and protects information when you use our business management applications, websites, APIs, and progressive web apps (collectively, the "Services").</p>
+        <p>By creating an account or using Zipoo, you agree to the collection and use of information in accordance with this Policy and the relevant data protection regulations of Tanzania.</p>
+      </article>
 
-        <h2>2. Information We Collect</h2>
-        <p>We collect information you provide directly, as well as data generated automatically during your operations:</p>
+      <!-- Section 2 -->
+      <article class="legal-card">
+        <h2>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112h288v288H112z"/><path d="M176 176h160M176 256h160M176 336h112"/></svg>
+          2. Information We Collect
+        </h2>
+        <p>We collect information you provide directly, as well as data generated automatically during your business operations:</p>
         <ul>
-          <li><strong>Account & Profile Information:</strong> Full name, phone number, email address, password hash, region, district, and business name during registration.</li>
+          <li><strong>Account & Profile Details:</strong> Full name, phone number, email address, password hash, region, district, and business name during registration.</li>
           <li><strong>Business & Operational Data:</strong> Store names, warehouse locations, product inventory, retail prices, cost prices, categories, barcodes, and supplier details.</li>
           <li><strong>Sales & Financial Records:</strong> Customer details, invoice lines, payment methods (Cash, Bank, Mobile Money), VAT settings, expense vouchers, shift reports, and rental records.</li>
-          <li><strong>Communications & Messaging:</strong> SMS delivery recipient numbers, sender ID preferences, and transaction receipts dispatched via our SMS gateway.</li>
-          <li><strong>Device & Offline Storage Data:</strong> Local storage and IndexedDB caches on your phone, tablet, or desktop to enable complete offline access and background synchronization.</li>
+          <li><strong>Communications & Messaging:</strong> Recipient phone numbers, sender ID preferences, and transaction receipts dispatched via our SMS gateway.</li>
+          <li><strong>Device & Offline Storage Data:</strong> Local storage and IndexedDB caches on your phone, tablet, or desktop to enable complete offline access and automatic sync.</li>
         </ul>
+      </article>
 
-        <h2>3. How We Use Your Information</h2>
+      <!-- Section 3 -->
+      <article class="legal-card">
+        <h2>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M336 208v-48a80 80 0 0 0-160 0v48"/><rect x="96" y="208" width="320" height="240" rx="48"/></svg>
+          3. How We Use Information
+        </h2>
         <p>We use the data collected for the following operational purposes:</p>
         <ul>
-          <li>To operate, calculate, and present your business POS, inventory levels, accounts, and financial dashboards.</li>
+          <li>To calculate, record, and display your business point-of-sale sales, inventory levels, accounts, and financial dashboards.</li>
           <li>To enable offline operation, allowing you to record sales, stock adjustments, and expenses without an internet connection and sync them automatically once reconnected.</li>
-          <li>To deliver transactional SMS notifications, OTP authentication codes, and digital receipt summaries to your customers and team.</li>
-          <li>To provide role-based access control (RBAC), ensuring staff members only access records approved by business owners or administrators.</li>
-          <li>To maintain platform security, prevent unauthorized account access, and perform audit logging.</li>
+          <li>To deliver transactional SMS notifications, OTP authentication codes, and digital receipt summaries to your customers and staff.</li>
+          <li>To enforce role-based access control (RBAC), ensuring team members only access records approved by business owners.</li>
+          <li>To maintain platform security, prevent unauthorized account access, and preserve system audit trails.</li>
         </ul>
+      </article>
 
-        <h2>4. Data Protection & Security</h2>
-        <p>
-          We employ modern security standards to safeguard your data. All communication between your device and our servers is encrypted using Secure Sockets Layer / Transport Layer Security (TLS/HTTPS). User passwords are cryptographically hashed using standard Bcrypt / Argon2 algorithms and are never stored in plaintext.
-        </p>
-        <p>
-          Offline records stored in your browser or app cache are tied to your device domain and can be cleared whenever you log out.
-        </p>
+      <!-- Section 4 -->
+      <article class="legal-card">
+        <h2>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 48l160 64v128c0 106-72 204-160 224-88-20-160-118-160-224V112z"/></svg>
+          4. Data Protection & Security
+        </h2>
+        <p>We employ modern security standards to safeguard your records. All communication between your device and our servers is encrypted using Secure Sockets Layer / Transport Layer Security (TLS/HTTPS).</p>
+        <p>User passwords are cryptographically hashed using standard Bcrypt / Argon2 algorithms and are never stored in plaintext. Offline records stored in your browser or app cache are tied to your device domain and can be cleared whenever you log out.</p>
+      </article>
 
-        <h2>5. Sharing & Third-Party Service Providers</h2>
-        <p>
-          We do not sell, rent, or trade your personal or business data to third parties. We share data only with trusted infrastructure providers necessary to fulfill our core services:
-        </p>
+      <!-- Section 5 -->
+      <article class="legal-card">
+        <h2>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M64 160l192 144 192-144"/><rect x="64" y="112" width="384" height="288" rx="32"/></svg>
+          5. Sharing & Service Providers
+        </h2>
+        <p>We never sell, rent, or trade your personal or business data to advertisers. We share data only with trusted infrastructure providers necessary to fulfill core services:</p>
         <ul>
           <li><strong>Telecom & SMS Aggregators (MegaSMS):</strong> Transmitting verification OTPs, payment receipts, and customer alerts via SMS.</li>
           <li><strong>Mail Transfer Agents (SMTP):</strong> Sending system password resets and notification emails.</li>
-          <li><strong>Payment Processors:</strong> Processing billing and subscription payments if and when authorized by you.</li>
+          <li><strong>Payment Processors:</strong> Processing billing and subscription packages if authorized by you.</li>
         </ul>
+      </article>
 
-        <h2>6. Data Ownership & User Rights</h2>
-        <p>
-          You retain full ownership of your business data. At any time, you have the right to:
-        </p>
+      <!-- Section 6 -->
+      <article class="legal-card">
+        <h2>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M128 256h256M256 128v256"/></svg>
+          6. Data Ownership & User Rights
+        </h2>
+        <p>You retain full ownership of your business data. At any time, you have the right to:</p>
         <ul>
           <li>Access and review your stored profile and business details in the Settings section.</li>
           <li>Export your sales reports, customer statements, and stock summaries to PDF or spreadsheets.</li>
           <li>Request correction of inaccurate information or deletion of your account by contacting our administrative support.</li>
         </ul>
-
-        <h2>7. Updates to This Policy</h2>
-        <p>
-          We may update our Privacy Policy periodically to reflect changes in our practices or applicable laws. Any modifications will be posted here with an updated "Last updated" date.
-        </p>
-
-        <h2>8. Contact Us</h2>
-        <p>
-          If you have any questions or concerns regarding this Privacy Policy or data handling in Zipoo, please contact us through the Zipoo Support menu or your account administrator.
-        </p>
       </article>
 
-      <div style="text-align:center;margin-top:24px;">
-        <a class="btn btn-secondary" href="javascript:if(history.length>1){history.back();}else{location.href='/login';}" data-i18n="legal.back">Back</a>
-      </div>
-    </main>
+      <!-- Section 7 -->
+      <article class="legal-card">
+        <h2>
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v144l96 48"/><circle cx="256" cy="256" r="192"/></svg>
+          7. Policy Updates & Contact
+        </h2>
+        <p>We may update our Privacy Policy periodically. Modifications will be posted on this page with an updated "Last updated" date.</p>
+        <p>If you have any questions regarding this Privacy Policy or data handling in Zipoo, please contact us through the Zipoo Support menu or reach your account administrator.</p>
+      </article>
 
-    <footer class="entry-footer">
-      <p data-i18n="app.tagline">Zipoo - Business anywhere</p>
-    </footer>
+      <footer class="entry-footer" style="margin-top:24px;">
+        <p data-i18n="app.tagline">Zipoo - Business anywhere</p>
+      </footer>
+    </main>
   </div>
 
   <div class="sheet-backdrop" id="app-menu" hidden data-menu>
