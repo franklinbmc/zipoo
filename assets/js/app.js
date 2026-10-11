@@ -11112,28 +11112,29 @@ const setupDashboardPage = () => {
       return;
     }
     list.innerHTML = recent.map((sale) => {
-      const isMobile = ["mobile", "mobile_money"].includes(String(sale.payment_method || "").toLowerCase());
-      const icon = isMobile
-        ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M12 18h.01"/></svg>'
-        : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>';
-      
-      // Real item name representation:
-      let itemTitle = "";
-      if (sale.primary_item_name) {
+      // Real item name representation (e.g. "Fanta", "Azam Energy Drink 330ml"):
+      let itemTitle = sale.items_summary || sale.primary_item_name;
+      if (!itemTitle && sale.primary_item_name) {
         const qty = Number(sale.primary_item_qty || 1);
         const qtyPrefix = qty > 1 ? `${qty.toLocaleString()}x ` : "";
-        const moreCount = Math.max(0, (Number(sale.item_lines_count || 1)) - 1);
-        itemTitle = `${qtyPrefix}${sale.primary_item_name}${moreCount > 0 ? ` (+${moreCount})` : ""}`;
-      } else {
-        itemTitle = sale.receipt_number || dashboardText.posSale();
+        itemTitle = `${qtyPrefix}${sale.primary_item_name}`;
+      }
+      if (!itemTitle && sale.item_name) {
+        itemTitle = sale.item_name;
+      }
+      if (!itemTitle && sale.notes && !sale.notes.toLowerCase().startsWith("pos sale")) {
+        itemTitle = sale.notes;
+      }
+      if (!itemTitle) {
+        itemTitle = sale.receipt_number || sale.invoice_number || dashboardText.posSale();
       }
 
       const method = methodLabel(sale.payment_method);
-      const time = shortTime(sale.created_at);
+      const time = shortTime(sale.created_at || sale.issue_date);
       const subInfo = [method, time].filter(Boolean).join(" &bull; ");
 
       return `
-      <button type="button" class="dashboard-list-row" data-dashboard-sale-id="${sale.id}" title="${escText(sale.receipt_number || '')}">
+      <button type="button" class="dashboard-list-row" data-dashboard-sale-id="${sale.id}" title="${escText(sale.receipt_number || sale.invoice_number || '')}">
         <div>
           <strong>${escText(itemTitle)}</strong>
           <span>${subInfo}</span>
@@ -11187,18 +11188,21 @@ const setupDashboardPage = () => {
   const loadDashboard = async () => {
     try {
       const range = streamRangeDates();
-      const [invoiceRes, posRes, stockRes, expensesRes] = await Promise.allSettled([
+      const [invoiceRes, posRes, recentRes, stockRes, expensesRes] = await Promise.allSettled([
         fetch(`${getBasePath()}api/sales.php`),
         fetch(`${getBasePath()}api/sales.php?history=pos&from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`),
+        fetch(`${getBasePath()}api/sales.php?history=recent&from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`),
         fetch(`${getBasePath()}api/items.php`),
         fetch(`${getBasePath()}api/accounts.php?action=expenses`),
       ]);
 
       let invoiceTodayTotal = 0;
       let invoiceTodayCount = 0;
+      let invoicesList = [];
       if (invoiceRes.status === "fulfilled" && invoiceRes.value.ok) {
         const data = await invoiceRes.value.json();
         const stats = data.stats || {};
+        invoicesList = data.invoices || [];
         invoiceTodayTotal = Number(stats.sales_today || 0) || 0;
         invoiceTodayCount = Number(stats.txn_today || 0) || 0;
         setText("[data-dashboard-amount-due]", fmt(stats.pay_later_due || 0));
@@ -11207,13 +11211,28 @@ const setupDashboardPage = () => {
 
       let posTodayTotal = 0;
       let posTodayCount = 0;
+      let posSalesList = [];
       if (posRes.status === "fulfilled" && posRes.value.ok) {
         const data = await posRes.value.json();
-        const sales = (data.sales || []).filter((sale) => String(sale.status || "") !== "cancelled");
-        posTodayTotal = sales.reduce((sum, sale) => sum + (Number(sale.total_amount || 0) || 0), 0);
-        posTodayCount = sales.length;
-        renderSales(sales);
+        posSalesList = (data.sales || []).filter((sale) => String(sale.status || "").toLowerCase() !== "cancelled");
+        posTodayTotal = posSalesList.reduce((sum, sale) => sum + (Number(sale.total_amount || 0) || 0), 0);
+        posTodayCount = posSalesList.length;
       }
+
+      // Recent sales stream with real product names (e.g. Fanta, Azam Energy Drink):
+      let streamSales = [];
+      if (recentRes.status === "fulfilled" && recentRes.value.ok) {
+        const data = await recentRes.value.json();
+        streamSales = (data.sales || []).filter((sale) => String(sale.status || "").toLowerCase() !== "cancelled");
+      }
+      if (!streamSales.length && posSalesList.length) {
+        streamSales = posSalesList;
+      }
+      if (!streamSales.length && invoicesList.length) {
+        streamSales = invoicesList.filter((inv) => !["cancelled", "draft"].includes(String(inv.status || "").toLowerCase()) && dateKey(inv.issue_date || inv.created_at) === todayKey);
+      }
+      renderSales(streamSales);
+
       const totalSalesToday = invoiceTodayTotal + posTodayTotal;
       const totalSalesCount = invoiceTodayCount + posTodayCount;
       setText("[data-dashboard-sales-today]", fmt(totalSalesToday));

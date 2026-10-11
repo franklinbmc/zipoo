@@ -159,7 +159,11 @@ function present_sale(array $row, int $itemsCount = 0): array
         'amount_paid' => (float) $row['amount_paid'],
         'balance_due' => (float) $row['total_amount'] - (float) $row['amount_paid'],
         'notes' => (string) ($row['notes'] ?? ''),
+        'payment_method' => (string) ($row['payment_method'] ?? 'cash'),
         'items_count' => $itemsCount,
+        'primary_item_name' => (string) ($row['primary_item_name'] ?? ''),
+        'primary_item_qty' => (float) ($row['primary_item_qty'] ?? 0),
+        'items_summary' => (string) ($row['items_summary'] ?? ''),
         'created_at' => (string) ($row['created_at'] ?? ''),
     ];
 }
@@ -498,7 +502,7 @@ try {
                 respond(404, ['ok' => false, 'message' => 'Invoice not found.']);
             }
 
-            $iStmt = $pdo->prepare('SELECT * FROM tbl_sale_items WHERE sale_id = :sid ORDER BY id ASC');
+            $iStmt = $pdo->prepare('SELECT si.*, COALESCE(NULLIF(si.item_name, ""), (SELECT name FROM tbl_items WHERE id = si.item_id), "Item") AS display_name FROM tbl_sale_items si WHERE si.sale_id = :sid ORDER BY si.id ASC');
             $iStmt->execute([':sid' => $id]);
             $items = $iStmt->fetchAll();
 
@@ -525,7 +529,7 @@ try {
                 return [
                     'id' => (int) $it['id'],
                     'item_id' => $it['item_id'] !== null ? (int) $it['item_id'] : null,
-                    'item_name' => (string) $it['item_name'],
+                    'item_name' => (string) ($it['display_name'] ?? $it['item_name'] ?? 'Item'),
                     'quantity' => (float) $it['quantity'],
                     'unit_price' => (float) $it['unit_price'],
                     'line_total' => (float) $it['line_total'],
@@ -565,26 +569,37 @@ try {
             respond(200, ['ok' => true, 'invoice' => $out]);
         }
 
-        // POS sales history (dated list of counter sales).
-        if (($_GET['history'] ?? '') === 'pos') {
+        // Sales history (POS counter sales and unified recent sales stream).
+        if (($_GET['history'] ?? '') === 'pos' || ($_GET['history'] ?? '') === 'recent') {
             $from = trim((string) ($_GET['from'] ?? ''));
             $to = trim((string) ($_GET['to'] ?? ''));
             $hq = trim((string) ($_GET['q'] ?? ''));
             $debtOnly = trim((string) ($_GET['debt'] ?? '')) === 'pay_later';
-            $conds = ['s.business_id = :bid', 's.sale_type = "pos"'];
+            $isRecentHistory = ($_GET['history'] ?? '') === 'recent';
+
+            $conds = ['s.business_id = :bid'];
             $hp = [':bid' => $businessId];
+
+            if ($isRecentHistory) {
+                // Recent sales stream includes any completed sales / invoices
+                $conds[] = 's.status NOT IN ("cancelled", "draft")';
+            } else {
+                $conds[] = 's.sale_type = "pos"';
+            }
+
             if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $from)) { $conds[] = 'DATE(s.created_at) >= :from'; $hp[':from'] = $from; }
             if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $to)) { $conds[] = 'DATE(s.created_at) <= :to'; $hp[':to'] = $to; }
             if ($hq !== '') { $conds[] = '(s.invoice_number LIKE :q OR s.customer_name LIKE :q)'; $hp[':q'] = '%' . $hq . '%'; }
             if ($debtOnly) { $conds[] = 's.payment_method = "pay_later" AND s.status != "cancelled" AND s.amount_paid < s.total_amount'; }
             $hwhere = implode(' AND ', $conds);
             $stmt = $pdo->prepare(
-                "SELECT s.id, s.invoice_number, s.customer_name, s.total_amount, s.amount_paid, s.payment_method, s.status, s.created_at,
+                "SELECT s.id, s.sale_type, s.invoice_number, s.customer_name, s.total_amount, s.amount_paid, s.payment_method, s.status, s.created_at,
                         u.full_name AS cashier,
                         (SELECT COALESCE(SUM(si.quantity), 0) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_count,
                         (SELECT COUNT(*) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS item_lines_count,
-                        (SELECT si.item_name FROM tbl_sale_items si WHERE si.sale_id = s.id ORDER BY si.id ASC LIMIT 1) AS primary_item_name,
-                        (SELECT si.quantity FROM tbl_sale_items si WHERE si.sale_id = s.id ORDER BY si.id ASC LIMIT 1) AS primary_item_qty
+                        (SELECT COALESCE(NULLIF(si.item_name, ''), (SELECT name FROM tbl_items WHERE id = si.item_id)) FROM tbl_sale_items si WHERE si.sale_id = s.id ORDER BY si.id ASC LIMIT 1) AS primary_item_name,
+                        (SELECT si.quantity FROM tbl_sale_items si WHERE si.sale_id = s.id ORDER BY si.id ASC LIMIT 1) AS primary_item_qty,
+                        (SELECT GROUP_CONCAT(CONCAT(CASE WHEN si.quantity > 1 THEN CONCAT(TRIM(TRAILING '.' FROM TRIM(TRAILING '0' FROM CAST(si.quantity AS CHAR))), 'x ') ELSE '' END, COALESCE(NULLIF(si.item_name, ''), (SELECT name FROM tbl_items WHERE id = si.item_id))) SEPARATOR ', ') FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_summary
                  FROM tbl_sales s LEFT JOIN tbl_users u ON u.id = s.created_by
                  WHERE {$hwhere} ORDER BY s.id DESC LIMIT 300"
             );
@@ -597,6 +612,7 @@ try {
                 return [
                     'id' => (int) $r['id'],
                     'receipt_number' => (string) $r['invoice_number'],
+                    'sale_type' => (string) ($r['sale_type'] ?? 'pos'),
                     'customer_name' => (string) ($r['customer_name'] ?? ''),
                     'total_amount' => (float) $r['total_amount'],
                     'amount_paid' => (float) $r['amount_paid'],
@@ -608,6 +624,7 @@ try {
                     'item_lines_count' => (int) ($r['item_lines_count'] ?? 0),
                     'primary_item_name' => (string) ($r['primary_item_name'] ?? ''),
                     'primary_item_qty' => (float) ($r['primary_item_qty'] ?? 0),
+                    'items_summary' => (string) ($r['items_summary'] ?? ''),
                     'created_at' => (string) $r['created_at'],
                 ];
             }, $rows);
@@ -645,7 +662,11 @@ try {
 
         $where = implode(' AND ', $conditions);
         $stmt = $pdo->prepare(
-            "SELECT s.*, (SELECT COUNT(*) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_count
+            "SELECT s.*,
+                    (SELECT COUNT(*) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_count,
+                    (SELECT COALESCE(NULLIF(si.item_name, ''), (SELECT name FROM tbl_items WHERE id = si.item_id)) FROM tbl_sale_items si WHERE si.sale_id = s.id ORDER BY si.id ASC LIMIT 1) AS primary_item_name,
+                    (SELECT si.quantity FROM tbl_sale_items si WHERE si.sale_id = s.id ORDER BY si.id ASC LIMIT 1) AS primary_item_qty,
+                    (SELECT GROUP_CONCAT(CONCAT(CASE WHEN si.quantity > 1 THEN CONCAT(TRIM(TRAILING '.' FROM TRIM(TRAILING '0' FROM CAST(si.quantity AS CHAR))), 'x ') ELSE '' END, COALESCE(NULLIF(si.item_name, ''), (SELECT name FROM tbl_items WHERE id = si.item_id))) SEPARATOR ', ') FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_summary
              FROM tbl_sales s WHERE {$where} ORDER BY s.id DESC"
         );
         $stmt->execute($params);
