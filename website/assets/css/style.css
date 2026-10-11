@@ -503,12 +503,14 @@ img, svg {
    ========================================================================== */
 
 .hero-showcase-container {
+  width: 100%;
   max-width: 980px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  min-width: 0;
 }
 
 /* Tabs Switcher */
@@ -558,6 +560,7 @@ img, svg {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-xl);
+  min-width: 0;
 }
 
 .showcase-track {
@@ -565,6 +568,7 @@ img, svg {
   width: 200%;
   transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
+  min-width: 0;
 }
 
 .showcase-slide {
@@ -572,6 +576,7 @@ img, svg {
   flex: 0 0 50%;
   box-sizing: border-box;
   padding: 4px;
+  min-width: 0;
 }
 
 /* Nav Arrows */
