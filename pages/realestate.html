@@ -24,8 +24,8 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Zipoo Real Estate: properties, units, tenants and rent collection.">
   <title>Real Estate - Zipoo</title>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=155">
-  <script src="/assets/js/offline.js?v=3"></script>
+  <link rel="stylesheet" href="/assets/css/styles.css?v=156">
+  <script src="/assets/js/offline.js?v=4"></script>
 </head>
 <body>
   <div class="app-shell stock-page-shell">
@@ -59,71 +59,99 @@
         </div>
       </section>
 
-      <nav class="stock-hub">
-        <button class="settings-accordion-link stock-hub-row" type="button" data-open-properties-workspace>
-          <span class="stock-hub-label">
-            <strong>Properties</strong>
-            <small>Buildings, plots &amp; their units</small>
-          </span>
-          <span class="stock-summary-meta">
-            <strong class="stock-count-badge" data-properties-count-badge>0 properties</strong>
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </span>
+      <!-- Quick Action Buttons -->
+      <div class="re-quick-actions">
+        <button class="btn btn-primary re-quick-btn" type="button" data-open-record-rent>
+          <svg viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;"><path d="M256 112v288M112 256h288" /></svg>
+          Record Rent
         </button>
-        <button class="settings-accordion-link stock-hub-row" type="button" data-open-tenancies-workspace>
-          <span class="stock-hub-label">
-            <strong>Tenancies</strong>
-            <small>Assign tenants to units</small>
-          </span>
-          <span class="stock-summary-meta">
-            <strong class="stock-count-badge" data-tenancies-count-badge>0 active</strong>
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </span>
+        <button class="btn btn-outline re-quick-btn" type="button" data-open-create-tenancy>
+          <svg viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;"><path d="M256 112v288M112 256h288" /></svg>
+          New Tenancy
         </button>
-        <button class="settings-accordion-link stock-hub-row" type="button" data-open-rent-workspace>
-          <span class="stock-hub-label">
-            <strong>Rent</strong>
-            <small>Collect rent &amp; track payments</small>
-          </span>
-          <span class="stock-summary-meta">
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </span>
+        <button class="btn btn-outline re-quick-btn" type="button" data-open-create-property>
+          <svg viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;"><path d="M256 112v288M112 256h288" /></svg>
+          Add Property
         </button>
-        <button class="settings-accordion-link stock-hub-row" type="button" data-open-staff-workspace>
-          <span class="stock-hub-label">
-            <strong>Staff</strong>
-            <small>Caretakers &amp; managers</small>
-          </span>
-          <span class="stock-summary-meta">
-            <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M184 112l144 144-144 144" /></svg>
-          </span>
-        </button>
-      </nav>
-    </main>
-  </div>
+      </div>
 
-  <!-- Workspace: Properties -->
-  <div class="fullscreen-modal" hidden data-properties-workspace>
-    <section class="fullscreen-panel" role="dialog" aria-modal="true">
-      <header class="fullscreen-header">
-        <button class="icon-button" type="button" data-properties-workspace-close aria-label="Back">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+      <!-- Segmented Tab Navigation -->
+      <div class="re-tabs-bar" role="tablist">
+        <button class="re-tab-btn active" type="button" role="tab" data-tab-target="rent" aria-selected="true">
+          Rent &amp; Collections
+          <span class="re-tab-badge" data-badge-rent>0</span>
         </button>
-        <h2>Properties</h2>
-        <button class="icon-button" type="button" data-open-create-property aria-label="Add property">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
+        <button class="re-tab-btn" type="button" role="tab" data-tab-target="properties" aria-selected="false">
+          Properties &amp; Units
+          <span class="re-tab-badge" data-badge-properties>0</span>
         </button>
-      </header>
-      <div class="fullscreen-body stock-workspace-body">
+        <button class="re-tab-btn" type="button" role="tab" data-tab-target="tenancies" aria-selected="false">
+          Tenancies
+          <span class="re-tab-badge" data-badge-tenancies>0</span>
+        </button>
+        <button class="re-tab-btn" type="button" role="tab" data-tab-target="history" aria-selected="false">
+          Payment History
+        </button>
+        <button class="re-tab-btn" type="button" role="tab" data-tab-target="staff" aria-selected="false">
+          Staff
+        </button>
+      </div>
+
+      <!-- Tab Panel: Rent & Collections -->
+      <section data-tab-panel="rent">
+        <div class="stock-list" data-payments-list></div>
+        <div class="company-users-empty" hidden data-payments-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M48 144h416v224H48zM256 200a56 56 0 100 112 56 56 0 000-112M120 176v160M392 176v160" /></svg>
+          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No rent records yet</strong>
+          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Record a rent payment to automatically update account balances.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-record-rent>Record Rent</button>
+        </div>
+      </section>
+
+      <!-- Tab Panel: Properties & Units -->
+      <section data-tab-panel="properties" hidden>
         <div class="stock-list" data-properties-list></div>
         <div class="company-users-empty" hidden data-properties-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
           <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M128 448V80h256v368M192 160h40M280 160h40M192 240h40M280 240h40M192 320h40M280 320h40" /></svg>
           <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No properties yet</strong>
-          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Add a building, plot or house, then create its rentable units.</p>
+          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Add your first building, plot or house, then add units.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-property>Add Property</button>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <!-- Tab Panel: Tenancies -->
+      <section data-tab-panel="tenancies" hidden>
+        <div class="stock-list" data-tenancies-list></div>
+        <div class="company-users-empty" hidden data-tenancies-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M144 48v416l40-28 40 28 40-28 40 28 40-28 40 28V48zM200 176h112M200 256h112" /></svg>
+          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No tenancies yet</strong>
+          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Assign a tenant to a vacant unit to begin managing rent.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-tenancy>New Tenancy</button>
+        </div>
+      </section>
+
+      <!-- Tab Panel: Payment History -->
+      <section data-tab-panel="history" hidden>
+        <div class="stock-list" data-history-list></div>
+        <div class="company-users-empty" hidden data-history-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <p style="margin:0;font-size:0.84rem;color:var(--color-muted);">No payment transactions recorded yet.</p>
+        </div>
+      </section>
+
+      <!-- Tab Panel: Staff -->
+      <section data-tab-panel="staff" hidden>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-staff>+ Add Staff</button>
+        </div>
+        <div class="stock-list" data-staff-list></div>
+        <div class="company-users-empty" hidden data-staff-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 96a56 56 0 100 112 56 56 0 000-112M120 424c0-75 61-120 136-120s136 45 136 120" /></svg>
+          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No staff assigned</strong>
+          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Add caretakers or managers to oversee your properties.</p>
+          <button class="btn btn-primary btn-sm" type="button" data-open-create-staff>Add Staff</button>
+        </div>
+      </section>
+    </main>
   </div>
 
   <!-- Workspace: Property detail (units) -->
@@ -151,78 +179,6 @@
         <div class="company-users-empty" hidden data-units-empty style="text-align:center;padding:24px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;">
           <p style="margin:0 0 12px;font-size:0.84rem;color:var(--color-muted);">No units yet. Add rooms, apartments or shops.</p>
           <button class="btn btn-primary btn-sm" type="button" data-open-create-unit>Add Unit</button>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Workspace: Tenancies -->
-  <div class="fullscreen-modal" hidden data-tenancies-workspace>
-    <section class="fullscreen-panel" role="dialog" aria-modal="true">
-      <header class="fullscreen-header">
-        <button class="icon-button" type="button" data-tenancies-workspace-close aria-label="Back">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
-        </button>
-        <h2>Tenancies</h2>
-        <button class="icon-button" type="button" data-open-create-tenancy aria-label="New tenancy">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
-        </button>
-      </header>
-      <div class="fullscreen-body stock-workspace-body">
-        <div class="stock-list" data-tenancies-list></div>
-        <div class="company-users-empty" hidden data-tenancies-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
-          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M144 48v416l40-28 40 28 40-28 40 28 40-28 40 28V48zM200 176h112M200 256h112" /></svg>
-          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No tenancies yet</strong>
-          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Assign a tenant to a vacant unit to start a tenancy.</p>
-          <button class="btn btn-primary btn-sm" type="button" data-open-create-tenancy>New Tenancy</button>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Workspace: Rent -->
-  <div class="fullscreen-modal" hidden data-rent-workspace>
-    <section class="fullscreen-panel" role="dialog" aria-modal="true">
-      <header class="fullscreen-header">
-        <button class="icon-button" type="button" data-rent-workspace-close aria-label="Back">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
-        </button>
-        <h2>Rent</h2>
-        <button class="icon-button" type="button" data-open-record-rent aria-label="Record rent">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
-        </button>
-      </header>
-      <div class="fullscreen-body stock-workspace-body">
-        <div class="stock-list" data-payments-list></div>
-        <div class="company-users-empty" hidden data-payments-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
-          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M48 144h416v224H48zM256 200a56 56 0 100 112 56 56 0 000-112M120 176v160M392 176v160" /></svg>
-          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No rent recorded yet</strong>
-          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Record a rent payment — it posts into your Bank &amp; Cash accounts.</p>
-          <button class="btn btn-primary btn-sm" type="button" data-open-record-rent>Record Rent</button>
-        </div>
-      </div>
-    </section>
-  </div>
-
-  <!-- Workspace: Staff -->
-  <div class="fullscreen-modal" hidden data-staff-workspace>
-    <section class="fullscreen-panel" role="dialog" aria-modal="true">
-      <header class="fullscreen-header">
-        <button class="icon-button" type="button" data-staff-workspace-close aria-label="Back">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
-        </button>
-        <h2>Staff</h2>
-        <button class="icon-button" type="button" data-open-create-staff aria-label="Add staff">
-          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M256 112v288M112 256h288" /></svg>
-        </button>
-      </header>
-      <div class="fullscreen-body stock-workspace-body">
-        <div class="stock-list" data-staff-list></div>
-        <div class="company-users-empty" hidden data-staff-empty style="text-align:center;padding:36px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-top:8px;">
-          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 96a56 56 0 100 112 56 56 0 000-112M120 424c0-75 61-120 136-120s136 45 136 120" /></svg>
-          <strong style="display:block;color:var(--color-navy);font-size:1rem;margin-bottom:4px;">No staff yet</strong>
-          <p style="margin:0 0 14px;font-size:0.84rem;color:var(--color-muted);">Add caretakers or managers for your properties.</p>
-          <button class="btn btn-primary btn-sm" type="button" data-open-create-staff>Add Staff</button>
         </div>
       </div>
     </section>
@@ -578,6 +534,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=157" defer></script>
+  <script src="/assets/js/app.js?v=158" defer></script>
 </body>
 </html>

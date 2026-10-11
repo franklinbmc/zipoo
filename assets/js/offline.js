@@ -293,6 +293,66 @@
       });
       return { ...best, invoices };
     }
+
+    if (ep === "realestate") {
+      let bundle = null;
+      for (const e of mine) {
+        const d = parse(e);
+        if (d && (d.properties || d.summary || d.tenancies || d.units || d.tenants)) {
+          if (!bundle || Object.keys(d).length > Object.keys(bundle).length) bundle = d;
+        }
+      }
+      if (!bundle) return null;
+      const res = q.get("resource") || "";
+      if (res === "" || res === "all" || res === "bundle") {
+        return {
+          ok: true,
+          summary: bundle.summary || { properties: 0, units_total: 0, units_occupied: 0, active_tenancies: 0, rent_collected_month: 0 },
+          properties: bundle.properties || [],
+          units: bundle.units || [],
+          tenancies: bundle.tenancies || [],
+          tenants: bundle.tenants || [],
+          payments: bundle.payments || [],
+          staff: bundle.staff || [],
+        };
+      }
+      if (res === "summary") return { ok: true, summary: bundle.summary || { properties: 0, units_total: 0, units_occupied: 0, active_tenancies: 0, rent_collected_month: 0 } };
+      if (res === "properties") return { ok: true, properties: bundle.properties || [] };
+      if (res === "units") {
+        const pid = q.get("property_id");
+        const list = bundle.units || [];
+        return { ok: true, units: pid ? list.filter((u) => String(u.property_id) === String(pid)) : list };
+      }
+      if (res === "tenancies") return { ok: true, tenancies: bundle.tenancies || [] };
+      if (res === "rent_overview") return { ok: true, tenants: bundle.tenants || [] };
+      if (res === "payments") return { ok: true, payments: bundle.payments || [] };
+      if (res === "staff") return { ok: true, staff: bundle.staff || [] };
+      if (res === "tenancy") {
+        const tid = q.get("id");
+        const t = (bundle.tenancies || []).find((x) => String(x.id) === String(tid));
+        if (t) {
+          const payments = (bundle.payments || []).filter((p) => String(p.tenancy_id) === String(tid));
+          return {
+            ok: true,
+            tenancy: {
+              ...t,
+              total_paid: payments.reduce((acc, p) => acc + (Number(p.amount) || 0), 0),
+              paid_until: null,
+              payments,
+            },
+          };
+        }
+      }
+      const propId = q.get("id");
+      if (propId) {
+        const p = (bundle.properties || []).find((x) => String(x.id) === String(propId));
+        if (p) {
+          const units = (bundle.units || []).filter((u) => String(u.property_id) === String(propId));
+          return { ok: true, property: { ...p, units } };
+        }
+      }
+      return { ok: true, ...bundle };
+    }
     return null;
   };
 
@@ -546,6 +606,197 @@
   PATCH["accounts.withdraw"] = patchAccountMoney;
   PATCH["accounts.expense"] = patchAccountMoney;
 
+  // Real Estate optimistic patches
+  PATCH["realestate.property_create"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const p = clone(op.derived.property);
+    if (Array.isArray(d.properties) && !d.properties.some((x) => String(x.id) === String(p.id))) {
+      d.properties = [p, ...d.properties];
+    }
+    if (d.summary) d.summary.properties = (d.summary.properties || 0) + 1;
+    return d;
+  };
+  PATCH["realestate.property_update"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const { property_id, changes } = op.derived;
+    if (Array.isArray(d.properties)) {
+      d.properties.forEach((p) => { if (String(p.id) === String(property_id)) Object.assign(p, changes); });
+    }
+    if (d.property && String(d.property.id) === String(property_id)) Object.assign(d.property, changes);
+    return d;
+  };
+  PATCH["realestate.property_delete"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const pid = String(op.derived.property_id);
+    if (Array.isArray(d.properties)) d.properties = d.properties.filter((p) => String(p.id) !== pid);
+    if (Array.isArray(d.units)) d.units = d.units.filter((unit) => String(unit.property_id) !== pid);
+    if (d.summary) d.summary.properties = Math.max(0, (d.summary.properties || 0) - 1);
+    return d;
+  };
+  PATCH["realestate.unit_create"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const unit = clone(op.derived.unit);
+    if (Array.isArray(d.units) && !d.units.some((x) => String(x.id) === String(unit.id))) {
+      d.units = [...d.units, unit];
+    }
+    if (d.property && String(d.property.id) === String(unit.property_id)) {
+      d.property.units = d.property.units || [];
+      if (!d.property.units.some((x) => String(x.id) === String(unit.id))) d.property.units.push(unit);
+      d.property.units_count = (d.property.units_count || 0) + 1;
+    }
+    if (Array.isArray(d.properties)) {
+      const p = d.properties.find((x) => String(x.id) === String(unit.property_id));
+      if (p) p.units_count = (p.units_count || 0) + 1;
+    }
+    if (d.summary) d.summary.units_total = (d.summary.units_total || 0) + 1;
+    return d;
+  };
+  PATCH["realestate.unit_update"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const { unit_id, changes } = op.derived;
+    const apply = (x) => Object.assign(x, changes);
+    if (Array.isArray(d.units)) d.units.forEach((u) => { if (String(u.id) === String(unit_id)) apply(u); });
+    if (d.property && Array.isArray(d.property.units)) d.property.units.forEach((u) => { if (String(u.id) === String(unit_id)) apply(u); });
+    return d;
+  };
+  PATCH["realestate.unit_delete"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const uid = String(op.derived.unit_id);
+    let removedPid = null;
+    if (Array.isArray(d.units)) {
+      const target = d.units.find((x) => String(x.id) === uid);
+      if (target) removedPid = target.property_id;
+      d.units = d.units.filter((x) => String(x.id) !== uid);
+    }
+    if (d.property && Array.isArray(d.property.units)) {
+      d.property.units = d.property.units.filter((x) => String(x.id) !== uid);
+      d.property.units_count = Math.max(0, (d.property.units_count || 1) - 1);
+    }
+    if (removedPid && Array.isArray(d.properties)) {
+      const p = d.properties.find((x) => String(x.id) === String(removedPid));
+      if (p) p.units_count = Math.max(0, (p.units_count || 1) - 1);
+    }
+    if (d.summary) d.summary.units_total = Math.max(0, (d.summary.units_total || 1) - 1);
+    return d;
+  };
+  PATCH["realestate.tenancy_create"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const t = clone(op.derived.tenancy);
+    if (Array.isArray(d.tenancies) && !d.tenancies.some((x) => String(x.id) === String(t.id))) {
+      d.tenancies = [t, ...d.tenancies];
+    }
+    if (Array.isArray(d.tenants) && !d.tenants.some((x) => String(x.tenancy_id) === String(t.id))) {
+      d.tenants = [{
+        tenancy_id: t.id, status: "active", rate: t.rate, charge_type: t.charge_type, start_date: t.start_date,
+        end_date: null, deposit: t.deposit, property_name: t.property_name, unit_name: t.unit_name,
+        tenant_name: t.tenant_name, tenant_phone: t.tenant_phone, payments_count: 0, total_paid: 0,
+        last_paid_date: null, last_amount: null, paid_until: null,
+      }, ...d.tenants];
+    }
+    const markOccupied = (unit) => { if (String(unit.id) === String(t.unit_id)) { unit.status = "occupied"; unit.tenant_name = t.tenant_name; } };
+    if (Array.isArray(d.units)) d.units.forEach(markOccupied);
+    if (d.property && Array.isArray(d.property.units)) d.property.units.forEach(markOccupied);
+    if (Array.isArray(d.properties)) {
+      const p = d.properties.find((x) => String(x.id) === String(t.property_id));
+      if (p) p.occupied_count = (p.occupied_count || 0) + 1;
+    }
+    if (d.summary) {
+      d.summary.active_tenancies = (d.summary.active_tenancies || 0) + 1;
+      d.summary.units_occupied = (d.summary.units_occupied || 0) + 1;
+    }
+    return d;
+  };
+  PATCH["realestate.tenancy_end"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const tid = String(op.derived.tenancy_id);
+    let unitId = null;
+    let propId = null;
+    if (Array.isArray(d.tenancies)) {
+      d.tenancies.forEach((t) => { if (String(t.id) === tid) { t.status = "ended"; unitId = t.unit_id; propId = t.property_id; } });
+    }
+    if (Array.isArray(d.tenants)) {
+      d.tenants.forEach((r) => { if (String(r.tenancy_id) === tid) r.status = "ended"; });
+    }
+    if (d.tenancy && String(d.tenancy.id) === tid) d.tenancy.status = "ended";
+    if (unitId) {
+      const markVacant = (u) => { if (String(u.id) === String(unitId)) { u.status = "vacant"; u.tenant_name = ""; } };
+      if (Array.isArray(d.units)) d.units.forEach(markVacant);
+      if (d.property && Array.isArray(d.property.units)) d.property.units.forEach(markVacant);
+    }
+    if (propId && Array.isArray(d.properties)) {
+      const p = d.properties.find((x) => String(x.id) === String(propId));
+      if (p) p.occupied_count = Math.max(0, (p.occupied_count || 1) - 1);
+    }
+    if (d.summary) {
+      d.summary.active_tenancies = Math.max(0, (d.summary.active_tenancies || 1) - 1);
+      d.summary.units_occupied = Math.max(0, (d.summary.units_occupied || 1) - 1);
+    }
+    return d;
+  };
+  PATCH["realestate.rent_payment_create"] = (d, op, u, gep) => {
+    const pmt = clone(op.derived.payment);
+    if (gep === "accounts") {
+      bumpAccountBalance(d, (a) => String(a.id) === String(pmt.account_id), pmt.amount);
+      return d;
+    }
+    if (gep !== "realestate" || !d) return d;
+    if (Array.isArray(d.payments) && !d.payments.some((x) => String(x.id) === String(pmt.id))) {
+      d.payments = [pmt, ...d.payments];
+    }
+    if (Array.isArray(d.tenants)) {
+      const row = d.tenants.find((x) => String(x.tenancy_id) === String(pmt.tenancy_id));
+      if (row) {
+        row.total_paid = round2(num(row.total_paid) + pmt.amount);
+        row.payments_count = (row.payments_count || 0) + 1;
+        row.last_paid_date = pmt.paid_date;
+        row.last_amount = pmt.amount;
+        if (pmt.period_end && (!row.paid_until || pmt.period_end > row.paid_until)) row.paid_until = pmt.period_end;
+      }
+    }
+    if (d.tenancy && String(d.tenancy.id) === String(pmt.tenancy_id)) {
+      d.tenancy.payments = d.tenancy.payments || [];
+      if (!d.tenancy.payments.some((x) => String(x.id) === String(pmt.id))) d.tenancy.payments.unshift(pmt);
+      d.tenancy.total_paid = round2(num(d.tenancy.total_paid) + pmt.amount);
+      if (pmt.period_end && (!d.tenancy.paid_until || pmt.period_end > d.tenancy.paid_until)) d.tenancy.paid_until = pmt.period_end;
+    }
+    if (d.summary) {
+      d.summary.rent_collected_month = round2(num(d.summary.rent_collected_month) + pmt.amount);
+    }
+    return d;
+  };
+  PATCH["realestate.rent_payment_delete"] = (d, op, u, gep) => {
+    if (gep !== "realestate" || !d) return d;
+    const pid = String(op.derived.payment_id);
+    let deleted = null;
+    if (Array.isArray(d.payments)) {
+      deleted = d.payments.find((x) => String(x.id) === pid);
+      d.payments = d.payments.filter((x) => String(x.id) !== pid);
+    }
+    if (d.tenancy && Array.isArray(d.tenancy.payments)) {
+      deleted = deleted || d.tenancy.payments.find((x) => String(x.id) === pid);
+      d.tenancy.payments = d.tenancy.payments.filter((x) => String(x.id) !== pid);
+      if (deleted) d.tenancy.total_paid = Math.max(0, round2(num(d.tenancy.total_paid) - deleted.amount));
+    }
+    if (deleted && Array.isArray(d.tenants)) {
+      const row = d.tenants.find((x) => String(x.tenancy_id) === String(deleted.tenancy_id));
+      if (row) {
+        row.total_paid = Math.max(0, round2(num(row.total_paid) - deleted.amount));
+        row.payments_count = Math.max(0, (row.payments_count || 1) - 1);
+      }
+    }
+    if (deleted && d.summary) {
+      d.summary.rent_collected_month = Math.max(0, round2(num(d.summary.rent_collected_month) - deleted.amount));
+    }
+    return d;
+  };
+  PATCH["realestate.tenant_quick_create"] = (d, op, u, gep) => {
+    if (gep === "customers" && d && Array.isArray(d.customers)) {
+      const c = clone(op.derived.customer);
+      if (!d.customers.some((x) => String(x.id) === String(c.id))) d.customers.push(c);
+    }
+    return d;
+  };
+
   const applyOne = (op, u, d) => {
     const fn = PATCH[`${op.endpoint}.${op.action}`];
     if (!fn) return d;
@@ -770,6 +1021,193 @@
   BUILDERS["accounts.deposit"] = buildAccountMoney;
   BUILDERS["accounts.withdraw"] = buildAccountMoney;
   BUILDERS["accounts.expense"] = buildAccountMoney;
+
+  // Real estate optimistic builders
+  BUILDERS["realestate.property_create"] = async (op, f, sc) => {
+    const name = String(f.name || "").trim();
+    if (!name) return fail(422, "Property name is required.");
+    const tempId = nextTempId();
+    const property = {
+      id: tempId, name, type: f.type || "residential", location: f.location || "",
+      notes: f.notes || "", status: "active", units_count: 0, occupied_count: 0, pending_sync: true,
+    };
+    const derived = { property };
+    const view = await peek("realestate.php?resource=properties", sc);
+    const patched = view ? applyOne({ endpoint: "realestate", action: "property_create", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=properties`, location.origin), clone(view)) : { properties: [property] };
+    return {
+      tempId, derived, status: 201, label: `Property: ${name}`,
+      response: { ok: true, offline: true, message: "Property created (saved offline).", properties: patched.properties || [property] },
+    };
+  };
+
+  BUILDERS["realestate.property_update"] = async (op, f, sc) => {
+    const name = String(f.name || "").trim();
+    if (!name) return fail(422, "Property name is required.");
+    const property_id = Number(f.property_id || 0);
+    const changes = { name, type: f.type || "residential", location: f.location || "", notes: f.notes || "" };
+    const derived = { property_id, changes };
+    const view = await peek("realestate.php?resource=properties", sc);
+    const patched = view ? applyOne({ endpoint: "realestate", action: "property_update", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=properties`, location.origin), clone(view)) : { properties: [] };
+    return {
+      derived, status: 200, label: `Edit Property: ${name}`,
+      response: { ok: true, offline: true, message: "Property updated (saved offline).", properties: patched.properties || [] },
+    };
+  };
+
+  BUILDERS["realestate.property_delete"] = async (op, f, sc) => {
+    const property_id = Number(f.property_id || 0);
+    const derived = { property_id };
+    const view = await peek("realestate.php?resource=properties", sc);
+    const patched = view ? applyOne({ endpoint: "realestate", action: "property_delete", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=properties`, location.origin), clone(view)) : { properties: [] };
+    return {
+      derived, status: 200, label: `Delete Property #${property_id}`,
+      response: { ok: true, offline: true, message: "Property deleted (saved offline).", properties: patched.properties || [] },
+    };
+  };
+
+  BUILDERS["realestate.unit_create"] = async (op, f, sc) => {
+    const name = String(f.name || "").trim();
+    if (!name) return fail(422, "Unit name is required.");
+    const property_id = Number(f.property_id || 0);
+    const tempId = nextTempId();
+    const rate = round2(num(f.rate));
+    const unit = {
+      id: tempId, property_id, name, charge_type: f.charge_type || "monthly",
+      rate, status: "vacant", notes: f.notes || "", pending_sync: true,
+    };
+    const derived = { unit };
+    const view = await peek(`realestate.php?resource=units&property_id=${property_id}`, sc);
+    const patched = view ? applyOne({ endpoint: "realestate", action: "unit_create", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=units&property_id=${property_id}`, location.origin), clone(view)) : { units: [unit] };
+    return {
+      tempId, derived, status: 201, label: `Unit: ${name}`,
+      response: { ok: true, offline: true, message: "Unit added (saved offline).", units: patched.units || [unit] },
+    };
+  };
+
+  BUILDERS["realestate.unit_update"] = async (op, f, sc) => {
+    const name = String(f.name || "").trim();
+    if (!name) return fail(422, "Unit name is required.");
+    const unit_id = Number(f.unit_id || 0);
+    const property_id = Number(f.property_id || 0);
+    const changes = { name, charge_type: f.charge_type || "monthly", rate: round2(num(f.rate)), notes: f.notes || "" };
+    const derived = { unit_id, property_id, changes };
+    const view = await peek(`realestate.php?resource=units&property_id=${property_id}`, sc);
+    const patched = view ? applyOne({ endpoint: "realestate", action: "unit_update", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=units&property_id=${property_id}`, location.origin), clone(view)) : { units: [] };
+    return {
+      derived, status: 200, label: `Edit Unit: ${name}`,
+      response: { ok: true, offline: true, message: "Unit updated (saved offline).", units: patched.units || [] },
+    };
+  };
+
+  BUILDERS["realestate.unit_delete"] = async (op, f, sc) => {
+    const unit_id = Number(f.unit_id || 0);
+    const derived = { unit_id };
+    return {
+      derived, status: 200, label: `Delete Unit #${unit_id}`,
+      response: { ok: true, offline: true, message: "Unit deleted (saved offline).", units: [] },
+    };
+  };
+
+  BUILDERS["realestate.tenancy_create"] = async (op, f, sc) => {
+    const unit_id = Number(f.unit_id || 0);
+    const customer_id = Number(f.customer_id || 0);
+    if (!unit_id) return fail(422, "Select a unit.");
+    if (!customer_id) return fail(422, "Select a tenant.");
+    const tempId = nextTempId();
+    const rate = round2(num(f.rate));
+    const deposit = round2(num(f.deposit));
+
+    // Look up customer & unit details
+    const [allUnits, allCust] = await Promise.all([
+      peek("realestate.php?resource=units", sc),
+      peek("customers.php", sc),
+    ]);
+    const uRec = ((allUnits && allUnits.units) || []).find((x) => String(x.id) === String(unit_id));
+    const cRec = ((allCust && allCust.customers) || []).find((x) => String(x.id) === String(customer_id));
+
+    const tenancy = {
+      id: tempId, property_id: uRec ? Number(uRec.property_id) : 0, unit_id, customer_id,
+      property_name: uRec ? uRec.property_name : "", unit_name: uRec ? uRec.name : "",
+      tenant_name: cRec ? (cRec.full_name || cRec.name) : "Tenant",
+      tenant_phone: cRec ? (cRec.phone || "") : "",
+      charge_type: f.charge_type || (uRec ? uRec.charge_type : "monthly"),
+      rate: rate || (uRec ? Number(uRec.rate) : 0),
+      start_date: f.start_date || sqlNow().slice(0, 10),
+      end_date: null, deposit, status: "active", notes: f.notes || "", pending_sync: true,
+    };
+    const derived = { tenancy };
+    const view = await peek("realestate.php?resource=tenancies", sc);
+    const patched = view ? applyOne({ endpoint: "realestate", action: "tenancy_create", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=tenancies`, location.origin), clone(view)) : { tenancies: [tenancy] };
+    return {
+      tempId, derived, status: 201, label: `Tenancy: ${tenancy.tenant_name}`,
+      response: { ok: true, offline: true, message: "Tenancy created (saved offline).", tenancies: patched.tenancies || [tenancy] },
+    };
+  };
+
+  BUILDERS["realestate.tenancy_end"] = async (op, f, sc) => {
+    const tenancy_id = Number(f.tenancy_id || 0);
+    const derived = { tenancy_id };
+    const view = await peek("realestate.php?resource=tenancies", sc);
+    const patched = view ? applyOne({ endpoint: "realestate", action: "tenancy_end", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=tenancies`, location.origin), clone(view)) : { tenancies: [] };
+    return {
+      derived, status: 200, label: `End Tenancy #${tenancy_id}`,
+      response: { ok: true, offline: true, message: "Tenancy ended (saved offline).", tenancies: patched.tenancies || [] },
+    };
+  };
+
+  BUILDERS["realestate.rent_payment_create"] = async (op, f, sc) => {
+    const tenancy_id = Number(f.tenancy_id || 0);
+    const amount = round2(num(f.amount));
+    if (!(amount > 0)) return fail(422, "Enter an amount greater than zero.");
+    const tempId = nextTempId();
+    const paid_date = f.paid_date || sqlNow().slice(0, 10);
+    const account_id = Number(f.account_id || 0);
+
+    const [tenView, accView] = await Promise.all([
+      peek("realestate.php?resource=tenancies", sc),
+      peek("accounts.php", sc),
+    ]);
+    const ten = ((tenView && tenView.tenancies) || []).find((x) => String(x.id) === String(tenancy_id));
+    const acc = ((accView && accView.accounts) || []).find((a) => String(a.id) === String(account_id)) || ((accView && accView.accounts) || [])[0];
+
+    const payment = {
+      id: tempId, tenancy_id, property_name: ten ? ten.property_name : "",
+      unit_name: ten ? ten.unit_name : "", tenant_name: ten ? ten.tenant_name : "Tenant",
+      amount, period_label: f.period_label || "", period_start: f.period_start || null,
+      period_end: f.period_end || null, paid_date, account_id: acc ? Number(acc.id) : account_id,
+      account_name: acc ? acc.name : "Cash", notes: f.notes || "", pending_sync: true,
+    };
+    const derived = { payment };
+    const payView = await peek("realestate.php?resource=payments", sc);
+    const patched = payView ? applyOne({ endpoint: "realestate", action: "rent_payment_create", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=payments`, location.origin), clone(payView)) : { payments: [payment] };
+    return {
+      tempId, derived, status: 201, label: `Rent: ${payment.tenant_name} · ${Math.round(amount).toLocaleString()}`,
+      response: { ok: true, offline: true, message: "Rent payment recorded (saved offline).", payments: patched.payments || [payment] },
+    };
+  };
+
+  BUILDERS["realestate.rent_payment_delete"] = async (op, f, sc) => {
+    const payment_id = Number(f.payment_id || 0);
+    const derived = { payment_id };
+    const payView = await peek("realestate.php?resource=payments", sc);
+    const patched = payView ? applyOne({ endpoint: "realestate", action: "rent_payment_delete", entries: op.entries, derived }, new URL(`${API_PREFIX}realestate.php?resource=payments`, location.origin), clone(payView)) : { payments: [] };
+    return {
+      derived, status: 200, label: `Delete Rent Payment #${payment_id}`,
+      response: { ok: true, offline: true, message: "Rent payment deleted (saved offline).", payments: patched.payments || [] },
+    };
+  };
+
+  BUILDERS["realestate.tenant_quick_create"] = async (op, f, sc) => {
+    const name = String(f.full_name || "").trim();
+    if (!name) return fail(422, "Tenant name is required.");
+    const tempId = nextTempId();
+    const customer = { id: tempId, full_name: name, phone: f.phone || "", total_sales: 0, sales_count: 0, pending_sync: true };
+    const derived = { customer };
+    return {
+      tempId, derived, status: 201, label: `Tenant: ${name}`,
+      response: { ok: true, offline: true, message: "Tenant added (saved offline).", customer },
+    };
+  };
 
   const humanAction = (ep, action) => `${action.replace(/_/g, " ")} (${ep})`;
   const buildOptimistic = async (op, sc) => {
@@ -1030,6 +1468,7 @@
       "accounts.php", "accounts.php?action=expenses", "accounts.php?action=expense_categories", "accounts.php?action=activity",
       "sales.php", `sales.php?history=pos&from=${from}&to=${today}`, `sales.php?history=pos&from=${today}&to=${today}`,
       "warehouses.php", "purchasing.php", "stock-movements.php", "company-users.php",
+      "realestate.php", "realestate.php?resource=summary", "realestate.php?resource=properties", "realestate.php?resource=units", "realestate.php?resource=tenancies", "realestate.php?resource=rent_overview", "realestate.php?resource=payments", "realestate.php?resource=staff",
     ];
   };
   async function prefetch(force = false) {

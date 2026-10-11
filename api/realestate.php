@@ -124,6 +124,164 @@ function load_units(PDO $pdo, int $businessId, ?int $propertyId = null): array
     return array_map('unit_payload', $stmt->fetchAll());
 }
 
+function load_summary(PDO $pdo, int $businessId): array
+{
+    $propCount = (int) $pdo->query('SELECT COUNT(*) FROM tbl_properties WHERE business_id = ' . $businessId)->fetchColumn();
+    $unitStmt = $pdo->prepare('SELECT COUNT(*) AS total, SUM(status = "occupied") AS occupied FROM tbl_property_units WHERE business_id = :bid');
+    $unitStmt->execute([':bid' => $businessId]);
+    $u = $unitStmt->fetch() ?: [];
+    $activeTenancies = (int) $pdo->query('SELECT COUNT(*) FROM tbl_tenancies WHERE business_id = ' . $businessId . ' AND status = "active"')->fetchColumn();
+    $rentStmt = $pdo->prepare(
+        'SELECT COALESCE(SUM(amount), 0) FROM tbl_rent_payments
+         WHERE business_id = :bid AND YEAR(paid_date) = YEAR(CURDATE()) AND MONTH(paid_date) = MONTH(CURDATE())'
+    );
+    $rentStmt->execute([':bid' => $businessId]);
+    return [
+        'properties' => $propCount,
+        'units_total' => (int) ($u['total'] ?? 0),
+        'units_occupied' => (int) ($u['occupied'] ?? 0),
+        'active_tenancies' => $activeTenancies,
+        'rent_collected_month' => (float) $rentStmt->fetchColumn(),
+    ];
+}
+
+function load_tenancies(PDO $pdo, int $businessId): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT t.*, u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, c.phone AS tenant_phone
+         FROM tbl_tenancies t
+         JOIN tbl_property_units u ON u.id = t.unit_id
+         JOIN tbl_properties p ON p.id = t.property_id
+         JOIN tbl_customers c ON c.id = t.customer_id
+         WHERE t.business_id = :bid
+         ORDER BY (t.status = "active") DESC, t.id DESC'
+    );
+    $stmt->execute([':bid' => $businessId]);
+    return array_map(static function ($t) {
+        return [
+            'id' => (int) $t['id'],
+            'property_id' => (int) $t['property_id'],
+            'unit_id' => (int) $t['unit_id'],
+            'customer_id' => (int) $t['customer_id'],
+            'property_name' => (string) $t['property_name'],
+            'unit_name' => (string) $t['unit_name'],
+            'tenant_name' => (string) $t['tenant_name'],
+            'tenant_phone' => (string) ($t['tenant_phone'] ?? ''),
+            'charge_type' => (string) $t['charge_type'],
+            'rate' => (float) $t['rate'],
+            'start_date' => (string) $t['start_date'],
+            'end_date' => $t['end_date'] !== null ? (string) $t['end_date'] : null,
+            'deposit' => (float) $t['deposit'],
+            'status' => (string) $t['status'],
+            'notes' => (string) ($t['notes'] ?? ''),
+        ];
+    }, $stmt->fetchAll());
+}
+
+function load_payments(PDO $pdo, int $businessId): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT r.*, u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, a.name AS account_name
+         FROM tbl_rent_payments r
+         JOIN tbl_property_units u ON u.id = r.unit_id
+         JOIN tbl_properties p ON p.id = r.property_id
+         JOIN tbl_customers c ON c.id = r.customer_id
+         LEFT JOIN tbl_accounts a ON a.id = r.account_id
+         WHERE r.business_id = :bid
+         ORDER BY r.id DESC LIMIT 200'
+    );
+    $stmt->execute([':bid' => $businessId]);
+    return array_map(static function ($r) {
+        return [
+            'id' => (int) $r['id'],
+            'tenancy_id' => (int) $r['tenancy_id'],
+            'property_name' => (string) $r['property_name'],
+            'unit_name' => (string) $r['unit_name'],
+            'tenant_name' => (string) $r['tenant_name'],
+            'amount' => (float) $r['amount'],
+            'period_label' => (string) ($r['period_label'] ?? ''),
+            'paid_date' => (string) $r['paid_date'],
+            'account_name' => (string) ($r['account_name'] ?? ''),
+            'notes' => (string) ($r['notes'] ?? ''),
+        ];
+    }, $stmt->fetchAll());
+}
+
+function load_rent_overview(PDO $pdo, int $businessId): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT t.id, t.status, t.rate, t.charge_type, t.start_date, t.end_date, t.deposit,
+                u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, c.phone AS tenant_phone,
+                (SELECT COUNT(*) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS payments_count,
+                (SELECT COALESCE(SUM(amount), 0) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS total_paid,
+                (SELECT MAX(paid_date) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS last_paid_date,
+                (SELECT amount FROM tbl_rent_payments r WHERE r.tenancy_id = t.id ORDER BY r.id DESC LIMIT 1) AS last_amount,
+                (SELECT MAX(period_end) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id AND r.period_end IS NOT NULL) AS paid_until
+         FROM tbl_tenancies t
+         JOIN tbl_property_units u ON u.id = t.unit_id
+         JOIN tbl_properties p ON p.id = t.property_id
+         JOIN tbl_customers c ON c.id = t.customer_id
+         WHERE t.business_id = :bid
+         ORDER BY (t.status = "active") DESC, t.id DESC'
+    );
+    $stmt->execute([':bid' => $businessId]);
+    return array_map(static function ($r) {
+        return [
+            'tenancy_id' => (int) $r['id'],
+            'status' => (string) $r['status'],
+            'rate' => (float) $r['rate'],
+            'charge_type' => (string) $r['charge_type'],
+            'start_date' => (string) $r['start_date'],
+            'end_date' => $r['end_date'] !== null ? (string) $r['end_date'] : null,
+            'deposit' => (float) $r['deposit'],
+            'property_name' => (string) $r['property_name'],
+            'unit_name' => (string) $r['unit_name'],
+            'tenant_name' => (string) $r['tenant_name'],
+            'tenant_phone' => (string) ($r['tenant_phone'] ?? ''),
+            'payments_count' => (int) $r['payments_count'],
+            'total_paid' => (float) $r['total_paid'],
+            'last_paid_date' => $r['last_paid_date'] !== null ? (string) $r['last_paid_date'] : null,
+            'last_amount' => $r['last_amount'] !== null ? (float) $r['last_amount'] : null,
+            'paid_until' => $r['paid_until'] !== null ? (string) $r['paid_until'] : null,
+        ];
+    }, $stmt->fetchAll());
+}
+
+function load_staff(PDO $pdo, int $businessId): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT s.*, p.name AS property_name FROM tbl_realestate_staff s
+         LEFT JOIN tbl_properties p ON p.id = s.property_id
+         WHERE s.business_id = :bid ORDER BY s.name ASC'
+    );
+    $stmt->execute([':bid' => $businessId]);
+    return array_map(static function ($s) {
+        return [
+            'id' => (int) $s['id'],
+            'name' => (string) $s['name'],
+            'phone' => (string) ($s['phone'] ?? ''),
+            'role' => (string) ($s['role'] ?? 'caretaker'),
+            'property_id' => $s['property_id'] !== null ? (int) $s['property_id'] : null,
+            'property_name' => (string) ($s['property_name'] ?? ''),
+            'notes' => (string) ($s['notes'] ?? ''),
+            'status' => (string) ($s['status'] ?? 'active'),
+        ];
+    }, $stmt->fetchAll());
+}
+
+function load_all_bundle(PDO $pdo, int $businessId): array
+{
+    return [
+        'summary' => load_summary($pdo, $businessId),
+        'properties' => load_properties($pdo, $businessId),
+        'units' => load_units($pdo, $businessId),
+        'tenancies' => load_tenancies($pdo, $businessId),
+        'tenants' => load_rent_overview($pdo, $businessId),
+        'payments' => load_payments($pdo, $businessId),
+        'staff' => load_staff($pdo, $businessId),
+    ];
+}
+
 function fetch_or_404(PDO $pdo, string $table, int $businessId, int $id, string $label): array
 {
     $stmt = $pdo->prepare("SELECT * FROM {$table} WHERE id = :id AND business_id = :bid LIMIT 1");
@@ -161,24 +319,12 @@ try {
             respond(200, ['ok' => true, 'property' => $out]);
         }
 
+        if ($resource === '' || $resource === 'all' || $resource === 'bundle') {
+            respond(200, array_merge(['ok' => true], load_all_bundle($pdo, $businessId)));
+        }
+
         if ($resource === 'summary') {
-            $propCount = (int) $pdo->query('SELECT COUNT(*) FROM tbl_properties WHERE business_id = ' . $businessId)->fetchColumn();
-            $unitStmt = $pdo->prepare('SELECT COUNT(*) AS total, SUM(status = "occupied") AS occupied FROM tbl_property_units WHERE business_id = :bid');
-            $unitStmt->execute([':bid' => $businessId]);
-            $u = $unitStmt->fetch() ?: [];
-            $activeTenancies = (int) $pdo->query('SELECT COUNT(*) FROM tbl_tenancies WHERE business_id = ' . $businessId . ' AND status = "active"')->fetchColumn();
-            $rentStmt = $pdo->prepare(
-                'SELECT COALESCE(SUM(amount), 0) FROM tbl_rent_payments
-                 WHERE business_id = :bid AND YEAR(paid_date) = YEAR(CURDATE()) AND MONTH(paid_date) = MONTH(CURDATE())'
-            );
-            $rentStmt->execute([':bid' => $businessId]);
-            respond(200, ['ok' => true, 'summary' => [
-                'properties' => $propCount,
-                'units_total' => (int) ($u['total'] ?? 0),
-                'units_occupied' => (int) ($u['occupied'] ?? 0),
-                'active_tenancies' => $activeTenancies,
-                'rent_collected_month' => (float) $rentStmt->fetchColumn(),
-            ]]);
+            respond(200, ['ok' => true, 'summary' => load_summary($pdo, $businessId)]);
         }
 
         if ($resource === 'properties') {
@@ -191,106 +337,16 @@ try {
         }
 
         if ($resource === 'tenancies') {
-            $stmt = $pdo->prepare(
-                'SELECT t.*, u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, c.phone AS tenant_phone
-                 FROM tbl_tenancies t
-                 JOIN tbl_property_units u ON u.id = t.unit_id
-                 JOIN tbl_properties p ON p.id = t.property_id
-                 JOIN tbl_customers c ON c.id = t.customer_id
-                 WHERE t.business_id = :bid
-                 ORDER BY (t.status = "active") DESC, t.id DESC'
-            );
-            $stmt->execute([':bid' => $businessId]);
-            $tenancies = array_map(static function ($t) {
-                return [
-                    'id' => (int) $t['id'],
-                    'property_id' => (int) $t['property_id'],
-                    'unit_id' => (int) $t['unit_id'],
-                    'customer_id' => (int) $t['customer_id'],
-                    'property_name' => (string) $t['property_name'],
-                    'unit_name' => (string) $t['unit_name'],
-                    'tenant_name' => (string) $t['tenant_name'],
-                    'tenant_phone' => (string) ($t['tenant_phone'] ?? ''),
-                    'charge_type' => (string) $t['charge_type'],
-                    'rate' => (float) $t['rate'],
-                    'start_date' => (string) $t['start_date'],
-                    'end_date' => $t['end_date'] !== null ? (string) $t['end_date'] : null,
-                    'deposit' => (float) $t['deposit'],
-                    'status' => (string) $t['status'],
-                    'notes' => (string) ($t['notes'] ?? ''),
-                ];
-            }, $stmt->fetchAll());
-            respond(200, ['ok' => true, 'tenancies' => $tenancies]);
+            respond(200, ['ok' => true, 'tenancies' => load_tenancies($pdo, $businessId)]);
         }
 
         if ($resource === 'payments') {
-            $stmt = $pdo->prepare(
-                'SELECT r.*, u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, a.name AS account_name
-                 FROM tbl_rent_payments r
-                 JOIN tbl_property_units u ON u.id = r.unit_id
-                 JOIN tbl_properties p ON p.id = r.property_id
-                 JOIN tbl_customers c ON c.id = r.customer_id
-                 LEFT JOIN tbl_accounts a ON a.id = r.account_id
-                 WHERE r.business_id = :bid
-                 ORDER BY r.id DESC LIMIT 200'
-            );
-            $stmt->execute([':bid' => $businessId]);
-            $payments = array_map(static function ($r) {
-                return [
-                    'id' => (int) $r['id'],
-                    'tenancy_id' => (int) $r['tenancy_id'],
-                    'property_name' => (string) $r['property_name'],
-                    'unit_name' => (string) $r['unit_name'],
-                    'tenant_name' => (string) $r['tenant_name'],
-                    'amount' => (float) $r['amount'],
-                    'period_label' => (string) ($r['period_label'] ?? ''),
-                    'paid_date' => (string) $r['paid_date'],
-                    'account_name' => (string) ($r['account_name'] ?? ''),
-                    'notes' => (string) ($r['notes'] ?? ''),
-                ];
-            }, $stmt->fetchAll());
-            respond(200, ['ok' => true, 'payments' => $payments]);
+            respond(200, ['ok' => true, 'payments' => load_payments($pdo, $businessId)]);
         }
 
         // Who rented + rent-status summary per tenancy.
         if ($resource === 'rent_overview') {
-            $stmt = $pdo->prepare(
-                'SELECT t.id, t.status, t.rate, t.charge_type, t.start_date, t.end_date, t.deposit,
-                        u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, c.phone AS tenant_phone,
-                        (SELECT COUNT(*) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS payments_count,
-                        (SELECT COALESCE(SUM(amount), 0) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS total_paid,
-                        (SELECT MAX(paid_date) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS last_paid_date,
-                        (SELECT amount FROM tbl_rent_payments r WHERE r.tenancy_id = t.id ORDER BY r.id DESC LIMIT 1) AS last_amount,
-                        (SELECT MAX(period_end) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id AND r.period_end IS NOT NULL) AS paid_until
-                 FROM tbl_tenancies t
-                 JOIN tbl_property_units u ON u.id = t.unit_id
-                 JOIN tbl_properties p ON p.id = t.property_id
-                 JOIN tbl_customers c ON c.id = t.customer_id
-                 WHERE t.business_id = :bid
-                 ORDER BY (t.status = "active") DESC, t.id DESC'
-            );
-            $stmt->execute([':bid' => $businessId]);
-            $rows = array_map(static function ($r) {
-                return [
-                    'tenancy_id' => (int) $r['id'],
-                    'status' => (string) $r['status'],
-                    'rate' => (float) $r['rate'],
-                    'charge_type' => (string) $r['charge_type'],
-                    'start_date' => (string) $r['start_date'],
-                    'end_date' => $r['end_date'] !== null ? (string) $r['end_date'] : null,
-                    'deposit' => (float) $r['deposit'],
-                    'property_name' => (string) $r['property_name'],
-                    'unit_name' => (string) $r['unit_name'],
-                    'tenant_name' => (string) $r['tenant_name'],
-                    'tenant_phone' => (string) ($r['tenant_phone'] ?? ''),
-                    'payments_count' => (int) $r['payments_count'],
-                    'total_paid' => (float) $r['total_paid'],
-                    'last_paid_date' => $r['last_paid_date'] !== null ? (string) $r['last_paid_date'] : null,
-                    'last_amount' => $r['last_amount'] !== null ? (float) $r['last_amount'] : null,
-                    'paid_until' => $r['paid_until'] !== null ? (string) $r['paid_until'] : null,
-                ];
-            }, $stmt->fetchAll());
-            respond(200, ['ok' => true, 'tenants' => $rows]);
+            respond(200, ['ok' => true, 'tenants' => load_rent_overview($pdo, $businessId)]);
         }
 
         // Full detail for one tenancy, including payment history.
@@ -358,25 +414,7 @@ try {
         }
 
         if ($resource === 'staff') {
-            $stmt = $pdo->prepare(
-                'SELECT s.*, p.name AS property_name FROM tbl_realestate_staff s
-                 LEFT JOIN tbl_properties p ON p.id = s.property_id
-                 WHERE s.business_id = :bid ORDER BY s.name ASC'
-            );
-            $stmt->execute([':bid' => $businessId]);
-            $staff = array_map(static function ($s) {
-                return [
-                    'id' => (int) $s['id'],
-                    'name' => (string) $s['name'],
-                    'phone' => (string) ($s['phone'] ?? ''),
-                    'role' => (string) ($s['role'] ?? 'caretaker'),
-                    'property_id' => $s['property_id'] !== null ? (int) $s['property_id'] : null,
-                    'property_name' => (string) ($s['property_name'] ?? ''),
-                    'notes' => (string) ($s['notes'] ?? ''),
-                    'status' => (string) ($s['status'] ?? 'active'),
-                ];
-            }, $stmt->fetchAll());
-            respond(200, ['ok' => true, 'staff' => $staff]);
+            respond(200, ['ok' => true, 'staff' => load_staff($pdo, $businessId)]);
         }
 
         respond(422, ['ok' => false, 'message' => 'Unknown resource.']);
@@ -503,7 +541,14 @@ try {
             $pdo->rollBack();
             throw $e;
         }
-        respond(201, ['ok' => true, 'message' => 'Tenancy created.']);
+        respond(201, [
+            'ok' => true,
+            'message' => 'Tenancy created.',
+            'tenancies' => load_tenancies($pdo, $businessId),
+            'tenants' => load_rent_overview($pdo, $businessId),
+            'units' => load_units($pdo, $businessId),
+            'summary' => load_summary($pdo, $businessId),
+        ]);
     }
 
     if ($action === 'tenancy_end') {
@@ -523,7 +568,14 @@ try {
             $pdo->rollBack();
             throw $e;
         }
-        respond(200, ['ok' => true, 'message' => 'Tenancy ended.']);
+        respond(200, [
+            'ok' => true,
+            'message' => 'Tenancy ended.',
+            'tenancies' => load_tenancies($pdo, $businessId),
+            'tenants' => load_rent_overview($pdo, $businessId),
+            'units' => load_units($pdo, $businessId),
+            'summary' => load_summary($pdo, $businessId),
+        ]);
     }
 
     // ---------- Rent payments (auto-post into Bank & Cash) ----------
@@ -577,7 +629,13 @@ try {
             $pdo->rollBack();
             throw $e;
         }
-        respond(201, ['ok' => true, 'message' => 'Rent payment recorded.']);
+        respond(201, [
+            'ok' => true,
+            'message' => 'Rent payment recorded.',
+            'payments' => load_payments($pdo, $businessId),
+            'tenants' => load_rent_overview($pdo, $businessId),
+            'summary' => load_summary($pdo, $businessId),
+        ]);
     }
 
     if ($action === 'rent_payment_delete') {
@@ -595,7 +653,13 @@ try {
             $pdo->rollBack();
             throw $e;
         }
-        respond(200, ['ok' => true, 'message' => 'Rent payment deleted.']);
+        respond(200, [
+            'ok' => true,
+            'message' => 'Rent payment deleted.',
+            'payments' => load_payments($pdo, $businessId),
+            'tenants' => load_rent_overview($pdo, $businessId),
+            'summary' => load_summary($pdo, $businessId),
+        ]);
     }
 
     // ---------- Tenant quick-create (into tbl_customers) ----------
