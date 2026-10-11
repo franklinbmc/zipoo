@@ -546,39 +546,80 @@ img, svg {
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
 }
 
-/* Slider Track */
+/* Slider Track (Horizontal Carousel Transition) */
+.showcase-slider-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+}
+
 .showcase-slider {
   width: 100%;
   position: relative;
-  min-height: 480px;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+}
+
+.showcase-track {
+  display: flex;
+  width: 200%;
+  transition: transform 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
 }
 
 .showcase-slide {
-  display: none;
-  width: 100%;
-  animation: fadeInSlide 0.3s ease forwards;
+  width: 50%;
+  flex: 0 0 50%;
+  box-sizing: border-box;
+  padding: 4px;
 }
 
-.showcase-slide.active {
-  display: block;
+/* Nav Arrows */
+.showcase-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
 }
 
-@keyframes fadeInSlide {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.showcase-arrow:hover {
+  background: var(--navy);
+  color: #ffffff;
+  border-color: var(--navy);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+}
+
+.showcase-arrow.prev {
+  left: -20px;
+}
+
+.showcase-arrow.next {
+  right: -20px;
+}
+
+@media (max-width: 1040px) {
+  .showcase-arrow.prev { left: 8px; }
+  .showcase-arrow.next { right: 8px; }
 }
 
 /* Slider Dots */
 .showcase-dots {
   display: flex;
   gap: 8px;
-  margin-top: 4px;
+  margin-top: 8px;
+  align-items: center;
 }
 
 .showcase-dot {
@@ -588,13 +629,14 @@ img, svg {
   background: #cbd5e1;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 0;
+  transition: all 0.25s ease;
 }
 
 .showcase-dot.active {
   background: var(--blue);
-  width: 24px;
-  border-radius: 12px;
+  width: 26px;
+  border-radius: 13px;
 }
 
 /* Realistic Smartphone Device Frame */

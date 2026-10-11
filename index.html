@@ -218,10 +218,18 @@
             </button>
           </div>
 
-          <!-- Slider Track -->
-          <div class="showcase-slider">
-            <!-- Slide 1: PC Dashboard Mockup -->
-            <div class="showcase-slide active" id="preview-pc" data-showcase-slide="pc" role="tabpanel" aria-label="PC View">
+          <!-- Slider Track Wrapper with Nav Arrows -->
+          <div class="showcase-slider-wrapper">
+            <button type="button" class="showcase-arrow prev" data-showcase-prev aria-label="Previous Slide">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+
+            <div class="showcase-slider">
+              <div class="showcase-track" data-showcase-track>
+                <!-- Slide 1: PC Dashboard Mockup -->
+                <div class="showcase-slide" id="preview-pc" data-showcase-slide="pc" role="tabpanel" aria-label="PC View">
               <div class="mockup-main-card">
                 <div class="mockup-topbar">
                   <div class="mockup-dots">
@@ -403,15 +411,22 @@
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </div><!-- /.showcase-track -->
+          </div><!-- /.showcase-slider -->
 
-          <!-- Slider Indicators -->
-          <div class="showcase-dots">
-            <button type="button" class="showcase-dot active" data-showcase-dot="pc" aria-label="View PC Dashboard"></button>
-            <button type="button" class="showcase-dot" data-showcase-dot="mobile" aria-label="View Mobile Smartphone App"></button>
-          </div>
+          <button type="button" class="showcase-arrow next" data-showcase-next aria-label="Next Slide">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div><!-- /.showcase-slider-wrapper -->
+
+        <!-- Slider Indicators -->
+        <div class="showcase-dots">
+          <button type="button" class="showcase-dot active" data-showcase-dot="pc" aria-label="View PC Dashboard"></button>
+          <button type="button" class="showcase-dot" data-showcase-dot="mobile" aria-label="View Mobile Smartphone App"></button>
         </div>
+      </div>
       </div>
     </section>
 
@@ -1149,6 +1164,6 @@
     </a>
   </div>
 
-  <script src="./assets/js/main.js?v=20261008_1"></script>
+  <script src="./assets/js/main.js?v=20261011_2"></script>
 </body>
 </html>

@@ -519,47 +519,126 @@
   }
 
   // ==========================================
-  // HERO SHOWCASE SLIDER (PC vs MOBILE)
+  // HERO SHOWCASE SLIDER (PC vs MOBILE CAROUSEL)
   // ==========================================
   function setupHeroShowcase() {
     const showcase = document.querySelector('[data-hero-showcase]');
     if (!showcase) return;
 
+    const track = showcase.querySelector('[data-showcase-track]');
     const tabs = showcase.querySelectorAll('[data-showcase-tab]');
-    const slides = showcase.querySelectorAll('[data-showcase-slide]');
     const dots = showcase.querySelectorAll('[data-showcase-dot]');
+    const prevBtn = showcase.querySelector('[data-showcase-prev]');
+    const nextBtn = showcase.querySelector('[data-showcase-next]');
 
-    function switchSlide(targetMode) {
+    const MODES = ['pc', 'mobile'];
+    let currentIndex = 0;
+    let autoPlayTimer = null;
+
+    function applySlide(index) {
+      currentIndex = (index + MODES.length) % MODES.length;
+      const targetMode = MODES[currentIndex];
+
+      // Smooth horizontal slide
+      if (track) {
+        track.style.transform = `translateX(-${currentIndex * 50}%)`;
+      }
+
+      // Update tabs
       tabs.forEach((tab) => {
         const isActive = tab.getAttribute('data-showcase-tab') === targetMode;
         tab.classList.toggle('active', isActive);
         tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
       });
 
-      slides.forEach((slide) => {
-        const isActive = slide.getAttribute('data-showcase-slide') === targetMode;
-        slide.classList.toggle('active', isActive);
-      });
-
+      // Update indicator dots
       dots.forEach((dot) => {
         const isActive = dot.getAttribute('data-showcase-dot') === targetMode;
         dot.classList.toggle('active', isActive);
       });
     }
 
+    // Tab clicks
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         const mode = tab.getAttribute('data-showcase-tab');
-        if (mode) switchSlide(mode);
+        const idx = MODES.indexOf(mode);
+        if (idx !== -1) {
+          applySlide(idx);
+          restartAutoPlay();
+        }
       });
     });
 
+    // Dot clicks
     dots.forEach((dot) => {
       dot.addEventListener('click', () => {
         const mode = dot.getAttribute('data-showcase-dot');
-        if (mode) switchSlide(mode);
+        const idx = MODES.indexOf(mode);
+        if (idx !== -1) {
+          applySlide(idx);
+          restartAutoPlay();
+        }
       });
     });
+
+    // Prev / Next arrows
+    prevBtn?.addEventListener('click', () => {
+      applySlide(currentIndex - 1);
+      restartAutoPlay();
+    });
+
+    nextBtn?.addEventListener('click', () => {
+      applySlide(currentIndex + 1);
+      restartAutoPlay();
+    });
+
+    // Touch Swipe support for mobile screens
+    let startX = 0;
+    let endX = 0;
+    showcase.addEventListener('touchstart', (e) => {
+      startX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    showcase.addEventListener('touchend', (e) => {
+      endX = e.changedTouches[0].screenX;
+      const diff = startX - endX;
+      if (Math.abs(diff) > 45) {
+        if (diff > 0) {
+          applySlide(currentIndex + 1); // Swipe left -> next
+        } else {
+          applySlide(currentIndex - 1); // Swipe right -> prev
+        }
+        restartAutoPlay();
+      }
+    }, { passive: true });
+
+    // Optional subtle auto-rotation every 6 seconds, paused on hover
+    function startAutoPlay() {
+      stopAutoPlay();
+      autoPlayTimer = setInterval(() => {
+        applySlide(currentIndex + 1);
+      }, 6000);
+    }
+
+    function stopAutoPlay() {
+      if (autoPlayTimer) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+      }
+    }
+
+    function restartAutoPlay() {
+      stopAutoPlay();
+      startAutoPlay();
+    }
+
+    showcase.addEventListener('mouseenter', stopAutoPlay);
+    showcase.addEventListener('mouseleave', startAutoPlay);
+
+    // Initial state
+    applySlide(0);
+    startAutoPlay();
   }
 
   // ==========================================
