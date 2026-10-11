@@ -581,7 +581,10 @@ try {
             $stmt = $pdo->prepare(
                 "SELECT s.id, s.invoice_number, s.customer_name, s.total_amount, s.amount_paid, s.payment_method, s.status, s.created_at,
                         u.full_name AS cashier,
-                        (SELECT COALESCE(SUM(si.quantity), 0) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_count
+                        (SELECT COALESCE(SUM(si.quantity), 0) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS items_count,
+                        (SELECT COUNT(*) FROM tbl_sale_items si WHERE si.sale_id = s.id) AS item_lines_count,
+                        (SELECT si.item_name FROM tbl_sale_items si WHERE si.sale_id = s.id ORDER BY si.id ASC LIMIT 1) AS primary_item_name,
+                        (SELECT si.quantity FROM tbl_sale_items si WHERE si.sale_id = s.id ORDER BY si.id ASC LIMIT 1) AS primary_item_qty
                  FROM tbl_sales s LEFT JOIN tbl_users u ON u.id = s.created_by
                  WHERE {$hwhere} ORDER BY s.id DESC LIMIT 300"
             );
@@ -602,6 +605,9 @@ try {
                     'status' => (string) $r['status'],
                     'cashier' => (string) ($r['cashier'] ?? ''),
                     'items_count' => (float) ($r['items_count'] ?? 0),
+                    'item_lines_count' => (int) ($r['item_lines_count'] ?? 0),
+                    'primary_item_name' => (string) ($r['primary_item_name'] ?? ''),
+                    'primary_item_qty' => (float) ($r['primary_item_qty'] ?? 0),
                     'created_at' => (string) $r['created_at'],
                 ];
             }, $rows);

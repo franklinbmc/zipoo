@@ -182,7 +182,11 @@ const AUTO_SW_TRANSLATIONS = {
   "Low Stock": "Stoku Ndogo",
   "Products": "Bidhaa",
   "Re-order recommended": "Inashauriwa kuagiza tena",
-  "POS Sales Stream": "Mtiririko wa Mauzo ya POS",
+  "Counter POS Till": "Kaunta ya POS Till",
+  "Shift active • Cash drawer open": "Zamu ipo hewani • Droo ya fedha imefunguliwa",
+  "New Sale →": "Mauzo Mapya →",
+  "Recent Sales": "Mauzo ya Hivi Karibuni",
+  "POS Sales Stream": "Mtiririko wa Mauzo",
   "Live": "Moja kwa moja",
   "Yesterday": "Jana",
   "This Week": "Wiki Hii",
@@ -11112,12 +11116,28 @@ const setupDashboardPage = () => {
       const icon = isMobile
         ? '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M12 18h.01"/></svg>'
         : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>';
+      
+      // Real item name representation:
+      let itemTitle = "";
+      if (sale.primary_item_name) {
+        const qty = Number(sale.primary_item_qty || 1);
+        const qtyPrefix = qty > 1 ? `${qty.toLocaleString()}x ` : "";
+        const moreCount = Math.max(0, (Number(sale.item_lines_count || 1)) - 1);
+        itemTitle = `${qtyPrefix}${sale.primary_item_name}${moreCount > 0 ? ` (+${moreCount})` : ""}`;
+      } else {
+        itemTitle = sale.receipt_number || dashboardText.posSale();
+      }
+
+      const method = methodLabel(sale.payment_method);
+      const time = shortTime(sale.created_at);
+      const subInfo = [method, time].filter(Boolean).join(" &bull; ");
+
       return `
-      <button type="button" class="dashboard-list-row" data-dashboard-sale-id="${sale.id}">
+      <button type="button" class="dashboard-list-row" data-dashboard-sale-id="${sale.id}" title="${escText(sale.receipt_number || '')}">
         <span class="dashboard-sale-icon${isMobile ? " mobile" : ""}">${icon}</span>
         <div>
-          <strong>${escText(sale.receipt_number || dashboardText.posSale())}</strong>
-          <span>${escText(sale.customer_name || dashboardText.walkInCustomer())} &bull; ${methodLabel(sale.payment_method)}${shortTime(sale.created_at) ? ` &bull; ${shortTime(sale.created_at)}` : ""}</span>
+          <strong>${escText(itemTitle)}</strong>
+          <span>${subInfo}</span>
         </div>
         <b>${fmt(sale.total_amount)}</b>
       </button>

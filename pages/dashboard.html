@@ -24,7 +24,7 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Zipoo dashboard route.">
   <title>Dashboard - Zipoo</title>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=155">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=156">
   <script src="/assets/js/offline.js?v=3"></script>
 </head>
 <body>
@@ -66,11 +66,19 @@
         </a>
       </section>
 
+      <a class="dashboard-pos-banner" href="/sales?workspace=pos" aria-label="Open POS counter checkout">
+        <div class="pos-banner-info">
+          <strong data-i18n="Counter POS Till">Counter POS Till</strong>
+          <small data-i18n="Shift active • Cash drawer open">Shift active &bull; Cash drawer open</small>
+        </div>
+        <span class="pos-banner-btn" data-i18n="New Sale →">New Sale &rarr;</span>
+      </a>
+
       <section class="dashboard-stream-section">
         <article class="dashboard-panel dashboard-sales-panel">
           <div class="dashboard-panel-head">
             <div>
-              <h2>POS Sales Stream</h2>
+              <h2 data-i18n="Recent Sales">Recent Sales</h2>
             </div>
             <span class="dashboard-status-pill" data-dashboard-stream-status>Live</span>
           </div>
@@ -316,6 +324,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=157" defer></script>
+  <script src="/assets/js/app.js?v=158" defer></script>
 </body>
 </html>

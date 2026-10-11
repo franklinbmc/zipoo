@@ -7254,6 +7254,61 @@ button.report-list-row:focus-visible {
   color: var(--color-teal);
 }
 
+.dashboard-pos-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: var(--radius-lg, 16px);
+  background: linear-gradient(135deg, var(--color-navy, #0f172a), #1d3557);
+  color: #ffffff;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dashboard-pos-banner:hover,
+.dashboard-pos-banner:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+  outline: none;
+}
+
+.pos-banner-info strong {
+  display: block;
+  font-size: 0.96rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.pos-banner-info small {
+  display: block;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.pos-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--color-blue, #1477ff);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(20, 119, 255, 0.35);
+  transition: opacity 0.15s ease;
+}
+
+.dashboard-pos-banner:hover .pos-banner-btn {
+  opacity: 0.95;
+}
+
 .dashboard-stream-section {
   width: 100%;
 }
@@ -7413,11 +7468,14 @@ button.report-list-row:focus-visible {
   }
 
   .dashboard-list-row {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 10px 0;
+    gap: 10px;
   }
 
   .dashboard-list-row b {
-    grid-column: 2;
+    grid-column: 3;
+    text-align: right;
   }
 }
 
