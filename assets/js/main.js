@@ -32,8 +32,10 @@
       'hero.trust3': 'Works on phones & computers',
 
       // Demo Mockup
-      'mockup.badge': 'Sample Zipoo Dashboard',
-      'mockup.location': 'Demo Business • Retail Store',
+      'showcase.pcTab': 'Computer / Laptop View',
+      'showcase.mobileTab': 'Smartphone App View',
+      'mockup.badge': 'Live PC Dashboard',
+      'mockup.location': 'Kariakoo Wholesale • Main Branch',
       'mockup.todaySales': "Today's Sales",
       'mockup.expenses': 'Expenses',
       'mockup.credit': 'Outstanding Credit',
@@ -248,8 +250,10 @@
       'hero.trust3': 'Inafanya kazi kwenye simu & kompyuta',
 
       // Demo Mockup
-      'mockup.badge': 'Mfano wa Dashibodi ya Zipoo',
-      'mockup.location': 'Biashara ya Mfano • Duka la Reja Reja',
+      'showcase.pcTab': 'Muonekano wa Kompyuta / PC',
+      'showcase.mobileTab': 'Muonekano wa Simu ya Mkononi',
+      'mockup.badge': 'Dashibodi ya Kompyuta',
+      'mockup.location': 'Kariakoo Jumla • Tawi Kuu',
       'mockup.todaySales': 'Mauzo ya Leo',
       'mockup.expenses': 'Matumizi',
       'mockup.credit': 'Madeni ya Wateja',
@@ -515,6 +519,50 @@
   }
 
   // ==========================================
+  // HERO SHOWCASE SLIDER (PC vs MOBILE)
+  // ==========================================
+  function setupHeroShowcase() {
+    const showcase = document.querySelector('[data-hero-showcase]');
+    if (!showcase) return;
+
+    const tabs = showcase.querySelectorAll('[data-showcase-tab]');
+    const slides = showcase.querySelectorAll('[data-showcase-slide]');
+    const dots = showcase.querySelectorAll('[data-showcase-dot]');
+
+    function switchSlide(targetMode) {
+      tabs.forEach((tab) => {
+        const isActive = tab.getAttribute('data-showcase-tab') === targetMode;
+        tab.classList.toggle('active', isActive);
+        tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      slides.forEach((slide) => {
+        const isActive = slide.getAttribute('data-showcase-slide') === targetMode;
+        slide.classList.toggle('active', isActive);
+      });
+
+      dots.forEach((dot) => {
+        const isActive = dot.getAttribute('data-showcase-dot') === targetMode;
+        dot.classList.toggle('active', isActive);
+      });
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const mode = tab.getAttribute('data-showcase-tab');
+        if (mode) switchSlide(mode);
+      });
+    });
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const mode = dot.getAttribute('data-showcase-dot');
+        if (mode) switchSlide(mode);
+      });
+    });
+  }
+
+  // ==========================================
   // STICKY HEADER SCROLL SHADOW
   // ==========================================
   function setupHeaderScroll() {
@@ -542,6 +590,7 @@
     });
 
     applyLanguage(currentLang);
+    setupHeroShowcase();
     setupMobileDrawer();
     setupFaq();
     setupHeaderScroll();

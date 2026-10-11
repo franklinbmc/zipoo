@@ -7,11 +7,75 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <meta name="description" content="Zipoo - Run your business. Know your numbers. Modern all-in-one software for retail and wholesale businesses in Tanzania. Manage sales, stock, customer debts, expenses, and profits simply.">
-  <title>Zipoo — Run your business. Know your numbers.</title>
+  <meta name="description" content="Zipoo ni mfumo rahisi wa biashara unaokuwezesha kusimamia mauzo ya kaunta (POS), stoo na mizigo, madeni ya wateja, matumizi, na ripoti za faida kutoka kwenye simu au kompyuta yako nchini Tanzania.">
+  <meta name="keywords" content="POS Tanzania, mfumo wa mauzo, stoo ya bidhaa, madeni ya wateja, mauzo kaunta, point of sale Dar es Salaam, biashara Tanzania, stock management software, accounting software Tanzania">
+  <meta name="author" content="Zipoo Technologies">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://zipoo.co.tz/">
+  <title>Zipoo — Mfumo Rahisi wa Mauzo (POS), Stoo na Hesabu za Biashara Tanzania</title>
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://zipoo.co.tz/">
+  <meta property="og:title" content="Zipoo — Run your business. Know your numbers.">
+  <meta property="og:description" content="Mfumo rahisi na wa kisasa wa kusimamia mauzo (POS), stoo ya bidhaa, madeni, matumizi na faida kwa maduka na biashara nchini Tanzania.">
+  <meta property="og:image" content="https://zipoo.co.tz/assets/images/zipoo-icon.png">
+  <meta property="og:locale" content="sw_TZ">
+  <meta property="og:locale:alternate" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Zipoo — Mfumo wa Mauzo na Stoo Tanzania">
+  <meta name="twitter:description" content="Simamia mauzo kaunta, stoo, madeni ya wateja na ripoti za faida kupitia simu au kompyuta.">
+  <meta name="twitter:image" content="https://zipoo.co.tz/assets/images/zipoo-icon.png">
+
+  <!-- JSON-LD Structured Data for Local Business / Software Application -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": "Zipoo",
+        "operatingSystem": "Web, Android, iOS, Windows, macOS",
+        "applicationCategory": "BusinessApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "10000",
+          "priceCurrency": "TZS"
+        },
+        "description": "All-in-one business management and Point of Sale (POS) software for retail, wholesale and distribution stores in Tanzania.",
+        "url": "https://zipoo.co.tz",
+        "author": {
+          "@type": "Organization",
+          "name": "Zipoo Technologies",
+          "url": "https://zipoo.co.tz"
+        }
+      },
+      {
+        "@type": "Organization",
+        "name": "Zipoo Technologies",
+        "url": "https://zipoo.co.tz",
+        "logo": "https://zipoo.co.tz/assets/images/zipoo-icon.png",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Dar es Salaam",
+          "addressCountry": "TZ"
+        },
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "Customer Support",
+          "email": "mambo@zipoo.co.tz",
+          "telephone": "+255713302950",
+          "availableLanguage": ["Swahili", "English"]
+        }
+      }
+    ]
+  }
+  </script>
   
-  <link rel="icon" href="./assets/images/zipoo-icon.png?v=20261008_1" type="image/png">
-  <link rel="stylesheet" href="./assets/css/style.css?v=20261008_1">
+  <link rel="icon" href="./assets/images/zipoo-icon.png?v=20261011_1" type="image/png">
+  <link rel="stylesheet" href="./assets/css/style.css?v=20261011_1">
 
   <script>
     // Clean up any stale Service Worker or cache from previous deployments
@@ -133,91 +197,219 @@
           </div>
         </div>
 
-        <!-- Hero Graphic Showcase (Sample Demo Preview Mockup) -->
-        <div class="hero-mockup-wrapper">
-          <div class="mockup-main-card">
-            <div class="mockup-topbar">
-              <div class="mockup-dots">
-                <span class="mockup-dot red"></span>
-                <span class="mockup-dot yellow"></span>
-                <span class="mockup-dot green"></span>
-              </div>
-              <div class="mockup-header-title">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
-                <span data-i18n="mockup.location">Demo Business • Retail Store</span>
-              </div>
-              <span class="table-pill" style="background: #eef5ff; color: #1477ff;" data-i18n="mockup.badge">Sample Zipoo Dashboard</span>
-            </div>
+        <!-- Hero Graphic Showcase (Interactive PC & Mobile Dashboard Slider) -->
+        <div class="hero-showcase-container" data-hero-showcase>
+          <!-- Slider Mode Switcher Tabs -->
+          <div class="showcase-tabs" role="tablist" aria-label="Device Preview Tabs">
+            <button type="button" class="showcase-tab active" data-showcase-tab="pc" role="tab" aria-selected="true" aria-controls="preview-pc">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+              <span data-i18n="showcase.pcTab">Computer / Laptop View</span>
+            </button>
+            <button type="button" class="showcase-tab" data-showcase-tab="mobile" role="tab" aria-selected="false" aria-controls="preview-mobile">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="5" y="2" width="14" height="20" rx="3" ry="3"/>
+                <line x1="12" y1="18" x2="12.01" y2="18"/>
+              </svg>
+              <span data-i18n="showcase.mobileTab">Smartphone App View</span>
+            </button>
+          </div>
 
-            <!-- Metric Cards -->
-            <div class="mockup-grid">
-              <div class="mockup-metric">
-                <div class="mockup-metric-label" data-i18n="mockup.todaySales">Today's Sales</div>
-                <div class="mockup-metric-val">TZS 1,450,000</div>
-                <div class="mockup-metric-trend">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-                  <span>42 Sales recorded</span>
-                </div>
-              </div>
-
-              <div class="mockup-metric">
-                <div class="mockup-metric-label" data-i18n="mockup.expenses">Expenses</div>
-                <div class="mockup-metric-val" style="color: #64748b;">TZS 185,000</div>
-                <div class="mockup-metric-trend" style="color: #64748b;">
-                  <span>Rent &amp; transport entries</span>
-                </div>
-              </div>
-
-              <div class="mockup-metric">
-                <div class="mockup-metric-label" data-i18n="mockup.credit">Outstanding Credit</div>
-                <div class="mockup-metric-val" style="color: #e11438;">TZS 640,000</div>
-                <div class="mockup-metric-trend" style="color: #e11438;">
-                  <span>5 Customers due</span>
-                </div>
-              </div>
-
-              <div class="mockup-metric">
-                <div class="mockup-metric-label" data-i18n="mockup.lowStock">Low Stock</div>
-                <div class="mockup-metric-val" style="color: #d97706;" data-i18n="mockup.lowStockVal">8 Products</div>
-                <div class="mockup-metric-trend" style="color: #d97706;">
-                  <span>Re-order recommended</span>
-                </div>
-              </div>
-
-              <!-- POS Live Feed Preview -->
-              <div class="mockup-preview-table">
-                <div class="table-header-row">
-                  <span data-i18n="mockup.streamTitle">Sample POS Sales Stream</span>
-                  <span class="table-pill" style="background: #e6faf5; color: #078c71;">Shift Active</span>
+          <!-- Slider Track -->
+          <div class="showcase-slider">
+            <!-- Slide 1: PC Dashboard Mockup -->
+            <div class="showcase-slide active" id="preview-pc" data-showcase-slide="pc" role="tabpanel" aria-label="PC View">
+              <div class="mockup-main-card">
+                <div class="mockup-topbar">
+                  <div class="mockup-dots">
+                    <span class="mockup-dot red"></span>
+                    <span class="mockup-dot yellow"></span>
+                    <span class="mockup-dot green"></span>
+                  </div>
+                  <div class="mockup-header-title">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+                    <span data-i18n="mockup.location">Kariakoo Wholesale &bull; Main Branch</span>
+                  </div>
+                  <span class="table-pill" style="background: #eef5ff; color: #1477ff;" data-i18n="mockup.badge">Live PC Dashboard</span>
                 </div>
 
-                <div class="preview-row">
-                  <div class="preview-row-item">
-                    <div class="preview-item-icon">
-                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
-                    </div>
-                    <div>
-                      <strong style="color: var(--navy); display: block; font-size: 0.92rem;">Azam Energy Drink 330ml (x24)</strong>
-                      <small style="color: var(--text-muted); font-size: 0.78rem;"><span data-i18n="mockup.cash">Cash</span> &bull; 10:42 AM</small>
+                <div class="mockup-grid">
+                  <div class="mockup-metric">
+                    <div class="mockup-metric-label" data-i18n="mockup.todaySales">Today's Sales</div>
+                    <div class="mockup-metric-val">TZS 1,450,000</div>
+                    <div class="mockup-metric-trend">
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                      <span>42 Sales recorded</span>
                     </div>
                   </div>
-                  <span class="preview-row-amount">TZS 26,000</span>
-                </div>
 
-                <div class="preview-row">
-                  <div class="preview-row-item">
-                    <div class="preview-item-icon" style="background: #e6faf5; color: #0bbf9a;">
-                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                    </div>
-                    <div>
-                      <strong style="color: var(--navy); display: block; font-size: 0.92rem;">Kilimanjaro Water 1.5L (x12)</strong>
-                      <small style="color: var(--text-muted); font-size: 0.78rem;"><span data-i18n="mockup.mpesa">Lipa kwa Simu</span> &bull; 10:38 AM</small>
+                  <div class="mockup-metric">
+                    <div class="mockup-metric-label" data-i18n="mockup.expenses">Expenses</div>
+                    <div class="mockup-metric-val" style="color: #64748b;">TZS 185,000</div>
+                    <div class="mockup-metric-trend" style="color: #64748b;">
+                      <span>Rent &amp; transport entries</span>
                     </div>
                   </div>
-                  <span class="preview-row-amount">TZS 18,000</span>
+
+                  <div class="mockup-metric">
+                    <div class="mockup-metric-label" data-i18n="mockup.credit">Outstanding Credit</div>
+                    <div class="mockup-metric-val" style="color: #e11438;">TZS 640,000</div>
+                    <div class="mockup-metric-trend" style="color: #e11438;">
+                      <span>5 Customers due</span>
+                    </div>
+                  </div>
+
+                  <div class="mockup-metric">
+                    <div class="mockup-metric-label" data-i18n="mockup.lowStock">Low Stock</div>
+                    <div class="mockup-metric-val" style="color: #d97706;" data-i18n="mockup.lowStockVal">8 Products</div>
+                    <div class="mockup-metric-trend" style="color: #d97706;">
+                      <span>Re-order recommended</span>
+                    </div>
+                  </div>
+
+                  <!-- POS Live Feed Preview -->
+                  <div class="mockup-preview-table">
+                    <div class="table-header-row">
+                      <span data-i18n="mockup.streamTitle">Sample POS Sales Stream</span>
+                      <span class="table-pill" style="background: #e6faf5; color: #078c71;">Shift Active</span>
+                    </div>
+
+                    <div class="preview-row">
+                      <div class="preview-row-item">
+                        <div class="preview-item-icon">
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+                        </div>
+                        <div>
+                          <strong style="color: var(--navy); display: block; font-size: 0.92rem;">Azam Energy Drink 330ml (x24)</strong>
+                          <small style="color: var(--text-muted); font-size: 0.78rem;"><span data-i18n="mockup.cash">Cash</span> &bull; 10:42 AM</small>
+                        </div>
+                      </div>
+                      <span class="preview-row-amount">TZS 26,000</span>
+                    </div>
+
+                    <div class="preview-row">
+                      <div class="preview-row-item">
+                        <div class="preview-item-icon" style="background: #e6faf5; color: #0bbf9a;">
+                          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        </div>
+                        <div>
+                          <strong style="color: var(--navy); display: block; font-size: 0.92rem;">Kilimanjaro Water 1.5L (x12)</strong>
+                          <small style="color: var(--text-muted); font-size: 0.78rem;"><span data-i18n="mockup.mpesa">Lipa kwa Simu</span> &bull; 10:38 AM</small>
+                        </div>
+                      </div>
+                      <span class="preview-row-amount">TZS 18,000</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
+
+            <!-- Slide 2: Mobile Smartphone App Mockup -->
+            <div class="showcase-slide" id="preview-mobile" data-showcase-slide="mobile" role="tabpanel" aria-label="Mobile App View">
+              <div class="phone-frame">
+                <div class="phone-speaker"></div>
+                <div class="phone-screen">
+                  <!-- Phone App Top Bar -->
+                  <div class="phone-topbar">
+                    <div class="phone-brand">
+                      <span class="phone-brand-mark">Z</span>
+                      <span class="phone-brand-name">Zipoo</span>
+                    </div>
+                    <div class="phone-top-actions">
+                      <span class="phone-live-dot" title="Online &amp; Syncing"></span>
+                      <span class="phone-menu-icon" aria-hidden="true">&#9776;</span>
+                    </div>
+                  </div>
+
+                  <!-- Phone KPI Grid -->
+                  <div class="phone-kpi-grid">
+                    <div class="phone-kpi-card">
+                      <span class="phone-kpi-label">Today's Sales</span>
+                      <strong class="phone-kpi-val">TZS 1,450,000</strong>
+                      <small class="phone-kpi-sub">42 sales today</small>
+                    </div>
+                    <div class="phone-kpi-card">
+                      <span class="phone-kpi-label">Expenses</span>
+                      <strong class="phone-kpi-val muted">TZS 185,000</strong>
+                      <small class="phone-kpi-sub">5 records</small>
+                    </div>
+                    <div class="phone-kpi-card">
+                      <span class="phone-kpi-label">Debts (Madeni)</span>
+                      <strong class="phone-kpi-val danger">TZS 640,000</strong>
+                      <small class="phone-kpi-sub danger">5 customers due</small>
+                    </div>
+                    <div class="phone-kpi-card">
+                      <span class="phone-kpi-label">Low Stock</span>
+                      <strong class="phone-kpi-val warning">8 Products</strong>
+                      <small class="phone-kpi-sub warning">Re-order soon</small>
+                    </div>
+                  </div>
+
+                  <!-- Quick Action POS Strip -->
+                  <div class="phone-pos-banner">
+                    <div>
+                      <strong>Counter POS Till</strong>
+                      <small>Shift active &bull; Cash drawer open</small>
+                    </div>
+                    <span class="phone-pos-btn">New Sale &rarr;</span>
+                  </div>
+
+                  <!-- Recent Mobile Feed -->
+                  <div class="phone-sales-feed">
+                    <div class="phone-feed-title">
+                      <span>Recent Sales</span>
+                      <span class="phone-pill">Live</span>
+                    </div>
+                    <div class="phone-feed-row">
+                      <div>
+                        <strong>Azam Energy Drink 330ml</strong>
+                        <small>Cash &bull; 10:42 AM</small>
+                      </div>
+                      <span class="phone-feed-amt">TZS 26,000</span>
+                    </div>
+                    <div class="phone-feed-row">
+                      <div>
+                        <strong>Kilimanjaro Water 1.5L</strong>
+                        <small>Lipa kwa Simu &bull; 10:38 AM</small>
+                      </div>
+                      <span class="phone-feed-amt">TZS 18,000</span>
+                    </div>
+                  </div>
+
+                  <!-- Phone Bottom Navigation Bar (matches Zipoo App M-Pesa style) -->
+                  <div class="phone-bottom-nav">
+                    <div class="phone-nav-item active">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-4a1 1 0 0 0-1-1h-3a1 1 0 0 0-1 1v4a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z"/></svg>
+                      <span>Home</span>
+                    </div>
+                    <div class="phone-nav-item">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/></svg>
+                      <span>Invoices</span>
+                    </div>
+                    <div class="phone-nav-item phone-nav-pos">
+                      <div class="phone-pos-circle">POS</div>
+                    </div>
+                    <div class="phone-nav-item">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l1-5h16l1 5M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/></svg>
+                      <span>Services</span>
+                    </div>
+                    <div class="phone-nav-item">
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/></svg>
+                      <span>Support</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slider Indicators -->
+          <div class="showcase-dots">
+            <button type="button" class="showcase-dot active" data-showcase-dot="pc" aria-label="View PC Dashboard"></button>
+            <button type="button" class="showcase-dot" data-showcase-dot="mobile" aria-label="View Mobile Smartphone App"></button>
           </div>
         </div>
       </div>

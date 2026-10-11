@@ -499,14 +499,366 @@ img, svg {
 }
 
 /* ==========================================================================
-   HERO DEMO DASHBOARD MOCKUP
+   HERO DEMO DASHBOARD SHOWCASE (PC & MOBILE SLIDER)
    ========================================================================== */
 
-.hero-mockup-wrapper {
+.hero-showcase-container {
   max-width: 980px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
+/* Tabs Switcher */
+.showcase-tabs {
+  display: inline-flex;
+  background: rgba(15, 23, 42, 0.06);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  gap: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.showcase-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.showcase-tab:hover {
+  color: var(--navy);
+}
+
+.showcase-tab.active {
+  background: #ffffff;
+  color: var(--blue);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* Slider Track */
+.showcase-slider {
+  width: 100%;
+  position: relative;
+  min-height: 480px;
+}
+
+.showcase-slide {
+  display: none;
+  width: 100%;
+  animation: fadeInSlide 0.3s ease forwards;
+}
+
+.showcase-slide.active {
+  display: block;
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slider Dots */
+.showcase-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.showcase-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.showcase-dot.active {
+  background: var(--blue);
+  width: 24px;
+  border-radius: 12px;
+}
+
+/* Realistic Smartphone Device Frame */
+.phone-frame {
+  max-width: 360px;
+  margin: 0 auto;
+  background: #0f172a;
+  border-radius: 40px;
+  padding: 12px;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.phone-speaker {
+  width: 50px;
+  height: 4px;
+  background: #334155;
+  border-radius: 3px;
+  margin: 6px auto 10px;
+}
+
+.phone-screen {
+  background: #f8fafc;
+  border-radius: 30px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-main);
+  text-align: left;
+  min-height: 520px;
+}
+
+.phone-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.phone-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.phone-brand-mark {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--navy);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.phone-brand-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.phone-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.phone-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.phone-menu-icon {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+}
+
+/* Phone KPI 2x2 grid */
+.phone-kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 12px;
+}
+
+.phone-kpi-card {
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.phone-kpi-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.phone-kpi-val {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--navy);
+  font-family: var(--font-mono);
+}
+
+.phone-kpi-val.muted { color: #64748b; }
+.phone-kpi-val.danger { color: #e11438; }
+.phone-kpi-val.warning { color: #d97706; }
+
+.phone-kpi-sub {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--teal-dark);
+}
+
+.phone-kpi-sub.danger { color: #e11438; }
+.phone-kpi-sub.warning { color: #d97706; }
+
+/* Phone POS Banner */
+.phone-pos-banner {
+  margin: 0 12px;
+  background: linear-gradient(135deg, var(--navy), #1d3557);
+  color: #ffffff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.phone-pos-banner strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.phone-pos-banner small {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.phone-pos-btn {
+  background: var(--blue);
+  color: #ffffff;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* Phone Sales Feed */
+.phone-sales-feed {
+  background: #ffffff;
+  margin: 10px 12px;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  flex: 1;
+}
+
+.phone-feed-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.phone-pill {
+  background: #e6faf5;
+  color: #078c71;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+}
+
+.phone-feed-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.phone-feed-row:last-child {
+  border-bottom: none;
+}
+
+.phone-feed-row strong {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--navy);
+}
+
+.phone-feed-row small {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.phone-feed-amt {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+/* Phone Bottom Nav (M-Pesa style floating POS) */
+.phone-bottom-nav {
+  margin-top: auto;
+  background: #ffffff;
+  border-top: 1px solid var(--border-light);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  padding: 6px 4px 8px;
+}
+
+.phone-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.phone-nav-item.active {
+  color: var(--blue);
+}
+
+.phone-nav-pos {
+  position: relative;
+  top: -12px;
+}
+
+.phone-pos-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 0.72rem;
+  box-shadow: 0 4px 12px rgba(20, 119, 255, 0.4);
+}
+
+/* Fallback & Existing Card Styles */
 .mockup-main-card {
   background: #ffffff;
   border: 1px solid var(--border);
