@@ -11036,7 +11036,7 @@ const setupDashboardPage = () => {
     expensesCount: (today, month) => isSw()
       ? `${today} leo • ${month} mwezi huu`
       : `${today} today • ${month} this month`,
-    noRecentSales: () => isSw() ? "Hakuna mauzo ya POS ya hivi karibuni." : "No recent POS sales yet.",
+    noRecentSales: () => isSw() ? "Hakuna mauzo ya leo bado." : "No recent sales today.",
     loadingSaleItems: () => isSw() ? "Inapakia bidhaa za mauzo..." : "Loading sale items...",
     couldNotLoadSale: () => isSw() ? "Imeshindikana kupakia mauzo." : "Could not load sale.",
     noItemsForSale: () => isSw() ? "Hakuna bidhaa kwenye mauzo haya." : "No items found for this sale.",
@@ -11134,7 +11134,6 @@ const setupDashboardPage = () => {
 
       return `
       <button type="button" class="dashboard-list-row" data-dashboard-sale-id="${sale.id}" title="${escText(sale.receipt_number || '')}">
-        <span class="dashboard-sale-icon${isMobile ? " mobile" : ""}">${icon}</span>
         <div>
           <strong>${escText(itemTitle)}</strong>
           <span>${subInfo}</span>
@@ -11240,15 +11239,6 @@ const setupDashboardPage = () => {
       /* Keep the static empty states when offline or unauthenticated. */
     }
   };
-
-  document.querySelectorAll("[data-dashboard-stream-range]").forEach((button) => {
-    button.addEventListener("click", () => {
-      document.querySelectorAll("[data-dashboard-stream-range]").forEach((btn) => btn.classList.remove("active"));
-      button.classList.add("active");
-      streamRange = button.dataset.dashboardStreamRange || "today";
-      loadDashboard();
-    });
-  });
 
   loadDashboard();
 };

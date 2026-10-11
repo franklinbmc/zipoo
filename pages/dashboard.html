@@ -24,7 +24,7 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="description" content="Zipoo dashboard route.">
   <title>Dashboard - Zipoo</title>
-  <link rel="stylesheet" href="/assets/css/styles.css?v=156">
+  <link rel="stylesheet" href="/assets/css/styles.css?v=157">
   <script src="/assets/js/offline.js?v=3"></script>
 </head>
 <body>
@@ -55,7 +55,7 @@
           <small data-dashboard-expenses-count>0 expenses this month</small>
         </a>
         <a class="dashboard-kpi-card" href="/sales?workspace=debts" aria-label="Open unpaid credit sales">
-          <span class="dashboard-kpi-label">Pay Later Debts</span>
+          <span class="dashboard-kpi-label" data-i18n="Debts (Madeni)">Debts (Madeni)</span>
           <strong class="dashboard-kpi-value danger amount-fit" data-dashboard-amount-due>TZS 0</strong>
           <small class="danger" data-dashboard-overdue>0 customers due</small>
         </a>
@@ -82,14 +82,8 @@
             </div>
             <span class="dashboard-status-pill" data-dashboard-stream-status>Live</span>
           </div>
-          <div class="dashboard-stream-filters" data-dashboard-stream-filters>
-            <button type="button" class="filter-pill active" data-dashboard-stream-range="today">Today</button>
-            <button type="button" class="filter-pill" data-dashboard-stream-range="yesterday">Yesterday</button>
-            <button type="button" class="filter-pill" data-dashboard-stream-range="week">This Week</button>
-            <button type="button" class="filter-pill" data-dashboard-stream-range="month">This Month</button>
-          </div>
           <div class="dashboard-list" data-dashboard-sales-list>
-            <p class="dashboard-empty">No recent POS sales yet.</p>
+            <p class="dashboard-empty">No recent sales today.</p>
           </div>
         </article>
       </section>
@@ -324,6 +318,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=158" defer></script>
+  <script src="/assets/js/app.js?v=159" defer></script>
 </body>
 </html>
