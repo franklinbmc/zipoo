@@ -5366,6 +5366,7 @@ button.settings-list-row:focus-visible {
 [data-rent-form-modal] .fullscreen-body,
 [data-staff-form-modal] .fullscreen-body,
 [data-tenancy-detail-workspace] .fullscreen-body,
+[data-rent-reminder-modal] .fullscreen-body,
 [data-account-edit-modal] .fullscreen-body,
 [data-business-manager-modal] .fullscreen-body,
 [data-business-create-modal] .fullscreen-body,
@@ -5397,6 +5398,10 @@ button.settings-list-row:focus-visible {
 
 [data-rent-form-modal] {
   z-index: 80 !important;
+}
+
+[data-rent-reminder-modal] {
+  z-index: 85 !important;
 }
 
 [data-amenity-chip] {
