@@ -10342,9 +10342,9 @@ const setupRealEstatePage = () => {
         const tenantInfo = occupied && u.tenant_name
           ? `<div style="font-size:0.78rem;color:var(--color-navy);margin-top:3px;">Tenant: <strong>${esc(u.tenant_name)}</strong></div>`
           : `<div style="font-size:0.75rem;color:var(--color-muted);margin-top:2px;">No tenant assigned</div>`;
-        const endTenancyBtn = occupied && u.tenancy_id
-          ? `<button type="button" class="btn btn-danger-outline btn-sm" data-unit-end-tenancy="${u.tenancy_id}" style="padding:3px 8px;font-size:0.74rem;">End Tenancy</button>`
-          : (occupied ? "" : `<button type="button" class="btn btn-outline btn-sm" data-unit-new-tenancy="${u.id}" style="padding:3px 8px;font-size:0.74rem;">+ Assign</button>`);
+        const assignBtn = !occupied
+          ? `<button type="button" class="btn btn-outline btn-sm" data-unit-new-tenancy="${u.id}" style="padding:3px 8px;font-size:0.74rem;">+ Assign</button>`
+          : "";
         const chevronBtn = occupied && u.tenancy_id
           ? `<button type="button" class="icon-button" data-unit-view-tenancy="${u.tenancy_id}" aria-label="View tenancy details" title="View tenancy and payment history" style="width:32px;height:32px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;margin-left:4px;">
               <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-navy);"><path d="M184 112l144 144-144 144"/></svg>
@@ -10359,7 +10359,7 @@ const setupRealEstatePage = () => {
               ${tenantInfo}
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">
-              ${endTenancyBtn}
+              ${assignBtn}
               <button type="button" class="icon-button" data-unit-edit="${u.id}" aria-label="Edit unit" title="Edit unit" style="width:32px;height:32px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;">
                 <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-navy);"><path d="M384 224L128 480H32v-96l256-256 96 96zM320 160l64-64 96 96-64 64-96-96z"/></svg>
               </button>
@@ -10616,19 +10616,6 @@ const setupRealEstatePage = () => {
     if (viewTenancyId) {
       e.stopPropagation();
       openTenancyDetail(viewTenancyId);
-      return;
-    }
-    const endTenancyId = e.target.closest("[data-unit-end-tenancy]")?.dataset.unitEndTenancy;
-    if (endTenancyId) {
-      e.stopPropagation();
-      const ok = await showConfirmModal({ title: "End tenancy", message: "End this tenancy? The unit will be marked vacant.", confirmLabel: "End tenancy", danger: true });
-      if (!ok) return;
-      try {
-        const b = new FormData(); b.set("action", "tenancy_end"); b.set("tenancy_id", endTenancyId);
-        await api({ body: b });
-        if (currentProperty) await openPropertyDetail(currentProperty.id);
-        loadAll();
-      } catch (err) { await showAppModal("Real Estate", err.message); }
       return;
     }
     const newTenancyUnitId = e.target.closest("[data-unit-new-tenancy]")?.dataset.unitNewTenancy;
