@@ -5378,6 +5378,27 @@ button.settings-list-row:focus-visible {
   max-width: 1100px;
 }
 
+/* Layering hierarchy for nested workspaces and action modals */
+[data-upcoming-payments-workspace],
+[data-property-detail-workspace] {
+  z-index: 55;
+}
+
+[data-tenancy-detail-workspace] {
+  z-index: 60;
+}
+
+[data-property-form-modal],
+[data-unit-form-modal],
+[data-tenancy-form-modal],
+[data-staff-form-modal] {
+  z-index: 70;
+}
+
+[data-rent-form-modal] {
+  z-index: 80 !important;
+}
+
 .report-controls {
   position: sticky;
   top: 0;
