@@ -10152,8 +10152,9 @@ const setupRealEstatePage = () => {
   const kpiUnits = document.querySelector("[data-kpi-units]");
   const kpiTenancies = document.querySelector("[data-kpi-tenancies]");
   const kpiRent = document.querySelector("[data-kpi-rent]");
-  const badgeTenanciesCount = document.querySelector("[data-badge-tenancies-count]");
   const badgePropertiesCount = document.querySelector("[data-badge-properties-count]");
+  const upcomingSummaryText = document.querySelector("[data-upcoming-summary-text]");
+  const upcomingBadge = document.querySelector("[data-upcoming-badge]");
 
   const updateSummaryUI = (s) => {
     if (!s) return;
@@ -10172,9 +10173,10 @@ const setupRealEstatePage = () => {
   let staffCache = [];
   let currentProperty = null;
 
-  // ======================= TENANCY OVERVIEW =======================
-  const tenancyOverviewList = document.querySelector("[data-tenancy-overview-list]");
-  const tenancyOverviewEmpty = document.querySelector("[data-tenancy-overview-empty]");
+  // ======================= UPCOMING PAYMENTS =======================
+  const upcomingPaymentsWorkspace = document.querySelector("[data-upcoming-payments-workspace]");
+  const upcomingListEl = document.querySelector("[data-upcoming-list]");
+  const upcomingEmptyEl = document.querySelector("[data-upcoming-empty]");
 
   const diffMonthsDays = (a, b) => {
     let months = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
@@ -10190,18 +10192,19 @@ const setupRealEstatePage = () => {
     return parts.join(" ");
   };
   const remainingInfo = (paidUntil, chargeType) => {
-    if (!paidUntil) return { text: "Renewal: Not paid", deadlineText: "No renewal date", cls: "out-of-stock" };
+    if (!paidUntil) return { text: "Renewal: Not paid", deadlineText: "No renewal date", cls: "out-of-stock", daysDiff: -999999 };
     const end = parseDate(paidUntil);
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    if (!end) return { text: "—", deadlineText: "—", cls: "" };
+    if (!end) return { text: "—", deadlineText: "—", cls: "", daysDiff: 999999 };
     const formattedEnd = formatDate(paidUntil);
+    const dayDiff = Math.round((end - today) / 86400000);
     if (end >= today) {
       if (chargeType === "daily") {
-        const d = Math.round((end - today) / 86400000);
         return {
-          text: d <= 0 ? "Renewal: Due today" : `Renewal: in ${d} day${d !== 1 ? "s" : ""}`,
-          deadlineText: `Renewal: ${formattedEnd} (${d}d left)`,
-          cls: d <= 3 ? "low-stock" : "in-stock"
+          text: dayDiff <= 0 ? "Renewal: Due today" : `Renewal: in ${dayDiff} day${dayDiff !== 1 ? "s" : ""}`,
+          deadlineText: `Renewal: ${formattedEnd} (${dayDiff}d left)`,
+          cls: dayDiff <= 3 ? "low-stock" : "in-stock",
+          daysDiff: dayDiff,
         };
       }
       const { months, days } = diffMonthsDays(today, end);
@@ -10209,38 +10212,63 @@ const setupRealEstatePage = () => {
       return {
         text: txt ? `Renewal: in ${txt}` : "Renewal: Due today",
         deadlineText: `Renewal: ${formattedEnd} (${txt || "today"})`,
-        cls: (months === 0 && days <= 3) ? "low-stock" : "in-stock"
+        cls: (months === 0 && days <= 3) ? "low-stock" : "in-stock",
+        daysDiff: dayDiff,
       };
     }
     if (chargeType === "daily") {
-      const d = Math.round((today - end) / 86400000);
+      const overdueDays = Math.abs(dayDiff);
       return {
-        text: `Overdue ${d} day${d !== 1 ? "s" : ""}`,
-        deadlineText: `Expired ${formattedEnd} (${d}d overdue)`,
-        cls: "out-of-stock"
+        text: `Overdue ${overdueDays} day${overdueDays !== 1 ? "s" : ""}`,
+        deadlineText: `Expired ${formattedEnd} (${overdueDays}d overdue)`,
+        cls: "out-of-stock",
+        daysDiff: dayDiff,
       };
     }
     const { months, days } = diffMonthsDays(end, today);
     return {
       text: `Overdue by ${spanText(months, days) || "0 days"}`,
       deadlineText: `Expired ${formattedEnd} (${spanText(months, days) || "0d"} overdue)`,
-      cls: "out-of-stock"
+      cls: "out-of-stock",
+      daysDiff: dayDiff,
     };
   };
 
-  const renderTenancyOverview = (list) => {
+  const renderUpcomingPayments = (list) => {
     rentOverviewCache = list || [];
-    const activeList = rentOverviewCache.filter((r) => r.status === "active");
-    if (badgeTenanciesCount) badgeTenanciesCount.textContent = `${activeList.length} active`;
-    if (!rentOverviewCache.length) {
-      if (tenancyOverviewList) tenancyOverviewList.replaceChildren();
-      if (tenancyOverviewEmpty) tenancyOverviewEmpty.hidden = false;
+    // Filter active tenancies and sort by closest deadline (ascending daysDiff)
+    const active = rentOverviewCache
+      .filter((r) => r.status === "active")
+      .map((r) => ({ ...r, _rem: remainingInfo(r.paid_until, r.charge_type) }))
+      .sort((a, b) => a._rem.daysDiff - b._rem.daysDiff);
+
+    // Update banner summary
+    const overdueCount = active.filter((r) => r._rem.daysDiff < 0).length;
+    const dueSoonCount = active.filter((r) => r._rem.daysDiff >= 0 && r._rem.daysDiff <= 7).length;
+    if (upcomingSummaryText) {
+      if (overdueCount > 0) {
+        upcomingSummaryText.textContent = `${overdueCount} overdue &bull; ${active.length} active tenancies`;
+      } else if (dueSoonCount > 0) {
+        upcomingSummaryText.textContent = `${dueSoonCount} due soon &bull; ${active.length} active tenancies`;
+      } else if (active.length > 0) {
+        upcomingSummaryText.textContent = `${active.length} active tenancies tracked`;
+      } else {
+        upcomingSummaryText.textContent = "Check tenancy renewal & rent deadlines";
+      }
+    }
+    if (upcomingBadge) {
+      upcomingBadge.textContent = overdueCount > 0 ? `${overdueCount} overdue` : `${active.length} active`;
+    }
+
+    if (!active.length) {
+      if (upcomingListEl) upcomingListEl.replaceChildren();
+      if (upcomingEmptyEl) upcomingEmptyEl.hidden = false;
       return;
     }
-    if (tenancyOverviewEmpty) tenancyOverviewEmpty.hidden = true;
-    if (tenancyOverviewList) {
-      tenancyOverviewList.innerHTML = rentOverviewCache.map((r) => {
-        const rem = r.status === "active" ? remainingInfo(r.paid_until, r.charge_type) : { text: "Contract Ended", deadlineText: "Ended", cls: "out-of-stock" };
+    if (upcomingEmptyEl) upcomingEmptyEl.hidden = true;
+    if (upcomingListEl) {
+      upcomingListEl.innerHTML = active.map((r) => {
+        const rem = r._rem;
         const contractDeadline = r.end_date ? ` • Contract End: ${formatDate(r.end_date)}` : "";
         const paidUntilLine = r.paid_until ? `Paid until ${formatDate(r.paid_until)}` : "No rent recorded";
         return `
@@ -10430,7 +10458,7 @@ const setupRealEstatePage = () => {
       const data = await api({ query: "" });
       updateSummaryUI(data.summary);
       renderProperties(data.properties || []);
-      renderTenancyOverview(data.tenants || []);
+      renderUpcomingPayments(data.tenants || []);
       renderTenancies(data.tenancies || []);
       renderHistory(data.payments || []);
       renderStaff(data.staff || []);
@@ -10815,8 +10843,16 @@ const setupRealEstatePage = () => {
   document.querySelectorAll("[data-open-record-rent]").forEach((b) => b.addEventListener("click", () => openRentForm()));
   document.querySelector("[data-rent-form-close]")?.addEventListener("click", () => { if (rentFormModal) rentFormModal.hidden = true; });
 
-  // Quick Collect or View Tenancy from tenancy overview cards
-  tenancyOverviewList?.addEventListener("click", (e) => {
+  // Open / Close Upcoming Payments Workspace
+  document.querySelector("[data-open-upcoming-payments]")?.addEventListener("click", () => {
+    if (upcomingPaymentsWorkspace) upcomingPaymentsWorkspace.hidden = false;
+  });
+  document.querySelector("[data-upcoming-payments-close]")?.addEventListener("click", () => {
+    closeWorkspace(upcomingPaymentsWorkspace);
+  });
+
+  // Quick Collect or View Tenancy from Upcoming Payments list
+  upcomingListEl?.addEventListener("click", (e) => {
     const quickPayId = e.target.closest("[data-quick-pay]")?.dataset.quickPay;
     if (quickPayId) {
       e.stopPropagation();

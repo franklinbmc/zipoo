@@ -59,22 +59,22 @@
         </div>
       </section>
 
-      <!-- Tenancy Overview Section -->
-      <section class="re-section" style="margin-top:20px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <h2 style="font-size:1.1rem;font-weight:900;color:var(--color-navy);margin:0;">Overview of Tenancy</h2>
-          <span class="badge-stock in-stock" data-badge-tenancies-count style="font-size:0.75rem;">0 active</span>
-        </div>
-        <div class="stock-list" data-tenancy-overview-list></div>
-        <div class="company-users-empty" hidden data-tenancy-overview-empty style="text-align:center;padding:32px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;margin-bottom:20px;">
-          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M144 48v416l40-28 40 28 40-28 40 28 40-28 40 28V48zM200 176h112M200 256h112" /></svg>
-          <strong style="display:block;color:var(--color-navy);font-size:0.95rem;margin-bottom:4px;">No active tenancies</strong>
-          <p style="margin:0;font-size:0.82rem;color:var(--color-muted);">Active tenancies and their renewal deadlines will appear here.</p>
-        </div>
+      <!-- Upcoming Payments Banner / Card -->
+      <section style="margin-top:16px;">
+        <button type="button" class="dashboard-pos-banner" data-open-upcoming-payments aria-label="Open upcoming rent payments" style="width:100%;text-align:left;cursor:pointer;border:none;background:linear-gradient(135deg,#0e74db,#1d4ed8);">
+          <div class="pos-banner-info">
+            <strong style="color:#ffffff;display:flex;align-items:center;gap:8px;">
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width:20px;height:20px;fill:currentColor;"><path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64zm0 344c-83.8 0-152-68.2-152-152S172.2 104 256 104s152 68.2 152 152-68.2 152-152 152zm16-248h-32v120l104 62.4 16-26.2-90.4-53.6V160z"/></svg>
+              Upcoming Payments
+            </strong>
+            <small style="color:rgba(255,255,255,0.85);" data-upcoming-summary-text>Check tenancy renewal &amp; rent deadlines</small>
+          </div>
+          <span class="pos-banner-btn" data-upcoming-badge style="background:#ffffff;color:#1d4ed8;font-weight:800;">View &rarr;</span>
+        </button>
       </section>
 
       <!-- Properties List Section -->
-      <section class="re-section" style="margin-top:24px;">
+      <section class="re-section" style="margin-top:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
           <h2 style="font-size:1.1rem;font-weight:900;color:var(--color-navy);margin:0;">Properties</h2>
           <span class="badge-stock in-stock" data-badge-properties-count style="font-size:0.75rem;">0 properties</span>
@@ -87,6 +87,28 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- Workspace: Upcoming Payments (Tenancies sorted by upcoming renewal deadline) -->
+  <div class="fullscreen-modal" hidden data-upcoming-payments-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-upcoming-payments-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2>Upcoming Payments</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body" style="padding:16px;">
+        <p style="font-size:0.82rem;color:var(--color-muted);margin:0 0 14px;">Tenancies ordered by renewal &amp; rent deadline. Tap any tenancy to view details and payment history.</p>
+        <div class="stock-list" data-upcoming-list></div>
+        <div class="company-users-empty" hidden data-upcoming-empty style="text-align:center;padding:32px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;">
+          <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M144 48v416l40-28 40 28 40-28 40 28 40-28 40 28V48zM200 176h112M200 256h112" /></svg>
+          <strong style="display:block;color:var(--color-navy);font-size:0.95rem;margin-bottom:4px;">No upcoming payments</strong>
+          <p style="margin:0;font-size:0.82rem;color:var(--color-muted);">All active tenancies are up to date or no active tenancies recorded.</p>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- Workspace: Property detail (units) -->
@@ -469,6 +491,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=161" defer></script>
+  <script src="/assets/js/app.js?v=162" defer></script>
 </body>
 </html>
