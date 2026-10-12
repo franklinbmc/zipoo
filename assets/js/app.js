@@ -10368,6 +10368,11 @@ const setupRealEstatePage = () => {
         const assignBtn = !occupied
           ? `<button type="button" class="btn btn-outline btn-sm" data-unit-new-tenancy="${u.id}" style="padding:3px 8px;font-size:0.74rem;">+ Assign</button>`
           : "";
+        const chevronBtn = occupied && u.tenancy_id
+          ? `<button type="button" class="icon-button" data-unit-view-tenancy="${u.tenancy_id}" aria-label="View tenancy details" title="View tenancy and payment history" style="width:32px;height:32px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;margin-left:4px;">
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-navy);"><path d="M184 112l144 144-144 144"/></svg>
+            </button>`
+          : "";
         let paymentMathHtml = "";
         if (occupied && u.tenancy_id) {
           const rem = remainingInfo(u.paid_until, u.charge_type);
