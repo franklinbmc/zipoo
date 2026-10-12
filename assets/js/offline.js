@@ -253,7 +253,7 @@
       return out;
     }
 
-    if (ep === "sales" && q.get("history") === "pos") {
+    if (ep === "sales" && (q.get("history") === "pos" || q.get("history") === "recent")) {
       let best = null;
       for (const e of mine) {
         const d = parse(e);
@@ -427,7 +427,10 @@
     return d;
   };
 
-  const isHistoryRequest = (u) => u.searchParams.get("history") === "pos";
+  const isHistoryRequest = (u) => {
+    const h = u.searchParams.get("history");
+    return h === "pos" || h === "recent";
+  };
   const isInvoiceList = (u) => !u.searchParams.get("id") && !u.searchParams.get("history") && !u.searchParams.get("action");
 
   const PATCH = {};
@@ -544,10 +547,16 @@
         if ((from && day < from) || (to && day > to)) return d;
         if (q.get("q") && !`${s.receipt_number} ${s.customer_name}`.toLowerCase().includes(q.get("q").toLowerCase())) return d;
         if (q.get("debt") === "pay_later" && !s.pay_later) return d;
+        const primaryLine = s.lines[0] || {};
+        const itemsSummary = s.lines.map((l) => `${l.quantity > 1 ? `${l.quantity}x ` : ""}${l.item_name}`).join(", ");
         d.sales = [{
           id: s.sale_id, receipt_number: s.receipt_number, customer_name: s.customer_name, total_amount: s.total_amount,
           amount_paid: s.settled, amount_due: Math.max(0, round2(s.total_amount - s.settled)), payment_method: s.payment_method,
           status: s.status, cashier: currentUser().full_name || "", items_count: s.lines.reduce((n, l) => n + l.quantity, 0),
+          item_lines_count: s.lines.length,
+          primary_item_name: primaryLine.item_name || "",
+          primary_item_qty: primaryLine.quantity || 1,
+          items_summary: itemsSummary,
           created_at: s.created_at, pending_sync: true,
         }, ...d.sales];
         if (d.stats) {
@@ -1467,6 +1476,7 @@
       "shifts.php?action=current", "shifts.php?action=list",
       "accounts.php", "accounts.php?action=expenses", "accounts.php?action=expense_categories", "accounts.php?action=activity",
       "sales.php", `sales.php?history=pos&from=${from}&to=${today}`, `sales.php?history=pos&from=${today}&to=${today}`,
+      "sales.php?history=recent", `sales.php?history=recent&from=${today}&to=${today}`,
       "warehouses.php", "purchasing.php", "stock-movements.php", "company-users.php",
       "realestate.php", "realestate.php?resource=summary", "realestate.php?resource=properties", "realestate.php?resource=units", "realestate.php?resource=tenancies", "realestate.php?resource=rent_overview", "realestate.php?resource=payments", "realestate.php?resource=staff",
     ];

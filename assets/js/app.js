@@ -11320,10 +11320,11 @@ const setupDashboardPage = () => {
   const loadDashboard = async () => {
     try {
       const range = streamRangeDates();
-      const [invoiceRes, posRes, recentRes, stockRes, expensesRes] = await Promise.allSettled([
+      const [invoiceRes, posRes, recentRes, fallbackRecentRes, stockRes, expensesRes] = await Promise.allSettled([
         fetch(`${getBasePath()}api/sales.php`),
         fetch(`${getBasePath()}api/sales.php?history=pos&from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`),
         fetch(`${getBasePath()}api/sales.php?history=recent&from=${encodeURIComponent(range.from)}&to=${encodeURIComponent(range.to)}`),
+        fetch(`${getBasePath()}api/sales.php?history=recent`),
         fetch(`${getBasePath()}api/items.php`),
         fetch(`${getBasePath()}api/accounts.php?action=expenses`),
       ]);
@@ -11357,13 +11358,29 @@ const setupDashboardPage = () => {
         const data = await recentRes.value.json();
         streamSales = (data.sales || []).filter((sale) => String(sale.status || "").toLowerCase() !== "cancelled");
       }
+      if (!streamSales.length && fallbackRecentRes.status === "fulfilled" && fallbackRecentRes.value.ok) {
+        const data = await fallbackRecentRes.value.json();
+        streamSales = (data.sales || []).filter((sale) => String(sale.status || "").toLowerCase() !== "cancelled");
+      }
       if (!streamSales.length && posSalesList.length) {
         streamSales = posSalesList;
       }
       if (!streamSales.length && invoicesList.length) {
-        streamSales = invoicesList.filter((inv) => !["cancelled", "draft"].includes(String(inv.status || "").toLowerCase()) && dateKey(inv.issue_date || inv.created_at) === todayKey);
+        streamSales = invoicesList.filter((inv) => !["cancelled", "draft"].includes(String(inv.status || "").toLowerCase()));
       }
       renderSales(streamSales);
+
+      // If POS sales query with range returned 0 but streamSales contains POS sales made today:
+      if (posTodayTotal === 0 && streamSales.length) {
+        const todayPos = streamSales.filter((s) => {
+          const sDate = String(s.created_at || s.issue_date || "").slice(0, 10);
+          return sDate === todayKey && String(s.status || "").toLowerCase() !== "cancelled" && (s.sale_type === "pos" || !s.sale_type);
+        });
+        if (todayPos.length) {
+          posTodayTotal = todayPos.reduce((sum, s) => sum + (Number(s.total_amount || 0) || 0), 0);
+          posTodayCount = todayPos.length;
+        }
+      }
 
       const totalSalesToday = invoiceTodayTotal + posTodayTotal;
       const totalSalesCount = invoiceTodayCount + posTodayCount;
