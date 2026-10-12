@@ -10172,6 +10172,8 @@ const setupRealEstatePage = () => {
   let paymentsCache = [];
   let staffCache = [];
   let currentProperty = null;
+  let currentSmsBalance = 0;
+  let currentLandlordContact = { name: "", phone: "", email: "", business_name: "" };
 
   // ======================= UPCOMING PAYMENTS =======================
   const upcomingPaymentsWorkspace = document.querySelector("[data-upcoming-payments-workspace]");
@@ -10191,6 +10193,130 @@ const setupRealEstatePage = () => {
     if (days) parts.push(`${days} day${days !== 1 ? "s" : ""}`);
     return parts.join(" ");
   };
+
+  const computeRentMath = (startDateStr, rate, chargeType, totalPaid, recordedPaidUntil) => {
+    const start = parseDate(startDateStr);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // 1. Duration from start date to today
+    let stayDurationText = "—";
+    if (start) {
+      if (start > today) {
+        const daysUntil = Math.round((start - today) / 86400000);
+        stayDurationText = `Starts in ${daysUntil} day${daysUntil !== 1 ? "s" : ""}`;
+      } else {
+        const { months, days } = diffMonthsDays(start, today);
+        stayDurationText = spanText(months, days) || "Started today";
+      }
+    }
+
+    // 2. Periods covered by collected amount
+    const r = Number(rate) || 0;
+    const paid = Number(totalPaid) || 0;
+    let periodsCovered = 0;
+    if (r > 0) {
+      periodsCovered = Math.floor(paid / r);
+    }
+
+    // 3. Deadline / Expected Date to pay again = start_date + periodsCovered
+    let expectedDate = null;
+    let paidUntilDate = null;
+    if (start) {
+      expectedDate = new Date(start);
+      if (chargeType === "daily") {
+        expectedDate.setDate(expectedDate.getDate() + periodsCovered);
+      } else if (chargeType === "yearly") {
+        expectedDate.setFullYear(expectedDate.getFullYear() + periodsCovered);
+      } else {
+        // monthly default
+        expectedDate.setMonth(expectedDate.getMonth() + periodsCovered);
+      }
+
+      if (recordedPaidUntil) {
+        const rec = parseDate(recordedPaidUntil);
+        if (rec) {
+          const nextRec = new Date(rec);
+          nextRec.setDate(nextRec.getDate() + 1);
+          if (nextRec > expectedDate) {
+            expectedDate = nextRec;
+          }
+        }
+      }
+
+      if (periodsCovered > 0) {
+        paidUntilDate = new Date(expectedDate);
+        paidUntilDate.setDate(paidUntilDate.getDate() - 1);
+      }
+    }
+
+    let daysDiff = -999999;
+    let statusText = "Due immediately";
+    let statusCls = "out-of-stock";
+    let deadlineText = "Due immediately";
+    let nextPaymentText = "Due immediately";
+
+    if (expectedDate) {
+      daysDiff = Math.round((expectedDate - today) / 86400000);
+      const formattedExp = formatDate(expectedDate);
+
+      if (daysDiff > 0) {
+        if (chargeType === "daily") {
+          statusText = `Due in ${daysDiff} day${daysDiff !== 1 ? "s" : ""}`;
+        } else {
+          const { months, days } = diffMonthsDays(today, expectedDate);
+          const txt = spanText(months, days);
+          statusText = txt ? `Due in ${txt}` : `Due in ${daysDiff}d`;
+        }
+        statusCls = daysDiff <= 7 ? "low-stock" : "in-stock";
+        deadlineText = `Expected: ${formattedExp} (${daysDiff}d left)`;
+        nextPaymentText = `Next Payment: ${formattedExp}`;
+      } else if (daysDiff === 0) {
+        statusText = "Due Today";
+        statusCls = "low-stock";
+        deadlineText = `Expected: Today (${formattedExp})`;
+        nextPaymentText = `Next Payment: Today (${formattedExp})`;
+      } else {
+        const overdueDays = Math.abs(daysDiff);
+        if (chargeType === "daily") {
+          statusText = `Overdue ${overdueDays} day${overdueDays !== 1 ? "s" : ""}`;
+        } else {
+          const { months, days } = diffMonthsDays(expectedDate, today);
+          const txt = spanText(months, days);
+          statusText = `Overdue by ${txt || overdueDays + "d"}`;
+        }
+        statusCls = "out-of-stock";
+        deadlineText = `Overdue since ${formattedExp} (${overdueDays}d ago)`;
+        nextPaymentText = `Was due: ${formattedExp}`;
+      }
+    }
+
+    let coveredText = "";
+    if (periodsCovered === 0) {
+      coveredText = "0 periods paid";
+    } else if (chargeType === "daily") {
+      coveredText = `${periodsCovered} day${periodsCovered !== 1 ? "s" : ""} paid`;
+    } else if (chargeType === "yearly") {
+      coveredText = `${periodsCovered} year${periodsCovered !== 1 ? "s" : ""} paid`;
+    } else {
+      coveredText = `${periodsCovered} month${periodsCovered !== 1 ? "s" : ""} paid`;
+    }
+
+    return {
+      stayDurationText,
+      periodsCovered,
+      coveredText,
+      expectedDate,
+      expectedDateFormatted: expectedDate ? formatDate(expectedDate) : "—",
+      paidUntilFormatted: paidUntilDate ? formatDate(paidUntilDate) : (recordedPaidUntil ? formatDate(recordedPaidUntil) : "No rent recorded"),
+      daysDiff,
+      statusText,
+      statusCls,
+      deadlineText,
+      nextPaymentText,
+    };
+  };
+
   const remainingInfo = (paidUntil, chargeType) => {
     if (!paidUntil) {
       return {
@@ -10206,7 +10332,6 @@ const setupRealEstatePage = () => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     if (!end) return { text: "—", deadlineText: "—", nextPaymentText: "—", nextPaymentDate: null, cls: "", daysDiff: 999999 };
 
-    // Next day of payment is exactly the day after paid_until
     const nextPay = new Date(end);
     nextPay.setDate(nextPay.getDate() + 1);
     const formattedNext = formatDate(nextPay);
@@ -10262,17 +10387,20 @@ const setupRealEstatePage = () => {
     // Filter active tenancies and sort by closest deadline (ascending daysDiff)
     const active = rentOverviewCache
       .filter((r) => r.status === "active")
-      .map((r) => ({ ...r, _rem: remainingInfo(r.paid_until, r.charge_type) }))
-      .sort((a, b) => a._rem.daysDiff - b._rem.daysDiff);
+      .map((r) => ({
+        ...r,
+        _math: computeRentMath(r.start_date, r.rate, r.charge_type, r.total_paid, r.paid_until),
+      }))
+      .sort((a, b) => a._math.daysDiff - b._math.daysDiff);
 
     // Update banner summary
-    const overdueCount = active.filter((r) => r._rem.daysDiff < 0).length;
-    const dueSoonCount = active.filter((r) => r._rem.daysDiff >= 0 && r._rem.daysDiff <= 7).length;
+    const overdueCount = active.filter((r) => r._math.daysDiff < 0).length;
+    const dueSoonCount = active.filter((r) => r._math.daysDiff >= 0 && r._math.daysDiff <= 7).length;
     if (upcomingSummaryText) {
       if (overdueCount > 0) {
-        upcomingSummaryText.textContent = `${overdueCount} overdue &bull; ${active.length} active tenancies`;
+        upcomingSummaryText.textContent = `${overdueCount} overdue • ${active.length} active tenancies`;
       } else if (dueSoonCount > 0) {
-        upcomingSummaryText.textContent = `${dueSoonCount} due soon &bull; ${active.length} active tenancies`;
+        upcomingSummaryText.textContent = `${dueSoonCount} due soon • ${active.length} active tenancies`;
       } else if (active.length > 0) {
         upcomingSummaryText.textContent = `${active.length} active tenancies tracked`;
       } else {
@@ -10291,19 +10419,41 @@ const setupRealEstatePage = () => {
     if (upcomingEmptyEl) upcomingEmptyEl.hidden = true;
     if (upcomingListEl) {
       upcomingListEl.innerHTML = active.map((r) => {
-        const rem = r._rem;
+        const math = r._math;
         const contractDeadline = r.end_date ? ` • Contract End: ${formatDate(r.end_date)}` : "";
-        const paidUntilLine = r.paid_until ? `Paid until ${formatDate(r.paid_until)}` : "No rent recorded";
         return `
-          <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;" data-rent-open="${r.tenancy_id}">
-            <div style="min-width:0;">
-              <div style="font-weight:800;color:var(--color-navy);font-size:0.95rem;">${esc(r.tenant_name)} <span style="font-size:0.78rem;font-weight:600;color:var(--color-muted);">(${esc(r.property_name)} • ${esc(r.unit_name)})</span></div>
-              <div style="font-size:0.8rem;color:var(--color-blue);font-weight:700;margin:2px 0;">${fmt(r.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(r.charge_type)}</span> &bull; <span style="color:var(--color-navy);">${esc(rem.deadlineText)}</span>${contractDeadline}</div>
-              <div style="font-size:0.75rem;color:var(--color-muted);">${esc(paidUntilLine)} &bull; Started ${formatDate(r.start_date)}</div>
+          <div class="re-card-item" style="display:flex;flex-direction:column;gap:10px;padding:14px;background:#fff;border:1px solid var(--color-line);border-radius:12px;margin-bottom:10px;cursor:pointer;" data-rent-open="${r.tenancy_id}">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+              <div style="min-width:0;">
+                <div style="font-weight:800;color:var(--color-navy);font-size:0.95rem;">
+                  ${esc(r.tenant_name)}
+                  <span style="font-size:0.78rem;font-weight:600;color:var(--color-muted);">(${esc(r.property_name)} • ${esc(r.unit_name)})</span>
+                </div>
+                <div style="font-size:0.8rem;color:var(--color-blue);font-weight:700;margin:3px 0;">
+                  ${fmt(r.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(r.charge_type)}</span>
+                  &bull; <span style="color:var(--color-navy);">${esc(math.deadlineText)}</span>${contractDeadline}
+                </div>
+              </div>
+              <span class="badge-stock ${math.statusCls}" style="white-space:nowrap;font-size:0.75rem;">${esc(math.statusText)}</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;">
-              <span class="badge-stock ${rem.cls}" style="white-space:nowrap;">${esc(rem.text)}</span>
-              <button type="button" class="btn btn-outline btn-sm" data-quick-pay="${r.tenancy_id}" style="padding:4px 10px;font-size:0.75rem;">+ Collect</button>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:6px;background:#f8fafc;padding:8px 10px;border-radius:8px;font-size:0.75rem;border:1px solid #f1f5f9;">
+              <div><span style="color:var(--color-muted);">Stay Duration:</span> <strong style="color:var(--color-navy);">${esc(math.stayDurationText)}</strong></div>
+              <div><span style="color:var(--color-muted);">Collected:</span> <strong style="color:var(--color-navy);">${fmt(r.total_paid)} (${esc(math.coveredText)})</strong></div>
+              <div><span style="color:var(--color-muted);">Deadline / Next Due:</span> <strong style="color:var(--color-blue);">${esc(math.expectedDateFormatted)}</strong></div>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:6px;border-top:1px dashed var(--color-line);">
+              <div style="font-size:0.74rem;color:var(--color-muted);">
+                Started ${formatDate(r.start_date)}
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">
+                <button type="button" class="btn btn-outline btn-sm" data-remind-rent="${r.tenancy_id}" style="padding:4px 10px;font-size:0.75rem;display:flex;align-items:center;gap:4px;">
+                  <svg viewBox="0 0 512 512" aria-hidden="true" style="width:13px;height:13px;fill:currentColor;"><path d="M448 384l-32-32V240c0-80-60-146-136-158V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v18C140 94 80 160 80 240v112l-32 32v32h400v-32zm-192 96c22.1 0 40-17.9 40-40h-80c0 22.1 17.9 40 40 40z"/></svg>
+                  Remind
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" data-quick-pay="${r.tenancy_id}" style="padding:4px 10px;font-size:0.75rem;">+ Collect</button>
+              </div>
             </div>
           </div>`;
       }).join("");
@@ -10510,6 +10660,8 @@ const setupRealEstatePage = () => {
   const loadAll = async () => {
     try {
       const data = await api({ query: "" });
+      if (typeof data.sms_balance !== "undefined") currentSmsBalance = Number(data.sms_balance) || 0;
+      if (data.landlord) currentLandlordContact = data.landlord;
       updateSummaryUI(data.summary);
       renderProperties(data.properties || []);
       renderUpcomingPayments(data.tenants || []);
@@ -11029,6 +11181,12 @@ const setupRealEstatePage = () => {
       openRentForm(quickPayId);
       return;
     }
+    const remindId = e.target.closest("[data-remind-rent]")?.dataset.remindRent;
+    if (remindId) {
+      e.stopPropagation();
+      openRentReminder(remindId);
+      return;
+    }
     const id = e.target.closest("[data-rent-open]")?.dataset.rentOpen;
     if (id) openTenancyDetail(id);
   });
@@ -11094,12 +11252,12 @@ const setupRealEstatePage = () => {
     if (tdRate) tdRate.textContent = `${fmt(t.rate)}${chargeLabel(t.charge_type)}`;
     if (tdTotal) tdTotal.textContent = fmt(t.total_paid || 0);
     const tdNextPayment = document.querySelector("[data-td-next-payment]");
-    if (tdPaidUntil) tdPaidUntil.textContent = t.paid_until ? formatDate(t.paid_until) : "—";
+    const math = computeRentMath(t.start_date, t.rate, t.charge_type, t.total_paid, t.paid_until);
+    if (tdPaidUntil) tdPaidUntil.textContent = math.paidUntilFormatted;
     if (tdRemaining) {
-      const rem = active ? remainingInfo(t.paid_until, t.charge_type) : { text: "Ended", nextPaymentText: "Ended" };
-      tdRemaining.textContent = rem.text;
+      tdRemaining.textContent = active ? math.statusText : "Ended";
       if (tdNextPayment) {
-        tdNextPayment.textContent = active ? rem.nextPaymentText : "Tenancy ended";
+        tdNextPayment.textContent = active ? math.nextPaymentText : "Tenancy ended";
       }
     }
     if (tdRecordBtn) tdRecordBtn.hidden = !active;
@@ -11267,6 +11425,169 @@ const setupRealEstatePage = () => {
       loadAll();
     } catch (err) { if (staffFormError) { staffFormError.textContent = err.message; staffFormError.hidden = false; } }
     finally { if (staffFormSubmit) staffFormSubmit.disabled = false; }
+  });
+
+  document.querySelector("[data-td-remind]")?.addEventListener("click", () => {
+    if (currentTenancyDetail) openRentReminder(currentTenancyDetail.id);
+  });
+
+  // ======================= RENT REMINDERS (SMS & EMAIL) =======================
+  const rentReminderModal = document.querySelector("[data-rent-reminder-modal]");
+  const rentReminderForm = document.querySelector("[data-rent-reminder-form]");
+  const reminderUnitSubtitle = document.querySelector("[data-reminder-unit-subtitle]");
+  const reminderSmsBalance = document.querySelector("[data-reminder-sms-balance]");
+  const reminderSmsBadge = document.querySelector("[data-reminder-sms-badge]");
+  const reminderTenancyIdInput = document.querySelector("[data-reminder-tenancy-id]");
+  const reminderCheckSms = document.querySelector("[data-reminder-check-sms]");
+  const reminderCheckEmail = document.querySelector("[data-reminder-check-email]");
+  const reminderToTenant = document.querySelector("[data-reminder-to-tenant]");
+  const reminderToLandlord = document.querySelector("[data-reminder-to-landlord]");
+  const reminderTenantName = document.querySelector("[data-reminder-tenant-name]");
+  const reminderTenantPhone = document.querySelector("[data-reminder-tenant-phone]");
+  const reminderTenantEmail = document.querySelector("[data-reminder-tenant-email]");
+  const reminderLandlordPhone = document.querySelector("[data-reminder-landlord-phone]");
+  const reminderLandlordEmail = document.querySelector("[data-reminder-landlord-email]");
+  const reminderSmsWrap = document.querySelector("[data-reminder-sms-wrap]");
+  const reminderSmsMessage = document.querySelector("[data-reminder-sms-message]");
+  const reminderSmsCharcount = document.querySelector("[data-reminder-sms-charcount]");
+  const reminderEmailWrap = document.querySelector("[data-reminder-email-wrap]");
+  const reminderEmailSubject = document.querySelector("[data-reminder-email-subject]");
+  const reminderFormError = document.querySelector("[data-reminder-form-error]");
+  const reminderSubmitBtn = document.querySelector("[data-reminder-submit]");
+
+  const updateSmsCharCount = () => {
+    if (!reminderSmsMessage || !reminderSmsCharcount) return;
+    const len = reminderSmsMessage.value.length;
+    reminderSmsCharcount.textContent = `${len} / 160 chars`;
+  };
+
+  reminderSmsMessage?.addEventListener("input", updateSmsCharCount);
+
+  reminderCheckSms?.addEventListener("change", () => {
+    if (reminderSmsWrap) reminderSmsWrap.hidden = !reminderCheckSms.checked;
+  });
+  reminderCheckEmail?.addEventListener("change", () => {
+    if (reminderEmailWrap) reminderEmailWrap.hidden = !reminderCheckEmail.checked;
+  });
+
+  const openRentReminder = (tenancyId) => {
+    const t = (rentOverviewCache || []).find((x) => String(x.tenancy_id) === String(tenancyId))
+      || (currentTenancyDetail && String(currentTenancyDetail.id) === String(tenancyId) ? currentTenancyDetail : null);
+    if (!t) return;
+
+    if (reminderFormError) reminderFormError.hidden = true;
+    if (reminderTenancyIdInput) reminderTenancyIdInput.value = String(t.tenancy_id || t.id);
+
+    const math = t._math || computeRentMath(t.start_date, t.rate, t.charge_type, t.total_paid, t.paid_until);
+
+    if (reminderUnitSubtitle) {
+      reminderUnitSubtitle.textContent = `${t.property_name || ""} • ${t.unit_name || ""}`;
+    }
+
+    if (reminderSmsBalance) reminderSmsBalance.textContent = `${currentSmsBalance} SMS`;
+    if (reminderSmsBadge) {
+      if (currentSmsBalance <= 0) {
+        reminderSmsBadge.textContent = "0 Available";
+        reminderSmsBadge.className = "badge-stock out-of-stock";
+      } else if (currentSmsBalance <= 5) {
+        reminderSmsBadge.textContent = "Low";
+        reminderSmsBadge.className = "badge-stock low-stock";
+      } else {
+        reminderSmsBadge.textContent = "Active";
+        reminderSmsBadge.className = "badge-stock in-stock";
+      }
+    }
+
+    if (reminderTenantName) reminderTenantName.textContent = t.tenant_name || "Tenant";
+    if (reminderTenantPhone) reminderTenantPhone.value = t.tenant_phone || "";
+    if (reminderTenantEmail) reminderTenantEmail.value = t.tenant_email || "";
+
+    if (reminderLandlordPhone) reminderLandlordPhone.value = currentLandlordContact.phone || "";
+    if (reminderLandlordEmail) reminderLandlordEmail.value = currentLandlordContact.email || "";
+
+    if (reminderCheckSms) reminderCheckSms.checked = currentSmsBalance > 0;
+    if (reminderCheckEmail) reminderCheckEmail.checked = true;
+    if (reminderToTenant) reminderToTenant.checked = true;
+    if (reminderToLandlord) reminderToLandlord.checked = false;
+
+    if (reminderSmsWrap) reminderSmsWrap.hidden = !reminderCheckSms?.checked;
+    if (reminderEmailWrap) reminderEmailWrap.hidden = false;
+
+    const formattedRate = `${fmt(t.rate)}${chargeLabel(t.charge_type)}`;
+    const msg = `Dear ${t.tenant_name}, rent reminder for ${t.property_name} (${t.unit_name}). Rent ${formattedRate} is expected by ${math.expectedDateFormatted}. Please make payment on time. Thank you!`;
+    if (reminderSmsMessage) {
+      reminderSmsMessage.value = msg;
+      updateSmsCharCount();
+    }
+    if (reminderEmailSubject) {
+      reminderEmailSubject.value = `Rent Reminder: ${t.property_name} (${t.unit_name})`;
+    }
+
+    if (rentReminderModal) rentReminderModal.hidden = false;
+  };
+
+  document.querySelector("[data-reminder-close]")?.addEventListener("click", () => {
+    if (rentReminderModal) rentReminderModal.hidden = true;
+  });
+  document.querySelector("[data-reminder-cancel]")?.addEventListener("click", () => {
+    if (rentReminderModal) rentReminderModal.hidden = true;
+  });
+
+  rentReminderForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (reminderFormError) reminderFormError.hidden = true;
+
+    const sendSms = reminderCheckSms?.checked;
+    const sendEmail = reminderCheckEmail?.checked;
+    if (!sendSms && !sendEmail) {
+      if (reminderFormError) {
+        reminderFormError.textContent = "Please select at least one delivery channel (SMS or Email).";
+        reminderFormError.hidden = false;
+      }
+      return;
+    }
+
+    const toTenant = reminderToTenant?.checked;
+    const toLandlord = reminderToLandlord?.checked;
+    if (!toTenant && !toLandlord) {
+      if (reminderFormError) {
+        reminderFormError.textContent = "Please select at least one recipient (Tenant or Landlord).";
+        reminderFormError.hidden = false;
+      }
+      return;
+    }
+
+    if (sendSms && currentSmsBalance <= 0) {
+      if (reminderFormError) {
+        reminderFormError.textContent = "SMS cannot be sent because your SMS balance is 0. Please uncheck SMS to send email only, or top up SMS in Billing.";
+        reminderFormError.hidden = false;
+      }
+      return;
+    }
+
+    try {
+      if (reminderSubmitBtn) reminderSubmitBtn.disabled = true;
+      const b = new FormData(rentReminderForm);
+      b.set("action", "send_rent_reminder");
+      b.set("send_sms", sendSms ? "1" : "0");
+      b.set("send_email", sendEmail ? "1" : "0");
+      b.set("to_tenant", toTenant ? "1" : "0");
+      b.set("to_landlord", toLandlord ? "1" : "0");
+
+      const res = await api({ body: b });
+      if (typeof res.sms_balance !== "undefined") {
+        currentSmsBalance = Number(res.sms_balance) || 0;
+      }
+      if (rentReminderModal) rentReminderModal.hidden = true;
+      await showAppModal("Rent Reminder", res.message || "Reminder sent successfully!");
+    } catch (err) {
+      if (reminderFormError) {
+        reminderFormError.textContent = err.message;
+        reminderFormError.hidden = false;
+      }
+    } finally {
+      if (reminderSubmitBtn) reminderSubmitBtn.disabled = false;
+    }
   });
 
   // ---- Init ----

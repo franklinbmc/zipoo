@@ -531,7 +531,8 @@
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
           <button class="btn btn-primary full" type="button" data-td-record>Record Rent</button>
-          <button class="btn btn-danger-outline full" type="button" data-td-end hidden>End Tenancy</button>
+          <button class="btn btn-outline full" type="button" data-td-remind>Send Reminder</button>
+          <button class="btn btn-danger-outline full" type="button" data-td-end hidden style="grid-column:1 / -1;">End Tenancy</button>
         </div>
 
         <div style="font-size:0.78rem;text-transform:uppercase;color:var(--color-muted);font-weight:800;margin-bottom:8px;">Payment History</div>
@@ -540,6 +541,120 @@
           <p style="margin:0;font-size:0.84rem;color:var(--color-muted);">No rent recorded for this tenancy yet.</p>
         </div>
       </div>
+    </section>
+  </div>
+
+  <!-- Modal: Send Rent Reminder (SMS & Email) -->
+  <div class="modal-backdrop" hidden data-rent-reminder-modal style="z-index:100000;">
+    <section class="app-modal" role="dialog" aria-modal="true" aria-labelledby="rent-reminder-title" style="max-width:520px;width:100%;text-align:left;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:8px;background:#eff6ff;color:#1d4ed8;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
+            <svg viewBox="0 0 512 512" aria-hidden="true" style="width:18px;height:18px;fill:currentColor;"><path d="M448 384l-32-32V240c0-80-60-146-136-158V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v18C140 94 80 160 80 240v112l-32 32v32h400v-32zm-192 96c22.1 0 40-17.9 40-40h-80c0 22.1 17.9 40 40 40z"/></svg>
+          </div>
+          <div>
+            <h2 id="rent-reminder-title" style="margin:0;font-size:1.1rem;color:var(--color-navy);font-weight:800;">Send Rent Reminder</h2>
+            <div style="font-size:0.78rem;color:var(--color-muted);" data-reminder-unit-subtitle>-</div>
+          </div>
+        </div>
+        <button class="icon-button" type="button" data-reminder-close aria-label="Close" style="width:32px;height:32px;">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M112 112l288 288M400 112L112 400" /></svg>
+        </button>
+      </div>
+
+      <!-- SMS Wallet balance banner -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 12px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:#166534;">
+          <svg viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;fill:currentColor;"><path d="M64 112h384v288H64zM32 64h448v48H32zm416 352H64v32h384z"/></svg>
+          <span>SMS Balance:</span>
+          <strong data-reminder-sms-balance>0 SMS</strong>
+        </div>
+        <span class="badge-stock in-stock" data-reminder-sms-badge style="font-size:0.72rem;">Active</span>
+      </div>
+
+      <form data-rent-reminder-form>
+        <input type="hidden" name="tenancy_id" data-reminder-tenancy-id>
+
+        <!-- Channels selection -->
+        <div style="margin-bottom:12px;">
+          <span style="font-size:0.78rem;font-weight:700;color:var(--color-navy);display:block;margin-bottom:6px;">Delivery Channels</span>
+          <div style="display:flex;gap:16px;">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.84rem;color:var(--color-navy);">
+              <input type="checkbox" name="send_sms" data-reminder-check-sms checked style="width:16px;height:16px;accent-color:#1d4ed8;">
+              <span>SMS Message</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.84rem;color:var(--color-navy);">
+              <input type="checkbox" name="send_email" data-reminder-check-email checked style="width:16px;height:16px;accent-color:#1d4ed8;">
+              <span>Email Notice</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Recipients: Tenant & Landlord -->
+        <div style="margin-bottom:12px;background:#f8fafc;border:1px solid var(--color-line);border-radius:10px;padding:10px;">
+          <span style="font-size:0.78rem;font-weight:700;color:var(--color-navy);display:block;margin-bottom:8px;">Recipients</span>
+          
+          <!-- Tenant -->
+          <div style="padding-bottom:10px;margin-bottom:10px;border-bottom:1px dashed var(--color-line);">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;font-size:0.82rem;color:var(--color-navy);margin-bottom:6px;">
+              <input type="checkbox" name="to_tenant" data-reminder-to-tenant checked style="width:15px;height:15px;accent-color:#1d4ed8;">
+              <span>Tenant (<span data-reminder-tenant-name>-</span>)</span>
+            </label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <label class="form-field" style="margin:0;">
+                <span style="font-size:0.72rem;">Tenant Phone</span>
+                <input type="text" name="tenant_phone" data-reminder-tenant-phone placeholder="e.g. 0712345678" style="font-size:0.82rem;padding:6px 8px;">
+              </label>
+              <label class="form-field" style="margin:0;">
+                <span style="font-size:0.72rem;">Tenant Email</span>
+                <input type="email" name="tenant_email" data-reminder-tenant-email placeholder="e.g. tenant@gmail.com" style="font-size:0.82rem;padding:6px 8px;">
+              </label>
+            </div>
+          </div>
+
+          <!-- Landlord -->
+          <div>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:700;font-size:0.82rem;color:var(--color-navy);margin-bottom:6px;">
+              <input type="checkbox" name="to_landlord" data-reminder-to-landlord checked style="width:15px;height:15px;accent-color:#1d4ed8;">
+              <span>Landlord / Owner Copy</span>
+            </label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <label class="form-field" style="margin:0;">
+                <span style="font-size:0.72rem;">Landlord Phone</span>
+                <input type="text" name="landlord_phone" data-reminder-landlord-phone placeholder="e.g. 0767302952" style="font-size:0.82rem;padding:6px 8px;">
+              </label>
+              <label class="form-field" style="margin:0;">
+                <span style="font-size:0.72rem;">Landlord Email</span>
+                <input type="email" name="landlord_email" data-reminder-landlord-email placeholder="e.g. owner@example.com" style="font-size:0.82rem;padding:6px 8px;">
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SMS Message Content -->
+        <label class="form-field" data-reminder-sms-wrap style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>SMS Message Text</span>
+            <span style="font-size:0.7rem;color:var(--color-muted);" data-reminder-sms-charcount>0 chars</span>
+          </div>
+          <textarea name="sms_message" data-reminder-sms-message rows="3" style="font-size:0.82rem;line-height:1.4;"></textarea>
+        </label>
+
+        <!-- Email Subject -->
+        <label class="form-field" data-reminder-email-wrap style="margin-bottom:10px;">
+          <span>Email Subject</span>
+          <input type="text" name="email_subject" data-reminder-email-subject style="font-size:0.82rem;">
+        </label>
+
+        <p class="inline-error" hidden data-reminder-form-error></p>
+
+        <div style="display:flex;gap:10px;margin-top:14px;">
+          <button class="btn btn-outline" type="button" data-reminder-cancel style="flex:1;">Cancel</button>
+          <button class="btn btn-primary" type="submit" data-reminder-submit style="flex:2;">
+            Send Reminder
+          </button>
+        </div>
+      </form>
     </section>
   </div>
 
@@ -552,6 +667,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=170" defer></script>
+  <script src="/assets/js/app.js?v=171" defer></script>
 </body>
 </html>
