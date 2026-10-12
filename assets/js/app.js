@@ -10147,33 +10147,13 @@ const setupRealEstatePage = () => {
     return data;
   };
 
-  // ---- Tabs ----
-  const tabButtons = document.querySelectorAll(".re-tab-btn[data-tab-target]");
-  const tabPanels = document.querySelectorAll("[data-tab-panel]");
-  const badgeRent = document.querySelector("[data-badge-rent]");
-  const badgeProperties = document.querySelector("[data-badge-properties]");
-  const badgeTenancies = document.querySelector("[data-badge-tenancies]");
-
-  const switchTab = (target) => {
-    tabButtons.forEach((b) => {
-      const active = b.dataset.tabTarget === target;
-      b.classList.toggle("active", active);
-      b.setAttribute("aria-selected", active ? "true" : "false");
-    });
-    tabPanels.forEach((p) => {
-      p.hidden = p.dataset.tabPanel !== target;
-    });
-  };
-
-  tabButtons.forEach((b) => {
-    b.addEventListener("click", () => switchTab(b.dataset.tabTarget));
-  });
-
   // ---- Summary / KPIs ----
   const kpiProperties = document.querySelector("[data-kpi-properties]");
   const kpiUnits = document.querySelector("[data-kpi-units]");
   const kpiTenancies = document.querySelector("[data-kpi-tenancies]");
   const kpiRent = document.querySelector("[data-kpi-rent]");
+  const badgeTenanciesCount = document.querySelector("[data-badge-tenancies-count]");
+  const badgePropertiesCount = document.querySelector("[data-badge-properties-count]");
 
   const updateSummaryUI = (s) => {
     if (!s) return;
@@ -10192,9 +10172,9 @@ const setupRealEstatePage = () => {
   let staffCache = [];
   let currentProperty = null;
 
-  // ======================= RENT OVERVIEW =======================
-  const paymentsList = document.querySelector("[data-payments-list]");
-  const paymentsEmpty = document.querySelector("[data-payments-empty]");
+  // ======================= TENANCY OVERVIEW =======================
+  const tenancyOverviewList = document.querySelector("[data-tenancy-overview-list]");
+  const tenancyOverviewEmpty = document.querySelector("[data-tenancy-overview-empty]");
 
   const diffMonthsDays = (a, b) => {
     let months = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
@@ -10210,49 +10190,65 @@ const setupRealEstatePage = () => {
     return parts.join(" ");
   };
   const remainingInfo = (paidUntil, chargeType) => {
-    if (!paidUntil) return { text: "Not paid", cls: "out-of-stock" };
+    if (!paidUntil) return { text: "Renewal: Not paid", deadlineText: "No renewal date", cls: "out-of-stock" };
     const end = parseDate(paidUntil);
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    if (!end) return { text: "—", cls: "" };
+    if (!end) return { text: "—", deadlineText: "—", cls: "" };
+    const formattedEnd = formatDate(paidUntil);
     if (end >= today) {
       if (chargeType === "daily") {
         const d = Math.round((end - today) / 86400000);
-        return { text: d <= 0 ? "Due today" : `${d} day${d !== 1 ? "s" : ""} left`, cls: d <= 3 ? "low-stock" : "in-stock" };
+        return {
+          text: d <= 0 ? "Renewal: Due today" : `Renewal: in ${d} day${d !== 1 ? "s" : ""}`,
+          deadlineText: `Renewal: ${formattedEnd} (${d}d left)`,
+          cls: d <= 3 ? "low-stock" : "in-stock"
+        };
       }
       const { months, days } = diffMonthsDays(today, end);
       const txt = spanText(months, days);
-      return { text: txt ? `${txt} left` : "Due today", cls: (months === 0 && days <= 3) ? "low-stock" : "in-stock" };
+      return {
+        text: txt ? `Renewal: in ${txt}` : "Renewal: Due today",
+        deadlineText: `Renewal: ${formattedEnd} (${txt || "today"})`,
+        cls: (months === 0 && days <= 3) ? "low-stock" : "in-stock"
+      };
     }
     if (chargeType === "daily") {
       const d = Math.round((today - end) / 86400000);
-      return { text: `Overdue ${d} day${d !== 1 ? "s" : ""}`, cls: "out-of-stock" };
+      return {
+        text: `Overdue ${d} day${d !== 1 ? "s" : ""}`,
+        deadlineText: `Expired ${formattedEnd} (${d}d overdue)`,
+        cls: "out-of-stock"
+      };
     }
     const { months, days } = diffMonthsDays(end, today);
-    return { text: `Overdue by ${spanText(months, days) || "0 days"}`, cls: "out-of-stock" };
+    return {
+      text: `Overdue by ${spanText(months, days) || "0 days"}`,
+      deadlineText: `Expired ${formattedEnd} (${spanText(months, days) || "0d"} overdue)`,
+      cls: "out-of-stock"
+    };
   };
 
-  const renderRentOverview = (list) => {
+  const renderTenancyOverview = (list) => {
     rentOverviewCache = list || [];
-    if (badgeRent) badgeRent.textContent = rentOverviewCache.length;
+    const activeList = rentOverviewCache.filter((r) => r.status === "active");
+    if (badgeTenanciesCount) badgeTenanciesCount.textContent = `${activeList.length} active`;
     if (!rentOverviewCache.length) {
-      if (paymentsList) paymentsList.replaceChildren();
-      if (paymentsEmpty) paymentsEmpty.hidden = false;
+      if (tenancyOverviewList) tenancyOverviewList.replaceChildren();
+      if (tenancyOverviewEmpty) tenancyOverviewEmpty.hidden = false;
       return;
     }
-    if (paymentsEmpty) paymentsEmpty.hidden = true;
-    if (paymentsList) {
-      paymentsList.innerHTML = rentOverviewCache.map((r) => {
-        const rem = r.status === "active" ? remainingInfo(r.paid_until, r.charge_type) : { text: "Ended", cls: "out-of-stock" };
-        const lastLine = r.last_paid_date
-          ? `Last paid ${formatDate(r.last_paid_date)}${r.last_amount != null ? " · " + fmt(r.last_amount) : ""}`
-          : "No payments yet";
-        const paidUntilLine = r.paid_until ? ` · paid to ${formatDate(r.paid_until)}` : "";
+    if (tenancyOverviewEmpty) tenancyOverviewEmpty.hidden = true;
+    if (tenancyOverviewList) {
+      tenancyOverviewList.innerHTML = rentOverviewCache.map((r) => {
+        const rem = r.status === "active" ? remainingInfo(r.paid_until, r.charge_type) : { text: "Contract Ended", deadlineText: "Ended", cls: "out-of-stock" };
+        const contractDeadline = r.end_date ? ` • Contract End: ${formatDate(r.end_date)}` : "";
+        const paidUntilLine = r.paid_until ? `Paid until ${formatDate(r.paid_until)}` : "No rent recorded";
         return `
           <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;" data-rent-open="${r.tenancy_id}">
             <div style="min-width:0;">
-              <div style="font-weight:800;color:var(--color-navy);font-size:0.95rem;">${esc(r.tenant_name)}</div>
-              <div style="font-size:0.8rem;color:var(--color-muted);margin:2px 0;">${esc(r.property_name)} • ${esc(r.unit_name)} (${fmt(r.rate)}${chargeLabel(r.charge_type)})</div>
-              <div style="font-size:0.76rem;color:var(--color-muted);">${esc(lastLine)}${paidUntilLine}</div>
+              <div style="font-weight:800;color:var(--color-navy);font-size:0.95rem;">${esc(r.tenant_name)} <span style="font-size:0.78rem;font-weight:600;color:var(--color-muted);">(${esc(r.property_name)} • ${esc(r.unit_name)})</span></div>
+              <div style="font-size:0.8rem;color:var(--color-blue);font-weight:700;margin:2px 0;">${fmt(r.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(r.charge_type)}</span> &bull; <span style="color:var(--color-navy);">${esc(rem.deadlineText)}</span>${contractDeadline}</div>
+              <div style="font-size:0.75rem;color:var(--color-muted);">${esc(paidUntilLine)} &bull; Started ${formatDate(r.start_date)}</div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;">
               <span class="badge-stock ${rem.cls}" style="white-space:nowrap;">${esc(rem.text)}</span>
@@ -10274,7 +10270,7 @@ const setupRealEstatePage = () => {
 
   const renderProperties = (list) => {
     propertyCache = list || [];
-    if (badgeProperties) badgeProperties.textContent = propertyCache.length;
+    if (badgePropertiesCount) badgePropertiesCount.textContent = `${propertyCache.length} propert${propertyCache.length === 1 ? "y" : "ies"}`;
     if (!propertyCache.length) {
       if (propertiesList) propertiesList.replaceChildren();
       if (propertiesEmpty) propertiesEmpty.hidden = false;
@@ -10349,33 +10345,30 @@ const setupRealEstatePage = () => {
 
   const renderTenancies = (list) => {
     tenancyCache = list || [];
-    const active = tenancyCache.filter((t) => t.status === "active");
-    if (badgeTenancies) badgeTenancies.textContent = active.length;
+    if (!tenanciesListEl) return;
     if (!tenancyCache.length) {
-      if (tenanciesListEl) tenanciesListEl.replaceChildren();
+      tenanciesListEl.replaceChildren();
       if (tenanciesEmpty) tenanciesEmpty.hidden = false;
       return;
     }
     if (tenanciesEmpty) tenanciesEmpty.hidden = true;
-    if (tenanciesListEl) {
-      tenanciesListEl.innerHTML = tenancyCache.map((t) => {
-        const isActive = t.status === "active";
-        const badge = isActive ? `<span class="badge-stock in-stock">Active</span>` : `<span class="badge-stock out-of-stock">Ended</span>`;
-        const endBtn = isActive ? `<button type="button" class="btn btn-danger-outline btn-sm" data-tenancy-end="${t.id}" style="padding:4px 8px;font-size:0.75rem;">End</button>` : "";
-        return `
-          <div class="re-card-item" data-tenancy-open="${t.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;">
-            <div style="min-width:0;text-align:left;">
-              <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(t.tenant_name)} ${badge}</div>
-              <div style="font-size:0.78rem;color:var(--color-muted);">${esc(t.property_name)} • ${esc(t.unit_name)}</div>
-              <div style="font-size:0.78rem;color:var(--color-blue);font-weight:700;">${fmt(t.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(t.charge_type)}</span> • from ${formatDate(t.start_date)}</div>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto;">
-              ${endBtn}
-              <svg class="svg-ico" viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;color:var(--color-muted);"><path d="M184 112l144 144-144 144" /></svg>
-            </div>
-          </div>`;
-      }).join("");
-    }
+    tenanciesListEl.innerHTML = tenancyCache.map((t) => {
+      const isActive = t.status === "active";
+      const badge = isActive ? `<span class="badge-stock in-stock">Active</span>` : `<span class="badge-stock out-of-stock">Ended</span>`;
+      const endBtn = isActive ? `<button type="button" class="btn btn-danger-outline btn-sm" data-tenancy-end="${t.id}" style="padding:4px 8px;font-size:0.75rem;">End</button>` : "";
+      return `
+        <div class="re-card-item" data-tenancy-open="${t.id}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;">
+          <div style="min-width:0;text-align:left;">
+            <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(t.tenant_name)} ${badge}</div>
+            <div style="font-size:0.78rem;color:var(--color-muted);">${esc(t.property_name)} • ${esc(t.unit_name)}</div>
+            <div style="font-size:0.78rem;color:var(--color-blue);font-weight:700;">${fmt(t.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(t.charge_type)}</span> • from ${formatDate(t.start_date)}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex:0 0 auto;">
+            ${endBtn}
+            <svg class="svg-ico" viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;color:var(--color-muted);"><path d="M184 112l144 144-144 144" /></svg>
+          </div>
+        </div>`;
+    }).join("");
   };
 
   // ======================= PAYMENT HISTORY =======================
@@ -10384,26 +10377,25 @@ const setupRealEstatePage = () => {
 
   const renderHistory = (list) => {
     paymentsCache = list || [];
+    if (!historyListEl) return;
     if (!paymentsCache.length) {
-      if (historyListEl) historyListEl.replaceChildren();
+      historyListEl.replaceChildren();
       if (historyEmptyEl) historyEmptyEl.hidden = false;
       return;
     }
     if (historyEmptyEl) historyEmptyEl.hidden = true;
-    if (historyListEl) {
-      historyListEl.innerHTML = paymentsCache.map((p) => {
-        const period = p.period_label || "";
-        const sub = [p.property_name ? `${p.property_name}/${p.unit_name}` : "", period, `Paid ${formatDate(p.paid_date)}`, p.account_name].filter(Boolean).map(esc).join(" • ");
-        return `
-          <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-            <div style="min-width:0;text-align:left;">
-              <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(p.tenant_name)} <span style="color:var(--color-blue);margin-left:6px;">${fmt(p.amount)}</span></div>
-              <div style="font-size:0.76rem;color:var(--color-muted);">${sub}</div>
-            </div>
-            <button type="button" class="btn btn-outline btn-sm" data-rent-open="${p.tenancy_id}" style="padding:4px 10px;font-size:0.75rem;">View</button>
-          </div>`;
-      }).join("");
-    }
+    historyListEl.innerHTML = paymentsCache.map((p) => {
+      const period = p.period_label || "";
+      const sub = [p.property_name ? `${p.property_name}/${p.unit_name}` : "", period, `Paid ${formatDate(p.paid_date)}`, p.account_name].filter(Boolean).map(esc).join(" • ");
+      return `
+        <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="min-width:0;text-align:left;">
+            <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(p.tenant_name)} <span style="color:var(--color-blue);margin-left:6px;">${fmt(p.amount)}</span></div>
+            <div style="font-size:0.76rem;color:var(--color-muted);">${sub}</div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm" data-rent-open="${p.tenancy_id}" style="padding:4px 10px;font-size:0.75rem;">View</button>
+        </div>`;
+    }).join("");
   };
 
   // ======================= STAFF =======================
@@ -10412,25 +10404,24 @@ const setupRealEstatePage = () => {
 
   const renderStaff = (list) => {
     staffCache = list || [];
+    if (!staffListEl) return;
     if (!staffCache.length) {
-      if (staffListEl) staffListEl.replaceChildren();
+      staffListEl.replaceChildren();
       if (staffEmpty) staffEmpty.hidden = false;
       return;
     }
     if (staffEmpty) staffEmpty.hidden = true;
-    if (staffListEl) {
-      staffListEl.innerHTML = staffCache.map((s) => `
-        <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
-          <div style="min-width:0;text-align:left;">
-            <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;text-transform:capitalize;">${esc(s.name)}</div>
-            <div style="font-size:0.78rem;color:var(--color-muted);text-transform:capitalize;">${esc(s.role)}${s.phone ? " • " + esc(s.phone) : ""}${s.property_name ? " • " + esc(s.property_name) : ""}</div>
-          </div>
-          <div style="display:flex;gap:6px;flex:0 0 auto;">
-            <button type="button" class="btn btn-outline btn-sm" data-staff-edit="${s.id}">Edit</button>
-            <button type="button" class="btn btn-danger-outline btn-sm" data-staff-delete="${s.id}">Delete</button>
-          </div>
-        </div>`).join("");
-    }
+    staffListEl.innerHTML = staffCache.map((s) => `
+      <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div style="min-width:0;text-align:left;">
+          <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;text-transform:capitalize;">${esc(s.name)}</div>
+          <div style="font-size:0.78rem;color:var(--color-muted);text-transform:capitalize;">${esc(s.role)}${s.phone ? " • " + esc(s.phone) : ""}${s.property_name ? " • " + esc(s.property_name) : ""}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex:0 0 auto;">
+          <button type="button" class="btn btn-outline btn-sm" data-staff-edit="${s.id}">Edit</button>
+          <button type="button" class="btn btn-danger-outline btn-sm" data-staff-delete="${s.id}">Delete</button>
+        </div>
+      </div>`).join("");
   };
 
   // ======================= UNIFIED LOAD =======================
@@ -10439,8 +10430,8 @@ const setupRealEstatePage = () => {
       const data = await api({ query: "" });
       updateSummaryUI(data.summary);
       renderProperties(data.properties || []);
+      renderTenancyOverview(data.tenants || []);
       renderTenancies(data.tenancies || []);
-      renderRentOverview(data.tenants || []);
       renderHistory(data.payments || []);
       renderStaff(data.staff || []);
     } catch {
@@ -10688,7 +10679,6 @@ const setupRealEstatePage = () => {
       await api({ body: b });
       if (tenancyFormModal) tenancyFormModal.hidden = true;
       await loadAll();
-      switchTab("tenancies");
     } catch (err) { if (tenancyFormError) { tenancyFormError.textContent = err.message; tenancyFormError.hidden = false; } }
     finally { if (tenancyFormSubmit) tenancyFormSubmit.disabled = false; }
   });
@@ -10825,8 +10815,8 @@ const setupRealEstatePage = () => {
   document.querySelectorAll("[data-open-record-rent]").forEach((b) => b.addEventListener("click", () => openRentForm()));
   document.querySelector("[data-rent-form-close]")?.addEventListener("click", () => { if (rentFormModal) rentFormModal.hidden = true; });
 
-  // Quick Collect or View Tenancy from rent overview cards
-  paymentsList?.addEventListener("click", (e) => {
+  // Quick Collect or View Tenancy from tenancy overview cards
+  tenancyOverviewList?.addEventListener("click", (e) => {
     const quickPayId = e.target.closest("[data-quick-pay]")?.dataset.quickPay;
     if (quickPayId) {
       e.stopPropagation();
