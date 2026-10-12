@@ -5409,6 +5409,12 @@ button.settings-list-row:focus-visible {
   border-color: var(--color-blue, #1d4ed8) !important;
 }
 
+@media (min-width: 900px) {
+  .tenancy-detail-kpis {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+}
+
 .report-controls {
   position: sticky;
   top: 0;

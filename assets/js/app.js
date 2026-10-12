@@ -10133,11 +10133,27 @@ const setupRealEstatePage = () => {
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const num = (v) => parseFloat(String(v ?? "").replace(/[^0-9.\-]/g, "")) || 0;
   const todayStr = () => new Date().toISOString().slice(0, 10);
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    try { const d = new Date(String(dateStr).replace(" ", "T")); return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }); } catch { return dateStr; }
+  const formatDate = (dateInput) => {
+    if (!dateInput) return "";
+    try {
+      let d;
+      if (dateInput instanceof Date) {
+        d = dateInput;
+      } else {
+        const s = String(dateInput).trim();
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+          const parts = s.slice(0, 10).split("-");
+          d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        } else {
+          d = new Date(s);
+        }
+      }
+      return isNaN(d.getTime()) ? String(dateInput) : d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return String(dateInput);
+    }
   };
-  const chargeLabel = (t) => (t === "daily" ? "/day" : "/month");
+  const chargeLabel = (t) => (t === "daily" ? "/day" : (t === "yearly" ? "/yr" : "/Mo"));
 
   const closeWorkspace = (el) => { if (el) el.hidden = true; };
   const api = async (opts) => {
