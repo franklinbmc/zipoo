@@ -10656,6 +10656,156 @@ const setupRealEstatePage = () => {
       </div>`).join("");
   };
 
+  // ======================= TENANTS DIRECTORY =======================
+  const badgeTenantsCount = document.querySelector("[data-badge-tenants-count]");
+  const openTenantsBtn = document.querySelector("[data-open-tenants-workspace]");
+  const tenantsHomeSubtitle = document.querySelector("[data-tenants-home-subtitle]");
+  const tenantsHomeBadge = document.querySelector("[data-tenants-home-badge]");
+  const tenantsWorkspace = document.querySelector("[data-tenants-workspace]");
+  const tenantsWorkspaceClose = document.querySelector("[data-tenants-workspace-close]");
+  const tenantsSearchInput = document.querySelector("[data-tenants-search]");
+  const tabTenantsActiveBtn = document.querySelector('[data-tab-tenants="active"]');
+  const tabTenantsInactiveBtn = document.querySelector('[data-tab-tenants="inactive"]');
+  const badgeActiveTenantsCount = document.querySelector("[data-badge-active-tenants-count]");
+  const badgeInactiveTenantsCount = document.querySelector("[data-badge-inactive-tenants-count]");
+  const tabContentActive = document.querySelector('[data-tenants-tab-content="active"]');
+  const tabContentInactive = document.querySelector('[data-tenants-tab-content="inactive"]');
+  const activeTenantsList = document.querySelector("[data-active-tenants-list]");
+  const activeTenantsEmpty = document.querySelector("[data-active-tenants-empty]");
+  const inactiveTenantsList = document.querySelector("[data-inactive-tenants-list]");
+  const inactiveTenantsEmpty = document.querySelector("[data-inactive-tenants-empty]");
+  let activeTenantsTab = "active";
+
+  const renderTenantsDirectory = () => {
+    const all = rentOverviewCache || [];
+    const active = all.filter((t) => t.status === "active");
+    const inactive = all.filter((t) => t.status !== "active");
+
+    if (badgeTenantsCount) badgeTenantsCount.textContent = `${active.length} active • ${inactive.length} ended`;
+    if (tenantsHomeSubtitle) tenantsHomeSubtitle.textContent = `${active.length} active, ${inactive.length} ended tenancies`;
+    if (tenantsHomeBadge) tenantsHomeBadge.textContent = `${active.length} active`;
+    if (badgeActiveTenantsCount) badgeActiveTenantsCount.textContent = String(active.length);
+    if (badgeInactiveTenantsCount) badgeInactiveTenantsCount.textContent = String(inactive.length);
+
+    const q = (tenantsSearchInput?.value || "").trim().toLowerCase();
+
+    const matchesQuery = (t) => {
+      if (!q) return true;
+      return (
+        (t.tenant_name || "").toLowerCase().includes(q) ||
+        (t.tenant_phone || "").toLowerCase().includes(q) ||
+        (t.tenant_email || "").toLowerCase().includes(q) ||
+        (t.property_name || "").toLowerCase().includes(q) ||
+        (t.unit_name || "").toLowerCase().includes(q)
+      );
+    };
+
+    const filteredActive = active.filter(matchesQuery);
+    const filteredInactive = inactive.filter(matchesQuery);
+
+    // Render Active List
+    if (activeTenantsList) {
+      if (!filteredActive.length) {
+        activeTenantsList.replaceChildren();
+        if (activeTenantsEmpty) activeTenantsEmpty.hidden = false;
+      } else {
+        if (activeTenantsEmpty) activeTenantsEmpty.hidden = true;
+        activeTenantsList.innerHTML = filteredActive.map((t) => {
+          const initial = esc((t.tenant_name || "T").slice(0, 1).toUpperCase());
+          const sub = [t.tenant_phone, t.tenant_email, `Started ${formatDate(t.start_date)}`].filter(Boolean).map(esc).join(" • ");
+          return `
+            <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;" data-rent-open="${t.tenancy_id || t.id}">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div class="customer-avatar" style="width:40px;height:40px;border-radius:10px;background:#e0f2fe;color:var(--color-blue);display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:800;font-size:0.95rem;">
+                  ${initial}
+                </div>
+                <div style="min-width:0;text-align:left;">
+                  <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(t.tenant_name)}</div>
+                  <div style="font-size:0.78rem;color:var(--color-blue);font-weight:700;margin:2px 0;">
+                    ${esc(t.property_name)} • ${esc(t.unit_name)}
+                    <span style="color:var(--color-muted);font-weight:500;">(${fmt(t.rate)}${chargeLabel(t.charge_type)})</span>
+                  </div>
+                  <div style="font-size:0.74rem;color:var(--color-muted);">${sub}</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;">
+                <span class="badge-stock in-stock" style="font-size:0.72rem;">Active</span>
+                <span style="font-size:0.76rem;font-weight:700;color:var(--color-navy);">${fmt(t.total_paid || 0)}</span>
+              </div>
+            </div>`;
+        }).join("");
+      }
+    }
+
+    // Render Inactive List
+    if (inactiveTenantsList) {
+      if (!filteredInactive.length) {
+        inactiveTenantsList.replaceChildren();
+        if (inactiveTenantsEmpty) inactiveTenantsEmpty.hidden = false;
+      } else {
+        if (inactiveTenantsEmpty) inactiveTenantsEmpty.hidden = true;
+        inactiveTenantsList.innerHTML = filteredInactive.map((t) => {
+          const initial = esc((t.tenant_name || "T").slice(0, 1).toUpperCase());
+          const dates = [`Started ${formatDate(t.start_date)}`, t.end_date ? `Ended ${formatDate(t.end_date)}` : "Ended"].filter(Boolean).join(" → ");
+          const sub = [t.tenant_phone, dates].filter(Boolean).map(esc).join(" • ");
+          return `
+            <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;" data-rent-open="${t.tenancy_id || t.id}">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div class="customer-avatar" style="width:40px;height:40px;border-radius:10px;background:#f1f5f9;color:var(--color-muted);display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-weight:800;font-size:0.95rem;">
+                  ${initial}
+                </div>
+                <div style="min-width:0;text-align:left;">
+                  <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(t.tenant_name)}</div>
+                  <div style="font-size:0.78rem;color:var(--color-muted);font-weight:600;margin:2px 0;">${esc(t.property_name)} • ${esc(t.unit_name)}</div>
+                  <div style="font-size:0.74rem;color:var(--color-muted);">${sub}</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:0 0 auto;">
+                <span class="badge-stock out-of-stock" style="font-size:0.72rem;">Ended</span>
+                <span style="font-size:0.76rem;font-weight:700;color:var(--color-muted);">${fmt(t.total_paid || 0)}</span>
+              </div>
+            </div>`;
+        }).join("");
+      }
+    }
+  };
+
+  const switchTenantsTab = (tab) => {
+    activeTenantsTab = tab;
+    if (tab === "active") {
+      if (tabTenantsActiveBtn) { tabTenantsActiveBtn.className = "btn btn-sm btn-primary"; }
+      if (tabTenantsInactiveBtn) { tabTenantsInactiveBtn.className = "btn btn-sm btn-outline"; }
+      if (tabContentActive) tabContentActive.hidden = false;
+      if (tabContentInactive) tabContentInactive.hidden = true;
+    } else {
+      if (tabTenantsActiveBtn) { tabTenantsActiveBtn.className = "btn btn-sm btn-outline"; }
+      if (tabTenantsInactiveBtn) { tabTenantsInactiveBtn.className = "btn btn-sm btn-primary"; }
+      if (tabContentActive) tabContentActive.hidden = true;
+      if (tabContentInactive) tabContentInactive.hidden = false;
+    }
+  };
+
+  tabTenantsActiveBtn?.addEventListener("click", () => switchTenantsTab("active"));
+  tabTenantsInactiveBtn?.addEventListener("click", () => switchTenantsTab("inactive"));
+  tenantsSearchInput?.addEventListener("input", renderTenantsDirectory);
+
+  openTenantsBtn?.addEventListener("click", () => {
+    if (tenantsWorkspace) tenantsWorkspace.hidden = false;
+    renderTenantsDirectory();
+  });
+  tenantsWorkspaceClose?.addEventListener("click", () => {
+    closeWorkspace(tenantsWorkspace);
+  });
+
+  activeTenantsList?.addEventListener("click", (e) => {
+    const id = e.target.closest("[data-rent-open]")?.dataset.rentOpen;
+    if (id) openTenancyDetail(id);
+  });
+  inactiveTenantsList?.addEventListener("click", (e) => {
+    const id = e.target.closest("[data-rent-open]")?.dataset.rentOpen;
+    if (id) openTenancyDetail(id);
+  });
+
   // ======================= UNIFIED LOAD =======================
   const loadAll = async () => {
     try {
@@ -10665,6 +10815,7 @@ const setupRealEstatePage = () => {
       updateSummaryUI(data.summary);
       renderProperties(data.properties || []);
       renderUpcomingPayments(data.tenants || []);
+      renderTenantsDirectory();
       renderTenancies(data.tenancies || []);
       renderHistory(data.payments || []);
       renderStaff(data.staff || []);
@@ -10981,7 +11132,7 @@ const setupRealEstatePage = () => {
   };
   tenancyUnitSel?.addEventListener("change", updateUnitHint);
   tenancyTenantSel?.addEventListener("change", () => { if (newTenantFields) newTenantFields.hidden = tenancyTenantSel.value !== "__new__"; });
-  attachThousandsFormatting(tenancyForm?.elements.deposit);
+  if (tenancyForm?.elements.deposit) attachThousandsFormatting(tenancyForm.elements.deposit);
 
   document.querySelectorAll("[data-open-create-tenancy]").forEach((b) => b.addEventListener("click", openTenancyForm));
   document.querySelector("[data-tenancy-form-close]")?.addEventListener("click", () => { if (tenancyFormModal) tenancyFormModal.hidden = true; });
@@ -11024,7 +11175,7 @@ const setupRealEstatePage = () => {
       b.set("unit_id", unitId);
       b.set("customer_id", customerId);
       b.set("start_date", tenancyForm.elements.start_date.value || todayStr());
-      b.set("deposit", String(num(tenancyForm.elements.deposit.value)));
+      b.set("deposit", String(num(tenancyForm.elements.deposit?.value || 0)));
       b.set("notes", tenancyForm.elements.notes.value.trim());
       await api({ body: b });
       if (tenancyFormModal) tenancyFormModal.hidden = true;

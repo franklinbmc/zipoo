@@ -86,6 +86,26 @@
           <p style="margin:0;font-size:0.82rem;color:var(--color-muted);">Tap the + icon at the top to add your first property.</p>
         </div>
       </section>
+
+      <!-- Tenants Section -->
+      <section class="re-section" style="margin-top:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <h2 style="font-size:1.1rem;font-weight:900;color:var(--color-navy);margin:0;">Tenants</h2>
+          <span class="badge-stock in-stock" data-badge-tenants-count style="font-size:0.75rem;">0 tenants</span>
+        </div>
+        <button type="button" class="dashboard-pos-banner" data-open-tenants-workspace aria-label="Open tenants list" style="width:100%;text-align:left;cursor:pointer;border:1px solid var(--color-line);background:#ffffff;border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:var(--shadow-sm);">
+          <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+            <div style="width:42px;height:42px;border-radius:10px;background:#eff6ff;color:#1d4ed8;display:flex;align-items:center;justify-content:center;flex:0 0 auto;">
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width:22px;height:22px;fill:currentColor;"><path d="M256 256c52.8 0 96-43.2 96-96s-43.2-96-96-96-96 43.2-96 96 43.2 96 96 96zm0 48c-63.6 0-192 31.8-192 96v48h384v-48c0-64.2-128.4-96-192-96z"/></svg>
+            </div>
+            <div style="min-width:0;">
+              <strong style="color:var(--color-navy);font-size:0.98rem;display:block;">Tenants Directory</strong>
+              <small style="color:var(--color-muted);font-size:0.8rem;" data-tenants-home-subtitle>Active tenants &amp; ended tenancies</small>
+            </div>
+          </div>
+          <span class="pos-banner-btn" data-tenants-home-badge style="background:#eff6ff;color:#1d4ed8;font-weight:800;border:1px solid #bfdbfe;">View &rarr;</span>
+        </button>
+      </section>
     </main>
   </div>
 
@@ -106,6 +126,57 @@
           <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M144 48v416l40-28 40 28 40-28 40 28 40-28 40 28V48zM200 176h112M200 256h112" /></svg>
           <strong style="display:block;color:var(--color-navy);font-size:0.95rem;margin-bottom:4px;">No upcoming payments</strong>
           <p style="margin:0;font-size:0.82rem;color:var(--color-muted);">All active tenancies are up to date or no active tenancies recorded.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Workspace: Tenants (Tabs: Active Tenants & Inactive/Ended Tenancies) -->
+  <div class="fullscreen-modal" hidden data-tenants-workspace>
+    <section class="fullscreen-panel" role="dialog" aria-modal="true">
+      <header class="fullscreen-header">
+        <button class="icon-button" type="button" data-tenants-workspace-close aria-label="Back">
+          <svg viewBox="0 0 512 512" aria-hidden="true"><path d="M328 112L184 256l144 144" /></svg>
+        </button>
+        <h2>Tenants</h2>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+      <div class="fullscreen-body" style="padding:16px;">
+        <!-- Search bar -->
+        <div style="margin-bottom:12px;">
+          <input type="search" data-tenants-search placeholder="Search tenant name, phone, property or unit..." style="width:100%;font-size:0.85rem;padding:9px 12px;border:1px solid var(--color-line);border-radius:10px;background:#f8fafc;">
+        </div>
+
+        <!-- Two Tabs: Active vs Inactive (Ended) -->
+        <div style="display:flex;gap:8px;border-bottom:1px solid var(--color-line);padding-bottom:10px;margin-bottom:14px;">
+          <button type="button" class="btn btn-sm btn-primary" data-tab-tenants="active" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:8px;">
+            <span>Active Tenants</span>
+            <span class="badge-stock in-stock" data-badge-active-tenants-count style="font-size:0.7rem;background:rgba(255,255,255,0.25);color:#fff;">0</span>
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" data-tab-tenants="inactive" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:8px;">
+            <span>Inactive / Ended</span>
+            <span class="badge-stock out-of-stock" data-badge-inactive-tenants-count style="font-size:0.7rem;">0</span>
+          </button>
+        </div>
+
+        <!-- Active Tenants Tab Content -->
+        <div data-tenants-tab-content="active">
+          <div class="stock-list" data-active-tenants-list></div>
+          <div class="company-users-empty" hidden data-active-tenants-empty style="text-align:center;padding:32px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;">
+            <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 256c52.8 0 96-43.2 96-96s-43.2-96-96-96-96 43.2-96 96 43.2 96 96 96zm0 48c-63.6 0-192 31.8-192 96v48h384v-48c0-64.2-128.4-96-192-96z"/></svg>
+            <strong style="display:block;color:var(--color-navy);font-size:0.95rem;margin-bottom:4px;">No active tenants</strong>
+            <p style="margin:0;font-size:0.82rem;color:var(--color-muted);">No units currently have an active tenancy.</p>
+          </div>
+        </div>
+
+        <!-- Inactive / Ended Tenants Tab Content -->
+        <div data-tenants-tab-content="inactive" hidden>
+          <div class="stock-list" data-inactive-tenants-list></div>
+          <div class="company-users-empty" hidden data-inactive-tenants-empty style="text-align:center;padding:32px 16px;background:#f8fafc;border:1px dashed var(--color-line);border-radius:12px;">
+            <svg class="svg-ico empty-ico" viewBox="0 0 512 512" aria-hidden="true"><path d="M256 256c52.8 0 96-43.2 96-96s-43.2-96-96-96-96 43.2-96 96 43.2 96 96 96zm0 48c-63.6 0-192 31.8-192 96v48h384v-48c0-64.2-128.4-96-192-96z"/></svg>
+            <strong style="display:block;color:var(--color-navy);font-size:0.95rem;margin-bottom:4px;">No ended tenancies</strong>
+            <p style="margin:0;font-size:0.82rem;color:var(--color-muted);">There are no past or ended tenancies recorded.</p>
+          </div>
         </div>
       </div>
     </section>
@@ -330,16 +401,10 @@
             <input type="text" data-new-tenant-phone placeholder="07...">
           </label>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-          <label class="form-field">
-            <span>Start Date <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
-            <input type="date" name="start_date" required>
-          </label>
-          <label class="form-field">
-            <span>Deposit</span>
-            <input type="text" inputmode="numeric" name="deposit" step="0.01" min="0" placeholder="0.00">
-          </label>
-        </div>
+        <label class="form-field">
+          <span>Start Date <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
+          <input type="date" name="start_date" required>
+        </label>
         <label class="form-field">
           <span>Notes</span>
           <textarea name="notes" rows="2" placeholder="Optional details..."></textarea>
@@ -667,6 +732,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=171" defer></script>
+  <script src="/assets/js/app.js?v=172" defer></script>
 </body>
 </html>
