@@ -10192,17 +10192,34 @@ const setupRealEstatePage = () => {
     return parts.join(" ");
   };
   const remainingInfo = (paidUntil, chargeType) => {
-    if (!paidUntil) return { text: "Renewal: Not paid", deadlineText: "No renewal date", cls: "out-of-stock", daysDiff: -999999 };
+    if (!paidUntil) {
+      return {
+        text: "Renewal: Not paid",
+        deadlineText: "No renewal date",
+        nextPaymentText: "Next Payment: Due immediately",
+        nextPaymentDate: null,
+        cls: "out-of-stock",
+        daysDiff: -999999,
+      };
+    }
     const end = parseDate(paidUntil);
     const today = new Date(); today.setHours(0, 0, 0, 0);
-    if (!end) return { text: "—", deadlineText: "—", cls: "", daysDiff: 999999 };
+    if (!end) return { text: "—", deadlineText: "—", nextPaymentText: "—", nextPaymentDate: null, cls: "", daysDiff: 999999 };
+
+    // Next day of payment is exactly the day after paid_until
+    const nextPay = new Date(end);
+    nextPay.setDate(nextPay.getDate() + 1);
+    const formattedNext = formatDate(nextPay);
     const formattedEnd = formatDate(paidUntil);
     const dayDiff = Math.round((end - today) / 86400000);
+
     if (end >= today) {
       if (chargeType === "daily") {
         return {
           text: dayDiff <= 0 ? "Renewal: Due today" : `Renewal: in ${dayDiff} day${dayDiff !== 1 ? "s" : ""}`,
           deadlineText: `Renewal: ${formattedEnd} (${dayDiff}d left)`,
+          nextPaymentText: `Next Payment: ${formattedNext}`,
+          nextPaymentDate: nextPay,
           cls: dayDiff <= 3 ? "low-stock" : "in-stock",
           daysDiff: dayDiff,
         };
@@ -10212,6 +10229,8 @@ const setupRealEstatePage = () => {
       return {
         text: txt ? `Renewal: in ${txt}` : "Renewal: Due today",
         deadlineText: `Renewal: ${formattedEnd} (${txt || "today"})`,
+        nextPaymentText: `Next Payment: ${formattedNext}`,
+        nextPaymentDate: nextPay,
         cls: (months === 0 && days <= 3) ? "low-stock" : "in-stock",
         daysDiff: dayDiff,
       };
@@ -10221,6 +10240,8 @@ const setupRealEstatePage = () => {
       return {
         text: `Overdue ${overdueDays} day${overdueDays !== 1 ? "s" : ""}`,
         deadlineText: `Expired ${formattedEnd} (${overdueDays}d overdue)`,
+        nextPaymentText: `Next Payment: Was due ${formattedNext}`,
+        nextPaymentDate: nextPay,
         cls: "out-of-stock",
         daysDiff: dayDiff,
       };
@@ -10229,6 +10250,8 @@ const setupRealEstatePage = () => {
     return {
       text: `Overdue by ${spanText(months, days) || "0 days"}`,
       deadlineText: `Expired ${formattedEnd} (${spanText(months, days) || "0d"} overdue)`,
+      nextPaymentText: `Next Payment: Was due ${formattedNext}`,
+      nextPaymentDate: nextPay,
       cls: "out-of-stock",
       daysDiff: dayDiff,
     };
@@ -10345,11 +10368,47 @@ const setupRealEstatePage = () => {
         const assignBtn = !occupied
           ? `<button type="button" class="btn btn-outline btn-sm" data-unit-new-tenancy="${u.id}" style="padding:3px 8px;font-size:0.74rem;">+ Assign</button>`
           : "";
-        const chevronBtn = occupied && u.tenancy_id
-          ? `<button type="button" class="icon-button" data-unit-view-tenancy="${u.tenancy_id}" aria-label="View tenancy details" title="View tenancy and payment history" style="width:32px;height:32px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;margin-left:4px;">
-              <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-navy);"><path d="M184 112l144 144-144 144"/></svg>
-            </button>`
-          : "";
+        let paymentMathHtml = "";
+        if (occupied && u.tenancy_id) {
+          const rem = remainingInfo(u.paid_until, u.charge_type);
+          const formattedPaidUntil = u.paid_until ? formatDate(u.paid_until) : "No rent recorded";
+          const startFormatted = u.start_date ? formatDate(u.start_date) : "—";
+          const totalPaidStr = fmt(u.total_paid || 0);
+
+          // Calculate period of stay covered (start_date -> paid_until)
+          let stayCoveredText = "";
+          if (u.start_date && u.paid_until) {
+            const sDate = parseDate(u.start_date);
+            const pDate = parseDate(u.paid_until);
+            if (sDate && pDate && pDate >= sDate) {
+              const diffDays = Math.round((pDate - sDate) / 86400000) + 1;
+              if (u.charge_type === "daily") {
+                stayCoveredText = `${diffDays} day${diffDays !== 1 ? "s" : ""} covered`;
+              } else {
+                const { months, days } = diffMonthsDays(sDate, pDate);
+                const span = spanText(months, days);
+                stayCoveredText = span ? `${span} covered` : `${diffDays}d covered`;
+              }
+            }
+          }
+
+          paymentMathHtml = `
+            <div style="margin-top:6px;padding:6px 10px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;font-size:0.75rem;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
+                <span style="font-weight:700;color:var(--color-navy);">Paid Until: <strong style="color:var(--color-blue);">${esc(formattedPaidUntil)}</strong></span>
+                <span class="badge-stock ${rem.cls}" style="font-size:0.68rem;padding:1px 6px;">${esc(rem.text)}</span>
+              </div>
+              <div style="color:var(--color-muted);margin-top:2px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.72rem;">
+                <span>Total Paid: <strong style="color:var(--color-navy);">${totalPaidStr}</strong></span>
+                ${stayCoveredText ? `<span>&bull; ${esc(stayCoveredText)}</span>` : ""}
+                ${startFormatted !== "—" ? `<span>&bull; From ${esc(startFormatted)}</span>` : ""}
+              </div>
+              <div style="margin-top:4px;padding-top:4px;border-top:1px dashed var(--color-line);color:var(--color-navy);font-weight:700;font-size:0.73rem;display:flex;align-items:center;gap:4px;">
+                <svg viewBox="0 0 512 512" aria-hidden="true" style="width:12px;height:12px;color:var(--color-blue);flex:0 0 auto;"><path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64zm0 344c-83.8 0-152-68.2-152-152S172.2 104 256 104s152 68.2 152 152-68.2 152-152 152zm16-248h-32v120l104 62.4 16-26.2-90.4-53.6V160z"/></svg>
+                <span>${esc(rem.nextPaymentText)}</span>
+              </div>
+            </div>`;
+        }
 
         const utils = Array.isArray(u.utilities) ? u.utilities.filter((x) => x && x.name && x.value) : [];
         const amens = Array.isArray(u.amenities) ? u.amenities.filter(Boolean) : [];
@@ -10370,6 +10429,7 @@ const setupRealEstatePage = () => {
               <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(u.name)} ${badge}</div>
               <div style="font-size:0.8rem;color:var(--color-blue);font-weight:700;">${fmt(u.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(u.charge_type)}</span></div>
               ${tenantInfo}
+              ${paymentMathHtml}
               ${utilsHtml}
               ${amensHtml}
             </div>
@@ -11071,10 +11131,14 @@ const setupRealEstatePage = () => {
     if (tdMeta) tdMeta.textContent = [`${t.property_name} • ${t.unit_name}`, t.tenant_phone, `from ${formatDate(t.start_date)}`].filter(Boolean).join(" • ");
     if (tdRate) tdRate.textContent = `${fmt(t.rate)}${chargeLabel(t.charge_type)}`;
     if (tdTotal) tdTotal.textContent = fmt(t.total_paid || 0);
+    const tdNextPayment = document.querySelector("[data-td-next-payment]");
     if (tdPaidUntil) tdPaidUntil.textContent = t.paid_until ? formatDate(t.paid_until) : "—";
     if (tdRemaining) {
-      const rem = active ? remainingInfo(t.paid_until, t.charge_type) : { text: "Ended" };
+      const rem = active ? remainingInfo(t.paid_until, t.charge_type) : { text: "Ended", nextPaymentText: "Ended" };
       tdRemaining.textContent = rem.text;
+      if (tdNextPayment) {
+        tdNextPayment.textContent = active ? rem.nextPaymentText : "Tenancy ended";
+      }
     }
     if (tdRecordBtn) tdRecordBtn.hidden = !active;
     if (tdEndBtn) tdEndBtn.hidden = !active;

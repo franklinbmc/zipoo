@@ -94,6 +94,10 @@ function unit_payload(array $row): array
         'tenant_id' => isset($row['tenant_id']) && $row['tenant_id'] !== null ? (int) $row['tenant_id'] : null,
         'tenant_name' => (string) ($row['tenant_name'] ?? ''),
         'tenancy_id' => isset($row['tenancy_id']) && $row['tenancy_id'] !== null ? (int) $row['tenancy_id'] : null,
+        'start_date' => isset($row['start_date']) && $row['start_date'] !== null ? (string) $row['start_date'] : null,
+        'end_date' => isset($row['end_date']) && $row['end_date'] !== null ? (string) $row['end_date'] : null,
+        'total_paid' => isset($row['total_paid']) ? (float) $row['total_paid'] : 0.0,
+        'paid_until' => isset($row['paid_until']) && $row['paid_until'] !== null ? (string) $row['paid_until'] : null,
     ];
 }
 
@@ -122,7 +126,10 @@ function load_units(PDO $pdo, int $businessId, ?int $propertyId = null): array
     }
     $stmt = $pdo->prepare(
         "SELECT u.*, p.name AS property_name,
-                t.id AS tenancy_id, t.customer_id AS tenant_id, c.full_name AS tenant_name
+                t.id AS tenancy_id, t.customer_id AS tenant_id, c.full_name AS tenant_name,
+                t.start_date, t.end_date,
+                (SELECT COALESCE(SUM(amount), 0) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id) AS total_paid,
+                (SELECT MAX(period_end) FROM tbl_rent_payments r WHERE r.tenancy_id = t.id AND r.period_end IS NOT NULL) AS paid_until
          FROM tbl_property_units u
          JOIN tbl_properties p ON p.id = u.property_id
          LEFT JOIN tbl_tenancies t ON t.unit_id = u.id AND t.status = 'active'

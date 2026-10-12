@@ -509,11 +509,12 @@
           <div style="font-size:0.82rem;color:var(--color-muted);margin-top:4px;" data-td-meta>-</div>
         </div>
 
-        <section class="stock-kpi-grid" style="margin-bottom:14px;">
+        <section class="stock-kpi-grid" style="margin-bottom:14px;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));">
           <div class="stock-kpi-card"><span class="kpi-label">Rent</span><strong class="kpi-val" data-td-rate>-</strong></div>
           <div class="stock-kpi-card"><span class="kpi-label">Total Paid</span><strong class="kpi-val" data-td-total>-</strong></div>
           <div class="stock-kpi-card"><span class="kpi-label">Paid Until</span><strong class="kpi-val" data-td-paiduntil>-</strong></div>
-          <div class="stock-kpi-card"><span class="kpi-label">Remaining</span><strong class="kpi-val" data-td-remaining>-</strong></div>
+          <div class="stock-kpi-card"><span class="kpi-label">Status / Due</span><strong class="kpi-val" data-td-remaining>-</strong></div>
+          <div class="stock-kpi-card" style="grid-column:1 / -1;background:#eff6ff;border-color:#bfdbfe;"><span class="kpi-label" style="color:#1e40af;">Next Payment Date</span><strong class="kpi-val" data-td-next-payment style="color:#1d4ed8;font-size:0.95rem;">-</strong></div>
         </section>
 
         <!-- Unit details: Utilities & Amenities -->
@@ -551,6 +552,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=167" defer></script>
+  <script src="/assets/js/app.js?v=168" defer></script>
 </body>
 </html>
