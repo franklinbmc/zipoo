@@ -10373,48 +10373,6 @@ const setupRealEstatePage = () => {
               <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-navy);"><path d="M184 112l144 144-144 144"/></svg>
             </button>`
           : "";
-        let paymentMathHtml = "";
-        if (occupied && u.tenancy_id) {
-          const rem = remainingInfo(u.paid_until, u.charge_type);
-          const formattedPaidUntil = u.paid_until ? formatDate(u.paid_until) : "No rent recorded";
-          const startFormatted = u.start_date ? formatDate(u.start_date) : "—";
-          const totalPaidStr = fmt(u.total_paid || 0);
-
-          // Calculate period of stay covered (start_date -> paid_until)
-          let stayCoveredText = "";
-          if (u.start_date && u.paid_until) {
-            const sDate = parseDate(u.start_date);
-            const pDate = parseDate(u.paid_until);
-            if (sDate && pDate && pDate >= sDate) {
-              const diffDays = Math.round((pDate - sDate) / 86400000) + 1;
-              if (u.charge_type === "daily") {
-                stayCoveredText = `${diffDays} day${diffDays !== 1 ? "s" : ""} covered`;
-              } else {
-                const { months, days } = diffMonthsDays(sDate, pDate);
-                const span = spanText(months, days);
-                stayCoveredText = span ? `${span} covered` : `${diffDays}d covered`;
-              }
-            }
-          }
-
-          paymentMathHtml = `
-            <div style="margin-top:6px;padding:6px 10px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;font-size:0.75rem;">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;">
-                <span style="font-weight:700;color:var(--color-navy);">Paid Until: <strong style="color:var(--color-blue);">${esc(formattedPaidUntil)}</strong></span>
-                <span class="badge-stock ${rem.cls}" style="font-size:0.68rem;padding:1px 6px;">${esc(rem.text)}</span>
-              </div>
-              <div style="color:var(--color-muted);margin-top:2px;display:flex;flex-wrap:wrap;gap:6px;font-size:0.72rem;">
-                <span>Total Paid: <strong style="color:var(--color-navy);">${totalPaidStr}</strong></span>
-                ${stayCoveredText ? `<span>&bull; ${esc(stayCoveredText)}</span>` : ""}
-                ${startFormatted !== "—" ? `<span>&bull; From ${esc(startFormatted)}</span>` : ""}
-              </div>
-              <div style="margin-top:4px;padding-top:4px;border-top:1px dashed var(--color-line);color:var(--color-navy);font-weight:700;font-size:0.73rem;display:flex;align-items:center;gap:4px;">
-                <svg viewBox="0 0 512 512" aria-hidden="true" style="width:12px;height:12px;color:var(--color-blue);flex:0 0 auto;"><path d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64zm0 344c-83.8 0-152-68.2-152-152S172.2 104 256 104s152 68.2 152 152-68.2 152-152 152zm16-248h-32v120l104 62.4 16-26.2-90.4-53.6V160z"/></svg>
-                <span>${esc(rem.nextPaymentText)}</span>
-              </div>
-            </div>`;
-        }
-
         const utils = Array.isArray(u.utilities) ? u.utilities.filter((x) => x && x.name && x.value) : [];
         const amens = Array.isArray(u.amenities) ? u.amenities.filter(Boolean) : [];
         const utilsHtml = utils.length
@@ -10434,7 +10392,6 @@ const setupRealEstatePage = () => {
               <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(u.name)} ${badge}</div>
               <div style="font-size:0.8rem;color:var(--color-blue);font-weight:700;">${fmt(u.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(u.charge_type)}</span></div>
               ${tenantInfo}
-              ${paymentMathHtml}
               ${utilsHtml}
               ${amensHtml}
             </div>
