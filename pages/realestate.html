@@ -211,6 +211,13 @@
       <form class="fullscreen-body" data-unit-form novalidate>
         <input type="hidden" name="unit_id" data-unit-form-id>
         <input type="hidden" name="property_id" data-unit-form-property-id>
+        <div style="background:#f1f5f9;border:1px solid var(--color-line);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+          <svg viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;color:var(--color-blue);flex:0 0 auto;"><path d="M112 112h288v352H112zM64 464h384"/></svg>
+          <div style="font-size:0.84rem;color:var(--color-navy);line-height:1.3;">
+            <span style="color:var(--color-muted);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.04em;font-weight:700;display:block;">Property</span>
+            <strong data-unit-form-property-name style="font-weight:700;">-</strong>
+          </div>
+        </div>
         <label class="form-field">
           <span>Unit Name <strong style="color:var(--color-danger,#ef4444);">*</strong></span>
           <input type="text" name="name" placeholder="e.g. Room A, Apartment 2, Shop 1" required>
@@ -497,6 +504,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=165" defer></script>
+  <script src="/assets/js/app.js?v=166" defer></script>
 </body>
 </html>

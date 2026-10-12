@@ -10546,6 +10546,7 @@ const setupRealEstatePage = () => {
   const unitFormTitle = document.querySelector("[data-unit-form-title]");
   const unitFormId = document.querySelector("[data-unit-form-id]");
   const unitFormPropertyId = document.querySelector("[data-unit-form-property-id]");
+  const unitFormPropertyName = document.querySelector("[data-unit-form-property-name]");
   const unitFormError = document.querySelector("[data-unit-form-error]");
   const unitFormSubmit = document.querySelector("[data-unit-form-submit]");
 
@@ -10554,7 +10555,11 @@ const setupRealEstatePage = () => {
     if (unitFormError) unitFormError.hidden = true;
     if (unitFormId) unitFormId.value = u ? String(u.id) : "";
     if (unitFormPropertyId) unitFormPropertyId.value = String(currentProperty?.id || "");
-    if (unitFormTitle) unitFormTitle.textContent = u ? "Edit Unit" : "Add Unit";
+    const propTitle = currentProperty?.name || "Property";
+    if (unitFormPropertyName) {
+      unitFormPropertyName.textContent = currentProperty ? `${currentProperty.name}${currentProperty.location ? ` (${currentProperty.location})` : ""}` : "-";
+    }
+    if (unitFormTitle) unitFormTitle.textContent = u ? `Edit Unit — ${propTitle}` : `Add Unit to ${propTitle}`;
     if (u && unitForm) {
       unitForm.elements.name.value = u.name || "";
       unitForm.elements.charge_type.value = u.charge_type || "monthly";
