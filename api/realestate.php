@@ -395,7 +395,7 @@ function get_smtp_config(PDO $pdo, int $businessId): array
     return $sStmt ? ($sStmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: []) : [];
 }
 
-function send_rent_email(array $smtp, string $toEmail, string $recipientName, string $subject, string $bodyHtml, string $bodyText): array
+function send_rent_email(array $smtp, string $toEmail, string $recipientName, string $subject, string $bodyHtml, string $bodyText, string $senderBusinessName = ''): array
 {
     if (empty($smtp['smtp_host']) || empty($smtp['from_email'])) {
         return ['ok' => false, 'message' => 'SMTP server is not configured.'];
@@ -422,7 +422,9 @@ function send_rent_email(array $smtp, string $toEmail, string $recipientName, st
             $mail->Username = $smtp['smtp_username'];
             $mail->Password = $smtp['smtp_password'] ?? '';
         }
-        $fromName = $smtp['from_name'] ?? 'Zipoo Property Management';
+        $fromName = !empty($senderBusinessName)
+            ? $senderBusinessName
+            : (!empty($smtp['from_name']) ? $smtp['from_name'] : 'Zipoo Property Management');
         $mail->setFrom($smtp['from_email'], $fromName);
         $mail->addAddress($toEmail, $recipientName);
         $mail->Subject = $subject;
@@ -1179,7 +1181,7 @@ try {
             $textBody = "Rent Reminder: {$t['property_name']} ({$t['unit_name']})\nTenant: {$t['tenant_name']}\nExpected Date: {$math['expected_date']}\nAmount: {$formattedRate}\nPlease make timely payment. Thank you!";
 
             foreach ($emailRecipients as $ercpt) {
-                $eRes = send_rent_email($smtpConfig, $ercpt['email'], $ercpt['name'], $emailSubject, $htmlBody, $textBody);
+                $eRes = send_rent_email($smtpConfig, $ercpt['email'], $ercpt['name'], $emailSubject, $htmlBody, $textBody, (string) ($landlordContact['business_name'] ?? ''));
                 if ($eRes['ok']) {
                     $emailSentCount++;
                 } else {
