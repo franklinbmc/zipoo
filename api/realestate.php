@@ -70,6 +70,14 @@ function property_payload(array $row): array
     ];
 }
 
+function parse_json_or_default($val, $default = [])
+{
+    if (is_array($val)) return $val;
+    if (!is_string($val) || trim($val) === '') return $default;
+    $d = json_decode($val, true);
+    return is_array($d) ? $d : $default;
+}
+
 function unit_payload(array $row): array
 {
     return [
@@ -81,6 +89,8 @@ function unit_payload(array $row): array
         'rate' => (float) ($row['rate'] ?? 0),
         'status' => (string) ($row['status'] ?? 'vacant'),
         'notes' => (string) ($row['notes'] ?? ''),
+        'utilities' => parse_json_or_default($row['utilities'] ?? null, []),
+        'amenities' => parse_json_or_default($row['amenities'] ?? null, []),
         'tenant_id' => isset($row['tenant_id']) && $row['tenant_id'] !== null ? (int) $row['tenant_id'] : null,
         'tenant_name' => (string) ($row['tenant_name'] ?? ''),
         'tenancy_id' => isset($row['tenancy_id']) && $row['tenancy_id'] !== null ? (int) $row['tenancy_id'] : null,
@@ -298,6 +308,7 @@ try {
     $userId = require_user();
     ensure_realestate_tables($pdo);
     ensure_rent_period_columns($pdo);
+    ensure_property_units_extended_columns($pdo);
     ensure_accounts_tables($pdo);
     ensure_rent_txn_type($pdo);
 
@@ -353,7 +364,7 @@ try {
         if ($resource === 'tenancy') {
             $tenancyId = (int) ($_GET['id'] ?? 0);
             $stmt = $pdo->prepare(
-                'SELECT t.*, u.name AS unit_name, p.name AS property_name, c.full_name AS tenant_name, c.phone AS tenant_phone, c.email AS tenant_email
+                'SELECT t.*, u.name AS unit_name, u.utilities AS unit_utilities, u.amenities AS unit_amenities, p.name AS property_name, c.full_name AS tenant_name, c.phone AS tenant_phone, c.email AS tenant_email
                  FROM tbl_tenancies t
                  JOIN tbl_property_units u ON u.id = t.unit_id
                  JOIN tbl_properties p ON p.id = t.property_id
@@ -398,6 +409,8 @@ try {
                 'status' => (string) $t['status'],
                 'property_name' => (string) $t['property_name'],
                 'unit_name' => (string) $t['unit_name'],
+                'unit_utilities' => parse_json_or_default($t['unit_utilities'] ?? null, []),
+                'unit_amenities' => parse_json_or_default($t['unit_amenities'] ?? null, []),
                 'tenant_name' => (string) $t['tenant_name'],
                 'tenant_phone' => (string) ($t['tenant_phone'] ?? ''),
                 'tenant_email' => (string) ($t['tenant_email'] ?? ''),
@@ -475,6 +488,36 @@ try {
         $chargeType = in_array($chargeType, ['daily', 'monthly'], true) ? $chargeType : 'monthly';
         $rate = round((float) ($_POST['rate'] ?? 0), 2);
         $notes = trim((string) ($_POST['notes'] ?? ''));
+        $rawUtilities = $_POST['utilities'] ?? null;
+        $utilitiesJson = null;
+        if (is_string($rawUtilities)) {
+            $dec = json_decode($rawUtilities, true);
+            if (is_array($dec)) {
+                $utilitiesJson = json_encode(array_values(array_filter($dec, static function ($item) {
+                    return is_array($item) && trim((string) ($item['name'] ?? '')) !== '';
+                })));
+            }
+        } elseif (is_array($rawUtilities)) {
+            $utilitiesJson = json_encode(array_values(array_filter($rawUtilities, static function ($item) {
+                return is_array($item) && trim((string) ($item['name'] ?? '')) !== '';
+            })));
+        }
+
+        $rawAmenities = $_POST['amenities'] ?? null;
+        $amenitiesJson = null;
+        if (is_string($rawAmenities)) {
+            $dec = json_decode($rawAmenities, true);
+            if (is_array($dec)) {
+                $amenitiesJson = json_encode(array_values(array_filter(array_map('trim', $dec), static function ($val) {
+                    return $val !== '';
+                })));
+            }
+        } elseif (is_array($rawAmenities)) {
+            $amenitiesJson = json_encode(array_values(array_filter(array_map('trim', $rawAmenities), static function ($val) {
+                return $val !== '';
+            })));
+        }
+
         fetch_or_404($pdo, 'tbl_properties', $businessId, $propertyId, 'Property');
         if ($name === '') {
             respond(422, ['ok' => false, 'message' => 'Unit name is required.']);
@@ -482,11 +525,11 @@ try {
         if ($action === 'unit_update') {
             $id = (int) ($_POST['unit_id'] ?? 0);
             fetch_or_404($pdo, 'tbl_property_units', $businessId, $id, 'Unit');
-            $pdo->prepare('UPDATE tbl_property_units SET name = :name, charge_type = :ct, rate = :rate, notes = :notes WHERE id = :id AND business_id = :bid')
-                ->execute([':name' => $name, ':ct' => $chargeType, ':rate' => $rate, ':notes' => $notes !== '' ? $notes : null, ':id' => $id, ':bid' => $businessId]);
+            $pdo->prepare('UPDATE tbl_property_units SET name = :name, charge_type = :ct, rate = :rate, notes = :notes, utilities = :util, amenities = :amen WHERE id = :id AND business_id = :bid')
+                ->execute([':name' => $name, ':ct' => $chargeType, ':rate' => $rate, ':notes' => $notes !== '' ? $notes : null, ':util' => $utilitiesJson, ':amen' => $amenitiesJson, ':id' => $id, ':bid' => $businessId]);
         } else {
-            $pdo->prepare('INSERT INTO tbl_property_units (business_id, property_id, name, charge_type, rate, status, notes) VALUES (:bid, :pid, :name, :ct, :rate, "vacant", :notes)')
-                ->execute([':bid' => $businessId, ':pid' => $propertyId, ':name' => $name, ':ct' => $chargeType, ':rate' => $rate, ':notes' => $notes !== '' ? $notes : null]);
+            $pdo->prepare('INSERT INTO tbl_property_units (business_id, property_id, name, charge_type, rate, status, notes, utilities, amenities) VALUES (:bid, :pid, :name, :ct, :rate, "vacant", :notes, :util, :amen)')
+                ->execute([':bid' => $businessId, ':pid' => $propertyId, ':name' => $name, ':ct' => $chargeType, ':rate' => $rate, ':notes' => $notes !== '' ? $notes : null, ':util' => $utilitiesJson, ':amen' => $amenitiesJson]);
         }
         respond($action === 'unit_create' ? 201 : 200, ['ok' => true, 'message' => $action === 'unit_create' ? 'Unit added.' : 'Unit updated.', 'units' => load_units($pdo, $businessId, $propertyId)]);
     }

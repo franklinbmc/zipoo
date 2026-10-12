@@ -122,3 +122,21 @@ function ensure_rent_period_columns(PDO $pdo): void
     $addColumn('tbl_rent_payments', 'period_start', 'DATE NULL AFTER period_label');
     $addColumn('tbl_rent_payments', 'period_end', 'DATE NULL AFTER period_start');
 }
+
+/** Self-heals utilities and amenities columns on tbl_property_units for pre-existing databases. */
+function ensure_property_units_extended_columns(PDO $pdo): void
+{
+    $addColumn = static function (string $table, string $column, string $definition) use ($pdo): void {
+        try {
+            $cols = $pdo->query("SHOW COLUMNS FROM {$table} LIKE '{$column}'")->fetchAll();
+        } catch (Throwable) {
+            return;
+        }
+        if (empty($cols)) {
+            $pdo->exec("ALTER TABLE {$table} ADD COLUMN {$column} {$definition}");
+        }
+    };
+
+    $addColumn('tbl_property_units', 'utilities', 'TEXT NULL AFTER notes');
+    $addColumn('tbl_property_units', 'amenities', 'TEXT NULL AFTER utilities');
+}

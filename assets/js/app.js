@@ -10351,12 +10351,27 @@ const setupRealEstatePage = () => {
             </button>`
           : "";
 
+        const utils = Array.isArray(u.utilities) ? u.utilities.filter((x) => x && x.name && x.value) : [];
+        const amens = Array.isArray(u.amenities) ? u.amenities.filter(Boolean) : [];
+        const utilsHtml = utils.length
+          ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">
+              ${utils.map((x) => `<span style="display:inline-flex;align-items:center;gap:3px;padding:1px 6px;background:#f1f5f9;border-radius:4px;font-size:0.72rem;color:var(--color-navy);"><strong style="color:var(--color-muted);">${esc(x.name)}:</strong> ${esc(x.value)}</span>`).join("")}
+            </div>`
+          : "";
+        const amensHtml = amens.length
+          ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;">
+              ${amens.map((a) => `<span style="padding:1px 6px;background:#e0f2fe;color:#0369a1;border-radius:4px;font-size:0.7rem;font-weight:600;">${esc(a)}</span>`).join("")}
+            </div>`
+          : "";
+
         return `
-          <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
+          <div class="re-card-item" style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;">
             <div style="min-width:0;text-align:left;flex:1 1 auto;cursor:${occupied && u.tenancy_id ? 'pointer' : 'default'};" ${occupied && u.tenancy_id ? `data-unit-view-tenancy="${u.tenancy_id}"` : ""}>
               <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(u.name)} ${badge}</div>
               <div style="font-size:0.8rem;color:var(--color-blue);font-weight:700;">${fmt(u.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(u.charge_type)}</span></div>
               ${tenantInfo}
+              ${utilsHtml}
+              ${amensHtml}
             </div>
             <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">
               ${assignBtn}
@@ -10549,6 +10564,51 @@ const setupRealEstatePage = () => {
   const unitFormPropertyName = document.querySelector("[data-unit-form-property-name]");
   const unitFormError = document.querySelector("[data-unit-form-error]");
   const unitFormSubmit = document.querySelector("[data-unit-form-submit]");
+  const unitUtilitiesList = document.querySelector("[data-unit-utilities-list]");
+  const unitAddUtilityBtn = document.querySelector("[data-unit-add-utility]");
+  const unitAmenitiesQuick = document.querySelector("[data-unit-amenities-quick]");
+  const unitAmenitiesCustom = document.querySelector("[data-unit-amenities-custom]");
+
+  const renderUtilityRow = (name = "", val = "") => {
+    const row = document.createElement("div");
+    row.dataset.utilityRow = "";
+    row.style.cssText = "display:grid;grid-template-columns:1fr 1fr 34px;gap:8px;align-items:center;";
+    row.innerHTML = `
+      <input type="text" data-utility-name placeholder="Field (e.g. LUKU)" value="${esc(name)}" style="font-size:0.85rem;padding:7px 10px;">
+      <input type="text" data-utility-value placeholder="Number / Account" value="${esc(val)}" style="font-size:0.85rem;padding:7px 10px;">
+      <button type="button" class="icon-button" data-utility-remove aria-label="Remove field" style="width:34px;height:34px;border:1px solid #fecaca;background:#fef2f2;border-radius:8px;">
+        <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-danger,#ef4444);"><path d="M112 112l288 288M400 112L112 400"/></svg>
+      </button>`;
+    row.querySelector("[data-utility-remove]")?.addEventListener("click", () => row.remove());
+    return row;
+  };
+
+  unitAddUtilityBtn?.addEventListener("click", () => {
+    if (unitUtilitiesList) {
+      const row = renderUtilityRow("", "");
+      unitUtilitiesList.appendChild(row);
+      row.querySelector("[data-utility-name]")?.focus();
+    }
+  });
+
+  unitAmenitiesQuick?.addEventListener("click", (e) => {
+    const chip = e.target.closest("[data-amenity-chip]");
+    if (chip) chip.classList.toggle("active");
+  });
+
+  const getSelectedAmenities = () => {
+    const selected = [];
+    unitAmenitiesQuick?.querySelectorAll("[data-amenity-chip].active").forEach((b) => {
+      const val = b.dataset.amenityChip?.trim();
+      if (val && !selected.includes(val)) selected.push(val);
+    });
+    if (unitAmenitiesCustom && unitAmenitiesCustom.value.trim()) {
+      unitAmenitiesCustom.value.split(",").map((s) => s.trim()).filter(Boolean).forEach((s) => {
+        if (!selected.includes(s)) selected.push(s);
+      });
+    }
+    return selected;
+  };
 
   const openUnitForm = (u = null) => {
     unitForm?.reset();
@@ -10560,6 +10620,37 @@ const setupRealEstatePage = () => {
       unitFormPropertyName.textContent = currentProperty ? `${currentProperty.name}${currentProperty.location ? ` (${currentProperty.location})` : ""}` : "-";
     }
     if (unitFormTitle) unitFormTitle.textContent = u ? `Edit Unit — ${propTitle}` : `Add Unit to ${propTitle}`;
+
+    // Reset / populate utilities list
+    if (unitUtilitiesList) {
+      unitUtilitiesList.replaceChildren();
+      const existingUtils = (u && Array.isArray(u.utilities) && u.utilities.length)
+        ? u.utilities
+        : [
+            { name: "LUKU", value: "" },
+            { name: "Water Account", value: "" },
+            { name: "Property No.", value: "" },
+            { name: "Internet", value: "" },
+          ];
+      existingUtils.forEach((item) => {
+        if (item) unitUtilitiesList.appendChild(renderUtilityRow(item.name || "", item.value || ""));
+      });
+    }
+
+    // Reset / populate amenities
+    const activeAmens = (u && Array.isArray(u.amenities)) ? u.amenities : [];
+    const customAmens = [];
+    unitAmenitiesQuick?.querySelectorAll("[data-amenity-chip]").forEach((b) => {
+      const val = b.dataset.amenityChip;
+      const isActive = activeAmens.includes(val);
+      b.classList.toggle("active", isActive);
+    });
+    activeAmens.forEach((a) => {
+      const isQuick = unitAmenitiesQuick?.querySelector(`[data-amenity-chip="${CSS.escape(a)}"]`);
+      if (!isQuick && !customAmens.includes(a)) customAmens.push(a);
+    });
+    if (unitAmenitiesCustom) unitAmenitiesCustom.value = customAmens.join(", ");
+
     if (u && unitForm) {
       unitForm.elements.name.value = u.name || "";
       unitForm.elements.charge_type.value = u.charge_type || "monthly";
@@ -10589,6 +10680,19 @@ const setupRealEstatePage = () => {
       b.set("charge_type", unitForm.elements.charge_type.value);
       b.set("rate", String(num(unitForm.elements.rate.value)));
       b.set("notes", unitForm.elements.notes.value.trim());
+
+      // Collect utilities list
+      const utilsData = [];
+      unitUtilitiesList?.querySelectorAll("[data-utility-row]").forEach((row) => {
+        const uName = row.querySelector("[data-utility-name]")?.value.trim();
+        const uVal = row.querySelector("[data-utility-value]")?.value.trim();
+        if (uName) utilsData.push({ name: uName, value: uVal || "" });
+      });
+      b.set("utilities", JSON.stringify(utilsData));
+
+      // Collect amenities
+      b.set("amenities", JSON.stringify(getSelectedAmenities()));
+
       const d = await api({ body: b });
       renderUnits(d.units || unitCache);
       if (unitFormModal) unitFormModal.hidden = true;
@@ -10974,6 +11078,34 @@ const setupRealEstatePage = () => {
     }
     if (tdRecordBtn) tdRecordBtn.hidden = !active;
     if (tdEndBtn) tdEndBtn.hidden = !active;
+
+    // Unit Utilities & Amenities in Tenancy Detail
+    const tdUnitDetails = document.querySelector("[data-td-unit-details]");
+    const tdUtilsWrap = document.querySelector("[data-td-utilities-wrap]");
+    const tdUtilsList = document.querySelector("[data-td-utilities-list]");
+    const tdAmensWrap = document.querySelector("[data-td-amenities-wrap]");
+    const tdAmensList = document.querySelector("[data-td-amenities-list]");
+    const utils = Array.isArray(t.unit_utilities) ? t.unit_utilities.filter((x) => x && x.name && x.value) : [];
+    const amens = Array.isArray(t.unit_amenities) ? t.unit_amenities.filter(Boolean) : [];
+    if (tdUnitDetails) {
+      if (utils.length || amens.length) {
+        tdUnitDetails.hidden = false;
+        if (tdUtilsWrap && tdUtilsList) {
+          tdUtilsWrap.hidden = !utils.length;
+          tdUtilsList.innerHTML = utils.map((x) => `
+            <div style="background:#fff;border:1px solid var(--color-line);border-radius:8px;padding:6px 10px;">
+              <div style="font-size:0.7rem;color:var(--color-muted);font-weight:700;text-transform:uppercase;">${esc(x.name)}</div>
+              <div style="font-size:0.85rem;font-weight:700;color:var(--color-navy);word-break:break-all;">${esc(x.value)}</div>
+            </div>`).join("");
+        }
+        if (tdAmensWrap && tdAmensList) {
+          tdAmensWrap.hidden = !amens.length;
+          tdAmensList.innerHTML = amens.map((a) => `<span style="padding:2px 8px;background:#e0f2fe;color:#0369a1;border-radius:6px;font-size:0.75rem;font-weight:600;">${esc(a)}</span>`).join("");
+        }
+      } else {
+        tdUnitDetails.hidden = true;
+      }
+    }
 
     const list = t.payments || [];
     if (!list.length) { if (tdPayments) tdPayments.replaceChildren(); if (tdPaymentsEmpty) tdPaymentsEmpty.hidden = false; return; }

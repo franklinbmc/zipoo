@@ -5399,6 +5399,16 @@ button.settings-list-row:focus-visible {
   z-index: 80 !important;
 }
 
+[data-amenity-chip] {
+  transition: all 0.15s ease;
+}
+
+[data-amenity-chip].active {
+  background: var(--color-blue, #1d4ed8) !important;
+  color: #ffffff !important;
+  border-color: var(--color-blue, #1d4ed8) !important;
+}
+
 .report-controls {
   position: sticky;
   top: 0;
