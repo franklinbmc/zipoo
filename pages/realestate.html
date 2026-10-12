@@ -125,10 +125,16 @@
       </header>
       <div class="fullscreen-body" style="padding:16px;">
         <div style="background:#fff;border:1px solid var(--color-line);border-radius:12px;padding:14px;margin-bottom:14px;">
-          <div style="font-size:0.82rem;color:var(--color-muted);" data-property-detail-meta>-</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
-            <button class="btn btn-outline btn-sm" type="button" data-prop-edit>Edit Property</button>
-            <button class="btn btn-danger-outline btn-sm" type="button" data-prop-delete>Delete Property</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <div style="font-size:0.84rem;color:var(--color-muted);" data-property-detail-meta>-</div>
+            <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">
+              <button class="icon-button" type="button" data-prop-edit aria-label="Edit Property" title="Edit Property" style="width:36px;height:36px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;">
+                <svg viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;color:var(--color-navy);"><path d="M384 224L128 480H32v-96l256-256 96 96zM320 160l64-64 96 96-64 64-96-96z"/></svg>
+              </button>
+              <button class="icon-button" type="button" data-prop-delete aria-label="Delete Property" title="Delete Property" style="width:36px;height:36px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;">
+                <svg viewBox="0 0 512 512" aria-hidden="true" style="width:16px;height:16px;color:var(--color-danger,#ef4444);"><path d="M112 112l288 288M400 112L112 400"/></svg>
+              </button>
+            </div>
           </div>
         </div>
         <div style="font-size:0.78rem;text-transform:uppercase;color:var(--color-muted);font-weight:800;margin-bottom:8px;">Units</div>
@@ -491,6 +497,6 @@
     </section>
   </div>
 
-  <script src="/assets/js/app.js?v=162" defer></script>
+  <script src="/assets/js/app.js?v=163" defer></script>
 </body>
 </html>

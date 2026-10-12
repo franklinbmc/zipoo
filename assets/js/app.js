@@ -10339,17 +10339,34 @@ const setupRealEstatePage = () => {
         const badge = occupied
           ? `<span class="badge-stock in-stock">Occupied</span>`
           : `<span class="badge-stock low-stock">Vacant</span>`;
-        const tenant = occupied && u.tenant_name ? `<div style="font-size:0.75rem;color:var(--color-muted);margin-top:2px;">Tenant: <strong>${esc(u.tenant_name)}</strong></div>` : "";
+        const tenantInfo = occupied && u.tenant_name
+          ? `<div style="font-size:0.78rem;color:var(--color-navy);margin-top:3px;">Tenant: <strong>${esc(u.tenant_name)}</strong></div>`
+          : `<div style="font-size:0.75rem;color:var(--color-muted);margin-top:2px;">No tenant assigned</div>`;
+        const endTenancyBtn = occupied && u.tenancy_id
+          ? `<button type="button" class="btn btn-danger-outline btn-sm" data-unit-end-tenancy="${u.tenancy_id}" style="padding:3px 8px;font-size:0.74rem;">End Tenancy</button>`
+          : (occupied ? "" : `<button type="button" class="btn btn-outline btn-sm" data-unit-new-tenancy="${u.id}" style="padding:3px 8px;font-size:0.74rem;">+ Assign</button>`);
+        const chevronBtn = occupied && u.tenancy_id
+          ? `<button type="button" class="icon-button" data-unit-view-tenancy="${u.tenancy_id}" aria-label="View tenancy details" title="View tenancy and payment history" style="width:32px;height:32px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;margin-left:4px;">
+              <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-navy);"><path d="M184 112l144 144-144 144"/></svg>
+            </button>`
+          : "";
+
         return `
           <div class="re-card-item" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;">
-            <div style="min-width:0;text-align:left;">
+            <div style="min-width:0;text-align:left;flex:1 1 auto;cursor:${occupied && u.tenancy_id ? 'pointer' : 'default'};" ${occupied && u.tenancy_id ? `data-unit-view-tenancy="${u.tenancy_id}"` : ""}>
               <div style="font-weight:800;color:var(--color-navy);font-size:0.92rem;">${esc(u.name)} ${badge}</div>
               <div style="font-size:0.8rem;color:var(--color-blue);font-weight:700;">${fmt(u.rate)}<span style="color:var(--color-muted);font-weight:500;">${chargeLabel(u.charge_type)}</span></div>
-              ${tenant}
+              ${tenantInfo}
             </div>
-            <div style="display:flex;gap:6px;flex:0 0 auto;">
-              <button type="button" class="btn btn-outline btn-sm" data-unit-edit="${u.id}">Edit</button>
-              <button type="button" class="btn btn-danger-outline btn-sm" data-unit-delete="${u.id}">Delete</button>
+            <div style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">
+              ${endTenancyBtn}
+              <button type="button" class="icon-button" data-unit-edit="${u.id}" aria-label="Edit unit" title="Edit unit" style="width:32px;height:32px;background:#f8fafc;border:1px solid var(--color-line);border-radius:8px;">
+                <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-navy);"><path d="M384 224L128 480H32v-96l256-256 96 96zM320 160l64-64 96 96-64 64-96-96z"/></svg>
+              </button>
+              <button type="button" class="icon-button" data-unit-delete="${u.id}" aria-label="Delete unit" title="Delete unit" style="width:32px;height:32px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;">
+                <svg viewBox="0 0 512 512" aria-hidden="true" style="width:14px;height:14px;color:var(--color-danger,#ef4444);"><path d="M112 112l288 288M400 112L112 400"/></svg>
+              </button>
+              ${chevronBtn}
             </div>
           </div>`;
       }).join("");
@@ -10595,6 +10612,37 @@ const setupRealEstatePage = () => {
   });
 
   unitsList?.addEventListener("click", async (e) => {
+    const viewTenancyId = e.target.closest("[data-unit-view-tenancy]")?.dataset.unitViewTenancy;
+    if (viewTenancyId) {
+      e.stopPropagation();
+      openTenancyDetail(viewTenancyId);
+      return;
+    }
+    const endTenancyId = e.target.closest("[data-unit-end-tenancy]")?.dataset.unitEndTenancy;
+    if (endTenancyId) {
+      e.stopPropagation();
+      const ok = await showConfirmModal({ title: "End tenancy", message: "End this tenancy? The unit will be marked vacant.", confirmLabel: "End tenancy", danger: true });
+      if (!ok) return;
+      try {
+        const b = new FormData(); b.set("action", "tenancy_end"); b.set("tenancy_id", endTenancyId);
+        await api({ body: b });
+        if (currentProperty) await openPropertyDetail(currentProperty.id);
+        loadAll();
+      } catch (err) { await showAppModal("Real Estate", err.message); }
+      return;
+    }
+    const newTenancyUnitId = e.target.closest("[data-unit-new-tenancy]")?.dataset.unitNewTenancy;
+    if (newTenancyUnitId) {
+      e.stopPropagation();
+      openTenancyForm();
+      setTimeout(() => {
+        if (tenancyUnitSel) {
+          tenancyUnitSel.value = String(newTenancyUnitId);
+          tenancyUnitSel.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }, 100);
+      return;
+    }
     const editId = e.target.closest("[data-unit-edit]")?.dataset.unitEdit;
     const delId = e.target.closest("[data-unit-delete]")?.dataset.unitDelete;
     if (editId) { const u = unitCache.find((x) => String(x.id) === String(editId)); if (u) openUnitForm(u); return; }
