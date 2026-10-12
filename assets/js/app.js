@@ -10634,13 +10634,7 @@ const setupRealEstatePage = () => {
     const newTenancyUnitId = e.target.closest("[data-unit-new-tenancy]")?.dataset.unitNewTenancy;
     if (newTenancyUnitId) {
       e.stopPropagation();
-      openTenancyForm();
-      setTimeout(() => {
-        if (tenancyUnitSel) {
-          tenancyUnitSel.value = String(newTenancyUnitId);
-          tenancyUnitSel.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-      }, 100);
+      openTenancyForm(newTenancyUnitId);
       return;
     }
     const editId = e.target.closest("[data-unit-edit]")?.dataset.unitEdit;
@@ -10674,22 +10668,33 @@ const setupRealEstatePage = () => {
   const tenancyFormSubmit = document.querySelector("[data-tenancy-form-submit]");
   let vacantUnitsCache = [];
 
-  const openTenancyForm = async () => {
+  const openTenancyForm = async (preselectedUnitId = "") => {
     tenancyForm?.reset();
     if (tenancyFormError) tenancyFormError.hidden = true;
     if (newTenantFields) newTenantFields.hidden = true;
     if (tenancyForm) tenancyForm.elements.start_date.value = todayStr();
+    if (tenancyFormModal) tenancyFormModal.hidden = false;
     try {
       const [unitsD, custD] = await Promise.all([
         api({ query: "?resource=units" }),
         fetch(`${getBasePath()}api/customers.php`).then((r) => r.json()).catch(() => ({ customers: [] })),
       ]);
       vacantUnitsCache = (unitsD.units || []).filter((u) => u.status === "vacant");
+      if (preselectedUnitId && !vacantUnitsCache.some((u) => String(u.id) === String(preselectedUnitId))) {
+        const fromProp = (currentProperty?.units || unitCache || []).find((u) => String(u.id) === String(preselectedUnitId));
+        if (fromProp) {
+          vacantUnitsCache.unshift({
+            ...fromProp,
+            property_name: fromProp.property_name || currentProperty?.name || "Unit",
+          });
+        }
+      }
       const unitOptions = vacantUnitsCache.map((u) => ({
         value: String(u.id),
         label: `${u.property_name} — ${u.name} (${fmt(u.rate)}${chargeLabel(u.charge_type)})`,
       }));
-      setSearchSelectOptions(tenancyUnitWrap, unitOptions, vacantUnitsCache.length ? "Choose a vacant unit..." : "No vacant units", "");
+      const selectedUnitVal = preselectedUnitId ? String(preselectedUnitId) : "";
+      setSearchSelectOptions(tenancyUnitWrap, unitOptions, vacantUnitsCache.length ? "Choose a vacant unit..." : "No vacant units", selectedUnitVal);
       updateUnitHint();
 
       const customers = custD.customers || [];
@@ -10699,7 +10704,6 @@ const setupRealEstatePage = () => {
       setSearchSelectOptions(tenancyTenantWrap, tenantOptions, "Choose a tenant...", "");
       if (newTenantFields) newTenantFields.hidden = true;
     } catch { /* ignore */ }
-    if (tenancyFormModal) tenancyFormModal.hidden = false;
   };
   const updateUnitHint = () => {
     const u = vacantUnitsCache.find((x) => String(x.id) === String(tenancyUnitSel?.value));
